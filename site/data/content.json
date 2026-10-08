@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "publication_mode": "demo",
+  "generated_at": "2026-10-08T14:29:29+00:00",
+  "articles": [
+    {
+      "id": "demo-fuel-guide",
+      "category": "Combustíveis",
+      "original_lang": "pt",
+      "status": "approved",
+      "demo": true,
+      "published_at": null,
+      "source": "DrivMatch News — demonstração",
+      "source_url": null,
+      "image": "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=900&q=80",
+      "locales": {
+        "pt": {
+          "title": "Como interpretar o preço do diesel por região nos Estados Unidos",
+          "summary": "A média nacional não representa necessariamente o preço pago em cada truck stop.",
+          "body": "O preço do diesel pode variar entre estados e regiões. Ao analisar uma cotação, confira a unidade em dólares por galão, a data do levantamento e a metodologia da fonte.\n\nPara planejar o custo de uma viagem, compare o indicador nacional com os preços efetivamente disponíveis no corredor onde o motorista irá abastecer. Este texto é apenas um exemplo editorial, não uma notícia atual."
+        },
+        "en": {
+          "title": "How to interpret diesel prices across US regions",
+          "summary": "The national average is not necessarily the price charged at each truck stop.",
+          "body": "Diesel prices can vary across states and regions. When reviewing a quote, check that it is expressed in US dollars per gallon and confirm the survey date and source methodology.\n\nWhen planning trip costs, compare the national benchmark with actual fuel prices on the route where the driver will stop. This is editorial demonstration content, not a current news report."
+        },
+        "es": {
+          "title": "Cómo interpretar los precios del diésel por región en Estados Unidos",
+          "summary": "El promedio nacional no representa necesariamente el precio de cada parada de camiones.",
+          "body": "Los precios del diésel pueden variar entre estados y regiones. Al consultar un precio, verifica que esté expresado en dólares por galón y revisa la fecha y la metodología de la fuente.\n\nPara calcular los costos de un viaje, compara el indicador nacional con los precios reales disponibles en la ruta donde el conductor va a cargar combustible. Este texto es una demostración editorial, no una noticia actual."
+        }
+      }
+    },
+    {
+      "id": "demo-road-guide",
+      "category": "Rodovias",
+      "original_lang": "en",
+      "status": "approved",
+      "demo": true,
+      "published_at": null,
+      "source": "DrivMatch News — demo",
+      "source_url": null,
+      "image": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80",
+      "locales": {
+        "pt": {
+          "title": "O que um aviso de interdição de rodovia deve informar",
+          "summary": "Trecho, sentido, duração e fonte oficial são essenciais para uma decisão segura.",
+          "body": "Um aviso de bloqueio rodoviário precisa identificar a estrada, o trecho afetado, o sentido de circulação e o horário da última confirmação.\n\nAntes de sugerir um desvio para veículos comerciais, é necessário verificar limites de altura, peso, restrições locais e informações oficiais do DOT estadual. Este texto é um exemplo de cobertura responsável."
+        },
+        "en": {
+          "title": "What a highway closure advisory should tell truck drivers",
+          "summary": "Location, direction, duration, and an official source are essential for a safe decision.",
+          "body": "A road closure advisory should identify the highway, the affected segment, the direction of travel, and when the information was last confirmed.\n\nBefore recommending a detour for commercial vehicles, verify height and weight limits, local restrictions, and current instructions from the state DOT. This is a demonstration of responsible reporting."
+        },
+        "es": {
+          "title": "Qué debe informar un aviso de cierre de carretera a los transportistas",
+          "summary": "El tramo, el sentido, la duración y una fuente oficial son fundamentales para decidir con seguridad.",
+          "body": "Un aviso de cierre vial debe identificar la carretera, el tramo afectado, el sentido de circulación y la hora de la última confirmación.\n\nAntes de recomendar un desvío a vehículos comerciales, hay que verificar los límites de altura y peso, las restricciones locales y las indicaciones vigentes del DOT estatal. Este texto es una demostración de cobertura responsable."
+        }
+      }
+    },
+    {
+      "id": "demo-autonomous-guide",
+      "category": "Tecnologia",
+      "original_lang": "es",
+      "status": "approved",
+      "demo": true,
+      "published_at": null,
+      "source": "DrivMatch News — demostración",
+      "source_url": null,
+      "image": "https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=900&q=80",
+      "locales": {
+        "pt": {
+          "title": "O que observar em lançamentos de caminhões autônomos",
+          "summary": "Segurança, limitações operacionais e certificação merecem atenção além do anúncio.",
+          "body": "Um lançamento de tecnologia autônoma merece análise cuidadosa: em quais estradas o sistema pode operar, sob quais condições climáticas e com que supervisão humana?\n\nTambém é importante distinguir testes, operações comerciais e planos futuros. Este texto é demonstrativo e não afirma que houve um lançamento recente."
+        },
+        "en": {
+          "title": "What to watch for in autonomous truck launches",
+          "summary": "Safety, operating limits, and certification matter beyond the announcement.",
+          "body": "An autonomous technology announcement deserves careful analysis: on which roads can the system operate, under what weather conditions, and with what degree of human oversight?\n\nIt is also important to distinguish testing, commercial operations, and future plans. This is demonstration content and does not claim that a recent launch occurred."
+        },
+        "es": {
+          "title": "Qué revisar en el lanzamiento de camiones autónomos",
+          "summary": "La seguridad, los límites operativos y las certificaciones importan más allá del anuncio.",
+          "body": "Un anuncio de tecnología autónoma merece un análisis cuidadoso: ¿en qué carreteras puede operar el sistema, bajo qué condiciones climáticas y con qué supervisión humana?\n\nTambién es importante distinguir entre pruebas, operaciones comerciales y planes futuros. Este texto es demostrativo y no afirma que haya ocurrido un lanzamiento reciente."
+        }
+      }
+    },
+    {
+      "id": "demo-freight-opportunity",
+      "category": "Fretes",
+      "original_lang": "pt",
+      "status": "approved",
+      "demo": true,
+      "kind": "opportunity",
+      "commercial_relationship": "DrivMatch platform listing — demonstration",
+      "consent_publication": true,
+      "published_at": null,
+      "source": "DrivMatch — exemplo editorial",
+      "source_url": null,
+      "image": "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=900&q=80",
+      "locales": {
+        "pt": {
+          "title": "Como uma nova oportunidade de frete aparecerá no DrivMatch News",
+          "summary": "Uma carga pública e validada pode aparecer entre as primeiras notícias, com origem identificada.",
+          "body": "Quando uma oportunidade real de frete for publicada na DrivMatch com autorização e dados suficientes, ela poderá ser destacada no jornal conforme sua relevância e prazo de validade.\n\nA matéria deve informar equipamento, origem, destino, requisitos e um link para consultar a oferta original. Esta publicação é somente um exemplo: não existe uma carga disponível associada a este card."
+        },
+        "en": {
+          "title": "How a new freight opportunity will appear on DrivMatch News",
+          "summary": "A public, verified load can appear near the top of the feed with clear attribution.",
+          "body": "When a real freight opportunity is published on DrivMatch with authorization and sufficient information, it may receive timely editorial placement based on relevance and expiration.\n\nThe item should identify equipment, origin, destination, requirements, and a link to the original offer. This is an example only: there is no available load associated with this card."
+        },
+        "es": {
+          "title": "Cómo aparecerá una nueva oportunidad de carga en DrivMatch News",
+          "summary": "Una carga pública y verificada puede aparecer entre las primeras noticias con su origen identificado.",
+          "body": "Cuando se publique una oportunidad real de carga en DrivMatch con autorización y datos suficientes, podrá destacarse en el periódico según su relevancia y fecha de vencimiento.\n\nLa publicación debe indicar el equipo requerido, origen, destino, condiciones y un enlace a la oferta original. Este es solo un ejemplo: no hay una carga disponible vinculada con esta tarjeta."
+        }
+      }
+    },
+    {
+      "id": "demo-compliance-guide",
+      "category": "Fiscalização",
+      "original_lang": "en",
+      "status": "approved",
+      "demo": true,
+      "published_at": null,
+      "source": "DrivMatch News — demo",
+      "source_url": null,
+      "image": "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=900&q=80",
+      "locales": {
+        "pt": {
+          "title": "Como conferir uma atualização de fiscalização do DOT",
+          "summary": "A autoridade, a regra e a data de vigência precisam estar documentadas.",
+          "body": "Antes de divulgar uma mudança de fiscalização, consulte o documento original da autoridade competente e confirme os veículos e motoristas abrangidos.\n\nUma proposta de regra não tem automaticamente os mesmos efeitos de uma norma já vigente. Este texto é um exemplo de metodologia jornalística."
+        },
+        "en": {
+          "title": "How to verify a DOT enforcement update",
+          "summary": "The authority, rule, and effective date must be documented.",
+          "body": "Before reporting a change in enforcement, consult the original document from the responsible authority and confirm which vehicles and drivers are covered.\n\nA proposed rule does not automatically have the same effect as a rule already in force. This is an example of reporting methodology."
+        },
+        "es": {
+          "title": "Cómo verificar una actualización de fiscalización del DOT",
+          "summary": "La autoridad, la norma y su fecha de entrada en vigor deben estar documentadas.",
+          "body": "Antes de divulgar un cambio en la fiscalización, consulta el documento original de la autoridad competente y confirma qué vehículos y conductores están incluidos.\n\nUna propuesta de norma no tiene automáticamente los mismos efectos que una regla que ya está vigente. Este texto es un ejemplo de metodología periodística."
+        }
+      }
+    }
+  ],
+  "market": {
+    "generated_at": "2026-10-08T14:29:29+00:00",
+    "mode": "offline-test",
+    "indicators": {},
+    "stocks": {},
+    "errors": []
+  },
+  "ads": {
+    "enabled": false,
+    "placements": [
+      {
+        "slot": "below_panorama",
+        "label": "Publicidade",
+        "title": "Anuncie no DrivMatch News",
+        "text": "Espaço disponível para parceiros do setor de transporte.",
+        "url": "https://drivmatch.com/",
+        "enabled": false,
+        "relationship": "house"
+      }
+    ]
+  }
+}

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DrivMatch News — Transporte e logística nos EUA</title>
+<style>
+:root{--navy:#091a2b;--navy2:#0f2235;--navy3:#132c44;--blue:#138ef0;--line:#dde5ec;--paper:#f6f8fa;--ink:#112438;--muted:#607283;--gold:#d7a85d;--soft:#eef5fb;--danger:#c53a3a;--green:#2f8a57}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.55 Arial,Helvetica,sans-serif}
+a{color:inherit} button,input,select{font:inherit} button{cursor:pointer}
+.demo{background:#e8f5ff;border-bottom:1px solid #c2e5fc;color:#185781;text-align:center;padding:8px 14px;font-size:12px}
+.header{background:#070c12;color:#fff} .header-inner{max-width:1390px;margin:auto;padding:14px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:2px} .brand img{width:375px;max-width:100%;height:auto;object-fit:contain;display:block} .brand .news{font-family:Arial,Helvetica,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.4px;color:#168ff0;line-height:1} 
+.edition{font-size:10px;letter-spacing:1.1px;color:#b5c1ce;text-align:right}.edition select{background:#0b1826;color:#ecf6ff;border:1px solid #314b63;border-radius:5px;padding:8px 10px;font-size:12px;letter-spacing:0;max-width:190px}
+.navbar{background:#0d1f31;color:#cbd5e1;border-top:1px solid #1a3046} .nav-inner{max-width:1390px;margin:auto;padding:10px 30px;display:flex;gap:24px;font-size:12px;flex-wrap:wrap} .nav-inner a{text-decoration:none} .nav-inner a:hover{color:#73c4ff}
+.main{max-width:1390px;margin:24px auto;padding:0 26px;display:grid;grid-template-columns:minmax(0,1fr) 286px;gap:20px;align-items:start}
+.lead,.panel,.opportunity-bar,.item,.story{background:#fff;border:1px solid var(--line);box-shadow:0 2px 12px #0e2a4010}
+.lead{padding:18px;margin-bottom:18px} .form{display:grid;grid-template-columns:1fr 210px 150px;gap:9px} .form input,.form select{background:#fff;border:1px solid #cedae5;border-radius:3px;padding:12px;color:#24374c;min-width:0}
+.topline{display:flex;justify-content:space-between;align-items:end;gap:12px;border-bottom:2px solid #2692da;padding-bottom:8px;margin-bottom:14px} .heading{margin:0;font:bold 20px Georgia,serif;text-transform:uppercase;letter-spacing:.3px} .sub{color:var(--muted);font-size:12px}
+.btn{background:var(--navy);color:#fff;padding:8px 13px;border:0;border-radius:4px;font-size:12px} .btn.secondary{background:#fff;color:var(--navy);border:1px solid #c7d6e5} .btn:disabled{opacity:.4;cursor:not-allowed}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 22px} .chip{border:1px solid #d1dce5;background:#fff;color:#4e5f71;padding:6px 12px;border-radius:24px;font-size:12px} .chip.active{background:#167ade;color:#fff;border-color:#167ade}
+.notice{margin-bottom:16px;padding:14px 16px;border-left:4px solid var(--gold);background:#fffaf1;color:#4c5a69;font-size:13px}
+.opportunity-bar{padding:16px;margin-bottom:24px;background:linear-gradient(180deg,#fff 0%,#f6fbff 100%)} .opp-head{display:flex;justify-content:space-between;align-items:end;gap:10px;border-bottom:2px solid #1d94e7;padding-bottom:8px;margin-bottom:14px}
+.opp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px} .opp{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;padding:10px;border:1px solid #d7e6f3;background:#fff} .opp img{width:120px;height:90px;object-fit:cover;border-radius:2px} .opp .kind{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#0076c3} .priority{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.3px;margin-left:6px} .priority.high{background:#ffebec;color:#9e1f2d} .priority.medium{background:#fff5df;color:#945b00} .opp h3{margin:4px 0 5px;font:18px/1.25 Georgia,serif} .opp p{margin:0 0 8px;color:#546777;font-size:13px} .opp .meta{font-size:11px;color:#788697}
+.carousel-controls{display:flex;gap:8px;align-items:center} .carousel-controls .btn{padding:6px 10px} .carousel-dots{display:flex;justify-content:center;gap:8px;margin:-12px 0 21px} .carousel-dot{width:8px;height:8px;border:0;border-radius:50%;background:#c8d6e4;padding:0} .carousel-dot.active{background:#168ff0}
+.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px} .story{overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,box-shadow .15s} .story:hover{transform:translateY(-2px);box-shadow:0 6px 25px #18375518} .story img{width:100%;height:170px;object-fit:cover;display:block} .story .info{padding:15px;flex:1} .kicker{font-size:10px;color:#0b79bc;text-transform:uppercase;font-weight:700;letter-spacing:1px} .story h3{font:18px/1.25 Georgia,serif;margin:7px 0 10px} .byline{font-size:11px;color:#788596}
+.section{margin-top:18px} .item{display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:18px;padding:19px;margin-bottom:9px;cursor:pointer} .item:hover{background:#fbfdff} .item h3{font:20px/1.25 Georgia,serif;margin:6px 0} .item p{margin:4px 0 12px;color:#526477;font-size:13px} .thumb{position:relative} .thumb img{width:100%;height:118px;object-fit:cover;border-radius:2px;display:block} .thumb .label{position:absolute;left:10px;bottom:10px;background:#08253ccc;color:#fff;padding:5px 8px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:2px} .tag{display:inline-block;background:#eff6fc;color:#126aa7;border-radius:2px;font-size:10px;padding:3px 7px;margin-right:6px;text-transform:uppercase}
+.side{background:var(--navy);color:#fff;padding:16px 15px;align-self:start} .side h2{margin:0 0 5px;color:#fff;font:bold 17px Georgia,serif;text-transform:uppercase;letter-spacing:.7px} .side .tiny{color:#a9bdd0;font-size:10px} .sideitem{padding:13px 0;border-top:1px solid #294054;display:flex;justify-content:space-between;align-items:start;gap:9px} .sideitem strong{font-size:12px;display:block} .sideitem small{font-size:10px;color:#8da9c5} .market-asof{display:block;color:#8da9c5;font-size:9px;white-space:normal;max-width:115px}.value{color:#c9d9e7;font-size:11px;text-align:right;white-space:nowrap} .mark{font-size:9px;color:#b4c5d6;border-radius:3px;background:#263e55;padding:4px 6px;display:inline-block;margin-top:4px} .sidegroup{font-size:10px;letter-spacing:1px;color:#65b9ff;text-transform:uppercase;font-weight:700;margin:19px 0 5px} .micro{font-size:10px;color:#a4bbce;margin:10px 0 0}
+.pagination{display:flex;justify-content:center;align-items:center;gap:12px;padding:15px} .empty{padding:35px;text-align:center;background:#fff;border:1px solid var(--line);color:#63768a}
+.footer{background:#091a2b;color:#b9c9d8;text-align:center;padding:26px;margin-top:40px} .footer strong{color:#fff}
+.modalshade{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:18px;z-index:50} .modalshade.open{display:flex} .modal{max-width:760px;background:#fff;width:100%;max-height:90vh;overflow:auto;border-radius:7px;padding:0 0 27px;box-shadow:0 18px 60px #0004} .modalhead{display:flex;justify-content:space-between;gap:10px;padding:18px 24px 0} .x{font-size:23px;border:0;background:transparent} .modalhero img{width:100%;height:280px;object-fit:cover;display:block} .modalbody{padding:0 24px} .modal h1{font:29px/1.2 Georgia,serif;margin:12px 0} .trans{border-top:1px solid #dce7f0;padding-top:15px;margin-top:19px} .article-language-buttons{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}.trans button{margin-right:0;background:#eaf3fd;border:1px solid #c5def4;border-radius:4px;padding:8px 11px;color:#115587} .disclosure{font-size:12px;color:#697c8c;padding:10px;background:#f1f5f9;border-radius:4px} .smalltext{font-size:12px;color:#718096}
+#noticias{scroll-margin-top:14px}
+@media(max-width:990px){.main{grid-template-columns:minmax(0,1fr)} .form{grid-template-columns:1fr 1fr} .form input{grid-column:1/-1} .opp-grid{grid-template-columns:1fr} }
+@media(max-width:740px){.features{grid-template-columns:1fr} .item{grid-template-columns:1fr} .thumb img{height:180px} .opp{grid-template-columns:1fr} .opp img{width:100%;height:160px} }
+@media(max-width:600px){.main{padding:0 11px;margin:15px auto} .header-inner{padding:11px 14px;flex-wrap:wrap} .brand .news{font-size:19px} .edition{font-size:9px} .form{grid-template-columns:1fr} .nav-inner{padding:10px 14px;gap:12px} .modal{padding-bottom:18px} .modalhero img{height:200px} .modal h1{font-size:24px} }
+@media(max-width:600px){.brand img{width:285px;max-width:100%}}
+.simulation{margin-top:22px;border-top:1px solid #3b576b;padding-top:12px}.simulation-heading{font-size:10px;color:#8bcfff;letter-spacing:.5px;font-weight:700;margin-bottom:9px}.sim-line{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #294054;padding:10px 0;gap:8px}.sim-line strong{display:block;color:white;font-size:12px}.sim-line small{display:block;color:#8da9c5;font-size:10px}.sim-price{text-align:right;color:white;font-size:12px;font-weight:700}.sim-up,.sim-down{display:block;padding:2px 5px;border-radius:3px;font-size:11px;margin-top:4px}.sim-up{background:#11653e;color:#b8fbd4}.sim-down{background:#9d2635;color:#ffe4e7}.sim-caption{font-size:10px;color:#bed0dd;margin-top:9px}
+/* Mercado em Foco: demonstração de cotação com direção */
+.side h2{font-family:Georgia,serif;font-size:18px}
+.value .price{display:block;font-size:14px;font-weight:700;color:#fff;white-space:nowrap}
+.value .change{display:inline-block;margin-top:4px;border-radius:12px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap}
+.change.up{color:#22d981;background:#063e2c}.change.down{color:#ff727a;background:#48222d}.change.flat{color:#c9d9e7;background:#263e55}
+.market-asof{display:block;margin-top:4px;font-size:9px;color:#a4bbce;white-space:normal;max-width:145px}
+.language-picker{display:inline-flex;align-items:center;gap:7px;padding-left:9px;background:#0b1826;border:1px solid #314b63;border-radius:5px}.language-picker img{width:26px;height:18px;object-fit:cover;border-radius:2px;flex-shrink:0}.edition .language-picker select{border:0;padding-left:0;background:transparent}.article-language-buttons img{width:22px;height:15px;vertical-align:-3px;margin-right:6px;border-radius:2px}
+/* Runtime: keep the approved v18 geometry while adding status indicators */
+.market-up{display:block;background:#093e32;color:#1ad87d;border-radius:4px;padding:3px 6px;font-size:10px;margin-top:4px}
+.market-down{display:block;background:#4d1f2b;color:#ff717a;border-radius:4px;padding:3px 6px;font-size:10px;margin-top:4px}
+.market-flat{display:block;color:#b4c6d7;border-radius:4px;font-size:10px;margin-top:4px}
+.market-asof{display:block;font-size:9px;color:#8ca5bc;white-space:normal;max-width:138px}
+.origin-pill{font-size:10px;color:#5d6d7b}
+.demo-ribbon{display:inline-block;font-size:10px;font-weight:bold;color:#854d10;background:#fff1cf;padding:2px 6px;border-radius:2px}
+#ad-slot{background:#fff;border:1px solid var(--line);padding:14px;margin:16px 0;text-align:center}
+#ad-slot .ad-label{display:block;color:#697686;letter-spacing:.9px;font-size:10px;font-weight:bold}
+#ad-slot a{display:inline-block;color:#0773ba;font-weight:bold;margin:5px;text-decoration:underline}
+#article-source a{color:#0879be;text-decoration:underline}
+.modalbody p#modalbodytext{white-space:pre-line;line-height:1.7}
+.article-language-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+article[role=button]{outline-offset:2px}
+.brand img{max-width:min(375px,100%)}
+</style>
+</head>
+<body>
+<div class="demo">DRIVMATCH NEWS • Ambiente de testes — conteúdos demonstrativos identificados</div>
+<header class="header"><div class="header-inner"><div class="brand"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></div><div class="edition">EDIÇÃO DIGITAL · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></span></div></div></header>
+
+<div class="main">
+<main>
+<div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div>
+<section id="panorama">
+  <div class="topline"><h2 class="heading">Panorama do Transporte</h2><div class="carousel-controls"><button class="btn secondary" id="featurePrev">← Anterior</button><span class="sub" id="featureCount"></span><button class="btn" id="featureNext">Próximas →</button></div></div>
+  <div class="features" id="features"></div><div class="carousel-dots" id="featureDots"></div>
+</section>
+<div id="ad-slot" aria-label="Publicidade" hidden></div>
+<section id="noticias" class="section">
+  <div class="topline"><h2 class="heading">Notícias</h2><span class="sub" id="count"></span></div>
+  <div class="chips" id="chips"></div>
+  <div id="list"></div>
+  <div class="pagination"><button class="btn secondary" id="prev">← Anterior</button><span class="sub" id="pagecount"></span><button class="btn" id="next">Próximas →</button></div>
+</section>
+<section id="fontes" class="panel" style="padding:21px;margin-top:22px"><h2 class="heading">Fontes & Transparência</h2><p>O DrivMatch News será alimentado por fontes jornalísticas, órgãos oficiais, publicações setoriais e profissionais do transporte, incluindo conteúdo público do X, sujeito a direitos e permissões de acesso.</p><p>Uma publicação em rede social é uma <strong>fonte potencial</strong>, não comprovação automática. Alertas de acidentes, rodovias fechadas e clima exigirão confirmação oficial recente antes de ser exibidos como ativos.</p><p class="smalltext">Política prevista: priorizar notícias de hoje e ontem, manter arquivo de longo prazo, identificar fonte, horário de publicação, verificação e alterações. Notícias ilustrativas desta prévia não são fatos noticiados.</p></section>
+</main>
+<aside class="side" id="mercados"><h2>Mercado em Foco</h2><div id="market"></div>
+<p class="micro" id="market-note" role="status"></p></aside>
+</div>
+<footer class="footer"><span class="smalltext">DrivMatch News — um produto da Hands On Dispatcher LLC</span><br><span class="smalltext">Cobertura editorial independente • Notícias e indicadores identificados por fonte e data.</span></footer>
+<div class="modalshade" id="shade"><article class="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody"><h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div><p id="modalbodytext"></p><p class="disclosure" id="article-disclosure"></p><p id="article-source"></p><div class="trans">
+<strong id="articleLanguageTitle">Ler esta notícia em outro idioma</strong>
+<div id="articleLanguageButtons" class="article-language-buttons"></div>
+<p id="translation" class="smalltext"></p>
+</div></div></article></div>
+<script src="data/bootstrap.js"></script>
+<script src="assets/app.js" defer></script>
+</body></html>
