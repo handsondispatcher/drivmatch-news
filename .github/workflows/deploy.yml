@@ -1,6 +1,8 @@
 name: Publicar DrivMatch News
 on:
   push:
+    branches: [main, drivmatch-weather-b3-v22]
+  pull_request:
     branches: [main]
   workflow_dispatch:
   schedule:
@@ -20,19 +22,48 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Testes de publicação e interface
+        run: |
+          python -m unittest discover -s tests
+          node tests/test_client.js
       - name: Atualizar conteúdo público e indicadores
         env:
           GOOGLE_TRANSLATE_API_KEY: ${{ secrets.GOOGLE_TRANSLATE_API_KEY }}
+          FINNHUB_REDISTRIBUTION_AUTHORIZED: ${{ vars.FINNHUB_REDISTRIBUTION_AUTHORIZED }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           DRIVMATCH_PUBLIC_OPPORTUNITIES_URL: ${{ vars.DRIVMATCH_PUBLIC_OPPORTUNITIES_URL }}
           DRIVMATCH_PUBLIC_FEED_TOKEN: ${{ secrets.DRIVMATCH_PUBLIC_FEED_TOKEN }}
-          DRIVMATCH_PUBLICATION_MODE: ${{ vars.DRIVMATCH_PUBLICATION_MODE }}
+          DRIVMATCH_PUBLICATION_MODE: production
+          USDBRL_SPOT_URL: ${{ vars.USDBRL_SPOT_URL }}
+          USDBRL_REDISTRIBUTION_AUTHORIZED: ${{ vars.USDBRL_REDISTRIBUTION_AUTHORIZED }}
+          USDBRL_PUBLIC_URL: ${{ vars.USDBRL_PUBLIC_URL }}
+          CLASS8_DATA_URL: ${{ vars.CLASS8_DATA_URL }}
+          CLASS8_REDISTRIBUTION_AUTHORIZED: ${{ vars.CLASS8_REDISTRIBUTION_AUTHORIZED }}
+          USDBRL_SPOT_TOKEN: ${{ secrets.USDBRL_SPOT_TOKEN }}
         run: python scripts/update.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-review
+          path: build/news-candidates.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-screenshots
+          path: test-results/
       - uses: actions/configure-pages@v5
+        if: github.ref == 'refs/heads/main'
       - uses: actions/upload-pages-artifact@v4
+        if: github.ref == 'refs/heads/main'
         with:
           path: site
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

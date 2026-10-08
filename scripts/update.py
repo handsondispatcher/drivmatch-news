@@ -79,7 +79,7 @@ def public_offers(errors, offline):
             if not a.get('id') or not a.get('locales') or not a.get('source_url','').startswith('https://'):continue
             if not a.get('published_at'):continue
             if a.get('expires_at') and datetime.fromisoformat(a['expires_at'].replace('Z','+00:00'))<NOW():continue
-            allowed={'id','category','original_lang','status','demo','kind','published_at','source','source_url','image','locales','consent_publication','expires_at','commercial_relationship','usage_rights'}
+            allowed={'id','category','original_lang','status','demo','kind','published_at','source','source_url','image','locales','consent_publication','expires_at','commercial_relationship','usage_rights','verified_at','verification_note'}
             item={key:value for key,value in a.items() if key in allowed}
             item['kind']='opportunity';item['demo']=False;item['source']=item.get('source') or 'DrivMatch';approved.append(item)
         return approved[:100]
@@ -96,9 +96,36 @@ def dated_quote(value, source, asof, change_pct=None, url=None):
     return obj
 
 
-def frankfurter_usdbrl():
-    d=json.loads(fetch('https://api.frankfurter.dev/v2/rate/usd/brl'))
-    return dated_quote(float(d['rate']),'Frankfurter (referência diária)',d['date'],url='https://frankfurter.dev/')
+def publication_valid(a):
+    try:
+        dt=datetime.fromisoformat(a.get('published_at','').replace('Z','+00:00'))
+        verified=datetime.fromisoformat(a.get('verified_at','').replace('Z','+00:00'))
+        return (not a.get('demo') and a.get('status')=='approved' and
+                a.get('usage_rights') in ('owned','licensed') and
+                a.get('source_url','').startswith('https://') and bool(a.get('source')) and
+                bool(a.get('verification_note')) and dt.tzinfo is not None and
+                verified.tzinfo is not None and dt<=NOW() and verified<=NOW())
+    except (ValueError, TypeError):return False
+
+
+def authorized_spot():
+    # Vendor-specific ingestion belongs in the authenticated backend adapter.
+    url=os.getenv('USDBRL_SPOT_URL','')
+    if not url or os.getenv('USDBRL_REDISTRIBUTION_AUTHORIZED')!='true':
+        raise ValueError('Authorized spot provider not configured')
+    if not url.startswith('https://'):raise ValueError('HTTPS required')
+    token=os.getenv('USDBRL_SPOT_TOKEN','')
+    d=json.loads(fetch(url,headers={'Authorization':'Bearer '+token} if token else {}))
+    if d.get('symbol')!='USD/BRL' or d.get('instrument')!='spot' or d.get('price_type')!='commercial':
+        raise ValueError('Not commercial USD/BRL spot')
+    if not d.get('source') or not d.get('source_url','').startswith('https://'):raise ValueError('Missing attribution')
+    dt=datetime.fromisoformat(d['observed_at'].replace('Z','+00:00'))
+    if dt.tzinfo is None or dt>NOW()+timedelta(seconds=30) or NOW()-dt>timedelta(days=5):
+        raise ValueError('Invalid timestamp')
+    q=dated_quote(d['value'],d['source'],dt.isoformat(),d.get('change_pct'),d['source_url'])
+    q['quote_status']='delayed' if NOW()-dt>timedelta(seconds=60) else 'snapshot'
+    q['instrument']='spot';q['price_type']='commercial'
+    return q
 
 
 def fred_latest(series, source):
@@ -109,7 +136,7 @@ def fred_latest(series, source):
     observations=[]
     for row in rows:
         try:
-            val=float(row[series]);dt=row['DATE']
+            val=float(row[series]);dt=row.get('DATE') or row['observation_date']
             if val>0:observations.append((dt,val))
         except (ValueError,KeyError,TypeError):continue
     if not observations:raise ValueError(f'No valid observations for {series}')
@@ -120,7 +147,7 @@ def fred_latest(series, source):
 
 def finnhub_quotes(errors):
     key=os.getenv('FINNHUB_API_KEY','')
-    if not key:return {}
+    if not key or os.getenv('FINNHUB_REDISTRIBUTION_AUTHORIZED')!='true':return {}
     results={}
     for sym in STOCKS:
         try:
@@ -137,37 +164,64 @@ def finnhub_quotes(errors):
     return results
 
 
+def class8_quotes(errors):
+    url=os.getenv('CLASS8_DATA_URL','')
+    if not url or os.getenv('CLASS8_REDISTRIBUTION_AUTHORIZED')!='true':return {}
+    try:
+        if not url.startswith('https://'):raise ValueError('HTTPS required')
+        d=json.loads(fetch(url))
+        result={}
+        for key in ('class8_orders','class8_sales'):
+            q=d.get(key,{})
+            dt=datetime.fromisoformat(q.get('observed_at','').replace('Z','+00:00'))
+            if q.get('unit')!='vehicles' or not q.get('source') or not q.get('source_url','').startswith('https://') or dt.tzinfo is None or dt>NOW():raise ValueError('Invalid Class 8 contract')
+            result[key]=dated_quote(q['value'],q['source'],dt.isoformat(),q.get('change_pct'),q['source_url'])
+        return result
+    except Exception as exc:errors.append('class8:'+type(exc).__name__);return {}
+
+
 def make_market(offline=False):
     market={'generated_at':NOW().isoformat(timespec='seconds'),'mode':'verified-or-unavailable','indicators':{},'stocks':{},'errors':[]}
     if offline:
         market['mode']='offline-test';return market
-    for key,fn in [('usdbrl',frankfurter_usdbrl),('diesel',lambda:fred_latest('GASDESW','EIA / FRED (semanal)')),
+    for key,fn in [('usdbrl',authorized_spot),('diesel',lambda:fred_latest('GASDESW','EIA / FRED (semanal)')),
                    ('brent',lambda:fred_latest('DCOILBRENTEU','EIA / FRED (diário)'))]:
         try:market['indicators'][key]=fn()
         except Exception as exc:market['errors'].append(f'{key}:{type(exc).__name__}')
     market['stocks']=finnhub_quotes(market['errors'])
+    market['indicators'].update(class8_quotes(market['errors']))
     return market
 
 
 def build(offline=False):
     errors=[]
     articles=read_json(ROOT/'content/editorial.json')
-    mode=os.getenv('DRIVMATCH_PUBLICATION_MODE','demo').strip().lower()
+    mode='production'
     if mode=='production':articles=[a for a in articles if not a.get('demo')]
     for article in articles:
         if article.get('status')!='approved':raise ValueError('Unapproved editorial article in publication file')
         if article.get('demo') is not True and article.get('usage_rights') not in ('owned','licensed'):
             raise ValueError('Production article lacks owned/licensed content rights')
     articles += public_offers(errors,offline)
+    articles = [a for a in articles if publication_valid(a)]
+    if not offline:
+        from collect_sources import collect
+        collect()
     unique={}
     for a in articles:
         if a['id'] in unique:continue
-        unique[a['id']]=translate_missing(a,errors,offline)
+        translated=translate_missing(a,errors,offline)
+        if all(translated.get('locales',{}).get(l,{}).get('title') and translated['locales'][l].get('body') for l in ('pt','en','es')):
+            unique[a['id']]=translated
+        else: errors.append(f'translation_incomplete:{a["id"]}')
     market=make_market(offline)
     ads=read_json(ROOT/'content/ads.json')
     data={'schema_version':1,'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
+    public_spot=os.getenv('USDBRL_PUBLIC_URL','')
+    runtime={'spot_url':public_spot if public_spot.startswith('https://') else ''}
+    (path/'runtime.json').write_text(json.dumps(runtime)+'\n',encoding='utf-8')
     (path/'content.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'market.json').write_text(json.dumps(market,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')

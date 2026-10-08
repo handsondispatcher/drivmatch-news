@@ -1,0 +1,287 @@
+{
+  "checked_at": "2026-10-08T23:28:05.089427+00:00",
+  "sources": [
+    {
+      "id": "freightwaves",
+      "status": "ok",
+      "candidates": 30,
+      "url": "https://www.freightwaves.com/feed"
+    },
+    {
+      "id": "transport-topics",
+      "status": "ok",
+      "candidates": 20,
+      "url": "https://www.ttnews.com/rss.xml"
+    },
+    {
+      "id": "land-line---ooida",
+      "status": "ok",
+      "candidates": 8,
+      "url": "https://landline.media/feed/"
+    },
+    {
+      "id": "the-trucker",
+      "status": "failed",
+      "error": "HTTPError",
+      "url": "https://www.thetrucker.com/feed"
+    },
+    {
+      "id": "overdrive",
+      "status": "manual-review",
+      "url": "https://www.overdriveonline.com"
+    },
+    {
+      "id": "ccj",
+      "status": "manual-review",
+      "url": "https://www.ccjdigital.com"
+    },
+    {
+      "id": "fleetowner",
+      "status": "manual-review",
+      "url": "https://www.fleetowner.com"
+    },
+    {
+      "id": "truck-news-canada",
+      "status": "ok",
+      "candidates": 15,
+      "url": "https://www.trucknews.com/feed/"
+    },
+    {
+      "id": "mexico-business-news",
+      "status": "manual-review",
+      "url": "https://mexicobusiness.news"
+    },
+    {
+      "id": "fmcsa",
+      "status": "manual-review",
+      "url": "https://www.fmcsa.dot.gov/newsroom"
+    },
+    {
+      "id": "cvsa",
+      "status": "manual-review",
+      "url": "https://www.cvsa.org/news/"
+    },
+    {
+      "id": "nws",
+      "status": "manual-review",
+      "url": "https://www.weather.gov/alerts"
+    },
+    {
+      "id": "nhc",
+      "status": "ok",
+      "candidates": 9,
+      "url": "https://www.nhc.noaa.gov/index-at.xml"
+    },
+    {
+      "id": "noaa",
+      "status": "manual-review",
+      "url": "https://www.noaa.gov"
+    },
+    {
+      "id": "fhwa---state-dot-511-directory",
+      "status": "manual-review",
+      "url": "https://www.fhwa.dot.gov/trafficinfo/"
+    },
+    {
+      "id": "eia",
+      "status": "manual-review",
+      "url": "https://www.eia.gov/petroleum/gasdiesel/"
+    },
+    {
+      "id": "usda-ams-trucking",
+      "status": "manual-review",
+      "url": "https://www.ams.usda.gov/services/transportation-analysis"
+    },
+    {
+      "id": "bts-transborder",
+      "status": "manual-review",
+      "url": "https://www.bts.gov/transborder"
+    },
+    {
+      "id": "cbp",
+      "status": "manual-review",
+      "url": "https://www.cbp.gov/newsroom"
+    },
+    {
+      "id": "cbsa",
+      "status": "manual-review",
+      "url": "https://www.cbsa-asfc.gc.ca"
+    },
+    {
+      "id": "sict-mexico",
+      "status": "manual-review",
+      "url": "https://www.gob.mx/sict"
+    },
+    {
+      "id": "anam-mexico",
+      "status": "manual-review",
+      "url": "https://anam.gob.mx"
+    },
+    {
+      "id": "dat",
+      "status": "manual-review",
+      "url": "https://www.dat.com/trendlines"
+    },
+    {
+      "id": "truckstop",
+      "status": "manual-review",
+      "url": "https://truckstop.com"
+    },
+    {
+      "id": "cass",
+      "status": "manual-review",
+      "url": "https://www.cassinfo.com/freight-audit-payment/cass-transportation-indexes"
+    },
+    {
+      "id": "atri",
+      "status": "manual-review",
+      "url": "https://truckingresearch.org"
+    },
+    {
+      "id": "ftr",
+      "status": "manual-review",
+      "url": "https://www.ftrintel.com"
+    },
+    {
+      "id": "act-research",
+      "status": "manual-review",
+      "url": "https://www.actresearch.net"
+    },
+    {
+      "id": "ata",
+      "status": "manual-review",
+      "url": "https://www.trucking.org"
+    },
+    {
+      "id": "tia",
+      "status": "manual-review",
+      "url": "https://www.tianet.org"
+    },
+    {
+      "id": "cargonet",
+      "status": "manual-review",
+      "url": "https://www.cargonet.com"
+    },
+    {
+      "id": "nhtsa",
+      "status": "manual-review",
+      "url": "https://www.nhtsa.gov/recalls"
+    },
+    {
+      "id": "transport-canada",
+      "status": "manual-review",
+      "url": "https://tc.canada.ca"
+    },
+    {
+      "id": "dol",
+      "status": "manual-review",
+      "url": "https://www.dol.gov/newsroom"
+    },
+    {
+      "id": "daimler-truck",
+      "status": "manual-review",
+      "url": "https://www.daimlertruck.com"
+    },
+    {
+      "id": "paccar",
+      "status": "manual-review",
+      "url": "https://www.paccar.com"
+    },
+    {
+      "id": "volvo-trucks",
+      "status": "manual-review",
+      "url": "https://www.volvotrucks.us"
+    },
+    {
+      "id": "love’s",
+      "status": "manual-review",
+      "url": "https://www.loves.com"
+    },
+    {
+      "id": "pilot",
+      "status": "manual-review",
+      "url": "https://pilotflyingj.com"
+    },
+    {
+      "id": "ta",
+      "status": "manual-review",
+      "url": "https://www.ta-petro.com"
+    },
+    {
+      "id": "samsara",
+      "status": "manual-review",
+      "url": "https://www.samsara.com"
+    },
+    {
+      "id": "motive",
+      "status": "manual-review",
+      "url": "https://gomotive.com"
+    },
+    {
+      "id": "geotab",
+      "status": "manual-review",
+      "url": "https://www.geotab.com"
+    },
+    {
+      "id": "tql",
+      "status": "manual-review",
+      "url": "https://www.tql.com"
+    },
+    {
+      "id": "echo",
+      "status": "manual-review",
+      "url": "https://www.echo.com"
+    },
+    {
+      "id": "worldwide-express",
+      "status": "manual-review",
+      "url": "https://wwex.com"
+    },
+    {
+      "id": "j.b.-hunt",
+      "status": "manual-review",
+      "url": "https://investor.jbhunt.com"
+    },
+    {
+      "id": "knight-swift",
+      "status": "manual-review",
+      "url": "https://investor.knight-swift.com"
+    },
+    {
+      "id": "schneider",
+      "status": "manual-review",
+      "url": "https://investors.schneider.com"
+    },
+    {
+      "id": "werner",
+      "status": "manual-review",
+      "url": "https://investor.werner.com"
+    },
+    {
+      "id": "old-dominion",
+      "status": "manual-review",
+      "url": "https://ir.odfl.com"
+    },
+    {
+      "id": "xpo",
+      "status": "manual-review",
+      "url": "https://investors.xpo.com"
+    },
+    {
+      "id": "landstar",
+      "status": "manual-review",
+      "url": "https://investor.landstar.com"
+    },
+    {
+      "id": "c.h.-robinson",
+      "status": "manual-review",
+      "url": "https://investor.chrobinson.com"
+    },
+    {
+      "id": "fedex",
+      "status": "manual-review",
+      "url": "https://investors.fedex.com"
+    }
+  ],
+  "candidate_count": 81
+}

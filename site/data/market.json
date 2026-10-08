@@ -1,7 +1,24 @@
 {
-  "generated_at": "2026-10-08T14:29:29+00:00",
-  "mode": "offline-test",
-  "indicators": {},
+  "generated_at": "2026-10-08T23:28:05+00:00",
+  "mode": "verified-or-unavailable",
+  "indicators": {
+    "diesel": {
+      "value": 6.199,
+      "source": "EIA / FRED (semanal)",
+      "observed_at": "2026-10-05",
+      "change_pct": -2.867,
+      "source_url": "https://fred.stlouisfed.org/series/GASDESW"
+    },
+    "brent": {
+      "value": 125.44,
+      "source": "EIA / FRED (diário)",
+      "observed_at": "2026-10-06",
+      "change_pct": -0.056,
+      "source_url": "https://fred.stlouisfed.org/series/DCOILBRENTEU"
+    }
+  },
   "stocks": {},
-  "errors": []
+  "errors": [
+    "usdbrl:ValueError"
+  ]
 }

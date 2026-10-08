@@ -1,7 +1,7 @@
 /* Runtime smoke test using a tiny DOM stub: no npm installation required. */
 const fs=require('fs'),vm=require('vm'),path=require('path'),assert=require('assert');
 const root=path.resolve(__dirname,'..');
-const data=JSON.parse(fs.readFileSync(path.join(root,'site/data/content.json'),'utf8'));
+const data={publication_mode:'production',market:{indicators:{},stocks:{}},articles:[{id:'test',status:'approved',demo:false,category:'Combustíveis',source:'Unit test fixture',source_url:'https://example.com',original_lang:'pt',published_at:'2026-10-08T10:00:00Z',locales:{pt:{title:'Como interpretar o preço do diesel',summary:'Teste',body:'O preço do diesel — TEST FIXTURE'},en:{title:'Diesel price test',summary:'Test',body:'TEST FIXTURE'},es:{title:'Precio del diésel',summary:'Prueba',body:'Los precios del diésel — TEST FIXTURE'}}}],ads:{enabled:false}};
 const elements={},selectors={};
 class Element {
  constructor(id){this.id=id;this.value='';this.innerHTML='';this.textContent='';this.placeholder='';this.dataset={};this.style={};this.disabled=false;this.hidden=false;this._listeners={};this.options=[];}
@@ -13,7 +13,7 @@ class Element {
 }
 const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','translation','shade','noticias'];
 for(const id of ids)elements[id]=new Element(id);
-for(const id of ['panorama .heading','noticias .heading','mercados h2','.demo'])selectors['#'+id]=new Element(id);
+for(const id of ['panorama .heading','noticias .heading','market-title','.demo'])selectors['#'+id]=new Element(id);
 selectors['.demo']=new Element('demo');
 elements.age.value='all';elements.category.options=[new Element('all')];elements.category.options[0].value='Todas';elements.age.options=['all','2','7','30'].map(v=>({value:v,text:''}));
 const document={documentElement:{lang:''},getElementById:id=>elements[id]||(()=>{throw Error('Missing id: '+id)})(),
@@ -27,6 +27,9 @@ document.ready();
 assert(elements.features.innerHTML.includes('Como interpretar o preço do diesel'));
 assert(elements.list.innerHTML.includes('Como interpretar o preço do diesel'));
 assert(elements.market.innerHTML.includes('Dólar comercial'));
+assert(elements.market.innerHTML.includes('FDX'));
+assert(elements.market.innerHTML.includes('Class 8'));
+assert(!elements.market.innerHTML.includes('SIMULAÇÃO'));
 const sample=0;
 elements.list.dispatch('click',{target:{closest:key=>({dataset:{story:String(sample)}})}});
 assert(elements.modalbodytext.textContent.includes('O preço do diesel'));

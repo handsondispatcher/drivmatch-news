@@ -8,9 +8,12 @@
       const map = card.querySelector('.weather-map');
       const frame = card.querySelector('iframe');
       if (!button || !map || !frame) return;
+      if (card.id === 'clima-desktop' && window.matchMedia('(min-width:991px)').matches) {
+        frame.src = weatherUrl; map.hidden = false; button.setAttribute('aria-expanded','true');
+      }
       button.addEventListener('click', () => {
         const opening = map.hidden;
-        if (opening && !frame.src) frame.src = weatherUrl;
+        if (opening && !frame.getAttribute('src')) frame.src = weatherUrl;
         map.hidden = !opening;
         button.setAttribute('aria-expanded', String(opening));
         button.textContent = opening ? 'Ocultar mapa' : 'Ver mapa animado';
