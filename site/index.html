@@ -70,6 +70,12 @@ article[role=button]{outline-offset:2px}
 .weather-card iframe{width:100%;height:275px;border:0;border-radius:5px;background:#dae6ed}
 .weather-mobile{display:none}
 @media(max-width:990px){.weather-desktop{display:none}.weather-mobile{display:block}.weather-mobile .weather-card{background:#0f2c45;margin:12px 0 14px}.weather-mobile .weather-card iframe{height:56vh;min-height:350px;max-height:560px}}
+
+.weather-card .weather-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.weather-card .weather-open{color:#b8e5ff;font-size:11px;text-decoration:none;font-weight:700;white-space:nowrap}
+.weather-card .weather-open:hover{text-decoration:underline}
+.weather-card iframe{height:315px}
+@media(max-width:990px){.weather-mobile .weather-card iframe{height:56vh;min-height:350px;max-height:540px}}
 </style>
 </head>
 <body>
@@ -79,7 +85,7 @@ article[role=button]{outline-offset:2px}
 <div class="main">
 <main>
 <div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div>
-<div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><button class="weather-load" type="button" aria-expanded="false">Ver mapa animado</button></div><p class="weather-note">Previsão meteorológica para planejamento de rotas. Consulte alertas oficiais antes de viajar.</p><div class="weather-map" hidden><iframe title="Mapa meteorológico Ventusky" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><div class="weather-links"><a href="https://www.weather.gov/alerts" target="_blank" rel="noopener noreferrer">Alertas NWS ↗</a> · <a href="https://www.fhwa.dot.gov/trafficinfo/" target="_blank" rel="noopener noreferrer">DOT / 511 ↗</a> · <a href="https://www.ventusky.com/" target="_blank" rel="noopener noreferrer">Ventusky ↗</a></div></section></div>
+<div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div>
 <section id="panorama">
   <div class="topline"><h2 class="heading">Panorama do Transporte</h2><div class="carousel-controls"><button class="btn secondary" id="featurePrev">← Anterior</button><span class="sub" id="featureCount"></span><button class="btn" id="featureNext">Próximas →</button></div></div>
   <div class="features" id="features"></div><div class="carousel-dots" id="featureDots"></div>
@@ -93,7 +99,7 @@ article[role=button]{outline-offset:2px}
 </section>
 <section id="fontes" class="panel" style="padding:21px;margin-top:22px"><h2 class="heading">Fontes & Transparência</h2><p>Monitoramos imprensa especializada, órgãos oficiais, associações e empresas de transporte nos Estados Unidos, Canadá e México. A coleta não equivale a aprovação editorial: cada publicação exige fonte, data, verificação e texto próprio ou licenciado nos três idiomas.</p><p>Alertas de clima e rodovias devem ser confirmados no NWS e no DOT / 511 antes de viajar.</p><p><a href="data/source-health.json" target="_blank" rel="noopener">Estado da coleta e fontes ↗</a></p></section>
 </main>
-<aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><button class="weather-load" type="button" aria-expanded="false">Ver mapa animado</button></div><p class="weather-note">Previsão meteorológica para planejamento de rotas. Consulte alertas oficiais antes de viajar.</p><div class="weather-map" hidden><iframe title="Mapa meteorológico Ventusky" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><div class="weather-links"><a href="https://www.weather.gov/alerts" target="_blank" rel="noopener noreferrer">Alertas NWS ↗</a> · <a href="https://www.fhwa.dot.gov/trafficinfo/" target="_blank" rel="noopener noreferrer">DOT / 511 ↗</a> · <a href="https://www.ventusky.com/" target="_blank" rel="noopener noreferrer">Ventusky ↗</a></div></section></div><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
+<aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
 <footer class="footer"><span class="smalltext">DrivMatch News — um produto da Hands On Dispatcher LLC</span><br><span class="smalltext">Cobertura editorial independente • Notícias e indicadores identificados por fonte e data.</span></footer>
