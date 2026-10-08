@@ -32,7 +32,7 @@ Sem esses serviços, nenhum preço é inventado. Diesel/Brent não requerem secr
 
 Executar python -m unittest discover -s tests; node tests/test_client.js; python scripts/prepare_site.py; npm ci; npx playwright install --with-deps chromium; npm run test:browser.
 
-8 testes Python e smoke JS passaram localmente. Download Chromium local falhou (arquivo truncado pela rede); validação visual depende do Actions. Teste real preparado em 360/390/768/1440px: overflow, marca, mercado, mapa, nove tickers e tradução de artigo sem alterar idioma global. Screenshots em artifact browser-screenshots.
+Testes Python e smoke JS passaram localmente. GitHub Actions 37859727092 e 37859738040 passaram também em navegador nas quatro larguras. Após o primeiro deploy, a inspeção pública detectou mistura de HTML novo com JS/bootstrap antigos em cache; script de build agora usa hashes de conteúdo em todos os scripts para evitar essa mistura. Teste real preparado em 360/390/768/1440px: overflow, marca, mercado, mapa, nove tickers e tradução de artigo sem alterar idioma global. Screenshots em artifact browser-screenshots.
 
 Push da branch/PR testa sem deploy. Somente main publica após testes; cron minutos 7/37 (~30min, sem SLA). Cliente recarrega JSON a cada minuto e proxy spot a cada 15s se configurado. Conferir CI e screenshots antes do merge; depois conferir deploy e HTML/JSON público. Revert do merge permite rollback.
 

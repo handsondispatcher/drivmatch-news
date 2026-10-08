@@ -5,6 +5,8 @@ publication consent and article rights; other publisher full texts are excluded.
 """
 from __future__ import annotations
 import csv
+import hashlib
+import re
 import html as html_module
 import io
 import json
@@ -225,6 +227,13 @@ def build(offline=False):
     (path/'content.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'market.json').write_text(json.dumps(market,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
+    # Content hashes prevent browsers mixing new HTML with cached runtime/data.
+    page=ROOT/'site/index.html'
+    markup=page.read_text(encoding='utf-8')
+    for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js'):
+        version=hashlib.sha256((ROOT/'site'/asset).read_bytes()).hexdigest()[:16]
+        markup=re.sub(r'(src="'+re.escape(asset)+r')(?:\?[^"]*)?"',lambda m:m.group(1)+'?v='+version+'"',markup)
+    page.write_text(markup,encoding='utf-8')
     print(f'Published {len(unique)} stories (demo={sum(a.get("demo") is True for a in unique.values())}); '
           f'quotes={len(market["indicators"])}; stocks={len(market["stocks"])}; errors={len(errors+market["errors"])}')
     for err in errors+market['errors']:print('nonfatal:',err)

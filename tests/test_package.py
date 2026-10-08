@@ -33,6 +33,12 @@ class PublicationTests(unittest.TestCase):
   feed='<rss><channel><item><title>Transport event</title><link>https://example.com/news/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item><item><title>Bad date</title><link>https://example.com/2</link></item><item><title>Wrong host</title><link>https://evil.example/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item></channel></rss>'
   rows=parse_feed(feed,{'url':'https://example.com','name':'Fixture','category':'Transporte','original_lang':'en'},datetime(2026,10,8,23,tzinfo=timezone.utc))
   self.assertEqual(len(rows),1);self.assertEqual(rows[0]['status'],'pending_review')
+ def test_cache_consistency(self):
+  import hashlib,re
+  page=(BASE/'site/index.html').read_text()
+  for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js'):
+   actual=hashlib.sha256((BASE/'site'/asset).read_bytes()).hexdigest()[:16]
+   self.assertIn(asset+'?v='+actual,page)
  def test_sources_and_tickers(self):
   self.assertGreaterEqual(len(json.loads((BASE/'content/sources.json').read_text())['sources']),50)
   self.assertEqual(up.STOCKS,['JBHT','KNX','SNDR','WERN','ODFL','XPO','LSTR','CHRW','FDX'])

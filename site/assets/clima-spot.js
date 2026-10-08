@@ -9,7 +9,7 @@
       const frame = card.querySelector('iframe');
       if (!button || !map || !frame) return;
       if (card.id === 'clima-desktop' && window.matchMedia('(min-width:991px)').matches) {
-        frame.src = weatherUrl; map.hidden = false; button.setAttribute('aria-expanded','true');
+        frame.src = weatherUrl; map.hidden = false; button.setAttribute('aria-expanded','true'); button.textContent = 'Ocultar mapa';
       }
       button.addEventListener('click', () => {
         const opening = map.hidden;
