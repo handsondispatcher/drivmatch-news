@@ -59,15 +59,27 @@ a{color:inherit} button,input,select{font:inherit} button{cursor:pointer}
 .article-language-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 article[role=button]{outline-offset:2px}
 .brand img{max-width:min(375px,100%)}
+
+.weather-card{border-radius:6px;border:1px solid #3c5872;padding:12px;margin-bottom:18px;background:#10304b;color:white}
+.weather-card .weather-top{display:flex;justify-content:space-between;align-items:center;gap:9px;flex-wrap:wrap}
+.weather-card h2{margin:0;color:inherit;font:bold 17px Georgia,serif;text-transform:uppercase}
+.weather-card .weather-load{border:1px solid #7ebfe9;background:#e8f4ff;color:#103b5e;border-radius:5px;min-height:42px;padding:7px 12px;font-weight:700;font-size:12px}
+.weather-card .weather-note,.weather-card .weather-links{font-size:11px;line-height:1.5;color:#cee0ec}
+.weather-card .weather-links a{color:#a7e2ff;text-underline-offset:2px}
+.weather-card .weather-map[hidden]{display:none}
+.weather-card iframe{width:100%;height:275px;border:0;border-radius:5px;background:#dae6ed}
+.weather-mobile{display:none}
+@media(max-width:990px){.weather-desktop{display:none}.weather-mobile{display:block}.weather-mobile .weather-card{background:#0f2c45;margin:12px 0 14px}.weather-mobile .weather-card iframe{height:56vh;min-height:350px;max-height:560px}}
 </style>
 </head>
 <body>
-<div class="demo">DRIVMATCH NEWS • Ambiente de testes — conteúdos demonstrativos identificados</div>
+<div class="demo">DRIVMATCH NEWS • Notícias verificadas por fonte e data</div>
 <header class="header"><div class="header-inner"><div class="brand"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></div><div class="edition">EDIÇÃO DIGITAL · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></span></div></div></header>
 
 <div class="main">
 <main>
 <div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div>
+<div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><button class="weather-load" type="button" aria-expanded="false">Ver mapa animado</button></div><p class="weather-note">Previsão meteorológica para planejamento de rotas. Consulte alertas oficiais antes de viajar.</p><div class="weather-map" hidden><iframe title="Mapa meteorológico Ventusky" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><div class="weather-links"><a href="https://www.weather.gov/alerts" target="_blank" rel="noopener noreferrer">Alertas NWS ↗</a> · <a href="https://www.fhwa.dot.gov/trafficinfo/" target="_blank" rel="noopener noreferrer">DOT / 511 ↗</a> · <a href="https://www.ventusky.com/" target="_blank" rel="noopener noreferrer">Ventusky ↗</a></div></section></div>
 <section id="panorama">
   <div class="topline"><h2 class="heading">Panorama do Transporte</h2><div class="carousel-controls"><button class="btn secondary" id="featurePrev">← Anterior</button><span class="sub" id="featureCount"></span><button class="btn" id="featureNext">Próximas →</button></div></div>
   <div class="features" id="features"></div><div class="carousel-dots" id="featureDots"></div>
@@ -79,9 +91,9 @@ article[role=button]{outline-offset:2px}
   <div id="list"></div>
   <div class="pagination"><button class="btn secondary" id="prev">← Anterior</button><span class="sub" id="pagecount"></span><button class="btn" id="next">Próximas →</button></div>
 </section>
-<section id="fontes" class="panel" style="padding:21px;margin-top:22px"><h2 class="heading">Fontes & Transparência</h2><p>O DrivMatch News será alimentado por fontes jornalísticas, órgãos oficiais, publicações setoriais e profissionais do transporte, incluindo conteúdo público do X, sujeito a direitos e permissões de acesso.</p><p>Uma publicação em rede social é uma <strong>fonte potencial</strong>, não comprovação automática. Alertas de acidentes, rodovias fechadas e clima exigirão confirmação oficial recente antes de ser exibidos como ativos.</p><p class="smalltext">Política prevista: priorizar notícias de hoje e ontem, manter arquivo de longo prazo, identificar fonte, horário de publicação, verificação e alterações. Notícias ilustrativas desta prévia não são fatos noticiados.</p></section>
+<section id="fontes" class="panel" style="padding:21px;margin-top:22px"><h2 class="heading">Fontes & Transparência</h2><p>Monitoramos imprensa especializada, órgãos oficiais, associações e empresas de transporte nos Estados Unidos, Canadá e México. A coleta não equivale a aprovação editorial: cada publicação exige fonte, data, verificação e texto próprio ou licenciado nos três idiomas.</p><p>Alertas de clima e rodovias devem ser confirmados no NWS e no DOT / 511 antes de viajar.</p><p><a href="data/source-health.json" target="_blank" rel="noopener">Estado da coleta e fontes ↗</a></p></section>
 </main>
-<aside class="side" id="mercados"><h2>Mercado em Foco</h2><div id="market"></div>
+<aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><button class="weather-load" type="button" aria-expanded="false">Ver mapa animado</button></div><p class="weather-note">Previsão meteorológica para planejamento de rotas. Consulte alertas oficiais antes de viajar.</p><div class="weather-map" hidden><iframe title="Mapa meteorológico Ventusky" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><div class="weather-links"><a href="https://www.weather.gov/alerts" target="_blank" rel="noopener noreferrer">Alertas NWS ↗</a> · <a href="https://www.fhwa.dot.gov/trafficinfo/" target="_blank" rel="noopener noreferrer">DOT / 511 ↗</a> · <a href="https://www.ventusky.com/" target="_blank" rel="noopener noreferrer">Ventusky ↗</a></div></section></div><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
 <footer class="footer"><span class="smalltext">DrivMatch News — um produto da Hands On Dispatcher LLC</span><br><span class="smalltext">Cobertura editorial independente • Notícias e indicadores identificados por fonte e data.</span></footer>
@@ -92,4 +104,5 @@ article[role=button]{outline-offset:2px}
 </div></div></article></div>
 <script src="data/bootstrap.js"></script>
 <script src="assets/app.js" defer></script>
+<script src="assets/clima-spot.js" defer></script>
 </body></html>

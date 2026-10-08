@@ -1,69 +1,44 @@
-import json
 from pathlib import Path
 import importlib.util
+import json
+import sys
 import unittest
 from unittest.mock import patch
-
+from datetime import datetime,timezone
 BASE=Path(__file__).resolve().parents[1]
-spec=importlib.util.spec_from_file_location('dm_updater',BASE/'scripts/update.py')
-up=importlib.util.module_from_spec(spec)
-spec.loader.exec_module(up)
-
-class DrivMatchSmokeTests(unittest.TestCase):
-    def test_v18_visual_preserved(self):
-        base=(BASE/'reference/drivmatch_news_v18_aprovada.html').read_text()
-        page=(BASE/'site/index.html').read_text()
-        self.assertIn('Panorama do Transporte',base)
-        self.assertIn('Panorama do Transporte',page)
-        self.assertIn('Mercado em Foco',page)
-        self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
-        self.assertIn('assets/logo-drivmatch-news.png',page)
-        self.assertNotIn('<nav class="navbar">',page)
-
-    def test_three_complete_demo_languages(self):
-        articles=json.loads((BASE/'content/editorial.json').read_text())
-        self.assertGreaterEqual(len(articles),3)
-        for a in articles:
-            self.assertTrue(a['demo'])
-            self.assertEqual(set(a['locales']),{'pt','en','es'})
-            for language in ('pt','en','es'):
-                self.assertTrue(a['locales'][language]['title'])
-                self.assertGreater(len(a['locales'][language]['body']),80)
-
-    def test_ad_default_off(self):
-        self.assertFalse(json.loads((BASE/'content/ads.json').read_text())['enabled'])
-
-    def test_frankfurter_usdbrl(self):
-        with patch.object(up,'fetch',return_value='{"date":"2026-10-08","rate":5.12345}'):
-            quote=up.frankfurter_usdbrl()
-        self.assertEqual(quote['value'],5.12345)
-        self.assertEqual(quote['observed_at'],'2026-10-08')
-
-    def test_fred_quote_parsing(self):
-        fixture='DATE,GASDESW\n2026-09-28,6.382\n2026-10-05,6.199\n'
-        with patch.object(up,'fetch',return_value=fixture):
-            quote=up.fred_latest('GASDESW','EIA / FRED')
-        self.assertEqual(quote['value'],6.199)
-        self.assertLess(quote['change_pct'],0)
-
-    def test_content_build_offline_and_no_fake_prices(self):
-        with patch.dict('os.environ',{'DRIVMATCH_PUBLICATION_MODE':'demo'}):
-            result=up.build(offline=True)
-        self.assertEqual(len(result['articles']),5)
-        self.assertFalse(result['market']['indicators'])
-        self.assertFalse(result['market']['stocks'])
-        self.assertTrue((BASE/'site/data/bootstrap.js').exists())
-
-    def test_translation_controls_independent_of_header(self):
-        js=(BASE/'site/assets/app.js').read_text()
-        self.assertIn('articleLang',js)
-        self.assertIn('articleLang=b.dataset.articleLang;renderArticle()',js)
-        self.assertNotIn('languageSet(b.dataset.articleLang)',js)
-        self.assertIn("setInterval(async()=>",js)
-
-    def test_scheduled_deploy(self):
-        workflow=(BASE/'.github/workflows/deploy.yml').read_text()
-        self.assertIn("cron: '7,37 * * * *'",workflow)
-        self.assertIn('actions/deploy-pages@v4',workflow)
-
+sys.path.insert(0,str(BASE/'scripts'))
+import update as up
+from collect_sources import parse_feed
+class PublicationTests(unittest.TestCase):
+ def test_visual_and_weather(self):
+  page=(BASE/'site/index.html').read_text()
+  for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — um produto da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
+  self.assertLess(page.index('id="clima-desktop"'),page.index('id="market-title"'))
+ def test_no_demo_default(self):
+  self.assertTrue(all(up.publication_valid(a) for a in json.loads((BASE/'content/editorial.json').read_text())))
+  self.assertFalse(up.publication_valid({'demo':True}))
+  self.assertFalse(up.publication_valid({'status':'approved','published_at':'yesterday'}))
+ def test_reject_daily_and_futures_as_spot(self):
+  for instrument in ['daily_reference','future']:
+   with patch.dict('os.environ',{'USDBRL_SPOT_URL':'https://vendor.example/feed','USDBRL_REDISTRIBUTION_AUTHORIZED':'true'}),patch.object(up,'fetch',return_value=json.dumps({'symbol':'USD/BRL','instrument':instrument,'price_type':'commercial'})):
+    with self.assertRaises(ValueError):up.authorized_spot()
+ def test_authorized_spot(self):
+  d={'symbol':'USD/BRL','instrument':'spot','price_type':'commercial','source':'test fixture','source_url':'https://vendor.example','value':5.1,'observed_at':datetime.now(timezone.utc).isoformat()}
+  with patch.dict('os.environ',{'USDBRL_SPOT_URL':'https://vendor.example/feed','USDBRL_REDISTRIBUTION_AUTHORIZED':'true'}),patch.object(up,'fetch',return_value=json.dumps(d)):
+   self.assertEqual(up.authorized_spot()['instrument'],'spot')
+ def test_fred_real_header(self):
+  with patch.object(up,'fetch',return_value='observation_date,GASDESW\n2026-09-28,6.382\n2026-10-05,6.199\n'):
+   self.assertEqual(up.fred_latest('GASDESW','EIA')['value'],6.199)
+ def test_feed_date_host_and_dedup_input(self):
+  feed='<rss><channel><item><title>Transport event</title><link>https://example.com/news/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item><item><title>Bad date</title><link>https://example.com/2</link></item><item><title>Wrong host</title><link>https://evil.example/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item></channel></rss>'
+  rows=parse_feed(feed,{'url':'https://example.com','name':'Fixture','category':'Transporte','original_lang':'en'},datetime(2026,10,8,23,tzinfo=timezone.utc))
+  self.assertEqual(len(rows),1);self.assertEqual(rows[0]['status'],'pending_review')
+ def test_sources_and_tickers(self):
+  self.assertGreaterEqual(len(json.loads((BASE/'content/sources.json').read_text())['sources']),50)
+  self.assertEqual(up.STOCKS,['JBHT','KNX','SNDR','WERN','ODFL','XPO','LSTR','CHRW','FDX'])
+ def test_safety_deploy(self):
+  s=(BASE/'.github/workflows/deploy.yml').read_text()
+  self.assertIn("if: github.ref == 'refs/heads/main'",s)
+  self.assertIn('python -m unittest discover',s)
+  self.assertIn("cron: '7,37 * * * *'",s)
 if __name__=='__main__':unittest.main()

@@ -1,3 +1,7 @@
+## Desenvolvimento real — branch drivmatch-weather-b3-v22
+
+A documentação atual é [docs/OPERATIONS.md](docs/OPERATIONS.md). O pipeline agora usa somente produção verificada, sem demonstrações. Seções anteriores abaixo descrevem a instalação histórica e não substituem a operação atual.
+
 # DrivMatch News — pacote de instalação e homologação
 
 **Referência visual aprovada:** DrivMatch News v18, sem redesenhar a logomarca. Arquivo preservado em `reference/drivmatch_news_v18_aprovada.html`.
