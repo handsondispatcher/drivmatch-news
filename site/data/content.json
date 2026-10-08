@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "publication_mode": "production",
-  "generated_at": "2026-10-08T23:28:17+00:00",
+  "generated_at": "2026-10-08T23:34:33+00:00",
   "articles": [
     {
       "id": "fmcsa-sleeper-study-20261008",
@@ -36,7 +36,7 @@
     }
   ],
   "market": {
-    "generated_at": "2026-10-08T23:28:05+00:00",
+    "generated_at": "2026-10-08T23:34:21+00:00",
     "mode": "verified-or-unavailable",
     "indicators": {
       "diesel": {
