@@ -44,6 +44,35 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('id="story-preview-download"',page)
   self.assertIn("$('story-preview').hidden=false",app)
   self.assertNotIn("a.download='drivmatch-news-story.png'",app)
+ def test_no_duplicate_events_or_publisher_suffix(self):
+  from editorial_text import clean_title, same_event, deduplicate_external
+  title="Motorista 'desatento' bate na traseira de um caminhão no Missouri"
+  self.assertEqual(clean_title(title+" - TheTrucker.com"),title)
+  self.assertTrue(same_event(title,title+" - TheTrucker.com"))
+  a={'title':title,'source':'The Trucker','source_url':'https://www.thetrucker.com/a','titles':{'pt':title}}
+  b={'title':title+' - TheTrucker.com','source':'TheTrucker.com','source_url':'https://www.thetrucker.com/b','titles':{'pt':title+' - TheTrucker.com'}}
+  self.assertEqual(len(deduplicate_external([a,b])),1)
+  self.assertEqual(len(deduplicate_external([a], [{'source_url':'https://another.com','locales':{'pt':{'title':title}}}])),0)
+  self.assertFalse(same_event('Motorista bate em caminhão no Missouri','Motorista bate em caminhão no Texas'))
+ def test_external_share_pages_have_social_photo_metadata(self):
+  import tempfile
+  from unittest.mock import patch
+  from build_share_pages import _write_page
+  with tempfile.TemporaryDirectory() as temp:
+   with patch('build_share_pages.create_card'):
+    self.assertTrue(_write_page(Path(temp),{'category':'Transporte'},'source-0123456789abcdef','Notícia sobre caminhões','Resumo próprio'))
+   html=(Path(temp)/'source-0123456789abcdef'/'index.html').read_text()
+   self.assertIn('property="og:image"',html)
+   self.assertIn('property="og:image:width" content="1200"',html)
+   self.assertIn('handsondispatcher.github.io/drivmatch-news/share/source-',html)
+   self.assertIn('drivmatch.com/news/?story=source-',html)
+   self.assertIn('twitter:card" content="summary_large_image"',html)
+ def test_verified_kodiak_original_summary(self):
+  stories=json.loads((BASE/'content/editorial.json').read_text())
+  kodiak=next(x for x in stories if x['id']=='kodiak-charger-dallas-laredo-20261008')
+  self.assertIn('435 milhas',kodiak['locales']['pt']['body'])
+  self.assertIn('motorista de segurança',kodiak['locales']['pt']['body'])
+  self.assertTrue(kodiak['verification_note'])
  def test_source_headline_translation_and_language_fallback(self):
   fixture={'title':'Snow closes Montana highway','source':'Fixture','source_url':'https://example.com/snow','published_at':'2026-10-09T09:00:00+00:00','category':'Clima','region':'US','origin_type':'rss'}
   def translate(title,source,target):
