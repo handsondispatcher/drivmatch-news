@@ -179,8 +179,10 @@ def build(minimum=0):
           f"assigned {len(assigned)}/{len(stories)} stories; external headlines with photos {with_photo}/{len(headlines)}")
     if len(downloaded) < minimum:
         raise RuntimeError(f"Photo thumbnail gate failed: {len(downloaded)} verified photos; required {minimum}")
+    if minimum and len(headlines) >= 12 and with_photo < 12:
+        raise RuntimeError(f"Photo coverage gate failed: only {with_photo} external headlines have photo thumbnails")
     return manifest
 
 
 if __name__ == "__main__":
-    build(minimum=4 if "--ci" in sys.argv else 0)
+    build(minimum=16 if "--ci" in sys.argv else 0)
