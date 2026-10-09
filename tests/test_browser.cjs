@@ -35,7 +35,7 @@ const {spawn}=require('node:child_process');
    await openEditorial();
    // Reader flows top to bottom; the language selector must not hide in the footer.
    const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','modalbodytext','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
-   assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-original'],`article flow ${JSON.stringify(order)}`);
+   assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-share-footer'] && order['article-share-footer']<order['article-original'],`article flow ${JSON.stringify(order)}`);
    assert.equal(await page.locator('#share-native').count(),1);
    assert.equal(await page.locator('#share-copy').count(),1);
    await page.locator('#share-native').click();
