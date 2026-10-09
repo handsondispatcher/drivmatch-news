@@ -24,8 +24,8 @@ const {spawn}=require('node:child_process');
    // External source cards may fill page one; locate an approved editorial card through pagination.
    const openEditorial=async()=>{
     for(let attempt=0;attempt<25;attempt++){
-     if(await page.locator('#list article[data-story]:not(:has-text("Manchete da fonte"))').count()){
-      await page.locator('#list article[data-story]:not(:has-text("Manchete da fonte"))').first().click();return;
+     if(await page.locator('#list article[data-story][data-external="false"]').count()){
+      await page.locator('#list article[data-story][data-external="false"]').first().click();return;
      }
      if(await page.locator('#next').isDisabled())break;
      await page.locator('#next').click();
@@ -86,12 +86,14 @@ const {spawn}=require('node:child_process');
    const langGrid=await page.locator('.source-translations').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length);
    assert.equal(langGrid,width>650?3:1);
    assert.equal(await page.locator('#article-disclosure').isVisible(),false);
+   const ptTitle=await page.locator('#modaltitle').textContent();
    await page.locator('[data-article-lang="es"]').click();
    assert.equal(await page.locator('#language').inputValue(),'pt');
-   assert.equal(await page.locator('#modaltitle').innerText().then(x=>x.includes('descanso')),true);
+   assert.notEqual(await page.locator('#modaltitle').textContent(),ptTitle);
+   assert.ok((await page.locator('#modalbodytext').textContent()).length>80);
    await page.locator('#article-dialog').evaluate(e=>e.scrollTop=e.scrollHeight);
    await page.keyboard.press('Escape');
-   await page.locator('#list article[data-story]:not(:has-text("Manchete da fonte"))').first().click();
+   await page.locator('#list article[data-story][data-external="false"]').first().click();
    assert.equal(await page.locator('#article-dialog').evaluate(e=>e.scrollTop),0);
    await page.keyboard.press('Escape');
    await page.locator('#language').selectOption('en');
