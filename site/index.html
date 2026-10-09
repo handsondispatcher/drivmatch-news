@@ -39,7 +39,7 @@ a{color:inherit} button,input,select{font:inherit} button{cursor:pointer}
 .article-share-actions button:focus-visible{outline:3px solid #f0bd44;outline-offset:2px}
 #share-feedback{font-size:11px;color:#266b3c}
 @media(max-width:450px){.article-share-actions button{font-size:11px;padding:7px 9px}}
-#noticias{scroll-margin-top:14px}
+.article-share{margin:18px 0;padding:12px;border:1px solid #cbdcec;border-radius:6px;background:#f5faff}.article-share strong{display:block;font-size:12px;color:#1c4b70;margin-bottom:7px}.article-share-actions{display:flex;gap:8px;flex-wrap:wrap}.article-share-actions button{padding:9px 12px;border:1px solid #9dc1de;border-radius:5px;background:#e4f1fc;color:#0a4c80;font-weight:700}.article-share-actions #shareWhatsapp{background:#137749;border-color:#137749;color:white}.article-share #shareFeedback{font-size:12px;color:#27634c}#noticias{scroll-margin-top:14px}
 @media(max-width:990px){.main{grid-template-columns:minmax(0,1fr)} .form{grid-template-columns:1fr 1fr} .form input{grid-column:1/-1} .opp-grid{grid-template-columns:1fr} }
 @media(max-width:740px){.features{grid-template-columns:1fr} .item{grid-template-columns:1fr} .thumb img{height:180px} .opp{grid-template-columns:1fr} .opp img{width:100%;height:160px} }
 @media(max-width:600px){.main{padding:0 11px;margin:15px auto} .header-inner{padding:11px 14px;flex-wrap:wrap} .brand .news{font-size:19px} .edition{font-size:9px} .form{grid-template-columns:1fr} .nav-inner{padding:10px 14px;gap:12px} .modal{padding-bottom:18px} .modalhero img{height:200px} .modal h1{font-size:24px} }
@@ -146,13 +146,13 @@ article[role=button]{outline-offset:2px}
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
 <footer class="footer"><span class="smalltext">DrivMatch News — um produto da Hands On Dispatcher LLC</span><br><span class="smalltext">Cobertura editorial independente • Notícias e indicadores identificados por fonte e data.</span></footer>
-<div class="modalshade" id="shade"><article class="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody"><h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div><div class="article-share-actions" id="article-share-actions"><button id="share-whatsapp" type="button">WhatsApp ↗</button><button id="share-copy" type="button">Copiar link</button><button id="share-native" type="button" hidden>Compartilhar</button><span id="share-feedback" role="status" aria-live="polite"></span></div><p id="modalbodytext"></p><p class="disclosure" id="article-disclosure"></p><p id="article-source"></p><div class="trans">
+<div class="modalshade" id="shade"><article class="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody"><h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div><div class="article-share-actions" id="article-share-actions"><button id="share-whatsapp" type="button">WhatsApp ↗</button><button id="share-copy" type="button">Copiar link</button><button id="share-native" type="button" hidden>Compartilhar</button><span id="share-feedback" role="status" aria-live="polite"></span></div><p id="modalbodytext"></p><p class="disclosure" id="article-disclosure"></p><div class="article-share"><strong>Compartilhe esta notícia</strong><div class="article-share-actions"><button type="button" id="shareWhatsapp">WhatsApp ↗</button><button type="button" id="shareCopy">Copiar link</button><button type="button" id="shareNative" hidden>Compartilhar</button></div><span id="shareFeedback" role="status"></span></div><p id="article-source"></p><div class="trans">
 <strong id="articleLanguageTitle">Ler esta notícia em outro idioma</strong>
 <div id="articleLanguageButtons" class="article-language-buttons"></div>
 <p id="translation" class="smalltext"></p>
 </div></div></article></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=0da9d75da4ad63a6" defer></script>
+<script src="assets/app.js?v=share20261009" defer></script>
 <script src="assets/utility-strip.js" defer></script>
 <script src="assets/news-crawler.js" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
