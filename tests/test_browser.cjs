@@ -21,7 +21,7 @@ const {spawn}=require('node:child_process');
    assert.match(await page.locator(card+' iframe').getAttribute('src'),/^https:\/\/embed\.ventusky\.com/);
    assert.equal(await page.locator(card+' iframe').isVisible(),true);
    assert.equal(await page.locator(card+' .weather-open').count(),1);
-   await page.locator('#list article').first().click();
+   await page.locator('#list article[data-story]').first().click();
    // Reader flows top to bottom; the language selector must not hide in the footer.
    const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','modalbodytext','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
    assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-original'] && order['article-original']<order['article-share-footer'],`article flow ${JSON.stringify(order)}`);
@@ -36,7 +36,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#modaltitle').innerText().then(x=>x.includes('descanso')),true);
    await page.locator('#article-dialog').evaluate(e=>e.scrollTop=e.scrollHeight);
    await page.keyboard.press('Escape');
-   await page.locator('#list article').first().click();
+   await page.locator('#list article[data-story]').first().click();
    assert.equal(await page.locator('#article-dialog').evaluate(e=>e.scrollTop),0);
    await page.keyboard.press('Escape');
    await page.locator('#language').selectOption('en');
