@@ -241,6 +241,28 @@ article[role=button]{outline-offset:2px}
 #article-dialog.external-article .article-source-button{min-height:52px;justify-content:center;text-align:center;flex-basis:auto}
 #article-dialog.external-article .article-source-button.secondary{background:#eaf3fc;color:#0a4b81;border-color:#9dc3e5}
 #article-dialog.external-article .source-access-warning{font-size:12px;color:#385b77;line-height:1.5}
+
+/* Mobile v18 recovery: compact masthead, useful two-column filters, readable photo cards. */
+@media(max-width:600px){
+  .header-inner{display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;min-height:74px}
+  .brand{flex:1 1 auto;min-width:0}
+  .brand img{width:clamp(155px,46vw,220px);max-width:100%;height:auto}
+  .edition{flex:0 0 auto;font-size:8px;letter-spacing:.25px;text-align:right;white-space:nowrap}
+  .edition select{max-width:125px;font-size:11px;padding:6px 5px}
+  .language-picker{display:inline-flex;align-items:center;gap:4px}
+  .language-picker img{max-width:23px;height:auto}
+  .lead{padding:12px;margin-bottom:14px}
+  .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .form input{grid-column:1/-1;min-width:0}
+  .form select{min-width:0;width:100%;padding:10px 6px;font-size:12px}
+  .features{grid-template-columns:1fr;gap:12px}
+  .story img{height:auto;aspect-ratio:16/9;object-fit:cover}
+  .item{grid-template-columns:minmax(0,1fr) 112px;gap:10px;padding:12px;align-items:start}
+  .item h3{font-size:16px;line-height:1.28}
+  .item .thumb img{height:92px;object-fit:cover}
+  .item .thumb .label{font-size:8px;padding:3px 4px;left:4px;bottom:4px}
+}
+@media(max-width:360px){.header-inner{flex-wrap:wrap}.edition{width:100%;text-align:left}.item{grid-template-columns:minmax(0,1fr) 92px}}
 </style>
 </head>
 <body>
