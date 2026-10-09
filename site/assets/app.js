@@ -214,6 +214,9 @@
     $('modalbodytext').textContent=isExternal
       ?(lang==='pt'?'Leia a reportagem completa na fonte pelos botões abaixo. O texto integral pertence ao veículo de origem; não apresentamos um resumo genérico como se fosse a matéria.':lang==='es'?'Lea el reportaje completo en la fuente con los enlaces de abajo.':'Read the full original report using the links below.')
       :(txt.body||txt.summary||'');
+    $('modalbrief').textContent=isExternal
+      ? (articleLang==='pt'?'Leia a reportagem completa no veículo original pelos links abaixo.':articleLang==='es'?'Lea el reportaje en el medio original mediante los enlaces.':'Read the complete report at the original publisher via the links.')
+      : '';
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
     const src=safeUrl(opened.source_url);
