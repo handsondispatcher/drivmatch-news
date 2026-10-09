@@ -62,6 +62,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#share-story').isVisible(),true);
    if(width===1440){
     await page.locator('#share-story').click();
+    await page.locator('#story-preview').waitFor({state:'visible',timeout:15000});
     assert.equal(await page.locator('#story-preview').isVisible(),true);
     const size=await page.locator('#story-preview-image').evaluate(async img=>{
       if(!img.complete)await new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;});
