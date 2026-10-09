@@ -38,6 +38,14 @@ const {spawn}=require('node:child_process');
    assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-original'] && order['article-original']<order['article-share-footer'],`article flow ${JSON.stringify(order)}`);
    assert.equal(await page.locator('#share-native').count(),1);
    assert.equal(await page.locator('#share-copy').count(),1);
+   await page.locator('#share-native').click();
+   assert.equal(await page.locator('#share-options').isVisible(),true);
+   for(const platform of ['whatsapp','facebook','threads','x','linkedin','telegram','reddit','pinterest','email']){
+    assert.equal(await page.locator('[data-share-platform="'+platform+'"]').count(),1);
+    assert.ok((await page.locator('[data-share-platform="'+platform+'"]').getAttribute('href')).length>10);
+   }
+   await page.locator('#share-native').click();
+   assert.equal(await page.locator('#share-options').isVisible(),false);
    assert.equal(await page.locator('#article-reading [data-article-lang]').count(),3);
    const langGrid=await page.locator('.source-translations').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length);
    assert.equal(langGrid,width>650?3:1);
