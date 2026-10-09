@@ -27,7 +27,7 @@ v32 is a consolidation of the **v31 editorial interface**, the approved visual b
 - **Consumer UI:** `site/assets/app.js` loads `data/news-images.json` alongside live headlines, selecting unique, topical photos from the manifest for hero, related, list and article modal, with photo credit linked to Wikimedia Commons. When no valid image is available, it uses a unique labeled vector card rather than a broken image.
 - **Social compatibility:** `scripts/build_share_pages.py` reuses the verified local images when composing 1200×630 social previews.
 - **Editorial accuracy:** These are **illustrative archival photographs**; they are **not** claimed to depict the reported event, carrier, weather incident or location. Attribution includes license, author and crop/resizing. Actual event-specific publisher photographs can only be added when reuse/redistribution rights are obtained.
-- **Gate:** The v32 photo downloader must produce at least four real, locally served JPEGs (initial technical smoke floor); mobile and desktop Playwright checks verify image loading and that captions label them as illustrative. Catalog size and successful coverage should continue increasing before final public launch.
+- **Gate:** The v32 photo downloader must produce at least 16 verified local JPEGs and cover at least 12 current external headlines when the feed has 12+ items. Mobile and desktop Playwright checks validate real loaded dimensions, local asset URLs and illustrative-photo disclosure. On network failure, the deployment gate fails closed, retaining the last successful published edition rather than silently replacing all photographs with graphics.
 
 ## Single source of truth
 
