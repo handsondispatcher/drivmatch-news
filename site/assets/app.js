@@ -149,7 +149,8 @@
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
     const src=safeUrl(opened.source_url);
     const translatedSource=src?langs.map(l=>{
-      const url='https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(l)+'&u='+encodeURIComponent(src);
+      const googleNews=/^https:\/\/(?:news\.google\.com|news-google\.com)/i.test(new URL(src).hostname.startsWith('news.')?src:src);
+      const url=l==='en'||googleNews?src:'https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(l)+'&u='+encodeURIComponent(src);
       const label=l==='pt'?'Matéria completa em Português':l==='en'?'Full article in English':'Artículo completo en Español';
       return `<a class="article-source-button ${l==='pt'?'primary':''}" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" hreflang="${l}"><img src="${flags[l]}" width="28" height="19" alt=""><span>${label} ↗</span></a>`;
     }).join(''):'';
