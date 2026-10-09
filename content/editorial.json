@@ -29,5 +29,191 @@
         "body": "Según FreightWaves, en su publicación del 8 de octubre, FMCSA abrió otra etapa de consulta para preparar su estudio de descanso dividido. El piloto evaluaría divisiones de 5/5 y 6/4 horas. La preparación del estudio no autoriza a los conductores en general a utilizar estas divisiones. Consulte la publicación original y las reglas vigentes antes de planificar la jornada."
       }
     }
+  },
+  {
+    "id": "news-cdl-schools-20261008",
+    "category": "Fiscalização",
+    "original_lang": "en",
+    "status": "approved",
+    "demo": false,
+    "kind": "news",
+    "published_at": "2026-10-08T00:00:00Z",
+    "source": "Transport Topics",
+    "source_url": "https://www.ttnews.com/articles/fmcsa-10000-trucker-schools",
+    "verified_at": "2026-10-09T01:31:41.746Z",
+    "verification_note": "Fonte e data confirmadas na reportagem de 08/10/2026; resumo editorial próprio, horário exato não apurado.",
+    "usage_rights": "owned",
+    "locales": {
+      "pt": {
+        "title": "FMCSA retira quase 10 mil escolas CDL do cadastro",
+        "summary": "A FMCSA informou a retirada de 9.",
+        "body": "A FMCSA informou a retirada de 9.970 locais de formação comercial até 5 de outubro, incluindo encerramentos e ações de fiscalização. Nem toda retirada comprova irregularidade."
+      },
+      "en": {
+        "title": "FMCSA removes nearly 10,000 CDL training sites",
+        "summary": "FMCSA reported 9,970 commercial-driver training sites removed or closed by October 5, including enforcement and voluntary exits.",
+        "body": "FMCSA reported 9,970 commercial-driver training sites removed or closed by October 5, including enforcement and voluntary exits. Removal does not establish wrongdoing at every site."
+      },
+      "es": {
+        "title": "FMCSA retira casi 10.000 centros de formación CDL",
+        "summary": "La FMCSA informó de 9.",
+        "body": "La FMCSA informó de 9.970 centros de formación comercial retirados o cerrados hasta el 5 de octubre. La medida incluye bajas voluntarias y actuaciones regulatorias."
+      }
+    }
+  },
+  {
+    "id": "news-truck-parking-20261008",
+    "category": "Rodovias",
+    "original_lang": "en",
+    "status": "approved",
+    "demo": false,
+    "kind": "news",
+    "published_at": "2026-10-08T00:00:00Z",
+    "source": "Transport Topics",
+    "source_url": "https://www.ttnews.com/articles/bipartisan-caucus-truck-parking",
+    "verified_at": "2026-10-09T01:31:41.746Z",
+    "verification_note": "Fonte e data confirmadas na reportagem de 08/10/2026; resumo editorial próprio, horário exato não apurado.",
+    "usage_rights": "owned",
+    "locales": {
+      "pt": {
+        "title": "Congresso discute mais vagas para caminhões",
+        "summary": "Parlamentares do Build More Caucus discutem facilitar projetos de estacionamento para caminhões.",
+        "body": "Parlamentares do Build More Caucus discutem facilitar projetos de estacionamento para caminhões. As vagas ainda não estão disponíveis; são propostas legislativas."
+      },
+      "en": {
+        "title": "US lawmakers push for more truck parking",
+        "summary": "The bipartisan Build More Caucus proposes faster approvals for truck parking projects.",
+        "body": "The bipartisan Build More Caucus proposes faster approvals for truck parking projects. The measures are proposals, not available spaces."
+      },
+      "es": {
+        "title": "Legisladores proponen más estacionamiento para camiones",
+        "summary": "El grupo bipartidista Build More Caucus busca agilizar proyectos de aparcamiento de camiones.",
+        "body": "El grupo bipartidista Build More Caucus busca agilizar proyectos de aparcamiento de camiones. Por ahora son propuestas legislativas."
+      }
+    }
+  },
+  {
+    "id": "news-class8-buyers-20261008",
+    "category": "Caminhões",
+    "original_lang": "en",
+    "status": "approved",
+    "demo": false,
+    "kind": "news",
+    "published_at": "2026-10-08T00:00:00Z",
+    "source": "Transport Topics",
+    "source_url": "https://www.ttnews.com/articles/truck-buyers-wait-and-see",
+    "verified_at": "2026-10-09T01:31:41.746Z",
+    "verification_note": "Fonte e data confirmadas na reportagem de 08/10/2026; resumo editorial próprio, horário exato não apurado.",
+    "usage_rights": "owned",
+    "locales": {
+      "pt": {
+        "title": "Compradores de Class 8 seguem cautelosos",
+        "summary": "Fabricantes dizem que há necessidade de renovar frotas, mas os compradores avaliam custos e regras de emissões.",
+        "body": "Fabricantes dizem que há necessidade de renovar frotas, mas os compradores avaliam custos e regras de emissões. A ACT estimou 18.700 encomendas preliminares em setembro; a FTR, 21.300."
+      },
+      "en": {
+        "title": "Class 8 truck buyers remain cautious",
+        "summary": "Manufacturers see replacement demand, but fleets weigh costs and emissions uncertainty.",
+        "body": "Manufacturers see replacement demand, but fleets weigh costs and emissions uncertainty. ACT estimated 18,700 preliminary September Class 8 orders; FTR estimated 21,300."
+      },
+      "es": {
+        "title": "Compradores de camiones Class 8 siguen cautelosos",
+        "summary": "Fabricantes ven demanda de renovación, pero las flotas evalúan costos y reglas de emisiones.",
+        "body": "Fabricantes ven demanda de renovación, pero las flotas evalúan costos y reglas de emisiones. ACT estimó 18.700 pedidos preliminares de Class 8 en septiembre y FTR, 21.300."
+      }
+    }
+  },
+  {
+    "id": "news-autonomous-beacons-20261008",
+    "category": "Tecnologia",
+    "original_lang": "en",
+    "status": "approved",
+    "demo": false,
+    "kind": "news",
+    "published_at": "2026-10-08T00:00:00Z",
+    "source": "FreightWaves",
+    "source_url": "https://www.freightwaves.com/news/fmcsa-aurora-warning-beacon-exemption-five-year",
+    "verified_at": "2026-10-09T01:31:55.282Z",
+    "verification_note": "Fonte e data confirmadas; resumo editorial independente. Hora não apurada, data usada para indexação.",
+    "usage_rights": "owned",
+    "locales": {
+      "pt": {
+        "title": "FMCSA autoriza sinalizadores em caminhões autônomos",
+        "summary": "A FMCSA autorizou, por cinco anos e sob condições, sinalizadores na cabine em substituição aos triângulos refletivos para operadores elegíveis de caminhões autônomos nível 4.",
+        "body": "A FMCSA autorizou, por cinco anos e sob condições, sinalizadores na cabine em substituição aos triângulos refletivos para operadores elegíveis de caminhões autônomos nível 4. A dispensa não vale automaticamente para outros veículos."
+      },
+      "en": {
+        "title": "FMCSA authorizes warning beacons for autonomous trucks",
+        "summary": "FMCSA granted a conditional five-year exemption allowing eligible Level 4 autonomous trucks to use cab-mounted warning beacons instead of roadside triangles.",
+        "body": "FMCSA granted a conditional five-year exemption allowing eligible Level 4 autonomous trucks to use cab-mounted warning beacons instead of roadside triangles. Conventional carriers do not automatically qualify."
+      },
+      "es": {
+        "title": "FMCSA autoriza balizas en camiones autónomos",
+        "summary": "La FMCSA concedió una exención condicional de cinco años que permite balizas en cabina en ciertos camiones autónomos de nivel 4 en lugar de triángulos.",
+        "body": "La FMCSA concedió una exención condicional de cinco años que permite balizas en cabina en ciertos camiones autónomos de nivel 4 en lugar de triángulos. No se aplica automáticamente a flotas convencionales."
+      }
+    }
+  },
+  {
+    "id": "news-savannah-port-20261008",
+    "category": "Fretes",
+    "original_lang": "en",
+    "status": "approved",
+    "demo": false,
+    "kind": "news",
+    "published_at": "2026-10-08T00:00:00Z",
+    "source": "FreightWaves",
+    "source_url": "https://www.freightwaves.com/news/new-monthly-mark-for-savannah-container-volume",
+    "verified_at": "2026-10-09T01:31:55.282Z",
+    "verification_note": "Fonte e data confirmadas; resumo editorial independente. Hora não apurada, data usada para indexação.",
+    "usage_rights": "owned",
+    "locales": {
+      "pt": {
+        "title": "Porto de Savannah supera 504 mil TEUs",
+        "summary": "O Porto de Savannah movimentou 504.",
+        "body": "O Porto de Savannah movimentou 504.015 TEUs em setembro, 3,7% acima do mesmo período anterior, segundo a Georgia Ports Authority. O volume indica atividade logística, não garantia de novos fretes."
+      },
+      "en": {
+        "title": "Savannah port exceeds 504,000 TEUs",
+        "summary": "The Port of Savannah handled 504,015 TEUs in September, up 3.",
+        "body": "The Port of Savannah handled 504,015 TEUs in September, up 3.7% year over year, according to Georgia Ports Authority. Container activity does not guarantee new loads for carriers."
+      },
+      "es": {
+        "title": "Puerto de Savannah supera 504.000 TEU",
+        "summary": "El puerto de Savannah movilizó 504.",
+        "body": "El puerto de Savannah movilizó 504.015 TEU en septiembre, un aumento interanual del 3,7% según Georgia Ports Authority. El volumen no garantiza nuevos fletes para transportistas."
+      }
+    }
+  },
+  {
+    "id": "news-fraud-trailer-20261008",
+    "category": "Segurança",
+    "original_lang": "en",
+    "status": "approved",
+    "demo": false,
+    "kind": "news",
+    "published_at": "2026-10-08T00:00:00Z",
+    "source": "FreightWaves",
+    "source_url": "https://www.freightwaves.com/news/man-gets-2-years-for-3-5m-amazon-fraud-using-23-trucking-accounts",
+    "verified_at": "2026-10-09T01:31:55.282Z",
+    "verification_note": "Fonte e data confirmadas; resumo editorial independente. Hora não apurada, data usada para indexação.",
+    "usage_rights": "owned",
+    "locales": {
+      "pt": {
+        "title": "Fraude em logística gera pena de prisão",
+        "summary": "Um homem de Connecticut foi condenado a 24 meses de prisão em esquema com 23 contas de transportadoras e cobranças por movimentos de carretas que não ocorreram.",
+        "body": "Um homem de Connecticut foi condenado a 24 meses de prisão em esquema com 23 contas de transportadoras e cobranças por movimentos de carretas que não ocorreram. A restituição ordenada supera US$ 3,5 milhões."
+      },
+      "en": {
+        "title": "Trucking-account fraud leads to prison sentence",
+        "summary": "A Connecticut man received a 24-month sentence after a scheme using 23 trucking accounts billed for trailer moves that never occurred.",
+        "body": "A Connecticut man received a 24-month sentence after a scheme using 23 trucking accounts billed for trailer moves that never occurred. Court-ordered restitution exceeded $3.5 million."
+      },
+      "es": {
+        "title": "Fraude con cuentas de transporte lleva a prisión",
+        "summary": "Un hombre de Connecticut recibió una condena de 24 meses por un fraude con 23 cuentas de transporte y cobros de movimientos de remolques inexistentes.",
+        "body": "Un hombre de Connecticut recibió una condena de 24 meses por un fraude con 23 cuentas de transporte y cobros de movimientos de remolques inexistentes. La restitución supera 3,5 millones de dólares."
+      }
+    }
   }
 ]
