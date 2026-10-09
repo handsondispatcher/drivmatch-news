@@ -27,28 +27,44 @@ function icon(d){
  if(/wind/.test(d))return '💨';
  return '🌤️';
 }
-function showCity(){
- if(i>=order.length){order=shuffle(order);i=0;}
- const [name,state]=order[i++].split('|');const c=cities.find(x=>x.city===name&&x.state===state)||{city:name,state,status:'unavailable'};el('top-city').textContent=c.city+', '+c.state;
- const age=Date.now()-Date.parse(c.forecast_updated_at||'');
- const good=c.status==='forecast'&&Number.isFinite(age)&&age>=0&&age<36*3600000;
- el('top-weather-icon').textContent=good?icon(c.condition_en):'☁️';
- const condition=String(c.condition_en||'').toLowerCase();
- const risk=good?(/blizzard|winter storm|heavy snow/.test(condition)?'❄️ Snow risk':/thunderstorm|severe storm/.test(condition)?'⚡ Storm risk':/heavy rain|flood/.test(condition)?'🌧️ Heavy rain':/dense fog/.test(condition)?'🌫️ Low visibility':''):'';
- el('top-condition').textContent=good?(risk||c.condition_en):(lang()==='en'?'Forecast unavailable':lang()==='es'?'Pronóstico no disponible':'Previsão indisponível');
- const hi=good&&Number.isFinite(Number(c.max_f))&&c.max_f!==null?Math.round(c.max_f)+'°F':'—';
- const lo=good&&Number.isFinite(Number(c.min_f))&&c.min_f!==null?Math.round(c.min_f)+'°F':'—';
- const celsius = f => Math.round((f-32)*5/9);const cHi=hi==='—'?'—':celsius(Number(c.max_f))+'°C';const cLo=lo==='—'?'—':celsius(Number(c.min_f))+'°C';
- el('top-range-f').textContent='Máx. '+hi+' · Mín. '+lo;
- el('top-range-c').textContent='Máx. '+cHi+' · Mín. '+cLo;
- el('top-condition').title=good?(lang()==='en'?'Forecast updated: ':lang()==='es'?'Pronóstico actualizado: ':'Previsão atualizada: ')+c.forecast_updated_at:'';
+function localizedCondition(desc){const d=String(desc||'').toLowerCase(),l=lang();
+ const cases=[[/blizzard|heavy snow|snow|sleet|flurr/,['Neve','Snow','Nieve']],[/thunder|storm/,['Tempestades','Thunderstorms','Tormentas']],[/heavy rain|rain|showers|drizzle/,['Chuva','Rain','Lluvia']],[/gust|wind/,['Rajadas de vento','Wind gusts','Ráfagas de viento']],[/fog|haze/,['Neblina','Fog','Niebla']],[/partly cloudy|partly sunny/,['Parcialmente nublado','Partly cloudy','Parcialmente nublado']],[/cloud|overcast/,['Nublado','Cloudy','Nublado']],[/clear|sun|fair/,['Céu limpo','Clear skies','Cielo despejado']]];
+ const c=cases.find(([re])=>re.test(d));return c?c[1][{pt:0,en:1,es:2}[l]||0]:String(desc||'').slice(0,60);
 }
+function validCities(){const now=Date.now();return cities.filter(c=>c.status==='forecast'&&typeof c.condition_en==='string'&&c.condition_en.trim()&&
+ Number.isFinite(c.max_f)&&Number.isFinite(c.min_f)&&Number.isFinite(Date.parse(c.forecast_updated_at||''))&&now-Date.parse(c.forecast_updated_at)>=0&&now-Date.parse(c.forecast_updated_at)<36*3600000);}
+function showCity(){
+ const good=validCities(),panel=document.querySelector('.dm-util-city');
+ if(!good.length){panel.hidden=true;return;}
+ panel.hidden=false;
+ const avail=new Map(good.map(c=>[c.city+'|'+c.state,c]));
+ let picked=null;
+ for(let tries=0;tries<order.length;tries++){
+   if(i>=order.length){order=shuffle(order);i=0;}
+   const key=order[i++];if(avail.has(key)){picked=avail.get(key);break;}
+ }
+ if(!picked){panel.hidden=true;return;}
+ el('top-city').textContent=picked.city+', '+picked.state;
+ el('top-weather-icon').textContent=icon(picked.condition_en);
+ el('top-condition').textContent=localizedCondition(picked.condition_en);
+ const d=picked.condition_en.toLowerCase();
+ const risk=/blizzard|heavy snow/.test(d)?['Neve intensa','Heavy snow','Nieve intensa']:
+   /thunder|severe storm/.test(d)?['⚡ Risco de tempestade','⚡ Storm risk','⚡ Riesgo de tormenta']:
+   /heavy rain|flood/.test(d)?['Chuva intensa','Heavy rain','Lluvia intensa']:
+   /dense fog/.test(d)?['Visibilidade reduzida','Low visibility','Visibilidad reducida']:null;
+ const riskEl=el('top-risk');riskEl.hidden=!risk;riskEl.textContent=risk?risk[{pt:0,en:1,es:2}[lang()]||0]:'';
+ const fhi=Math.round(picked.max_f),flo=Math.round(picked.min_f);
+ el('top-range-f').textContent='Máx. '+fhi+'°F · Mín. '+flo+'°F';
+ el('top-range-c').textContent='Máx. '+Math.round((fhi-32)*5/9)+'°C · Mín. '+Math.round((flo-32)*5/9)+'°C';
+ el('top-condition').title='';
+}
+
 async function weather(){
  try{
   const r=await fetch('data/weather.json?d='+Date.now(),{cache:'no-store'});if(!r.ok)return;
   const j=await r.json();if(!Array.isArray(j.cities))return;
   const m=new Map(j.cities.map(c=>[c.city+'|'+c.state,c]));
-  cities=fixed.map(([city,state])=>Object.assign({city,state,status:'unavailable'},m.get(city+'|'+state)||{}));
+  cities=fixed.map(([city,state])=>Object.assign({city,state,status:'unavailable'},m.get(city+'|'+state)||{}));showCity();
  }catch(_){}
 }
 async function quotes(){
@@ -67,7 +83,7 @@ function init(){
  if(!el('top-city'))return;
  showMarket();showCity();
  if(location.protocol.startsWith('http')){weather();quotes();live();setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);}
- setInterval(showCity,60000);el('language')?.addEventListener('change',()=>{showMarket();i=Math.max(0,i-1);showCity()});
+ setInterval(showCity,10000);el('language')?.addEventListener('change',()=>{showMarket();i=Math.max(0,i-1);showCity()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
