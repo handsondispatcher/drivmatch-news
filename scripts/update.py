@@ -277,6 +277,24 @@ def build(offline=False):
     articles += public_offers(errors,offline)
     articles = [a for a in articles if publication_valid(a)]
     # Headlines are attributed external links, never auto-approved DrivMatch articles.
+    # Editorial relevance gate: audience = truck drivers, dispatchers and freight brokers.
+    # Feed category is not evidence of relevance. Require a concrete trucking,
+    # freight, commercial-road, logistics or material road-weather connection.
+    def trucking_relevant(item):
+        import re
+        title=item.get('title','').casefold()
+        category=item.get('category','')
+        transport=re.search(r'\\b(truck(?:er|ers|ing|s)?|semi[- ]truck|tractor[- ]trailer|18[- ]wheeler|cdl|fmcsa|dot|freight|cargo|shipment|shipping|shipper|carrier|broker|dispatch|logistics|supply chain|warehouse|fleet|diesel|fuel price|truck stop|weigh station|hours.of.service|eld|interstate|highway|road closure|roadwork|chain law|commercial vehicle|big rig|trailer|load board|port congestion|container freight|drayage|toll road|truck parking|truck driver)\\b',title)
+        weather=re.search(r'\\b(hurricane|tropical storm|blizzard|snowstorm|winter storm|ice storm|flood(?:ing|s)?|wildfire|tornado|storm surge)\\b',title)
+        impact=re.search(r'\\b(road|highway|interstate|i-\\d+|closure|evacuation|port|freight|shipping|trucking|transport|supply chain|travel disruption|travel ban)\\b',title)
+        # Major dangerous weather is relevant to route planning even before closures.
+        severe=bool(weather and re.search(r'\\b(hurricane|blizzard|winter storm|wildfire|flood|tornado)\\b',title))
+        if re.search(r'\\b(poverty|youth|celebrity|season [2-9]|episode|how to watch|streaming|movie|sports betting|fashion|real estate|building permits|concert|tv show)\\b',title) and not transport:
+            return False
+        if category=='Clima':
+            return bool(transport or (weather and (impact or severe)))
+        return bool(transport)
+
     external_headlines=[]
     if not offline:
         from collect_sources import collect
@@ -289,6 +307,7 @@ def build(offline=False):
                 if item.get('source_url') in seen or not item.get('title') or not item.get('source_url','').startswith('https://'):continue
                 # Discovery feeds are broad. Exclude entertainment/streaming false positives
                 # rather than labeling them as operational weather alerts.
+                if not trucking_relevant(item):continue
                 headline=item['title'].casefold()
                 if item.get('category')=='Clima' and any(term in headline for term in
                     ('season 2','season 3','how to watch','streaming','episode','trailer','rocky mountain wreckers')):
