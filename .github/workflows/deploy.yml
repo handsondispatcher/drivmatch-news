@@ -102,7 +102,7 @@ jobs:
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$PHOTOS" -o /tmp/drivmatch-news-images.json
           PHOTO=$(python -c 'import json; m=json.load(open("/tmp/drivmatch-news-images.json")); a=list(m["images"].values()); assert m["license_policy"]=="curated_commons" and len(a)>=16 and all(x["image"].startswith("assets/news-photos/") and x["image_credit"] and x["image_license"] for x in a); print(a[0]["image"])')
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "https://handsondispatcher.github.io/drivmatch-news/$PHOTO" -o /tmp/drivmatch-real-thumbnail.jpg
-          python -c 'from PIL import Image; p=Image.open("/tmp/drivmatch-real-thumbnail.jpg"); p.verify(); print("PHOTO THUMBNAILS PASS: verified JPEG served from local origin")'
+          python -c 'from pathlib import Path; b=Path("/tmp/drivmatch-real-thumbnail.jpg").read_bytes(); assert len(b)>10000 and b[:3]==bytes.fromhex("ffd8ff") and b[-2:]==bytes.fromhex("ffd9"); print("PHOTO THUMBNAILS PASS: real complete JPEG served from public origin")'
           LIVE="https://handsondispatcher.github.io/drivmatch-news/data/live-feed.json"
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$LIVE" -o /tmp/drivmatch-live-feed.json
           python -c 'import json; x=json.load(open("/tmp/drivmatch-live-feed.json")); assert x["schema_version"]==1 and x["operational_alerts_integrated"] is False; assert all(not i["is_active_incident"] and i["severity"] is None for i in x["items"]); print("LIVE NEWS FEED PASS:",len(x["items"]),"fresh non-urgent items")'
