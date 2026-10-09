@@ -97,11 +97,25 @@ article[role=button]{outline-offset:2px}
 .dm-util-city{gap:8px}.dm-util-temps{margin-left:auto}.dm-util-temp-row{font-size:13.5px}
 .dm-util-city #top-condition{max-width:140px}
 }
+
+.dm-util-city[hidden],.dm-weather-risk[hidden],.dm-news-crawler[hidden]{display:none!important}
+.dm-util-city .dm-weather-risk{color:#a33f17;font-size:12px;font-weight:700;max-width:225px}
+.dm-news-crawler{border-bottom:1px solid #d1e2ec;background:#0b2236;color:#f3f7fa;font-family:Arial,Helvetica,sans-serif}
+.dm-crawler-viewport{overflow:hidden;white-space:nowrap;padding:9px 0}
+.dm-crawler-track{display:flex;width:max-content;align-items:center;gap:36px;animation:dm-ticker 68s linear infinite;will-change:transform}
+.dm-crawler-track:hover,.dm-crawler-track:focus-within{animation-play-state:paused}
+.dm-crawler-link{color:#f3f7fa;text-decoration:none;font-size:13px;display:inline-flex;gap:8px;align-items:center}
+.dm-crawler-link:hover,.dm-crawler-link:focus-visible{text-decoration:underline}
+.dm-crawler-label{font-weight:700;color:#68bfff;font-size:11px;letter-spacing:.4px}
+@keyframes dm-ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.dm-crawler-track{animation:none;flex-wrap:wrap;width:auto;padding:0 12px}.dm-crawler-viewport{white-space:normal}}
+@media(max-width:750px){.dm-crawler-track{animation-duration:50s}.dm-crawler-link{font-size:12px}.dm-crawler-viewport{padding:10px 0}}
 </style>
 </head>
 <body>
 <header class="header"><div class="header-inner"><div class="brand"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></div><div class="edition">EDIÇÃO DIGITAL · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></span></div></div></header>
-<section id="dm-utility" class="dm-utility" aria-label="Mercado e tempo"><div class="dm-util-inner"><div class="dm-util-quote"><span id="top-usd-label">Dólar</span> <strong id="top-usd-value">—</strong><small id="top-usd-date" title="Última cotação verificada">Sem cotação</small></div><div class="dm-util-quote"><span id="top-diesel-label">Diesel EUA</span> <strong id="top-diesel-value">—</strong><small id="top-diesel-date" title="Referência média semanal">EIA · semanal</small></div><div class="dm-util-city" aria-live="off"><span id="top-weather-icon" aria-hidden="true">🌤️</span><span><strong id="top-city">Tempo nos EUA</strong><small id="top-condition">Aguardando previsão oficial</small></span><div class="dm-util-temps" aria-label="Temperaturas previstas"><div class="dm-util-temp-row" id="top-range-f">Máx. —°F · Mín. —°F</div><div class="dm-util-temp-row secondary" id="top-range-c">Máx. —°C · Mín. —°C</div></div></div></div></section>
+<section id="dm-utility" class="dm-utility" aria-label="Mercado e tempo"><div class="dm-util-inner"><div class="dm-util-quote"><span id="top-usd-label">Dólar</span> <strong id="top-usd-value">—</strong><small id="top-usd-date" title="Última cotação verificada">Sem cotação</small></div><div class="dm-util-quote"><span id="top-diesel-label">Diesel EUA</span> <strong id="top-diesel-value">—</strong><small id="top-diesel-date" title="Referência média semanal">EIA · semanal</small></div><div class="dm-util-city" aria-live="off" hidden><span id="top-weather-icon" aria-hidden="true">🌤️</span><span><strong id="top-city">Tempo nos EUA</strong><small id="top-condition"></small><small id="top-risk" class="dm-weather-risk" hidden></small></span><div class="dm-util-temps" aria-label="Temperaturas previstas"><div class="dm-util-temp-row" id="top-range-f">Máx. —°F · Mín. —°F</div><div class="dm-util-temp-row secondary" id="top-range-c">Máx. —°C · Mín. —°C</div></div></div></div></section>
+<section id="dm-news-crawler" class="dm-news-crawler" aria-label="Manchetes recentes" hidden><div class="dm-crawler-viewport" id="dm-crawler-viewport"><div class="dm-crawler-track" id="dm-crawler-track"></div></div></section>
 
 <div class="main">
 <main>
@@ -132,5 +146,6 @@ article[role=button]{outline-offset:2px}
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=3fcd616e589cfa3d" defer></script>
 <script src="assets/utility-strip.js" defer></script>
+<script src="assets/news-crawler.js" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>
