@@ -6,7 +6,7 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '7,37 * * * *'  # alvo: a cada 30 min, sem SLA exato
+    - cron: '7,17,27,37,47,57 * * * *'  # alvo: a cada 10 min; GitHub Actions não garante execução exata
 permissions:
   contents: read
   pages: write
