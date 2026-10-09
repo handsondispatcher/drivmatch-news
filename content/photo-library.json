@@ -524,6 +524,83 @@
         "história",
         "rodovia"
       ]
+    },
+    {
+      "id": "eb-i-4-seminole-co-rest-area-truck-parking-1-jpg",
+      "file": "EB I-4 Seminole Co Rest Area; Truck Parking-1.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:EB_I-4_Seminole_Co_Rest_Area%3B_Truck_Parking-1.jpg",
+      "description": "Estacionamento para caminhões na rodovia Interstate 4, Flórida",
+      "keywords": [
+        "parking",
+        "estacionamento",
+        "rodovia",
+        "motorista",
+        "rodovias",
+        "truck stop"
+      ]
+    },
+    {
+      "id": "truck-stop-belgrade-montana-jpg",
+      "file": "Truck Stop, Belgrade, Montana.jpg",
+      "credit": "born1945",
+      "license": "CC BY-SA 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Truck_Stop%2C_Belgrade%2C_Montana.jpg",
+      "description": "Caminhões em parada de estrada em Montana",
+      "keywords": [
+        "diesel",
+        "truck stop",
+        "abastecimento",
+        "caminhoneiro",
+        "estrada",
+        "montana"
+      ]
+    },
+    {
+      "id": "sb-i-95-truck-parking-area-south-of-exit-18-3-jpg",
+      "file": "SB I-95; Truck Parking Area south of Exit 18-3.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:SB_I-95%3B_Truck_Parking_Area_south_of_Exit_18-3.jpg",
+      "description": "Área de estacionamento para caminhões na I-95, Carolina do Sul",
+      "keywords": [
+        "rodovia",
+        "parking",
+        "caminhão",
+        "motorista",
+        "estacionamento"
+      ]
+    },
+    {
+      "id": "sb-i-75-rest-area-alachua-co-fla-24-jpg",
+      "file": "SB I-75 Rest Area, Alachua Co, FLA-24.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:SB_I-75_Rest_Area%2C_Alachua_Co%2C_FLA-24.jpg",
+      "description": "Caminhões em área de descanso na Interstate 75, Flórida",
+      "keywords": [
+        "parking",
+        "descanso",
+        "caminhão",
+        "rodovia",
+        "caminhoneiro"
+      ]
+    },
+    {
+      "id": "wb-i-10-columbia-co-rest-area-tandem-truck-parking-sign-2-jpg",
+      "file": "WB I-10 Columbia Co Rest Area; Tandem Truck Parking Sign-2.jpg",
+      "credit": "DanTD",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:WB_I-10_Columbia_Co_Rest_Area%3B_Tandem_Truck_Parking_Sign-2.jpg",
+      "description": "Sinalização de estacionamento para caminhões na Interstate 10",
+      "keywords": [
+        "parking",
+        "parada",
+        "truck stop",
+        "estacionamento",
+        "caminhoneiros"
+      ]
     }
   ]
 }
