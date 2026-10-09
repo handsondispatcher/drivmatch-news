@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "editorial_policy": "Permitted Commons/public-domain archive photographs, illustrative only; never claim they depict breaking-news events.",
+  "photos": [
+    {
+      "id": "semi-truck-jpg",
+      "file": "Semi Truck.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Semi_Truck.jpg/960px-Semi_Truck.jpg",
+      "credit": "KOMUnews / Anna Burkart",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Semi_Truck.jpg",
+      "description": "Caminhão em rodovia, foto de arquivo ilustrativa; não retrata veículo da Kodiak",
+      "keywords": [
+        "truck",
+        "trucking",
+        "transporte",
+        "freight",
+        "caminhão",
+        "caminhoneiro",
+        "motorista",
+        "rodovia",
+        "highway"
+      ]
+    },
+    {
+      "id": "sleeper-box-patrice-raunet-picture-los-angeles-california-jpg",
+      "file": "SLEEPER BOX PATRICE RAUNET PICTURE LOS ANGELES CALIFORNIA.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/SLEEPER_BOX_PATRICE_RAUNET_PICTURE_LOS_ANGELES_CALIFORNIA.jpg/960px-SLEEPER_BOX_PATRICE_RAUNET_PICTURE_LOS_ANGELES_CALIFORNIA.jpg",
+      "credit": "Raunet",
+      "license": "Domínio público",
+      "source_url": "https://commons.wikimedia.org/wiki/File:SLEEPER_BOX_PATRICE_RAUNET_PICTURE_LOS_ANGELES_CALIFORNIA.jpg",
+      "description": "Cabine sleeper de caminhão, imagem de arquivo",
+      "keywords": [
+        "sleeper",
+        "sleep",
+        "rest",
+        "descanso",
+        "hos",
+        "motorista",
+        "caminhoneiro",
+        "cabine"
+      ]
+    },
+    {
+      "id": "cdltrainingtruck-jpg",
+      "file": "Cdltrainingtruck.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Cdltrainingtruck.jpg/960px-Cdltrainingtruck.jpg",
+      "credit": "Lucylonghauler",
+      "license": "CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Cdltrainingtruck.jpg",
+      "description": "Caminhão utilizado para treinamento de CDL, imagem ilustrativa",
+      "keywords": [
+        "cdl",
+        "escola",
+        "treinamento",
+        "training",
+        "license",
+        "licença",
+        "driver",
+        "caminhoneiro"
+      ]
+    },
+    {
+      "id": "interstate-95-rest-area-20332-truck-parking-lot-jpg",
+      "file": "Interstate 95 Rest Area 20332; Truck Parking Lot.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Interstate_95_Rest_Area_20332%3B_Truck_Parking_Lot.jpg/960px-Interstate_95_Rest_Area_20332%3B_Truck_Parking_Lot.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Interstate_95_Rest_Area_20332%3B_Truck_Parking_Lot.jpg",
+      "description": "Estacionamento de caminhões em rodovia, imagem ilustrativa",
+      "keywords": [
+        "parking",
+        "estacionamento",
+        "parada",
+        "truck stop",
+        "descanso",
+        "infraestrutura",
+        "road"
+      ]
+    },
+    {
+      "id": "kenworth-t660-of-srt-jpg",
+      "file": "Kenworth T660 of SRT.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Kenworth_T660_of_SRT.jpg/960px-Kenworth_T660_of_SRT.jpg",
+      "credit": "Mr.choppers",
+      "license": "CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Kenworth_T660_of_SRT.jpg",
+      "description": "Caminhão pesado Kenworth Class 8, imagem ilustrativa",
+      "keywords": [
+        "kenworth",
+        "truck",
+        "caminhão",
+        "class 8",
+        "veteranos",
+        "transportadora",
+        "freight"
+      ]
+    },
+    {
+      "id": "uber-otto-autonomous-driving-truck-jpg",
+      "file": "Uber OTTO autonomous driving truck.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Uber_OTTO_autonomous_driving_truck.jpg/960px-Uber_OTTO_autonomous_driving_truck.jpg",
+      "credit": "Steve Jurvetson",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Uber_OTTO_autonomous_driving_truck.jpg",
+      "description": "Caminhão autônomo de arquivo, imagem ilustrativa; não retrata necessariamente o operador da notícia",
+      "keywords": [
+        "autonomous",
+        "autônom",
+        "sem motorista",
+        "driverless",
+        "fmcsa",
+        "aurora",
+        "kodiak",
+        "automação"
+      ]
+    },
+    {
+      "id": "port-of-savannah-2021-jpg",
+      "file": "Port of Savannah - 2021.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Port_of_Savannah_-_2021.jpg/960px-Port_of_Savannah_-_2021.jpg",
+      "credit": "CBP Photography / Jerry Glaser",
+      "license": "Domínio público (governo dos EUA)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Port_of_Savannah_-_2021.jpg",
+      "description": "Foto do Porto de Savannah, 2021; imagem de arquivo",
+      "keywords": [
+        "port",
+        "porto",
+        "container",
+        "savannah",
+        "shipping",
+        "importação",
+        "exportação",
+        "frete"
+      ]
+    },
+    {
+      "id": "aahus-port-container-loading-jpg",
+      "file": "Aahus port container loading.JPG",
+      "credit": "Jan Pešula",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Aahus_port_container_loading.JPG",
+      "description": "Carregamento de contêiner em caminhão em porto",
+      "keywords": [
+        "container",
+        "delivery",
+        "carga",
+        "freight",
+        "porto",
+        "terminal",
+        "logística"
+      ]
+    },
+    {
+      "id": "warehouse-loading-dock-jpg",
+      "file": "Warehouse Loading Dock.JPG",
+      "credit": "Jandrinov",
+      "license": "Domínio público",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Warehouse_Loading_Dock.JPG",
+      "description": "Doca de carga e descarga em centro logístico",
+      "keywords": [
+        "warehouse",
+        "centro logístico",
+        "armazém",
+        "walmart",
+        "logística",
+        "distribution",
+        "amazon",
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "container-transfer-02a-jpg",
+      "file": "Container transfer 02A.jpg",
+      "credit": "Joe Mabel",
+      "license": "CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Container_transfer_02A.jpg",
+      "description": "Transferência de contêiner de um caminhão em terminal",
+      "keywords": [
+        "container",
+        "freight",
+        "terminal",
+        "shipping",
+        "carga",
+        "rail",
+        "port"
+      ]
+    },
+    {
+      "id": "united-states-postal-service-truck-jpg",
+      "file": "United States Postal Service Truck.jpg",
+      "credit": "aomarks",
+      "license": "Domínio público",
+      "source_url": "https://commons.wikimedia.org/wiki/File:United_States_Postal_Service_Truck.jpg",
+      "description": "Caminhão de serviço postal",
+      "keywords": [
+        "mail",
+        "correio",
+        "parcel",
+        "usps",
+        "entrega",
+        "remessa",
+        "delivery",
+        "post"
+      ]
+    },
+    {
+      "id": "transport-truck-and-container-jpg",
+      "file": "Transport truck and container.jpg",
+      "credit": "Governo dos EUA",
+      "license": "Domínio público (governo dos EUA)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Transport_truck_and_container.jpg",
+      "description": "Transporte de contêiner em caminhão",
+      "keywords": [
+        "truck",
+        "container",
+        "load",
+        "carga",
+        "freight",
+        "port",
+        "transport"
+      ]
+    },
+    {
+      "id": "freight-truck-as-seen-on-highway-jpg",
+      "file": "Freight truck as seen on highway.jpg",
+      "credit": "Soulful sunshine",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Freight_truck_as_seen_on_highway.jpg",
+      "description": "Caminhão de cargas trafegando em rodovia",
+      "keywords": [
+        "road",
+        "rodovia",
+        "highway",
+        "trucking",
+        "freight",
+        "estrada",
+        "caminhão"
+      ]
+    },
+    {
+      "id": "freight-trucks-running-on-highway-jpg",
+      "file": "Freight trucks running on highway.jpg",
+      "credit": "Soulful sunshine",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Freight_trucks_running_on_highway.jpg",
+      "description": "Caminhões de cargas trafegando em rodovia",
+      "keywords": [
+        "highway",
+        "rodovia",
+        "transport",
+        "caminhoneiro",
+        "congestionamento",
+        "logística"
+      ]
+    },
+    {
+      "id": "truck-and-warehouse-geograph-org-uk-852506-jpg",
+      "file": "Truck and Warehouse - geograph.org.uk - 852506.jpg",
+      "credit": "Sebastian Ballard",
+      "license": "CC BY-SA 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Truck_and_Warehouse_-_geograph.org.uk_-_852506.jpg",
+      "description": "Caminhão ao lado de um depósito logístico",
+      "keywords": [
+        "warehouse",
+        "armazém",
+        "logística",
+        "distribuição",
+        "delivery",
+        "supply chain"
+      ]
+    }
+  ]
+}
