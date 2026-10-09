@@ -924,6 +924,48 @@
       "region": "MX",
       "source_type": "aggregator",
       "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+    },
+    {
+      "id": "radar-northern-plains-winter",
+      "name": "Montana, Dakotas e Wyoming · neve e rodovias",
+      "url": "https://news.google.com",
+      "category": "Clima",
+      "feed_url": "https://news.google.com/rss/search?q=Montana%20OR%20Wyoming%20OR%20North%20Dakota%20OR%20South%20Dakota%20(snow%20OR%20blizzard%20OR%20interstate%20closure%20OR%20chain%20restrictions)%20when%3A2d&hl=en-US&gl=US&ceid=US:en",
+      "original_lang": "en",
+      "access": "discovery-rss",
+      "publication": "external-discovery-only",
+      "enabled": true,
+      "region": "US",
+      "source_type": "aggregator",
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+    },
+    {
+      "id": "radar-rockies-winter",
+      "name": "Colorado e Utah · neve, gelo e interstates",
+      "url": "https://news.google.com",
+      "category": "Rodovias",
+      "feed_url": "https://news.google.com/rss/search?q=Colorado%20OR%20Utah%20(snow%20OR%20winter%20storm%20OR%20I-70%20OR%20I-80%20OR%20chain%20law%20OR%20highway%20closure)%20when%3A2d&hl=en-US&gl=US&ceid=US:en",
+      "original_lang": "en",
+      "access": "discovery-rss",
+      "publication": "external-discovery-only",
+      "enabled": true,
+      "region": "US",
+      "source_type": "aggregator",
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+    },
+    {
+      "id": "radar-pacific-northwest-weather",
+      "name": "Washington, Oregon e Idaho · clima rodoviário",
+      "url": "https://news.google.com",
+      "category": "Clima",
+      "feed_url": "https://news.google.com/rss/search?q=Washington%20OR%20Oregon%20OR%20Idaho%20(mountain%20pass%20OR%20snow%20OR%20wildfire%20OR%20highway%20closure%20OR%20truck%20restriction)%20when%3A2d&hl=en-US&gl=US&ceid=US:en",
+      "original_lang": "en",
+      "access": "discovery-rss",
+      "publication": "external-discovery-only",
+      "enabled": true,
+      "region": "US",
+      "source_type": "aggregator",
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
     }
   ]
 }
