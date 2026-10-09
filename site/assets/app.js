@@ -335,6 +335,24 @@
       const bottomTitle=548+Math.min(lines.length,9)*lineHeight;
       // A road/truck illustration is intentionally generic; not a claimed photo of the event.
       const illustrationY=Math.max(1100,Math.min(1320,bottomTitle+80));
+      // Add the publisher-attributed editorial synopsis when there is room.
+      // The summary is owned text for approved stories, or transparent context for links.
+      const synopsis=String(story.kind==='external_link'
+        ?(editorialContext[lang]?.[story.category]||'')
+        :(localeOf(story,lang)?.summary||localeOf(story,lang)?.body||''))
+        .replace(/\s+/g,' ').trim().slice(0,270);
+      if(synopsis&&illustrationY-bottomTitle>205){
+        ctx.fillStyle='#64c6f4';ctx.font='700 27px Arial, sans-serif';
+        ctx.fillText(lang==='en'?'IN BRIEF':lang==='es'?'EN RESUMEN':'EM RESUMO',77,bottomTitle+35);
+        ctx.fillStyle='#d8ebf8';ctx.font='32px Arial, sans-serif';
+        const words=synopsis.split(/\s+/),synopsisLines=[];let row='';
+        for(const word of words){const trial=row?row+' '+word:word;
+          if(ctx.measureText(trial).width>920&&row){synopsisLines.push(row);row=word;}else row=trial;
+        }
+        if(row)synopsisLines.push(row);
+        const maxLines=Math.min(5,Math.floor((illustrationY-bottomTitle-105)/46));
+        synopsisLines.slice(0,maxLines).forEach((line,i)=>ctx.fillText(line,77,bottomTitle+91+i*46,920));
+      }
       ctx.fillStyle='#0f456b';ctx.fillRect(0,illustrationY,1080,275);
       ctx.fillStyle='#113957';ctx.beginPath();ctx.moveTo(0,illustrationY+275);ctx.lineTo(1080,illustrationY+275);ctx.lineTo(920,illustrationY+150);ctx.lineTo(165,illustrationY+150);ctx.closePath();ctx.fill();
       ctx.fillStyle='#0b1a2b';ctx.fillRect(130,illustrationY+106,600,102);

@@ -69,6 +69,7 @@ const {spawn}=require('node:child_process');
       return [img.naturalWidth,img.naturalHeight];
     });
     assert.deepEqual(size,[1080,1920]);
+    await page.locator('#story-preview-image').screenshot({path:'test-results/story-card.png'});
     const storyDownload=page.waitForEvent('download',{timeout:12000});
     await page.locator('#story-preview-download').click();
     const download=await storyDownload;
