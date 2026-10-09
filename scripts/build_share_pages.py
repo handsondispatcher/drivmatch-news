@@ -146,6 +146,7 @@ def _write_page(directory, story, slug, title, description, locale="pt-BR"):
     share_url=SHARE_BASE+"/share/"+slug+"/"
     article_url=ARTICLE_BASE+"/?story="+slug
     target=directory/slug
+    target.mkdir(parents=True,exist_ok=True)
     create_card(title,str(story.get("category") or "Transporte"),target/"social.jpg",story)
     image_url=share_url+"social.jpg"
     esc=lambda v:escape(str(v),quote=True)
