@@ -89,7 +89,7 @@
     try {
       const id=new URLSearchParams(location.search).get('story');
       const story=id&&pageStories().find(a=>a.id===id);
-      if(story){opened=story;articleLang=lang;renderArticle();}
+      if(story){opened=story;articleLang=lang;$('article-dialog').scrollTop=0;renderArticle();}
     }catch(_){}
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
@@ -110,7 +110,7 @@
     const photoCredit=opened.image_source_url && safeUrl(opened.image_source_url)
       ? `<p class="image-credit">Foto ilustrativa: <a href="${escapeHTML(opened.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(opened.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(opened.image_license||'Licença na fonte')}</p>`:'';
     $('article-source').innerHTML+=photoCredit;
-    $('articleLanguageTitle').textContent=lang==='en'?'Language of the summary above:':lang==='es'?'Idioma del resumen anterior:':'Idioma do resumo acima:';
+    $('articleLanguageTitle').textContent=lang==='en'?'Article language':lang==='es'?'Idioma de la noticia':'Idioma da notícia';
     $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('share-feedback').textContent='';
@@ -119,6 +119,7 @@
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
     $('language').value=next;$('languageFlag').src=flags[next];$('languageFlag').alt=next==='pt'?'Bandeira do Brasil':next==='en'?'US flag':'Bandera de España';
     $('share-label').textContent=next==='en'?'Share':next==='es'?'Compartir':'Compartilhar';
+    $('share-section-title').textContent=next==='en'?'Share this story':next==='es'?'Comparte esta noticia':'Compartilhe esta notícia';
     $('share-copy').textContent=next==='en'?'Copy link':next==='es'?'Copiar enlace':'Copiar link';
     const trans=labels[next];document.querySelector('#panorama .heading').textContent=trans.panorama;document.querySelector('#noticias .heading').textContent=trans.news;
     document.querySelector('#market-title').textContent=trans.market;
@@ -142,7 +143,7 @@
     $('featurePrev').addEventListener('click',()=>{featurePage--;renderStories();});
     $('featureNext').addEventListener('click',()=>{featurePage++;renderStories();});
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
-    const clickArticle=e=>{const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened)renderArticle();};
+    const clickArticle=e=>{const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){$('article-dialog').scrollTop=0;renderArticle();}};
     const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
     $('share-native').addEventListener('click',async()=>{
       if(!opened)return;
