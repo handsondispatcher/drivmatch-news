@@ -176,8 +176,8 @@
     $('share-section-title').textContent=next==='en'?'Share this story':next==='es'?'Comparte esta noticia':'Compartilhe esta notícia';
     $('share-copy').textContent=next==='en'?'Copy link':next==='es'?'Copiar enlace':'Copiar link';
     $('share-whatsapp-copy').textContent=next==='en'?'WhatsApp Web already open? Copy message to paste in your chat':next==='es'?'¿Ya tienes WhatsApp Web abierto? Copia el mensaje':'Já está no WhatsApp Web? Copiar mensagem para colar na conversa';
-    $('share-story').querySelector('span:last-child').textContent=next==='en'?'Story image':next==='es'?'Imagen Story':'Card Stories';
-    $('share-system').querySelector('span:last-child').textContent=next==='en'?'Other apps':next==='es'?'Otras apps':'Outros apps';
+    $('share-story-label').textContent=next==='en'?'Story image':next==='es'?'Imagen Story':'Card Stories';
+    $('share-system-label').textContent=next==='en'?'Other apps':next==='es'?'Otras apps':'Outros apps';
     $('share-stories-hint').textContent=next==='en'?'Stories: save the image and publish it in your app. Not an automatic post.':next==='es'?'Historias: guarda la imagen y publícala en tu app. No se publica automáticamente.':'Stories: salve a imagem e publique no seu aplicativo. Não há publicação automática em Stories.';
     const trans=labels[next];document.querySelector('#panorama .heading').textContent=trans.panorama;document.querySelector('#noticias .heading').textContent=trans.news;
     document.querySelector('#market-title').textContent=trans.market;
