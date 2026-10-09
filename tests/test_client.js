@@ -11,7 +11,7 @@ class Element {
  get classList(){return {add(){},remove(){}};}
  scrollIntoView(){}
 }
-const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-feedback','translation','shade','noticias'];
+const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','article-dialog','translation','shade','noticias'];
 for(const id of ids)elements[id]=new Element(id);
 for(const id of ['panorama .heading','noticias .heading','market-title','.demo'])selectors['#'+id]=new Element(id);
 selectors['.demo']=new Element('demo');
@@ -35,6 +35,9 @@ elements.list.dispatch('click',{target:{closest:key=>({dataset:{story:String(sam
 assert(elements.modalbodytext.textContent.includes('O preço do diesel'));
 assert(elements.articleLanguageButtons.innerHTML.includes('data-article-lang="es"'));
 assert(elements.articleLanguageButtons.innerHTML.includes('data-article-lang="en"'));
+assert.strictEqual(elements.articleLanguageTitle.textContent,'Idioma da notícia');
+assert.strictEqual(elements['share-section-title'].textContent,'Compartilhe esta notícia');
+assert.strictEqual(elements['article-dialog'].scrollTop,0);
 // translating article should NOT change the top-of-page language selector
 elements.articleLanguageButtons.dispatch('click',{target:{closest:key=>({dataset:{articleLang:'es'}})}});
 assert(elements.modaltitle.textContent.includes('diésel'));
