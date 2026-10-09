@@ -25,7 +25,7 @@
   function localeOf(article, chosen=lang){return article.locales?.[chosen] || article.locales?.[article.original_lang] || null}
   // Curated Unsplash licensed illustrations, never passed off as photographs of an incident.
   const topicPhotos={
-    Clima:['photo-1534274988757-a28bf1a57c17','photo-1500530855697-b586d89ba3ee','photo-1534088568595-a066f410bcda'],
+    Clima:['photo-1534274988757-a28bf1a57c17','photo-1500530855697-b586d89ba3ee','photo-1534088568595-a066f410bcda','photo-1500673922987-e212871fec22','photo-1473448912268-2022ce9509d8','photo-1490750967868-88aa4486c946','photo-1507525428034-b723cf961d3e','photo-1519681393784-d120267933ba','photo-1464822759023-fed622ff2c3b'],
     Rodovias:['photo-1500534623283-312aade485b7','photo-1449965408869-eaa3f722e40d'],
     Acidentes:['photo-1449965408869-eaa3f722e40d'],
     Combustíveis:['photo-1519608487953-e999c86e7455'],
@@ -40,7 +40,7 @@
     const supplied=safeUrl(a.image);if(supplied)return supplied;
     if(a.kind!=='external_link')return 'assets/fallback.svg';
     const choices=topicPhotos[a.category]||topicPhotos.Transporte;
-    const seed=Array.from(String(a.source_url||a.title||'')).reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
+    const seed=Array.from(String((a.source_url||'')+'|'+(a.locales?.en?.title||a.locales?.pt?.title||''))).reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
     return 'https://images.unsplash.com/'+choices[seed%choices.length]+'?auto=format&fit=crop&w=900&q=75';
   }
   function imageHTML(a, suffix=''){
