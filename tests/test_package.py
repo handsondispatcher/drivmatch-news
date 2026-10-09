@@ -33,6 +33,28 @@ class PublicationTests(unittest.TestCase):
   feed='<rss><channel><item><title>Transport event</title><link>https://example.com/news/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item><item><title>Bad date</title><link>https://example.com/2</link></item><item><title>Wrong host</title><link>https://evil.example/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item></channel></rss>'
   rows=parse_feed(feed,{'url':'https://example.com','name':'Fixture','category':'Transporte','original_lang':'en'},datetime(2026,10,8,23,tzinfo=timezone.utc))
   self.assertEqual(len(rows),1);self.assertEqual(rows[0]['status'],'pending_review')
+ def test_source_headline_translation_and_language_fallback(self):
+  fixture={'title':'Snow closes Montana highway','source':'Fixture','source_url':'https://example.com/snow','published_at':'2026-10-09T09:00:00+00:00','category':'Clima','region':'US','origin_type':'rss'}
+  def translate(title,source,target):
+   return {'pt':'Neve fecha rodovia em Montana','es':'Nieve cierra carretera en Montana'}[target]
+  with patch.object(up,'translate_source_headline',side_effect=translate):
+   result=up.localize_source_headlines([fixture],[],False)[0]
+  self.assertEqual(result['titles']['pt'],'Neve fecha rodovia em Montana')
+  self.assertEqual(result['titles']['en'],fixture['title'])
+  self.assertEqual(result['titles']['es'],'Nieve cierra carretera en Montana')
+  with patch.object(up,'translate_source_headline',side_effect=TimeoutError):
+   errors=[]
+   result=up.localize_source_headlines([fixture],errors,False)[0]
+  self.assertEqual(result['titles'],{'en':fixture['title']})
+  self.assertTrue(any('headline_translation_incomplete' in x for x in errors))
+ def test_topic_images_and_no_duplicate_refresh(self):
+  js=(BASE/'site/assets/app.js').read_text()
+  self.assertIn('topicPhotos',js)
+  self.assertIn('images.unsplash.com',js)
+  self.assertIn('translated_langs',js)
+  self.assertIn('Título original sem tradução',js)
+  self.assertEqual(js.count('setInterval(refreshNews,60000)'),1)
+  self.assertNotIn("fetch('data/content.json'+stamp",js)
  def test_cache_consistency(self):
   import hashlib,re
   page=(BASE/'site/index.html').read_text()
