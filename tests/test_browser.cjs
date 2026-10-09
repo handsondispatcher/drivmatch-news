@@ -41,7 +41,7 @@ const {spawn}=require('node:child_process');
    assert.ok(sourceLinks.every(url=>!url.includes('translate.google.com')&&!url.includes('.translate.goog')),'Primary source links must not use blocked translation proxies');
    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/Traduzir página/);
    // Switching the entire site to English must translate weather and publisher footer.
-   await page.locator('#shade').evaluate(el=>el.classList.remove('open'));
+   await page.locator('#article-dialog .x').click();
    await page.locator('#language').selectOption('en');
    assert.equal(await page.locator('#clima-desktop .weather-top h2').innerText(),'Weather');
    assert.match(await page.locator('#footer-publisher').innerText(),/A publication of Hands On Dispatcher LLC/);
