@@ -202,7 +202,12 @@
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
     const storyPhoto=licensedPhotoOf(opened);
     $('modalimg').src=imageOf(opened);$('modalimg').onerror=()=>{$('modalimg').onerror=null;$('modalimg').src=storyGraphic(opened);};$('modalimg').alt=storyPhoto?.image_alt||opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
-    $('modaltitle').textContent=cleanHeadline(txt.title);$('modalmeta').textContent=opened.demo?al.demo:opened.published_at?`${al.published}: ${opened.published_at}`:'';
+    $('modaltitle').textContent=cleanHeadline(txt.title);
+    const publishTime=Date.parse(opened.published_at||'');
+    const shownDate=Number.isFinite(publishTime)
+      ? new Date(publishTime).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-MX':'en-US',{dateStyle:'short',timeStyle:'short'})
+      : String(opened.published_at||'');
+    $('modalmeta').textContent=opened.demo?al.demo:opened.published_at?`${al.published}: ${shownDate}`:'';
     const isExternal=opened.kind==='external_link';
     if(isExternal)$('article-dialog').classList.add('external-article');
     else $('article-dialog').classList.remove('external-article');
