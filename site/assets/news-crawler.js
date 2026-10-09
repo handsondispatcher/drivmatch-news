@@ -11,17 +11,17 @@ function display(){
  for(const a of sourceHeadlines){
    if(!a.source_url?.startsWith('https://')||!a.title||seen.has(a.source_url))continue;
    seen.add(a.source_url);
-   links.push({title:a.title,source:a.source||'External source',url:a.source_url,external:true});
+   links.push({title:a.title,source:a.source||'External source',url:a.source_url,external:true,region:a.region||'US',date:a.published_at||''});
  }
  // Supplement with approved stories not already included in the source monitor.
  for(const a of validStories){
    if(seen.has(a.source_url))continue;seen.add(a.source_url);
-   links.push({title:a.locales[l].title,source:a.source||'DrivMatch News',url:a.source_url,external:false});
+   links.push({title:a.locales[l].title,source:a.source||'DrivMatch News',url:a.source_url,external:false,region:'US',date:a.published_at||''});
  }
  if(!links.length){bar.hidden=true;return;}
- const els=links.slice(0,35).map(a=>{
+ const els=links.slice(0,65).map(a=>{
    const link=document.createElement('a');link.className='dm-crawler-link';link.href=a.url;link.target='_blank';link.rel='noopener noreferrer';
-   const k=document.createElement('span');k.className='dm-crawler-label';k.textContent=(a.external?'FONTE EXTERNA · ':'')+clean(a.source);
+   const k=document.createElement('span');k.className='dm-crawler-label';k.textContent=(a.external?'FONTE · ':'')+clean(a.region)+' · '+clean(a.source);
    const t=document.createElement('span');t.textContent=clean(a.title);
    link.append(k,t);return link;
  });
