@@ -267,7 +267,22 @@ def build(offline=False):
     runtime={'spot_url':public_spot if public_spot.startswith('https://') else ''}
     (path/'runtime.json').write_text(json.dumps(runtime)+'\n',encoding='utf-8')
     (path/'content.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    (path/'source-headlines.json').write_text(json.dumps({'generated_at':NOW().isoformat(timespec='seconds'),'editorial_status':'external_feed_links_not_editorially_approved','headlines':external_headlines},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    source_health_path=ROOT/'build/source-health.json'
+    try:
+        source_health=read_json(source_health_path) if not offline else {}
+    except (OSError,ValueError,TypeError):
+        source_health={}
+    statuses=source_health.get('sources',[])
+    source_metrics={'total':len(statuses),'working':sum(x.get('status')=='ok' for x in statuses),
+                    'failed':sum(x.get('status')=='failed' for x in statuses),
+                    'manual':sum(x.get('status')=='manual-review' for x in statuses)}
+    latest=max((x.get('published_at','') for x in external_headlines),default='')
+    monitor={'generated_at':NOW().isoformat(timespec='seconds'),
+             'last_source_check':source_health.get('checked_at'),
+             'latest_headline_at':latest,'source_metrics':source_metrics,
+             'editorial_status':'external_feed_links_not_editorially_approved',
+             'headlines':external_headlines}
+    (path/'source-headlines.json').write_text(json.dumps(monitor,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'market.json').write_text(json.dumps(market,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'weather.json').write_text(json.dumps(weather,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
