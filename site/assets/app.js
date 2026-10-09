@@ -242,6 +242,8 @@
       const urls=shareDestinations(shareText(),shareUrlOf(opened));
       shareOptions.querySelectorAll('[data-share-platform]').forEach(a=>{a.href=urls[a.dataset.sharePlatform]||'#';});
     });
+    $('share-options-close').addEventListener('click',()=>{shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');$('share-native').focus();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!shareOptions.hidden){shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');e.stopPropagation();}});
     $('share-system').addEventListener('click',async()=>{
       if(!opened)return;
       const title=shareText(),url=shareUrlOf(opened);
