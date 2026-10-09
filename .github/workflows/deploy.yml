@@ -40,7 +40,9 @@ jobs:
           CLASS8_DATA_URL: ${{ vars.CLASS8_DATA_URL }}
           CLASS8_REDISTRIBUTION_AUTHORIZED: ${{ vars.CLASS8_REDISTRIBUTION_AUTHORIZED }}
           USDBRL_SPOT_TOKEN: ${{ secrets.USDBRL_SPOT_TOKEN }}
-        run: python scripts/update.py
+        run: |
+          python scripts/update.py
+          python scripts/build_share_pages.py
       - name: Gerar links exclusivos e prévias para compartilhamento
         run: python scripts/build_share_pages.py
       - uses: actions/upload-artifact@v4
