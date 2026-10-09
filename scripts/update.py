@@ -280,6 +280,19 @@ def build(offline=False):
     # Editorial relevance gate: audience = truck drivers, dispatchers and freight brokers.
     # Feed category is not evidence of relevance. Require a concrete trucking,
     # freight, commercial-road, logistics or material road-weather connection.
+    # Scope: domestic US or US-Canada / US-Mexico corridors only.
+    def within_us_corridor(item):
+        import re
+        title=item.get('title','').casefold()
+        region=str(item.get('region','US')).upper()
+        if region not in ('US','USA','CA','CAN','MX','MEX'):return False
+        foreign=r'\b(vietnam|vietnamese|da nang|hanoi|saigon|china|chinese|beijing|india|indian|europe|european union|germany|france|ukraine|russia|iran|iraq|israel|gaza|pakistan|bangladesh|japan|korea|australia|brazil|argentina|colombia|africa|asia|middle east|united kingdom|britain|turkey)\b'
+        us=r'\b(united states|u\\.?s\\.?a?\\.?|american|fmcsa|us[- ]mexico|us[- ]canada)\b'
+        cross=r'\b(canada|canadian|mexico|mexican|border|cross.border|customs|cbp|usmca)\b'
+        if re.search(foreign,title):return False
+        if region in ('CA','CAN','MX','MEX'):return bool(re.search(us,title) and re.search(cross,title))
+        return True
+
     def trucking_relevant(item):
         import re
         title=item.get('title','').casefold()
@@ -307,7 +320,7 @@ def build(offline=False):
                 if item.get('source_url') in seen or not item.get('title') or not item.get('source_url','').startswith('https://'):continue
                 # Discovery feeds are broad. Exclude entertainment/streaming false positives
                 # rather than labeling them as operational weather alerts.
-                if not trucking_relevant(item):continue
+                if not within_us_corridor(item) or not trucking_relevant(item):continue
                 headline=item['title'].casefold()
                 if item.get('category')=='Clima' and any(term in headline for term in
                     ('season 2','season 3','how to watch','streaming','episode','trailer','rocky mountain wreckers')):
