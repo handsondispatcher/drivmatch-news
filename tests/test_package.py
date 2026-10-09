@@ -202,6 +202,10 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("k.textContent=category[",ticker)
   self.assertNotIn("showRadar()",ticker)
   self.assertIn("seen.has(a.source_url)",ticker)
+  self.assertIn("fresh(sourceCheckedAt,MAX_SNAPSHOT_AGE_MS)",ticker)
+  self.assertIn("fresh(a.published_at,MAX_HEADLINE_AGE_MS)",ticker)
+  self.assertIn("MAX_SNAPSHOT_AGE_MS=30*60*1000",ticker)
+  self.assertIn("MAX_HEADLINE_AGE_MS=48*60*60*1000",ticker)
   self.assertNotIn('id="radar-fontes"',(BASE/'site/index.html').read_text())
   sources=json.loads((BASE/'content/sources.json').read_text())['sources']
   self.assertGreaterEqual(sum(bool(x.get('feed_url')) for x in sources),25)
