@@ -63,6 +63,15 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('k.textContent=category[',ticker)
   self.assertIn("untranslated",ticker)
   self.assertIn("ticker-i18n-20261009",(BASE/'site/index.html').read_text())
+ def test_external_headlines_restore_article_modal(self):
+  js=(BASE/'site/assets/app.js').read_text()
+  self.assertIn('role="button" data-story="${i}"',js)
+  self.assertNotIn('role="link" data-external-url=',js)
+  self.assertNotIn('${cat} · ${escapeHTML(a.region',js)
+  self.assertIn("a.kind==='external_link' ? safeUrl(a.source_url)",js)
+  self.assertIn("opened.kind==='external_link'",js)
+  self.assertIn("article-source",js)
+  self.assertIn("share-native",js)
  def test_cache_consistency(self):
   import hashlib,re
   page=(BASE/'site/index.html').read_text()
