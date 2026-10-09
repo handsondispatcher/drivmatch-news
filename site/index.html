@@ -188,6 +188,20 @@ article[role=button]{outline-offset:2px}
 #article-dialog .article-source-button,#article-dialog .article-source-button.primary{min-height:38px;padding:7px 9px;font-size:12px;flex-basis:auto;flex:1 1 180px}
 #article-dialog .full-article-heading{margin-top:6px}
 @media(max-width:600px){#article-dialog{width:100vw;max-height:100dvh;border-radius:0}#article-dialog .modalhero img{height:85px}#article-dialog .modalbody{padding:0 12px}#article-dialog .modalhead{padding:5px 12px}}
+
+/* Compact, icon-first sharing chooser floating above the reader. */
+#article-dialog .article-share-footer{position:relative;z-index:8}
+#article-dialog .share-options:not([hidden]){display:block;position:absolute;bottom:calc(100% - 2px);left:0;width:min(420px,100%);max-height:min(390px,65dvh);overflow-y:auto;background:#fff;border:1px solid #bdd3e7;border-radius:12px;box-shadow:0 12px 40px #001d3c38;padding:13px;box-sizing:border-box;margin:0}
+#article-dialog .share-options[hidden]{display:none!important}
+#article-dialog .share-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font:700 14px Arial,sans-serif;color:#102e48}
+#article-dialog .share-picker-head button{font-size:24px;line-height:1;border:0;background:transparent;color:#3b5369;cursor:pointer;padding:0 6px}
+#article-dialog .share-picker-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+#article-dialog .share-picker-grid a,#article-dialog .share-picker-grid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:0;min-height:70px;padding:7px 2px;border:1px solid #e1eaf1;border-radius:9px;background:#f8fbfe;color:#173c5a;text-decoration:none;font:600 10px Arial,sans-serif;cursor:pointer;text-align:center}
+#article-dialog .share-picker-grid a:hover,#article-dialog .share-picker-grid button:hover{background:#e9f4ff;border-color:#7db5e3}
+#article-dialog .share-picker-grid img{display:block;width:26px;height:26px;object-fit:contain}
+#article-dialog .share-picker-grid .share-picker-system span:first-child{font-size:26px;color:#096ab8}
+#article-dialog .share-options .share-hint{margin:9px 0 0;font:11px/1.4 Arial,sans-serif;color:#5b7083}
+@media(max-width:450px){#article-dialog .share-picker-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -229,19 +243,15 @@ article[role=button]{outline-offset:2px}
 <div class="article-share-actions" id="article-share-actions" aria-label="Compartilhar matéria">
 <button id="share-native" class="share-primary" type="button"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.5 6.6-4m-6.6 9 6.6 4"/></svg><span id="share-label">Compartilhar</span></button>
 <button id="share-copy" class="share-secondary" type="button">Copiar link</button>
-<div id="share-options" class="share-options" hidden role="group" aria-label="Escolha onde compartilhar">
-<a data-share-platform="whatsapp" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-<a data-share-platform="facebook" target="_blank" rel="noopener noreferrer">Facebook</a>
-<a data-share-platform="threads" target="_blank" rel="noopener noreferrer">Threads</a>
-<a data-share-platform="x" target="_blank" rel="noopener noreferrer">X / Twitter</a>
-<a data-share-platform="linkedin" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-<a data-share-platform="telegram" target="_blank" rel="noopener noreferrer">Telegram</a>
-<a data-share-platform="reddit" target="_blank" rel="noopener noreferrer">Reddit</a>
-<a data-share-platform="pinterest" target="_blank" rel="noopener noreferrer">Pinterest</a>
-<a data-share-platform="email">E-mail</a>
-<button id="share-system" type="button">Mais opções do dispositivo</button>
-<p class="share-hint">TikTok e Instagram não oferecem compartilhamento direto universal de links pela web; use Copiar link ou as opções do dispositivo.</p>
-</div>
+<div id="share-options" class="share-options" hidden role="dialog" aria-modal="false" aria-label="Escolher onde compartilhar"><div class="share-picker-head"><strong>Compartilhar notícia</strong><button id="share-options-close" type="button" aria-label="Fechar opções de compartilhamento">×</button></div><div class="share-picker-grid"><a data-share-platform="whatsapp" aria-label="Compartilhar no WhatsApp" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/whatsapp/25D366" alt="" width="26" height="26" loading="lazy"><span>WhatsApp</span></a>
+<a data-share-platform="facebook" aria-label="Compartilhar no Facebook" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/facebook/1877F2" alt="" width="26" height="26" loading="lazy"><span>Facebook</span></a>
+<a data-share-platform="threads" aria-label="Compartilhar no Threads" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/threads/111111" alt="" width="26" height="26" loading="lazy"><span>Threads</span></a>
+<a data-share-platform="x" aria-label="Compartilhar no X" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/x/111111" alt="" width="26" height="26" loading="lazy"><span>X</span></a>
+<a data-share-platform="linkedin" aria-label="Compartilhar no LinkedIn" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/linkedin/0A66C2" alt="" width="26" height="26" loading="lazy"><span>LinkedIn</span></a>
+<a data-share-platform="telegram" aria-label="Compartilhar no Telegram" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="" width="26" height="26" loading="lazy"><span>Telegram</span></a>
+<a data-share-platform="reddit" aria-label="Compartilhar no Reddit" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/reddit/FF4500" alt="" width="26" height="26" loading="lazy"><span>Reddit</span></a>
+<a data-share-platform="pinterest" aria-label="Compartilhar no Pinterest" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/pinterest/BD081C" alt="" width="26" height="26" loading="lazy"><span>Pinterest</span></a>
+<a data-share-platform="email" aria-label="Compartilhar no E-mail" target="_self" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/gmail/EA4335" alt="" width="26" height="26" loading="lazy"><span>E-mail</span></a><button id="share-system" type="button" class="share-picker-system"><span aria-hidden="true">↗</span><span>Mais opções</span></button></div><p class="share-hint">Para Instagram e TikTok, use Copiar link ou Mais opções do dispositivo.</p></div>
 <span id="share-feedback" role="status" aria-live="polite"></span>
 </div></section><section class="article-original" id="article-original" aria-label="Reportagem completa na fonte"><div id="article-source"></div></section>
 
