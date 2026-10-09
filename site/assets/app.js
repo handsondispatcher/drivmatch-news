@@ -180,8 +180,8 @@
       ? `<p class="image-credit">Foto ilustrativa: <a href="${escapeHTML(opened.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(opened.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(opened.image_license||'Licença na fonte')}</p>`:'';
     $('article-source').innerHTML+=photoCredit;
     $('articleLanguageTitle').textContent=lang==='en'?'Article language':lang==='es'?'Idioma de la noticia':'Idioma da notícia';
-    $('articleLanguageButtons').innerHTML=opened.kind==='external_link'?'':langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
-    $('article-reading').hidden=opened.kind==='external_link';
+    $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]&&(opened.kind!=='external_link'||opened.translated_langs?.includes(l))).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
+    $('article-reading').hidden=opened.kind==='external_link'&&(!opened.translated_langs||opened.translated_langs.length<2);
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('share-feedback').textContent='';
     $('share-options').hidden=true;
