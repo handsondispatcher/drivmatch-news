@@ -7,10 +7,11 @@ const headline=s=>clean(s).replace(/https?:\/\/\S+/gi,'').replace(/\s+-\s+[^-]{2
 function display(){
  const bar=byId('dm-news-crawler'),track=byId('dm-crawler-track');if(!bar||!track)return;
  const l=byId('language')?.value||'pt';
- const validStories=entries.filter(a=>a.status==='approved'&&!a.demo&&a.locales?.[l]?.title&&a.source_url?.startsWith('https://'));
+ const validStories=entries.filter(a=>a.status==='approved'&&!a.demo&&a.locales?.[l]?.title&&a.source_url?.startsWith('https://')&&(l==='en'||a.locales[l].title!==a.locales?.en?.title));
  const links=[],seen=new Set();
  for(const a of sourceHeadlines){
    if(!a.source_url?.startsWith('https://')||!a.title||!a.titles?.[l]||seen.has(a.source_url))continue;
+   if(l!==(a.original_lang||'en')&&clean(a.titles[l]).toLowerCase()===clean(a.title).toLowerCase())continue;
    seen.add(a.source_url);
    const title=a.titles?.[l]||a.title;
    const untranslated=!a.titles?.[l];
