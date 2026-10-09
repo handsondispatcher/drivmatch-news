@@ -166,6 +166,7 @@
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('share-feedback').textContent='';
     $('share-options').hidden=true;
+    $('share-picker-feedback').textContent='';
     $('share-native').setAttribute('aria-expanded','false');
     $('shade').classList.add('open');
   }
@@ -174,6 +175,10 @@
     $('share-label').textContent=next==='en'?'Share':next==='es'?'Compartir':'Compartilhar';
     $('share-section-title').textContent=next==='en'?'Share this story':next==='es'?'Comparte esta noticia':'Compartilhe esta notícia';
     $('share-copy').textContent=next==='en'?'Copy link':next==='es'?'Copiar enlace':'Copiar link';
+    $('share-whatsapp-copy').textContent=next==='en'?'WhatsApp Web already open? Copy message to paste in your chat':next==='es'?'¿Ya tienes WhatsApp Web abierto? Copia el mensaje':'Já está no WhatsApp Web? Copiar mensagem para colar na conversa';
+    $('share-story').querySelector('span:last-child').textContent=next==='en'?'Story image':next==='es'?'Imagen Story':'Card Stories';
+    $('share-system').querySelector('span:last-child').textContent=next==='en'?'Other apps':next==='es'?'Otras apps':'Outros apps';
+    $('share-stories-hint').textContent=next==='en'?'Stories: save the image and publish it in your app. Not an automatic post.':next==='es'?'Historias: guarda la imagen y publícala en tu app. No se publica automáticamente.':'Stories: salve a imagem e publique no seu aplicativo. Não há publicação automática em Stories.';
     const trans=labels[next];document.querySelector('#panorama .heading').textContent=trans.panorama;document.querySelector('#noticias .heading').textContent=trans.news;
     document.querySelector('#market-title').textContent=trans.market;
     $('search').placeholder=trans.search;$('category').options[0].text=trans.filters;
@@ -223,7 +228,7 @@
     const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
     const shareOptions=$('share-options');
     const shareDestinations=(title,url)=>({
-      whatsapp:'https://wa.me/?text='+encodeURIComponent(title+'\n'+url),
+      whatsapp:(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'')?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent(title+'\n'+url),
       facebook:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),
       threads:'https://www.threads.net/intent/post?text='+encodeURIComponent(title+' '+url),
       x:'https://twitter.com/intent/tweet?text='+encodeURIComponent(title)+'&url='+encodeURIComponent(url),
@@ -237,6 +242,7 @@
       if(!opened)return;
       const expanded=shareOptions.hidden;
       shareOptions.hidden=!expanded;
+      pickerFeedback.textContent='';
       $('share-native').setAttribute('aria-expanded',String(expanded));
       if(!expanded)return;
       const urls=shareDestinations(shareText(),shareUrlOf(opened));
@@ -244,6 +250,53 @@
     });
     $('share-options-close').addEventListener('click',()=>{shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');$('share-native').focus();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!shareOptions.hidden){shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');e.stopPropagation();}});
+    const shareMessage=()=>shareText()+'\n'+shareUrlOf(opened);
+    const pickerFeedback=$('share-picker-feedback');
+    const shareSystem=$('share-system');
+    shareSystem.hidden=typeof navigator.share!=='function';
+    const copyToClipboard=async(value)=>{
+      if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(value);return;}
+      const helper=document.createElement('textarea');helper.value=value;helper.setAttribute('readonly','');
+      helper.style.position='fixed';helper.style.opacity='0';document.body.appendChild(helper);helper.select();
+      const ok=document.execCommand('copy');helper.remove();if(!ok)throw Error('Clipboard unavailable');
+    };
+    $('share-whatsapp-copy').addEventListener('click',async()=>{
+      if(!opened)return;
+      try{await copyToClipboard(shareMessage());pickerFeedback.textContent=lang==='en'?'Message copied. Paste it in your open WhatsApp Web chat.':lang==='es'?'Mensaje copiado. Pégalo en tu conversación abierta de WhatsApp Web.':'Mensagem copiada. Cole na conversa que já está aberta no WhatsApp Web.';}
+      catch(_){pickerFeedback.textContent=lang==='en'?'Copy the headline and link manually.':lang==='es'?'Copia el titular y el enlace manualmente.':'Não foi possível copiar automaticamente. Use Copiar link.';}
+    });
+    $('share-story').addEventListener('click',async()=>{
+      if(!opened)return;
+      const story=opened,title=localeOf(story,lang)?.title||shareText();
+      const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1920;
+      const ctx=canvas.getContext('2d');
+      if(!ctx){pickerFeedback.textContent='Não foi possível criar a imagem neste navegador.';return;}
+      const bg=ctx.createLinearGradient(0,0,1080,1920);bg.addColorStop(0,'#05111f');bg.addColorStop(1,'#123d63');
+      ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1920);
+      ctx.fillStyle='#079ce9';ctx.fillRect(70,435,940,9);
+      ctx.fillStyle='#c4e6ff';ctx.font='700 29px Arial, sans-serif';ctx.fillText('DRIVMATCH NEWS',78,525);
+      ctx.fillStyle='#ffffff';ctx.font='700 66px Georgia, serif';
+      const words=String(title).split(/\s+/),lines=[];let line='';
+      for(const word of words){const trial=line?line+' '+word:word;if(ctx.measureText(trial).width>925&&line){lines.push(line);line=word;}else line=trial;}
+      if(line)lines.push(line);
+      let y=680;for(const segment of lines.slice(0,9)){ctx.fillText(segment,78,y,925);y+=89;}
+      if(lines.length>9){ctx.font='700 34px Arial, sans-serif';ctx.fillText('…',78,y+18);}
+      ctx.fillStyle='#8bcaf5';ctx.fillRect(78,1600,924,2);
+      ctx.fillStyle='#ffffff';ctx.font='600 36px Arial, sans-serif';ctx.fillText('Leia a notícia em drivmatch.com/news',78,1685,924);
+      ctx.fillStyle='#b7d7ec';ctx.font='27px Arial, sans-serif';ctx.fillText('Compartilhe a informação. Confira a fonte.',78,1740,924);
+      try{
+        const logo=new Image();logo.src='assets/logo-drivmatch-news.png';
+        await new Promise((resolve,reject)=>{if(logo.complete&&logo.naturalWidth)return resolve();logo.onload=resolve;logo.onerror=reject;});
+        ctx.drawImage(logo,70,140,Math.min(810,logo.naturalWidth*1.8),Math.min(170,logo.naturalHeight*1.8));
+      }catch(_){ctx.fillStyle='#ffffff';ctx.font='700 54px Arial, sans-serif';ctx.fillText('DrivMatch News',78,215);}
+      try{
+        const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw Error('Image export failed');
+        const blobUrl=URL.createObjectURL(blob),a=document.createElement('a');
+        a.href=blobUrl;a.download='drivmatch-news-story.png';document.body.appendChild(a);a.click();a.remove();
+        setTimeout(()=>URL.revokeObjectURL(blobUrl),10000);
+        pickerFeedback.textContent=lang==='en'?'Story image saved. Add it to your Instagram, TikTok or WhatsApp Story.':lang==='es'?'Imagen guardada. Publícala en tu historia de Instagram, TikTok o WhatsApp.':'Imagem de Story salva. Publique no Instagram, TikTok ou Status do WhatsApp.';
+      }catch(_){pickerFeedback.textContent=lang==='en'?'Could not save the Story image.':lang==='es'?'No se pudo guardar la imagen.':'Não foi possível salvar a imagem do Story.';}
+    });
     $('share-system').addEventListener('click',async()=>{
       if(!opened)return;
       const title=shareText(),url=shareUrlOf(opened);
