@@ -96,7 +96,7 @@ jobs:
           grep -q 'blockedPublisher' /tmp/drivmatch-crawler.js
           echo "READER ACCESS PASS: ticker geoblock filter published"
           if curl --fail --location --silent --show-error --max-time 12 https://drivmatch.com/news/ -o /tmp/drivmatch-domain.html; then
-            if grep -q 'uma publicação da Hands On Dispatcher LLC' /tmp/drivmatch-domain.html; then
+            if grep -q 'um produto da Hands On Dispatcher LLC' /tmp/drivmatch-domain.html; then
               echo "CUSTOM DOMAIN PASS: updated publication footer found"
             else
               echo "::warning::Custom domain responded but new publisher footer was not found; check cache or proxy"
