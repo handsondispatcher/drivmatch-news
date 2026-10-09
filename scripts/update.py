@@ -319,11 +319,15 @@ def build(offline=False):
     from weather_brief import collect_weather
     weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
-    data={'schema_version':1,'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
+    release=read_json(ROOT/'content/release.json')
+    if release.get('version')!='v32' or release.get('public_launch_approved') is not False:
+        raise ValueError('Invalid release contract: v32 must remain prelaunch')
+    data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
     public_spot=os.getenv('USDBRL_PUBLIC_URL','')
     runtime={'spot_url':public_spot if public_spot.startswith('https://') else ''}
+    (path/'release.json').write_text(json.dumps(release,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'runtime.json').write_text(json.dumps(runtime)+'\n',encoding='utf-8')
     (path/'content.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     source_health_path=ROOT/'build/source-health.json'
