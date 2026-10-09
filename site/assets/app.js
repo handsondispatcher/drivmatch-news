@@ -148,20 +148,18 @@
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
     const src=safeUrl(opened.source_url);
-    // A publisher may block Google Translate or access from Brazil. Never promise a full translation.
+    // Use the publisher's direct URL as the primary path: Google Translate proxies
+    // are frequently blocked by Cloudflare (including The Trucker).
     const googleNews=!!src&&/^https:\/\/news\.google\.com(?:\/|$)/i.test(src);
     const translatedSource=src?langs.map(l=>{
-      const isOriginal=l===(opened.original_lang||'en') || googleNews;
-      const url=isOriginal?src:'https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(l)+'&u='+encodeURIComponent(src);
-      const label=isOriginal
-        ?(l==='pt'?'Abrir fonte original':l==='en'?'Open original source':'Abrir fuente original')
-        :(l==='pt'?'Tentar tradução automática':l==='en'?'Try automatic translation':'Intentar traducción automática');
-      return `<a class="article-source-button ${l===lang?'primary':''}" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer"><img src="${flags[l]}" width="28" height="19" alt=""><span>${label} ↗</span></a>`;
+      const label=l==='en'?'Open original article':l==='pt'?'Abrir original • traduzir no navegador':'Abrir original • traducir en navegador';
+      return `<a class="article-source-button ${l===lang?'primary':''}" href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer"><img src="${flags[l]}" width="28" height="19" alt=""><span>${label} ↗</span></a>`;
     }).join(''):'';
     const fullHeading=lang==='en'?'Read the report at the publisher':lang==='es'?'Leer la noticia en el sitio de origen':'CONSULTE A REPORTAGEM NA FONTE';
     const sourceOriginal=lang==='en'?'Original publisher link':lang==='es'?'Enlace original del medio':'Link original da publicação';
-    const accessWarning=lang==='en'?'Automatic translation is provided by an external service and may fail or be blocked by the publisher. DrivMatch News does not reproduce the full third-party article.':lang==='es'?'La traducción automática es externa y puede fallar o ser bloqueada por el medio. DrivMatch News no reproduce el artículo completo de terceros.':'A tradução automática é externa e pode falhar ou ser bloqueada pelo site de origem. O DrivMatch News não reproduz integralmente matérias de terceiros.';
-    $('article-source').innerHTML=src?`<div class="full-article-heading">${fullHeading}</div><div class="source-translations">${translatedSource}</div><p class="source-access-warning">${accessWarning}</p><a class="source-original" href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${sourceOriginal} ↗</a>`:escapeHTML(opened.source||'');
+    const accessWarning=lang==='en'?'The article opens directly at the publisher. To translate it, use your browser’s Translate page feature. Some publishers block access from certain regions. DrivMatch News cannot mirror full third-party articles without permission.':lang==='es'?'El artículo abre directamente en el sitio original. Para traducirlo, usa Traducir página en tu navegador. Algunos medios bloquean regiones. No republicamos artículos completos sin permiso.':'A notícia abre diretamente no site original. Para ler em português, use Traduzir página no menu do navegador. Alguns veículos bloqueiam regiões; o DrivMatch News não pode copiar matérias integrais sem autorização.';
+    const optionalTranslate=src&&!googleNews?'<a class="source-translate-link" href="'+escapeHTML('https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(lang)+'&u='+encodeURIComponent(src))+'" target="_blank" rel="noopener noreferrer">'+(lang==='pt'?'Tentar Google Tradutor (pode ser bloqueado)':lang==='es'?'Probar Google Traductor (puede bloquearse)':'Try Google Translate (may be blocked)')+' ↗</a>':'';
+    $('article-source').innerHTML=src?`<div class="full-article-heading">${fullHeading}</div><div class="source-translations">${translatedSource}</div><p class="source-access-warning">${accessWarning}</p><a class="source-original" href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${sourceOriginal} ↗</a> ${optionalTranslate}`:escapeHTML(opened.source||'');
     const photoCredit=opened.image_source_url && safeUrl(opened.image_source_url)
       ? `<p class="image-credit">Foto ilustrativa: <a href="${escapeHTML(opened.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(opened.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(opened.image_license||'Licença na fonte')}</p>`:'';
     $('article-source').innerHTML+=photoCredit;
