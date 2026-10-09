@@ -49,6 +49,17 @@ TRUCK = re.compile(r'\b(?:trucks?|truckers?|trucking|truck drivers?|'
     r'border checkpoints?|immigration checkpoints?|'
     r'irps?|iftas?|drayage|intermodal|logistics|supply chain|'
     r'port congestion|container freight)\b',re.I)
+CORE_ROAD = re.compile(r'\b(?:trucks?|truckers?|trucking|semi[- ]trucks?|18[- ]wheelers?|'
+    r'cdl|fmcsa|usdot|freight brokers?|dispatchers?|box trucks?|cargo vans?|'
+    r'sprinter vans?|hot[ -]?shots?|flatbeds?|dry vans?|reefers?|trailers?|'
+    r'commercial vehicles?|truck stops?|truck parking|truckload|drayage|'
+    r'haulage|haulers?|carriers?|tractor[- ]trailers?|weigh stations?|'
+    r'elds?|sleeper berths?|hours.of.service|immigrant drivers?|'
+    r'english proficiency|roadside inspections?|truck repair|truck tires?)\b',re.I)
+CONSUMER_FUEL = re.compile(r'\b(?:diesel|fuel prices?|gas prices?)\b',re.I)
+NON_ROAD_FREIGHT = re.compile(r'\b(?:ocean freight|air freight|air cargo|'
+    r'rail freight|railcar|trans.pacific|container ship|vessel|'
+    r'maritime|natural gas shipments|lng shipments)\b',re.I)
 WEATHER = re.compile(r'\b(?:hurricane|tropical storm|blizzard|snowstorm|'
     r'winter storm|ice storm|flood(?:ing|s)?|wildfire|tornado)\b',re.I)
 ROAD_IMPACT = re.compile(r'\b(?:road|highway|interstate|i-\d+|closure|'
@@ -67,10 +78,19 @@ def eligible(item):
     if region not in ('US','USA','CA','CAN','MX','MEX'):return False
     hostname=(urlparse(str(item.get('source_url') or '')).hostname or '').lower().removeprefix('www.')
     if not hostname:return False
-    if FOREIGN.search(title):return False
-    if OFF_TOPIC.search(title) and not TRUCK.search(title):return False
     has_us=bool(US_LOCATION.search(title) or US_STATE_RE.search(title) or US_ABBREV.search(title))
     has_cross=bool(CROSS.search(title))
+    core=bool(CORE_ROAD.search(title))
+    trade_publisher=any(hostname==d or hostname.endswith('.'+d) for d in US_TRUCK_PUBLISHERS)
+    # Foreign nationalities can be relevant to US immigrant/CDL driver rules;
+    # an accident or local transport event overseas is not.
+    if FOREIGN.search(title) and not (has_us and core and re.search(r'\b(?:immigran|immigration|foreign.born|english proficiency|cdl|fmcsa)\w*\b',title,re.I)):
+        return False
+    if re.search(r'\bfood trucks?\b',title,re.I) and not re.search(r'\b(?:freight|cargo|trucking|cdl)\b',title,re.I):
+        return False
+    if NON_ROAD_FREIGHT.search(title) and not core:return False
+    if CONSUMER_FUEL.search(title) and not (core or trade_publisher):return False
+    if OFF_TOPIC.search(title) and not core:return False
     is_ca_mx=region in ('CA','CAN','MX','MEX')
     canadian_domain=hostname.endswith('.ca') or hostname.endswith('.mx') or hostname.endswith('.com.mx')
     # US/Canada and US/Mexico: domestic Canadian/Mexican coverage is NOT allowed.
@@ -78,10 +98,10 @@ def eligible(item):
         if not (has_us and has_cross):return False
     elif not has_us:
         # Search-feed geography is a query setting, not evidence of article geography.
-        if not any(hostname==d or hostname.endswith('.'+d) for d in US_TRUCK_PUBLISHERS):
+        if not trade_publisher:
             return False
     # Weather must have an explicit US route impact, or originate at NHC (US storms).
     if item.get('category')=='Clima':
         return bool((WEATHER.search(title) and (ROAD_IMPACT.search(title) or
             (hostname.endswith('noaa.gov') and has_us))) or (TRUCK.search(title) and ROAD_IMPACT.search(title)))
-    return bool(TRUCK.search(title) or (has_cross and has_us and ROAD_IMPACT.search(title)))
+    return bool((TRUCK.search(title) and (core or trade_publisher or has_us)) or (has_cross and has_us and core))
