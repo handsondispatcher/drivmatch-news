@@ -12,7 +12,7 @@ from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
  def test_visual_and_weather(self):
   page=(BASE/'site/index.html').read_text()
-  for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — um produto da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
+  for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — uma publicação da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
   self.assertLess(page.index('id="clima-desktop"'),page.index('id="market-title"'))
  def test_no_demo_default(self):
   self.assertTrue(all(up.publication_valid(a) for a in json.loads((BASE/'content/editorial.json').read_text())))
