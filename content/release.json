@@ -1,10 +1,18 @@
 {
   "product": "DrivMatch News",
-  "version": "v32",
-  "baseline": "v31 + post-v31 improvements (2026-10-09)",
+  "version": "v33",
+  "baseline": "v32 preserved at backup/v32-approved-2026-10-09 + v33 editorial polish (2026-10-09)",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
   "consolidated_on": "2026-10-09",
-  "editorial_alerts_are_live_incidents": false
+  "editorial_alerts_are_live_incidents": false,
+  "backup_branch": "backup/v32-approved-2026-10-09",
+  "backup_commit": "659a146b8f48c342c2a62d86a1330d59760116d4",
+  "polish_scope": [
+    "responsive_typography",
+    "carousel_accessibility_and_swipe",
+    "market_sidebar_readability",
+    "five_headline_briefing"
+  ]
 }

@@ -1,14 +1,18 @@
-# DrivMatch News — v32 (baseline consolidada, 09/10/2026)
+# DrivMatch News — v33 (Revisão editorial, 09/10/2026)
 
-**CONTINUIDADE ENTRE CHATS (01 / 02 / 03 / próximos):** [Leia PRIMEIRO o registro canônico do projeto](docs/CONTINUIDADE_DRIVMATCH_NEWS.md). Este registro reúne decisões, versões, links de PRs/deploys, pendências e a instrução de **não exigir que o usuário repita o histórico**.\n\n**Versão atual do produto: v32.** Consolidação da interface editorial v31 com as melhorias posteriores já presentes na `main`. **A v18 é referência histórica, não a versão de trabalho.**
+**Estado:** Desenvolvimento / Pré-lançamento. **Não autorizado para divulgação como produto concluído.**
 
-**Estado:** desenvolvimento / pré-lançamento. **Não autorizado para divulgação como produto concluído.** Consulte [a especificação e os critérios de homologação da v32](docs/V32_RELEASE.md) e o [Release Gate #18](https://github.com/handsondispatcher/drivmatch-news/issues/18).
+**ANTES DE COMEÇAR EM OUTRO CHAT:** leia [docs/CONTINUIDADE_DRIVMATCH_NEWS.md](docs/CONTINUIDADE_DRIVMATCH_NEWS.md). O histórico recuperado, as decisões, os PRs, versões e pendências estão preservados aqui para evitar instruções repetidas.
 
-**Implementação:** `site/index.html` + `site/assets/app.js`; conteúdo de matérias em `content/editorial.json`, monitor de fontes em `content/sources.json`, scripts de atualização em `scripts/`, atualizações a cada execução do GitHub Actions `.github/workflows/deploy.yml`, integração de notícias em `site/data/live-feed.json` e share cards em `site/share/` (gerados no build). Versão e status em `content/release.json` e `site/data/release.json`.
+## Backup íntegro da v32 e desenvolvimento seguro
 
-**Preservado na v32:** layout v31 com manchete grande e três relacionadas, idiomas e bandeiras, clima Ventusky/NWS, mercado com dados verificados, matérias originais com atribuição, WhatsApp e compartilhamento social, restrições de geografia/frescor/deduplicação, rodapé da Hands On Dispatcher LLC.
+- **v32 preservada:** [`backup/v32-approved-2026-10-09`](https://github.com/handsondispatcher/drivmatch-news/tree/backup/v32-approved-2026-10-09), commit `659a146b8f48c342c2a62d86a1330d59760116d4`.
+- **v33:** polimento de legibilidade, sidebar clima/mercado, setas compactas + dots clicáveis + swipe no Panorama e 5 manchetes do feed atual; a v31 + v32 continua preservada em sua estrutura.
+- **Documentação atual:** [V33_RELEASE.md](docs/V33_RELEASE.md). **Gate de lançamento:** [issue #18](https://github.com/handsondispatcher/drivmatch-news/issues/18) continua aberto.
+- **Rollback:** trazer o tree do commit v32 preservado à `main` via PR e validação automatizada; jamais desfazer trabalhos posteriores por force push.
+- **Sem simulações indevidas:** preços, imagens, direitos de conteúdo, RSS e tradução continuam sujeitos a evidência e autorizações; `/live` e ticker da home são aplicação separada.
 
-**Sem funcionalidades simuladas:** dados comerciais sem provedor autorizado permanecem indisponíveis; links originais não significam tradução integral da publicação; o `/live` e o ticker do site principal são outra aplicação.
+**Marca oficial:** logo horizontal azul original, rodapé «DrivMatch News — um produto da Hands On Dispatcher LLC», português brasileiro, inglês americano e espanhol latino-americano.
 
 ---
 

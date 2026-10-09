@@ -1,4 +1,4 @@
-/* DrivMatch News v32 — composição editorial v31 + atualizações posteriores; v18 é apenas referência histórica. */
+/* DrivMatch News v33 — polimento editorial sobre v32; baseline v31 e modal compacto preservados. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -143,7 +143,16 @@
       :`<div class="empty">${labels[lang].noResults}</div>`;
     $('featureCount').textContent=`${featurePage+1} / ${n}`;
     $('featurePrev').disabled=featurePage===0; $('featureNext').disabled=featurePage===n-1;
-    $('featureDots').innerHTML=Array.from({length:n},(_,i)=>`<button type="button" class="carousel-dot ${i===featurePage?'active':''}" data-slide="${i}" aria-label="${i+1}"></button>`).join('');
+    const slideLabel=lang==='pt'?'Ir para página':lang==='es'?'Ir a la página':'Go to page';
+    $('featureDots').innerHTML=Array.from({length:n},(_,i)=>`<button type="button" class="carousel-dot ${i===featurePage?'active':''}" data-slide="${i}" aria-label="${slideLabel} ${i+1} / ${n}" aria-pressed="${i===featurePage}" ${i===featurePage?'aria-current="page"':''}></button>`).join('');
+    const shortlist=f.slice(0,5);
+    $('highlights-title').textContent=lang==='pt'?'5 manchetes em foco':lang==='es'?'5 titulares destacados':'5 headlines in focus';
+    $('highlights-note').textContent=lang==='pt'?'Seleção por relevância e recência do feed; confira a fonte original.':lang==='es'?'Selección del feed; compruebe la fuente original.':'Selected from the news feed; verify the original source.';
+    $('highlightList').innerHTML=shortlist.map(a=>{
+      const i=indexSet.get(a.id),title=cleanHeadline(localeOf(a)?.title||'');
+      return `<li><button type="button" data-story="${i}" aria-label="${escapeHTML(title)}"><span class="highlight-headline">${escapeHTML(title)}</span><span class="highlight-source">${escapeHTML(a.source||'')}</span></button></li>`;
+    }).join('');
+    $('highlights').hidden=!shortlist.length;
   }
   function percentBadge(v){if(!Number.isFinite(v))return '';
     const cls=v>0?'market-up':v<0?'market-down':'market-flat';const arrow=v>0?'▲':v<0?'▼':'—';const n=(v>0?'+':'')+v.toLocaleString(lang==='pt'?'pt-BR':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -276,7 +285,10 @@
     document.querySelector('#market-title').textContent=trans.market;
     $('search').placeholder=trans.search;$('category').options[0].text=trans.filters;
     const ages=$('age').options;[trans.allDates,trans.d2,trans.d7,trans.d30].forEach((t,i)=>{if(ages[i])ages[i].text=t});
-    $('featurePrev').textContent=$('prev').textContent=trans.prev;$('featureNext').textContent=$('next').textContent=trans.next;
+    $('prev').textContent=trans.prev;$('next').textContent=trans.next;
+    $('featurePrev').textContent='←';$('featureNext').textContent='→';
+    $('featurePrev').setAttribute('aria-label',trans.prev.replace(/[←→]/g,'').trim());
+    $('featureNext').setAttribute('aria-label',trans.next.replace(/[←→]/g,'').trim());
     $('chips').innerHTML=['Todas',...CATS].map(c=>`<button class="chip ${selected===c?'active':''}" data-cat="${c}">${c==='Todas'?trans.all:escapeHTML(localizedCategory(c))}</button>`).join('');
     [...$('category').options].slice(1).forEach(o=>o.textContent=localizedCategory(o.value));
     if(rerender){renderStories();renderMarket();renderAds();if(opened)renderArticle();}
@@ -327,6 +339,22 @@
     $('featurePrev').addEventListener('click',()=>{featurePage--;renderStories();});
     $('featureNext').addEventListener('click',()=>{featurePage++;renderStories();});
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
+    // Native horizontal gesture on the main Panorama; vertical page scrolling remains free.
+    let panoramaTouch=null;
+    $('features').addEventListener('touchstart',e=>{
+      if(e.touches.length!==1)return;
+      panoramaTouch={x:e.touches[0].clientX,y:e.touches[0].clientY};
+    },{passive:true});
+    $('features').addEventListener('touchend',e=>{
+      if(!panoramaTouch||!e.changedTouches.length)return;
+      const dx=e.changedTouches[0].clientX-panoramaTouch.x;
+      const dy=e.changedTouches[0].clientY-panoramaTouch.y;
+      panoramaTouch=null;
+      if(Math.abs(dx)<60||Math.abs(dx)<=Math.abs(dy)*1.4)return;
+      const max=Math.max(0,Math.ceil(articlesFiltered().length/featureSize)-1);
+      const nextPage=Math.min(max,Math.max(0,featurePage+(dx<0?1:-1)));
+      if(nextPage!==featurePage){featurePage=nextPage;renderStories();}
+    },{passive:true});
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function')window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');};
     const shareText=()=>opened?cleanHeadline(localeOf(opened,lang)?.title||'DrivMatch News'):'DrivMatch News';
     const shareSummary=()=>opened?(opened.kind==='external_link'
@@ -486,9 +514,9 @@
         $('share-feedback').textContent=lang==='en'?'Link copied!':lang==='es'?'¡Enlace copiado!':'Link copiado!';
       }catch(_){$('share-feedback').textContent=(lang==='en'?'Copy the link: ':lang==='es'?'Copia el enlace: ':'Copie o link: ')+url;}
     });
-    $('list').addEventListener('click',clickArticle);$('features').addEventListener('click',clickArticle);
+    $('list').addEventListener('click',clickArticle);$('features').addEventListener('click',clickArticle);$('highlightList').addEventListener('click',clickArticle);
     const keyArticle=e=>{if(e.key==='Enter'||e.key===' '){const item=e.target.closest('[data-story]');if(item){e.preventDefault();clickArticle({target:item});}}};
-    $('list').addEventListener('keydown',keyArticle);$('features').addEventListener('keydown',keyArticle);
+    $('list').addEventListener('keydown',keyArticle);$('features').addEventListener('keydown',keyArticle);$('highlightList').addEventListener('keydown',keyArticle);
     $('articleLanguageButtons').addEventListener('click',e=>{const b=e.target.closest('[data-article-lang]');if(!b)return;articleLang=b.dataset.articleLang;renderArticle();});
     $('shade').addEventListener('click',e=>{if(e.target===$('shade'))closeModal();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});

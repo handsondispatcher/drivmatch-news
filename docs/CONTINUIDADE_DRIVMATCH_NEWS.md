@@ -1,5 +1,14 @@
 # DrivMatch News — CONTINUIDADE CANÔNICA / LEIA PRIMEIRO
 
+## ATUALIZAÇÃO CANÔNICA 09/10/2026 — V33 E BACKUP V32
+
+**Versão em desenvolvimento atual: v33**, com base na v32 (v31 + melhorias posteriores); **lançamento ainda bloqueado**, `public_launch_approved=false`. A v32 foi salvaguardada no GitHub sob **`backup/v32-approved-2026-10-09`**, commit exato **`659a146b8f48c342c2a62d86a1330d59760116d4`**, antes de qualquer alteração v33. **Não apagar/mover essa branch**, não force-push e não confundir `release/drivmatch-news-v32-20261009` (branch antiga) com o backup de agora. A especificação v33 e o procedimento de retorno estão em **[V33_RELEASE.md](V33_RELEASE.md)**.
+
+**Decisão do usuário:** salvar o site atual ANTES de revisar v33. A v33 é revisão incremental baseada em War Room, com tipografia, Panorama e sidebar, dots/gestos e módulo de manchetes do feed; preservar logo e modal Android sem scroll. O estudo de mockup com caminhões e mapa é CONCEITO, não notícia real e não layout já aprovado. Se a v33 reprovar CI não divulgar nem atualizar `main`; se aprovar, publicar mantendo branch backup intacta. O issue #18 continua controlando final de pré-lançamento.
+
+### Histórico até v32 — arquivo de decisão, não versão corrente
+
+
 **Atualizado:** 09/10/2026. **Projeto:** Jornal DrivMatch News / Hands On Dispatcher LLC.  
 **Versão de trabalho:** **v32**, sobre a branch **`main`** do repositório `handsondispatcher/drivmatch-news`. **Estado:** `DEVELOPMENT_PRELAUNCH`, `public_launch_approved=false`.  
 **NÃO recomeçar, NÃO regredir à v18, NÃO pedir ao usuário que reconte decisões de chats anteriores.** Documento de continuidade para os chats «01 DrivMatch News», «02 DrivMatch News», «03 DrivMatch News» e suas continuações.
