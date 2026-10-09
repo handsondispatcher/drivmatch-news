@@ -21,7 +21,18 @@ const {spawn}=require('node:child_process');
    assert.match(await page.locator(card+' iframe').getAttribute('src'),/^https:\/\/embed\.ventusky\.com/);
    assert.equal(await page.locator(card+' iframe').isVisible(),true);
    assert.equal(await page.locator(card+' .weather-open').count(),1);
-   await page.locator('#list article[data-story]').first().click();
+   // External source cards may fill page one; locate an approved editorial card through pagination.
+   const openEditorial=async()=>{
+    for(let attempt=0;attempt<25;attempt++){
+     if(await page.locator('#list article[data-story]').count()){
+      await openEditorial();return;
+     }
+     if(await page.locator('#next').isDisabled())break;
+     await page.locator('#next').click();
+    }
+    throw new Error('No approved editorial article reachable through news pagination');
+   };
+   await openEditorial();
    // Reader flows top to bottom; the language selector must not hide in the footer.
    const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','modalbodytext','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
    assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-original'] && order['article-original']<order['article-share-footer'],`article flow ${JSON.stringify(order)}`);
