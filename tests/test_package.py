@@ -58,7 +58,9 @@ class PublicationTests(unittest.TestCase):
  def test_ticker_respects_selected_language(self):
   ticker=(BASE/'site/assets/news-crawler.js').read_text()
   self.assertIn("a.titles?.[l]||a.title",ticker)
-  self.assertIn("l==='es'?'FUENTE",ticker)
+  self.assertIn('TECNOLOGIA E TRANSPORTE',ticker)
+  self.assertIn('DIESEL E COMBUSTÍVEIS',ticker)
+  self.assertIn('k.textContent=category[',ticker)
   self.assertIn("untranslated",ticker)
   self.assertIn("ticker-i18n-20261009",(BASE/'site/index.html').read_text())
  def test_cache_consistency(self):
