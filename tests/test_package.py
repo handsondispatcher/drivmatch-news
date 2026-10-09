@@ -91,6 +91,26 @@ class PublicationTests(unittest.TestCase):
    result=up.localize_source_headlines([fixture],errors,False)[0]
   self.assertEqual(result['titles'],{'en':fixture['title']})
   self.assertTrue(any('headline_translation_incomplete' in x for x in errors))
+ def test_live_feed_freshness_access_and_no_fake_urgency(self):
+  from live_feed import make_live_feed
+  now=datetime(2026,10,9,15,tzinfo=timezone.utc)
+  def row(ident,source,published,pt='Caminhoneiros dos EUA enfrentam nova regra'):
+   return {'id':ident,'source_url':source,'published_at':published,'status':'approved','titles':{'pt':pt,'en':'US truckers face new rule','es':'Camioneros de EE. UU. afrontan nueva regla'},'category':'Transporte'}
+  fresh=now.isoformat()
+  old=datetime(2026,10,1,tzinfo=timezone.utc).isoformat()
+  items=[
+   row('fresh','https://www.freightwaves.com/news/new-rule',fresh),
+   row('blocked','https://www.thetrucker.com/news/rule',fresh),
+   row('stale','https://www.ttnews.com/articles/old',old),
+   row('duplicate','https://www.ttnews.com/articles/new',fresh),
+  ]
+  feed=make_live_feed([],items,now)
+  self.assertEqual([x['id'] for x in feed['items']],['fresh'])
+  self.assertFalse(feed['operational_alerts_integrated'])
+  self.assertFalse(feed['items'][0]['is_active_incident'])
+  self.assertIsNone(feed['items'][0]['severity'])
+  self.assertIn('/news/?story=fresh',feed['items'][0]['url'])
+  self.assertIn("live-feed.json",(BASE/'scripts/update.py').read_text())
  def test_geographic_editorial_gate_blocks_foreign_and_domestic_canada(self):
   from editorial_gate import eligible
   def article(title,region='US',url='https://news.google.com/rss/articles/example',category='Transporte'):
