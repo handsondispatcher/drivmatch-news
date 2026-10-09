@@ -37,6 +37,14 @@ v32 is a consolidation of the **v31 editorial interface**, the approved visual b
 - `README.md` (current top section) and this document supersede all old "v18 current" instructions, which are historical.
 - The version gate requires Python unit tests, client JS smoke, Playwright checks at 360 / 390 / 768 / 1440 px and a post-deploy check for the public HTML and manifest.
 
+## v32 mobile article/share reader — regression and correction (09/10/2026)
+
+Android screenshots showed the article modal's two primary sharing controls pushed below the initial viewport. The earlier CSS already contained a sticky-footer intention but later selectors overrode it with relative/static positioning. This was not an invitation to redesign the newspaper.
+
+The correction in `site/index.html` restores an always-visible mobile share dock with the **Compartilhar** blue icon button on the left and **Copiar link** on the right, with safe-area spacing. The source-language buttons, article hero, title, attribution and link presentation are compact on <=650px, and padding reserves room for the dock so it never hides the last paragraph. The share picker opens above the dock inside the viewport. Larger screens keep existing styling. Mobile Playwright regression asserts both buttons are visible **before scrolling**, after scrolling, and that the picker fits at 360px and 390px.
+
+**DO NOT propose copy-paste CSS patches to the user** when GitHub access is connected. Implement fixes, run tests, verify production and carry forward decisions in [CONTINUIDADE_DRIVMATCH_NEWS.md](CONTINUIDADE_DRIVMATCH_NEWS.md).
+
 ## Explicitly not claimed as complete
 
 1. The product is **NOT authorized for public-launch announcements**. Follow issue #18 for final review and approval.
