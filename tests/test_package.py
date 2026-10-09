@@ -108,7 +108,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('role="button" data-story="${i}"',js)
   self.assertNotIn('role="link" data-external-url=',js)
   self.assertNotIn('${cat} · ${escapeHTML(a.region',js)
-  self.assertIn("a.kind==='external_link' ? safeUrl(a.source_url)",js)
+  self.assertIn("const shareUrlOf = a => 'https://handsondispatcher.github.io/drivmatch-news/share/'",js)
   self.assertIn("opened.kind==='external_link'",js)
   self.assertIn("article-source",js)
   self.assertIn("share-native",js)

@@ -8,18 +8,21 @@ function display(){
  const bar=byId('dm-news-crawler'),track=byId('dm-crawler-track');if(!bar||!track)return;
  const l=byId('language')?.value||'pt';
  const validStories=entries.filter(a=>a.status==='approved'&&!a.demo&&a.locales?.[l]?.title&&a.source_url?.startsWith('https://')&&(l==='en'||a.locales[l].title!==a.locales?.en?.title));
- const links=[],seen=new Set();
+ const links=[],seen=new Set(),seenTitles=new Set();
+ const cleanTitle=t=>String(t||'').replace(/\\s*(?:[-–—|])\\s*(?:thetrucker(?:\\.com)?|the trucker|freightwaves|transport topics|truck news|[\\w-]+\\.(?:com|net|org))\\s*$/i,'').trim();
+ const fingerprint=t=>cleanTitle(t).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
  for(const a of sourceHeadlines){
-   if(a.geo_scope_verified!==true||!a.source_url?.startsWith('https://')||!a.title||!a.titles?.[l]||seen.has(a.source_url))continue;
+   if(a.geo_scope_verified!==true||a.origin_type==='aggregator-discovery'||/news\\.google\\.com/i.test(a.source_url||'')||!a.source_url?.startsWith('https://')||!a.title||!a.titles?.[l]||seen.has(a.source_url))continue;
    if(l!==(a.original_lang||'en')&&clean(a.titles[l]).toLowerCase()===clean(a.title).toLowerCase())continue;
-   seen.add(a.source_url);
-   const title=a.titles?.[l]||a.title;
+   const title=cleanTitle(a.titles?.[l]||a.title);
+   if(seenTitles.has(fingerprint(title)))continue;
+   seenTitles.add(fingerprint(title));seen.add(a.source_url);
    const untranslated=!a.titles?.[l];
    links.push({title,untranslated,source:a.source||'External source',url:a.source_url,external:true,region:a.region||'US',date:a.published_at||'',category:a.category||'Transporte'});
  }
  // Supplement with approved stories not already included in the source monitor.
  for(const a of validStories){
-   if(seen.has(a.source_url))continue;seen.add(a.source_url);
+   if(seen.has(a.source_url)||seenTitles.has(fingerprint(a.locales[l].title)))continue;seen.add(a.source_url);seenTitles.add(fingerprint(a.locales[l].title));
    links.push({title:a.locales[l].title,source:a.source||'DrivMatch News',url:a.source_url,external:false,region:'US',date:a.published_at||'',category:a.category||'Transporte'});
  }
  if(!links.length){bar.hidden=true;return;}

@@ -82,11 +82,27 @@
     if(!a.published_at)return '';
     return `${labels[lang].published}: ${escapeHTML(new Date(a.published_at).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{dateStyle:'short',timeStyle:'short'}))}`;
   }
+  // Publisher names are metadata, not part of editorial headlines.
+  function cleanHeadline(title){
+    return String(title||'').replace(/\s*(?:[-–—|])\s*(?:thetrucker(?:\.com)?|the trucker|freightwaves|transport topics|truck news|trucknews(?:\.com)?|land line|overdrive(?:online)?|fleetowner|cdllife|[\w-]+\.(?:com|net|org))\s*$/i,'').trim();
+  }
+  function eventFingerprint(title){
+    return cleanHeadline(title).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  }
+  function duplicateEvent(a,b){
+    const x=eventFingerprint(a),y=eventFingerprint(b);
+    if(!x||!y)return false;
+    if(x===y)return true;
+    const one=new Set(x.split(' ')),two=new Set(y.split(' '));
+    if(Math.min(one.size,two.size)<6)return false;
+    const overlap=[...one].filter(t=>two.has(t)).length;
+    return overlap/Math.max(1,one.size+two.size-overlap)>=.84;
+  }
   function storyCard(a,i,featured=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
     if(a.kind==='external_link'){
-      const title=escapeHTML(txt?.title||''), url=escapeHTML(safeUrl(a.source_url)||'#'), attribution=escapeHTML(a.source||'');
+      const title=escapeHTML(cleanHeadline(txt?.title||'')), url=escapeHTML(safeUrl(a.source_url)||'#'), attribution=escapeHTML(a.source||'');
       const translated=a.translated_langs?.includes(lang);const languageNotice=translated?'':(lang==='pt'?' · Título original sem tradução':lang==='es'?' · Titular original sin traducir':' · Original headline (not translated)');
-      const note=(lang==='pt'?'Manchete da fonte · Abrir original ↗':lang==='es'?'Titular de la fuente · Abrir original ↗':'Source headline · Open original ↗')+languageNotice;
+      const note=(lang==='pt'?'Leia o contexto no DrivMatch News':lang==='es'?'Lee el contexto en DrivMatch News':'Read the context on DrivMatch News')+languageNotice;
       const body=`<div class="kicker">${cat}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div><p>${note}</p>`;
       return featured?`<article class="story" tabindex="0" role="button" data-story="${i}">${imageHTML(a)}<div class="info">${body}</div></article>`:`<article class="item" tabindex="0" role="button" data-story="${i}"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></article>`;
     }
@@ -133,12 +149,15 @@
     $('ad-slot').innerHTML=`<span class="ad-label">${labels[lang].ad}</span><a href="${escapeHTML(ad.url)}" target="_blank" rel="noopener noreferrer sponsored">${escapeHTML(ad.title||'')}</a><p>${escapeHTML(ad.text||'')}</p>`;
   }
   // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.
-  const shareUrlOf = a => a.kind==='external_link' ? safeUrl(a.source_url) : 'https://handsondispatcher.github.io/drivmatch-news/share/'+encodeURIComponent(a.id)+'/';
+  // Social platforms require our own crawlable Open Graph page, never an RSS redirect.
+  const shareUrlOf = a => 'https://handsondispatcher.github.io/drivmatch-news/share/'+encodeURIComponent(a.id)+'/';
+  let sharedStoryConsumed=false;
   function openSharedStory(){
+    if(sharedStoryConsumed)return;
     try {
       const id=new URLSearchParams(location.search).get('story');
       const story=id&&pageStories().find(a=>a.id===id);
-      if(story){opened=story;articleLang=lang;renderArticle();$('article-dialog').scrollTop=0;}
+      if(story){sharedStoryConsumed=true;opened=story;articleLang=lang;renderArticle();$('article-dialog').scrollTop=0;}
     }catch(_){}
   }
   // Headline-based context is written by DrivMatch News, not a copy of a third-party article.
@@ -159,23 +178,18 @@
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
     $('modalimg').src=imageOf(opened);$('modalimg').alt=opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
-    $('modaltitle').textContent=txt.title;$('modalmeta').textContent=opened.demo?al.demo:opened.published_at?`${al.published}: ${opened.published_at}`:'';
+    $('modaltitle').textContent=cleanHeadline(txt.title);$('modalmeta').textContent=opened.demo?al.demo:opened.published_at?`${al.published}: ${opened.published_at}`:'';
     $('modalbodytext').textContent=opened.kind==='external_link'?sourceBrief(opened,articleLang):(txt.body||txt.summary||'');
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
     const src=safeUrl(opened.source_url);
     // Use the publisher's direct URL as the primary path: Google Translate proxies
     // are frequently blocked by Cloudflare (including The Trucker).
-    const googleNews=!!src&&/^https:\/\/news\.google\.com(?:\/|$)/i.test(src);
-    const translatedSource=src?langs.map(l=>{
-      const label=l==='en'?'Open original article':l==='pt'?'Abrir original • traduzir no navegador':'Abrir original • traducir en navegador';
-      return `<a class="article-source-button ${l===lang?'primary':''}" href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer"><img src="${flags[l]}" width="28" height="19" alt=""><span>${label} ↗</span></a>`;
-    }).join(''):'';
-    const fullHeading=lang==='en'?'Read the report at the publisher':lang==='es'?'Leer la noticia en el sitio de origen':'CONSULTE A REPORTAGEM NA FONTE';
-    const sourceOriginal=lang==='en'?'Original publisher link':lang==='es'?'Enlace original del medio':'Link original da publicação';
-    const accessWarning=lang==='en'?'The article opens directly at the publisher. To translate it, use your browser’s Translate page feature. Some publishers block access from certain regions. DrivMatch News cannot mirror full third-party articles without permission.':lang==='es'?'El artículo abre directamente en el sitio original. Para traducirlo, usa Traducir página en tu navegador. Algunos medios bloquean regiones. No republicamos artículos completos sin permiso.':'A notícia abre diretamente no site original. Para ler em português, use Traduzir página no menu do navegador. Alguns veículos bloqueiam regiões; o DrivMatch News não pode copiar matérias integrais sem autorização.';
-    const optionalTranslate=src&&!googleNews?'<a class="source-translate-link" href="'+escapeHTML('https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(lang)+'&u='+encodeURIComponent(src))+'" target="_blank" rel="noopener noreferrer">'+(lang==='pt'?'Tentar Google Tradutor (pode ser bloqueado)':lang==='es'?'Probar Google Traductor (puede bloquearse)':'Try Google Translate (may be blocked)')+' ↗</a>':'';
-    $('article-source').innerHTML=src?`<div class="full-article-heading">${fullHeading}</div><div class="source-translations">${translatedSource}</div><p class="source-access-warning">${accessWarning}</p><a class="source-original" href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${sourceOriginal} ↗</a> ${optionalTranslate}`:escapeHTML(opened.source||'');
+    // Only promise what is delivered: the full external report is controlled by its publisher.
+    const sourceButton=src?`<a class="article-source-button primary" href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${lang==='en'?'Visit original publisher':lang==='es'?'Visitar la fuente original':'Visitar fonte original'} ↗</a>`:'';
+    const fullHeading=lang==='en'?'Original reporting':lang==='es'?'Reportaje de origen':'FONTE DA REPORTAGEM';
+    const accessWarning=lang==='en'?'The original publisher may restrict access. The DrivMatch News article above remains available in your selected language.':lang==='es'?'El medio original puede restringir el acceso. El texto del DrivMatch News está disponible arriba en el idioma elegido.':'O veículo original pode restringir o acesso. A leitura do DrivMatch News está disponível acima, em português.';
+    $('article-source').innerHTML=src?`<div class="full-article-heading">${fullHeading}</div><div class="source-translations">${sourceButton}</div><p class="source-access-warning">${accessWarning}</p>`:escapeHTML(opened.source||'');
     const photoCredit=opened.image_source_url && safeUrl(opened.image_source_url)
       ? `<p class="image-credit">Foto ilustrativa: <a href="${escapeHTML(opened.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(opened.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(opened.image_license||'Licença na fonte')}</p>`:'';
     $('article-source').innerHTML+=photoCredit;
@@ -229,15 +243,16 @@
         if(Array.isArray(next.headlines)){
           const approved=new Set((data.articles||[]).map(x=>x.source_url));
           const seen=new Set();
-          externalHeadlines=next.headlines.filter(x=>x.geo_scope_verified===true&&x.title&&!/\b(tanzania|tanz[aâ]nia|vietnam|vietnamese|da nang|hanoi)\b/i.test(x.title+' '+Object.values(x.titles||{}).join(' '))&&safeUrl(x.source_url)&&!approved.has(x.source_url)&&!seen.has(x.source_url)&&seen.add(x.source_url)).slice(0,90).map(x=>({
-            id:'source-'+String(x.source_url).slice(-80),kind:'external_link',status:'external_source',demo:false,
+          externalHeadlines=next.headlines.filter(x=>x.geo_scope_verified===true&&x.title&&x.origin_type!=='aggregator-discovery'&&!/news\.google\.com/i.test(x.source_url||'')&&!/\b(tanzania|tanz[aâ]nia|vietnam|vietnamese|da nang|hanoi)\b/i.test(x.title+' '+Object.values(x.titles||{}).join(' '))&&safeUrl(x.source_url)&&!approved.has(x.source_url)&&!seen.has(x.source_url)&&seen.add(x.source_url)).filter((x,i,rows)=>!rows.slice(0,i).some(y=>duplicateEvent(x.titles?.pt||x.title,y.titles?.pt||y.title))&&!data.articles.some(y=>Object.values(y.locales||{}).some(loc=>duplicateEvent(x.titles?.pt||x.title,loc.title)))).slice(0,90).map(x=>({
+            id:x.id,kind:'external_link',status:'external_source',demo:false,
             category:CATS.includes(x.category)?x.category:'Transporte',region:x.region||'US',source:x.source,
             source_url:x.source_url,published_at:x.published_at,original_lang:x.original_lang|| (x.region==='MX'?'es':'en'),image:x.image||'',
-            locales:Object.fromEntries(langs.map(l=>[l,{title:x.titles?.[l]||x.title,summary:'',body:''}])),translated_langs:Object.keys(x.titles||{})
+            locales:Object.fromEntries(langs.map(l=>[l,{title:cleanHeadline(x.titles?.[l]||x.title),summary:'',body:''}])),translated_langs:Object.keys(x.titles||{})
           }));
         }
       }
       if(!opened)renderStories();
+      openSharedStory();
     }catch(e){/* Keep last successfully loaded issue when offline. */}
   }
   function install(){if(location.protocol.startsWith('http')){refreshNews();setInterval(refreshNews,60000);}CATS.forEach(c=>$('category').add(new Option(c,c)));
@@ -254,10 +269,13 @@
     $('featureNext').addEventListener('click',()=>{featurePage++;renderStories();});
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function')window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');};
-    const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
+    const shareText=()=>opened?cleanHeadline(localeOf(opened,lang)?.title||'DrivMatch News'):'DrivMatch News';
+    const shareSummary=()=>opened?(opened.kind==='external_link'
+      ?(lang==='en'?'Headline and context from DrivMatch News.':lang==='es'?'Titular y contexto en DrivMatch News.':'Manchete e contexto no DrivMatch News.')
+      :String(localeOf(opened,lang)?.summary||'').trim()):'';
     const shareOptions=$('share-options');
-    const shareDestinations=(title,url)=>({
-      whatsapp:(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'')?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent(title+'\n'+url),
+    const shareDestinations=(title,url,summary='')=>({
+      whatsapp:(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'')?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent([title,summary,url].filter(Boolean).join('\n\n')),
       facebook:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),
       threads:'https://www.threads.net/intent/post?text='+encodeURIComponent(title+' '+url),
       x:'https://twitter.com/intent/tweet?text='+encodeURIComponent(title)+'&url='+encodeURIComponent(url),
@@ -274,12 +292,12 @@
       pickerFeedback.textContent='';
       $('share-native').setAttribute('aria-expanded',String(expanded));
       if(!expanded)return;
-      const urls=shareDestinations(shareText(),shareUrlOf(opened));
+      const urls=shareDestinations(shareText(),shareUrlOf(opened),shareSummary());
       shareOptions.querySelectorAll('[data-share-platform]').forEach(a=>{a.href=urls[a.dataset.sharePlatform]||'#';});
     });
     $('share-options-close').addEventListener('click',()=>{shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');$('share-native').focus();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!shareOptions.hidden){shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');e.stopPropagation();}});
-    const shareMessage=()=>shareText()+'\n'+shareUrlOf(opened);
+    const shareMessage=()=>[shareText(),shareSummary(),shareUrlOf(opened)].filter(Boolean).join('\n\n');
     const pickerFeedback=$('share-picker-feedback');
     const shareSystem=$('share-system');
     shareSystem.hidden=typeof navigator.share!=='function';

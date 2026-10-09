@@ -37,9 +37,9 @@ const {spawn}=require('node:child_process');
    const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','modalbodytext','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
    assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-share-footer'] && order['article-share-footer']<order['article-original'],`article flow ${JSON.stringify(order)}`);
    const sourceLinks=await page.locator('#article-source .article-source-button').evaluateAll(nodes=>nodes.map(n=>n.href));
-   assert.equal(sourceLinks.length,3);
+   assert.equal(sourceLinks.length,1);
    assert.ok(sourceLinks.every(url=>!url.includes('translate.google.com')&&!url.includes('.translate.goog')),'Primary source links must not use blocked translation proxies');
-   assert.match(await page.locator('#article-source .source-access-warning').innerText(),/Traduzir página/);
+   assert.match(await page.locator('#article-source .source-access-warning').innerText(),/DrivMatch News/);
    // Switching the entire site to English must translate weather and publisher footer.
    await page.locator('#article-dialog .x').click();
    await page.locator('#language').selectOption('en');
@@ -60,6 +60,9 @@ const {spawn}=require('node:child_process');
    assert.match(await page.locator('[data-share-platform="whatsapp"]').getAttribute('href'),/^https:\/\/web\.whatsapp\.com\/send\?text=/);
    assert.equal(await page.locator('#share-whatsapp-copy').isVisible(),true);
    assert.equal(await page.locator('#share-story').isVisible(),true);
+   const shareLink=await page.locator('[data-share-platform="whatsapp"]').getAttribute('href');
+   assert.match(decodeURIComponent(shareLink),/handsondispatcher.github.io\/drivmatch-news\/share\//);
+   assert.ok(!decodeURIComponent(shareLink).includes('news.google.com/rss/'));
    if(width===1440){
     await page.locator('#share-story').click();
     await page.locator('#story-preview').waitFor({state:'visible',timeout:15000});
