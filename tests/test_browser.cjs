@@ -80,7 +80,7 @@ const {spawn}=require('node:child_process');
        copy:{top:copy.top,bottom:copy.bottom,left:copy.left,right:copy.right,height:copy.height},
        viewportWidth:innerWidth,viewportHeight:innerHeight};
     });
-    assert.equal(fit.position,'static','Share controls must be inside document flow, not an overlay');
+    assert.equal(fit.position,'relative','Share controls must follow the article in normal flow; the picker anchors above them');
     assert.ok(fit.share.top>=0&&fit.share.bottom<=fit.viewportHeight,`Share visible without scroll ${JSON.stringify(fit)}`);
     assert.ok(fit.copy.top>=0&&fit.copy.bottom<=fit.viewportHeight,'Copy visible without scroll');
     assert.ok(fit.share.right<fit.copy.left,'Share and copy must be side by side');
