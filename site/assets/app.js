@@ -61,7 +61,7 @@
     const t=Object.values(a.locales).flatMap(v=>[v.title,v.summary,v.body]).join(' ') + ' '+a.category+' '+a.source;
     return !q||t.toLocaleLowerCase(lang).includes(q);
   }
-  function articlesFiltered(){return pageStories().filter(matches)}
+  function articlesFiltered(){return pageStories().filter(a=>(a.kind!=='external_link'||a.translated_langs?.includes(lang))&&matches(a))}
   function daysLabel(a){if(a.demo)return `<span class="demo-ribbon">${labels[lang].demo}</span>`;
     if(!a.published_at)return '';
     return `${labels[lang].published}: ${escapeHTML(new Date(a.published_at).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{dateStyle:'short',timeStyle:'short'}))}`;
