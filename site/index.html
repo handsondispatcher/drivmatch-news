@@ -161,6 +161,10 @@ article[role=button]{outline-offset:2px}
   #article-dialog .article-reading{padding:12px;margin:13px 0 15px}
 }
 
+
+/* Keep share actions accessible in the reader without scrolling past source links. */
+#article-dialog .article-share-footer{position:sticky;bottom:0;z-index:4;background:#fff;padding:12px 18px 16px;box-shadow:0 -5px 15px #00000016;margin-left:-18px;margin-right:-18px}
+#article-dialog .article-reading[hidden]{display:none!important}
 </style>
 </head>
 <body>
