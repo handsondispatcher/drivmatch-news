@@ -14,13 +14,16 @@ class Element {
  get classList(){return {add(){},remove(){}};}
  scrollIntoView(){}
 }
-const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-dialog','translation','shade','noticias'];
+const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-dialog','translation','shade','noticias','footer-publisher','footer-description','footer-legal','story-preview','story-preview-image','story-preview-download','story-preview-close','story-preview-title','story-preview-hint'];
 for(const id of ids)elements[id]=new Element(id);
 for(const id of ['panorama .heading','noticias .heading','market-title','.demo'])selectors['#'+id]=new Element(id);
 selectors['.demo']=new Element('demo');
+selectors['.edition']=new Element('edition');selectors['.edition'].childNodes=[{textContent:'EDIÇÃO DIGITAL · '}];
+selectors['.weather-top h2']=[new Element('weather-head-1'),new Element('weather-head-2')];selectors['.weather-card']=[new Element('weather-card-1'),new Element('weather-card-2')];
 elements.age.value='all';elements.category.options=[new Element('all')];elements.category.options[0].value='Todas';elements.age.options=['all','2','7','30'].map(v=>({value:v,text:''}));
 const document={documentElement:{lang:''},getElementById:id=>elements[id]||(()=>{throw Error('Missing id: '+id)})(),
  querySelector:key=>selectors[key]||(()=>{throw Error('Missing selector: '+key)})(),
+ querySelectorAll:key=>selectors[key]||[],
  addEventListener(event,cb){if(event==='DOMContentLoaded')this.ready=cb;}};
 const window={DRIVMATCH_BOOTSTRAP:data};
 const sandbox={document,window,navigator:{userAgent:'Desktop smoke test'},location:{search:'',protocol:'file:'},URLSearchParams,Option:function(t,v){return {text:t,value:v}},
