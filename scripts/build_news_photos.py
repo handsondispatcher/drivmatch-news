@@ -43,9 +43,9 @@ def _candidate_urls(photo: dict):
     base = f"https://upload.wikimedia.org/wikipedia/commons"
     # Wikimedia Commons stores files under the normalized filename's MD5 path.
     # A canonical local JPG thumb is much more reliable than Special:Redirect.
-    yield f"{base}/thumb/{digest[0]}/{digest[:2]}/{encoded}/640px-{encoded}"
+    yield f"{base}/thumb/{digest[0]}/{digest[:2]}/{encoded}/560px-{encoded}"
     yield f"{base}/{digest[0]}/{digest[:2]}/{encoded}"
-    yield "https://commons.wikimedia.org/wiki/Special:Redirect/file/" + encoded + "?width=640"
+    yield "https://commons.wikimedia.org/wiki/Special:Redirect/file/" + encoded + "?width=560"
 
 
 def _download_photo(photo: dict):
