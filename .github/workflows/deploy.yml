@@ -79,3 +79,22 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verificar cartão social público após publicação
+        run: |
+          set -e
+          SHARE="https://handsondispatcher.github.io/drivmatch-news/share/kodiak-charger-dallas-laredo-20261008/"
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$SHARE" -o /tmp/drivmatch-share.html
+          grep -q 'property="og:image"' /tmp/drivmatch-share.html
+          grep -q 'og:image:width" content="1200"' /tmp/drivmatch-share.html
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "${SHARE}social.jpg" -o /tmp/drivmatch-social.jpg
+          test "$(wc -c < /tmp/drivmatch-social.jpg)" -gt 10000
+          echo "PUBLIC SOCIAL PREVIEW PASS: Open Graph HTML and photo JPEG are accessible"
+          if curl --fail --location --silent --show-error --max-time 12 https://drivmatch.com/news/ -o /tmp/drivmatch-domain.html; then
+            if grep -q 'uma publicação da Hands On Dispatcher LLC' /tmp/drivmatch-domain.html; then
+              echo "CUSTOM DOMAIN PASS: updated publication footer found"
+            else
+              echo "::warning::Custom domain responded but new publisher footer was not found; check cache or proxy"
+            fi
+          else
+            echo "::warning::Custom domain unavailable to the runner; check DNS or proxy"
+          fi
