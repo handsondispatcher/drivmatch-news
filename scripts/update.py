@@ -284,12 +284,12 @@ def build(offline=False):
         import re
         title=item.get('title','').casefold()
         category=item.get('category','')
-        transport=re.search(r'\\b(truck(?:er|ers|ing|s)?|semi[- ]truck|tractor[- ]trailer|18[- ]wheeler|cdl|fmcsa|dot|freight|cargo|shipment|shipping|shipper|carrier|broker|dispatch|logistics|supply chain|warehouse|fleet|diesel|fuel price|truck stop|weigh station|hours.of.service|eld|interstate|highway|road closure|roadwork|chain law|commercial vehicle|big rig|trailer|load board|port congestion|container freight|drayage|toll road|truck parking|truck driver)\\b',title)
-        weather=re.search(r'\\b(hurricane|tropical storm|blizzard|snowstorm|winter storm|ice storm|flood(?:ing|s)?|wildfire|tornado|storm surge)\\b',title)
-        impact=re.search(r'\\b(road|highway|interstate|i-\\d+|closure|evacuation|port|freight|shipping|trucking|transport|supply chain|travel disruption|travel ban)\\b',title)
+        transport=re.search(r'\b(truck(?:er|ers|ing|s)?|semi[- ]truck|tractor[- ]trailer|18[- ]wheeler|cdl|fmcsa|dot|freight|cargo|shipment|shipping|shipper|carrier|broker|dispatch|logistics|supply chain|warehouse|fleet|diesel|fuel price|truck stop|weigh station|hours.of.service|eld|interstate|highway|road closure|roadwork|chain law|commercial vehicle|big rig|trailer|load board|port congestion|container freight|drayage|toll road|truck parking|truck driver)\b',title)
+        weather=re.search(r'\b(hurricane|tropical storm|blizzard|snowstorm|winter storm|ice storm|flood(?:ing|s)?|wildfire|tornado|storm surge)\b',title)
+        impact=re.search(r'\b(road|highway|interstate|i-\d+|closure|evacuation|port|freight|shipping|trucking|transport|supply chain|travel disruption|travel ban)\b',title)
         # Major dangerous weather is relevant to route planning even before closures.
-        severe=bool(weather and re.search(r'\\b(hurricane|blizzard|winter storm|wildfire|flood|tornado)\\b',title))
-        if re.search(r'\\b(poverty|youth|celebrity|season [2-9]|episode|how to watch|streaming|movie|sports betting|fashion|real estate|building permits|concert|tv show)\\b',title) and not transport:
+        severe=bool(weather and re.search(r'\b(hurricane|blizzard|winter storm|wildfire|flood|tornado)\b',title))
+        if re.search(r'\b(poverty|youth|celebrity|season [2-9]|episode|how to watch|streaming|movie|sports betting|fashion|real estate|building permits|concert|tv show)\b',title) and not transport:
             return False
         if category=='Clima':
             return bool(transport or (weather and (impact or severe)))
