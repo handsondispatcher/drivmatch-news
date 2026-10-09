@@ -27,6 +27,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#market-title').textContent(),'Mercado em Foco');
    assert.equal(await page.locator('#mercados').innerText().then(x=>x.includes('FDX')),true);
    const card=width>990?'#clima-desktop':'#clima-mobile';
+   assert.equal(await page.locator('#dm-crawler-track a[href*="thetrucker.com"]').count(),0,'Known geo-blocked publisher must not appear in ticker');
    // Approved layout: Ventusky is visible immediately, without a toggle.
    assert.match(await page.locator(card+' iframe').getAttribute('src'),/^https:\/\/embed\.ventusky\.com/);
    assert.equal(await page.locator(card+' iframe').isVisible(),true);

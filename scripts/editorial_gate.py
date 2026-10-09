@@ -78,6 +78,8 @@ def eligible(item):
     if region not in ('US','USA','CA','CAN','MX','MEX'):return False
     hostname=(urlparse(str(item.get('source_url') or '')).hostname or '').lower().removeprefix('www.')
     if not hostname:return False
+    # Brazilian reader-access gate: this publisher currently blocks Brazil.
+    if hostname=='thetrucker.com' or hostname.endswith('.thetrucker.com'):return False
     has_us=bool(US_LOCATION.search(title) or US_STATE_RE.search(title) or US_ABBREV.search(title))
     has_cross=bool(CROSS.search(title))
     core=bool(CORE_ROAD.search(title))

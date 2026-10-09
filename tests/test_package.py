@@ -113,7 +113,18 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(eligible(article('Canada US border crossing truck inspections delayed at Detroit','CA',url='https://trucknews.com/cross-border')))
   self.assertFalse(eligible(article('Truck crash in Tanzania prompts US commentary',url='https://thetrucker.com/world')))
   self.assertFalse(eligible(article('Freight capacity changes',url='https://news.google.com/rss/articles/ambiguous')))
-  self.assertTrue(eligible(article('Trucking insurance premiums increase',url='https://www.thetrucker.com/news/insurance')))
+  self.assertFalse(eligible(article('Trucking insurance premiums increase',url='https://www.thetrucker.com/news/insurance')))
+  self.assertTrue(eligible(article('Trucking insurance premiums increase',url='https://www.freightwaves.com/news/insurance')))
+ def test_brazil_reader_access_gate(self):
+  from editorial_gate import eligible
+  example={'title':'FMCSA rules change for Texas truckers','source_url':'https://www.thetrucker.com/news/fmcsa','region':'US','category':'Transporte'}
+  self.assertFalse(eligible(example))
+  self.assertTrue(eligible({**example,'source_url':'https://www.freightwaves.com/news/fmcsa'}))
+  app=(BASE/'site/assets/app.js').read_text()
+  ticker=(BASE/'site/assets/news-crawler.js').read_text()
+  self.assertIn('thetrucker\\.com',app)
+  self.assertIn('blockedPublisher(a.source_url)',ticker)
+  self.assertIn('!blockedPublisher(a.source_url)',ticker)
  def test_geo_scope_is_required_by_frontend_and_ticker(self):
   self.assertIn('x.geo_scope_verified===true',(BASE/'site/assets/app.js').read_text())
   self.assertIn('a.geo_scope_verified!==true',(BASE/'site/assets/news-crawler.js').read_text())
