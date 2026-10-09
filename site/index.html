@@ -379,7 +379,7 @@ article[role=button]{outline-offset:2px}
   #article-dialog .article-share-actions button{height:35px;min-height:35px;padding:5px 7px;font-size:11px;line-height:1.1}
   #article-dialog .article-share-actions button svg{width:14px;height:14px}
   #article-dialog #share-feedback:empty{display:none}
-  #article-dialog .share-options:not([hidden]){position:fixed;bottom:12px;left:10px;right:10px;width:auto;max-height:min(66dvh,440px);overflow-y:auto;z-index:120;margin:0}
+  #article-dialog .share-options:not([hidden]){position:fixed;bottom:calc(64px + env(safe-area-inset-bottom,0px));left:10px;right:10px;width:auto;max-height:min(58dvh,395px);overflow-y:auto;z-index:120;margin:0}
 }
 @media(max-width:650px) and (max-height:580px){
   #article-dialog .modalhero img{height:30px}
