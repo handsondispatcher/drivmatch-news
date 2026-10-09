@@ -6,6 +6,12 @@
 
 Este arquivo registra decisões recuperadas e resultados verificáveis até a data acima; não é cópia literal nem alegação de ter arquivado todo o texto de todas as conversas. Quando houver divergência, prevalecem decisões mais recentes do usuário e o código/testes reais.
 
+## PRIORIDADE DE 09/10/2026 — REGRESSÃO ANDROID / INSTRUÇÃO EXPRESSA DO USUÁRIO
+
+O usuário confirmou com **novas capturas de tela** que o comportamento de PR #22 («Compartilhar» fixado no rodapé) **NÃO resolveu a necessidade**. **Exigência mais recente, prioritária:** a janela de matéria no mobile deve ser **compacta o suficiente para caber inteira na tela**, **sem precisar rolar**, especialmente com notícia externa. As três opções PT/EN/ES de fonte e os dois botões «Compartilhar» / «Copiar link» devem ter **altura baixa**, caber lado a lado e aparecer já na abertura. **Não simplesmente mover/fixar o rodapé**. Manter acesso legalmente claro à fonte e aos créditos, preservar todas as opções de share. Layout desktop intacto. Quando títulos variáveis forem longos e o dispositivo muito baixo, deve preservar acesso ao conteúdo sem cortar a matéria; a regra básica 360×680 e 390×680 deve passar em testes automatizados de scrollHeight ≤ clientHeight.
+
+A correção para esta última decisão está sendo desenvolvida no PR posterior ao #22 (compact mobile reader); conferir seu merge e CI/deploy ao continuar. **O usuário não precisa reexplicar isso, nem aplicar CSS manual.**
+
 ## 1. Autoridade e procedimento ao retomar em outro chat
 
 1. Ler **este arquivo**, `docs/V32_RELEASE.md`, `content/release.json`, o **issue #18** e os últimos workflows de GitHub Actions.
