@@ -91,7 +91,12 @@
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
     const src=safeUrl(opened.source_url);
-    $('article-source').innerHTML=src?`<a href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${al.source} ↗</a>`:escapeHTML(opened.source||'');
+    const translatedSource = src ? langs.map(l=>{
+      const url='https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(l)+'&u='+encodeURIComponent(src);
+      const label=l==='pt'?'🇧🇷 Matéria original em Português':l==='en'?'🇺🇸 Original article in English':'🇪🇸 Artículo original en Español';
+      return `<a class="source-translate-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" hreflang="${l}">${label} ↗</a>`;
+    }).join('') : '';
+    $('article-source').innerHTML=src?`<a href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${al.source} ↗</a><div class="source-translations">${translatedSource}</div>`:escapeHTML(opened.source||'');
     $('articleLanguageTitle').textContent=al.articleTitle;
     $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="20" height="13" alt="" style="vertical-align:middle;margin-right:5px">${escapeHTML(texts[l].replace(/^\S+ /,''))}${l===articleLang?' ✓':''}</button>`).join('');
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
