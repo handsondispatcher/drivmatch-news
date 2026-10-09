@@ -29,11 +29,13 @@ function showCity(){
  const c=cities[i++%cities.length];el('top-city').textContent=c.city+', '+c.state;
  const age=Date.now()-Date.parse(c.forecast_updated_at||'');
  const good=c.status==='forecast'&&Number.isFinite(age)&&age>=0&&age<36*3600000;
- el('top-weather-icon').textContent=good?icon(c.condition_en):'🌤️';
+ el('top-weather-icon').textContent=good?icon(c.condition_en):'🌐';
  el('top-condition').textContent=good?c.condition_en:(lang()==='en'?'Forecast unavailable':lang()==='es'?'Pronóstico no disponible':'Previsão indisponível');
  const hi=good&&Number.isFinite(Number(c.max_f))&&c.max_f!==null?Math.round(c.max_f)+'°F':'—';
  const lo=good&&Number.isFinite(Number(c.min_f))&&c.min_f!==null?Math.round(c.min_f)+'°F':'—';
- el('top-range').textContent=hi+' / '+lo;
+ const celsius = f => Math.round((f-32)*5/9);const cHi=hi==='—'?'—':celsius(Number(c.max_f))+'°C';const cLo=lo==='—'?'—':celsius(Number(c.min_f))+'°C';
+ el('top-range-f').textContent='Máx. '+hi+' · Mín. '+lo;
+ el('top-range-c').textContent='Máx. '+cHi+' · Mín. '+cLo;
  el('top-condition').title=good?'NWS · '+c.forecast_updated_at:'';
 }
 async function weather(){
@@ -60,7 +62,7 @@ function init(){
  if(!el('top-city'))return;
  showMarket();showCity();
  if(location.protocol.startsWith('http')){weather();quotes();live();setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);}
- setInterval(showCity,60000);el('language')?.addEventListener('change',()=>{showMarket();showCity()});
+ setInterval(showCity,60000);el('language')?.addEventListener('change',()=>{showMarket();i=(i+fixed.length-1)%fixed.length;showCity()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
