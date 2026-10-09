@@ -114,12 +114,12 @@
     $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('share-feedback').textContent='';
-    $('share-native').hidden=!(typeof navigator!=='undefined' && typeof navigator.share==='function');
-    $('share-feedback').textContent='';
     $('shade').classList.add('open');
   }
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
     $('language').value=next;$('languageFlag').src=flags[next];$('languageFlag').alt=next==='pt'?'Bandeira do Brasil':next==='en'?'US flag':'Bandera de España';
+    $('share-label').textContent=next==='en'?'Share':next==='es'?'Compartir':'Compartilhar';
+    $('share-copy').textContent=next==='en'?'Copy link':next==='es'?'Copiar enlace':'Copiar link';
     const trans=labels[next];document.querySelector('#panorama .heading').textContent=trans.panorama;document.querySelector('#noticias .heading').textContent=trans.news;
     document.querySelector('#market-title').textContent=trans.market;
     $('search').placeholder=trans.search;$('category').options[0].text=trans.filters;
@@ -133,26 +133,6 @@
     $('edition-date').textContent=new Date().toLocaleDateString('pt-BR');
     // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
-    $('share-whatsapp').addEventListener('click',()=>{
-      if(!opened)return;
-      const url=shareUrlOf(opened),title=localeOf(opened)?.title||'DrivMatch News';
-      window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(title+' — '+url),'_blank','noopener,noreferrer');
-    });
-    $('share-copy').addEventListener('click',()=>{
-      if(!opened)return;
-      const url=shareUrlOf(opened);
-      if(typeof navigator!=='undefined' && navigator.clipboard?.writeText)
-        navigator.clipboard.writeText(url).then(()=>$('share-feedback').textContent='Link copiado!',()=>$('share-feedback').textContent='Não foi possível copiar.');
-      else $('share-feedback').textContent=url;
-    });
-    if(typeof navigator!=='undefined' && navigator.share){
-      $('share-native').hidden=false;
-      $('share-native').addEventListener('click',()=>{
-        if(!opened)return;
-        navigator.share({title:localeOf(opened)?.title||'DrivMatch News',url:shareUrlOf(opened)}).catch(()=>{});
-      });
-    }
-
     $('search').addEventListener('input',()=>{page=featurePage=0;renderStories();});
     $('category').addEventListener('change',e=>{selected=e.target.value;page=featurePage=0;languageSet(lang);});
     $('age').addEventListener('change',()=>{page=featurePage=0;renderStories();});
@@ -163,36 +143,34 @@
     $('featureNext').addEventListener('click',()=>{featurePage++;renderStories();});
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened)renderArticle();};
-    const shareUrl=()=>opened?'https://drivmatch.com/news/share/'+encodeURIComponent(opened.id)+'/':'';
     const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
-    $('share-whatsapp').addEventListener('click',()=>{
+    $('share-native').addEventListener('click',async()=>{
       if(!opened)return;
-      const url='https://wa.me/?text='+encodeURIComponent(shareText()+'\n'+shareUrl());
-      if(typeof window.open==='function')window.open(url,'_blank','noopener,noreferrer');
-      else $('share-feedback').textContent=shareUrl();
+      const title=shareText(),url=shareUrlOf(opened);
+      if(typeof navigator!=='undefined' && typeof navigator.share==='function'){
+        try{await navigator.share({title,url});return;}catch(e){if(e?.name==='AbortError')return;}
+      }
+      // Desktop and browsers without Web Share: always provide a working destination.
+      const whatsapp='https://wa.me/?text='+encodeURIComponent(title+'\n'+url);
+      if(typeof window.open==='function')window.open(whatsapp,'_blank','noopener,noreferrer');
+      else $('share-feedback').textContent=url;
     });
     $('share-copy').addEventListener('click',async()=>{
       if(!opened)return;
-      const url=shareUrl();
+      const url=shareUrlOf(opened);
       try{
         if(typeof navigator!=='undefined' && navigator.clipboard?.writeText){
           await navigator.clipboard.writeText(url);
-          $('share-feedback').textContent='Link copiado!';
-        }else{$('share-feedback').textContent='Link: '+url;}
-      }catch(_){$('share-feedback').textContent='Link: '+url;}
+        }else{
+          const helper=document.createElement('textarea');
+          helper.value=url;helper.setAttribute('readonly','');helper.style.position='fixed';helper.style.opacity='0';
+          document.body.appendChild(helper);helper.select();
+          const copied=document.execCommand('copy');helper.remove();
+          if(!copied)throw Error('clipboard unavailable');
+        }
+        $('share-feedback').textContent=lang==='en'?'Link copied!':lang==='es'?'¡Enlace copiado!':'Link copiado!';
+      }catch(_){$('share-feedback').textContent=(lang==='en'?'Copy the link: ':lang==='es'?'Copia el enlace: ':'Copie o link: ')+url;}
     });
-    $('share-native').addEventListener('click',async()=>{
-      if(!opened||typeof navigator==='undefined'||!navigator.share)return;
-      try{await navigator.share({title:shareText(),url:shareUrl()});}catch(_){}
-    });
-    const storyFromUrl=()=>{
-      if(typeof location==='undefined'||!location.search)return;
-      const id=new URLSearchParams(location.search).get('story');
-      if(!id)return;
-      const found=pageStories().find(a=>a.id===id);
-      if(found){opened=found;articleLang=lang;renderArticle();}
-    };
-    storyFromUrl();
     $('list').addEventListener('click',clickArticle);$('features').addEventListener('click',clickArticle);
     const keyArticle=e=>{if(e.key==='Enter'||e.key===' '){const item=e.target.closest('[data-story]');if(item){e.preventDefault();clickArticle({target:item});}}};
     $('list').addEventListener('keydown',keyArticle);$('features').addEventListener('keydown',keyArticle);

@@ -11,7 +11,7 @@ class Element {
  get classList(){return {add(){},remove(){}};}
  scrollIntoView(){}
 }
-const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-feedback','translation','shade','noticias'];
+const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-feedback','translation','shade','noticias'];
 for(const id of ids)elements[id]=new Element(id);
 for(const id of ['panorama .heading','noticias .heading','market-title','.demo'])selectors['#'+id]=new Element(id);
 selectors['.demo']=new Element('demo');
