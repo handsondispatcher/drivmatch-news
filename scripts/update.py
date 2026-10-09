@@ -244,9 +244,9 @@ def build(offline=False):
             seen={a.get('source_url') for a in articles}
             for item in sorted(rows,key=lambda a:a.get('published_at',''),reverse=True):
                 if item.get('source_url') in seen or not item.get('title') or not item.get('source_url','').startswith('https://'):continue
-                external_headlines.append({k:item[k] for k in ('title','source','source_url','published_at','category')})
+                external_headlines.append({k:item[k] for k in ('title','source','source_url','published_at','category','region','origin_type')})
                 seen.add(item['source_url'])
-                if len(external_headlines)>=35:break
+                if len(external_headlines)>=90:break
         except (OSError,ValueError,TypeError,KeyError) as exc:
             errors.append('external_headlines:'+type(exc).__name__)
     unique={}
