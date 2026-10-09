@@ -55,4 +55,8 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("FONTE EXTERNA",ticker)
   self.assertIn("a.external?'FONTE EXTERNA · ':'",ticker)
   self.assertIn("seen.has(a.source_url)",ticker)
+  self.assertIn("radar-fontes",(BASE/'site/index.html').read_text())
+  sources=json.loads((BASE/'content/sources.json').read_text())['sources']
+  self.assertGreaterEqual(sum(bool(x.get('feed_url')) for x in sources),25)
+  self.assertTrue({'US','CA','MX'}.issubset({x.get('region') for x in sources}))
 if __name__=='__main__':unittest.main()
