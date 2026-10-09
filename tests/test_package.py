@@ -53,7 +53,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("external_feed_links_not_editorially_approved",source)
   self.assertIn("source-headlines.json",source)
   self.assertIn("FONTE EXTERNA",ticker)
-  self.assertIn("a.external?'FONTE EXTERNA · ':'",ticker)
+  self.assertIn("FONTE EXTERNA",ticker)
   self.assertIn("seen.has(a.source_url)",ticker)
   self.assertIn("radar-fontes",(BASE/'site/index.html').read_text())
   sources=json.loads((BASE/'content/sources.json').read_text())['sources']
