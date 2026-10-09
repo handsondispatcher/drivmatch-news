@@ -55,6 +55,12 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('Título original sem tradução',js)
   self.assertEqual(js.count('setInterval(refreshNews,60000)'),1)
   self.assertNotIn("fetch('data/content.json'+stamp",js)
+ def test_ticker_respects_selected_language(self):
+  ticker=(BASE/'site/assets/news-crawler.js').read_text()
+  self.assertIn("a.titles?.[l]||a.title",ticker)
+  self.assertIn("l==='es'?'FUENTE",ticker)
+  self.assertIn("untranslated",ticker)
+  self.assertIn("ticker-i18n-20261009",(BASE/'site/index.html').read_text())
  def test_cache_consistency(self):
   import hashlib,re
   page=(BASE/'site/index.html').read_text()
