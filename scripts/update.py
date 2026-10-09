@@ -282,6 +282,7 @@ def build(offline=False):
     # freight, commercial-road, logistics or material road-weather connection.
     # Scope: domestic US or US-Canada / US-Mexico corridors only.
     from editorial_gate import eligible as editorial_eligible
+    from editorial_text import deduplicate_external
 
     external_headlines=[]
     if not offline:
@@ -295,17 +296,18 @@ def build(offline=False):
                 if item.get('source_url') in seen or not item.get('title') or not item.get('source_url','').startswith('https://'):continue
                 # Discovery feeds are broad. Exclude entertainment/streaming false positives
                 # rather than labeling them as operational weather alerts.
+                if item.get('origin_type')=='aggregator-discovery' or 'news.google.com' in item.get('source_url',''):continue
                 if not editorial_eligible(item):continue
                 headline=item['title'].casefold()
                 if item.get('category')=='Clima' and any(term in headline for term in
                     ('season 2','season 3','how to watch','streaming','episode','trailer','rocky mountain wreckers')):
                     continue
-                external_headlines.append({**{k:item[k] for k in ('title','source','source_url','published_at','category','region','origin_type')},'original_lang':item.get('original_lang','en'),'geo_scope_verified':True})
+                external_headlines.append({**{k:item[k] for k in ('title','source','source_url','published_at','category','region','origin_type')},'id':'source-'+hashlib.sha256(item['source_url'].encode()).hexdigest()[:20],'original_lang':item.get('original_lang','en'),'geo_scope_verified':True})
                 seen.add(item['source_url'])
                 if len(external_headlines)>=90:break
         except (OSError,ValueError,TypeError,KeyError) as exc:
             errors.append('external_headlines:'+type(exc).__name__)
-    external_headlines=localize_source_headlines(external_headlines,errors,offline)
+    external_headlines=deduplicate_external(localize_source_headlines(external_headlines,errors,offline),articles)
     unique={}
     for a in articles:
         if a['id'] in unique:continue

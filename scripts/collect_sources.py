@@ -9,6 +9,7 @@ from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+from editorial_text import clean_title
 ROOT=Path(__file__).resolve().parents[1]
 def parse_feed(raw, source, now=None):
     now=now or datetime.now(timezone.utc)
@@ -35,7 +36,7 @@ def parse_feed(raw, source, now=None):
         expected=urlparse(source['url']).hostname or ''
         if not url.startswith('https://') or hostname.removeprefix('www.')!=expected.removeprefix('www.') or not title:continue
         if source.get('access')=='discovery-rss' and hostname not in ('news.google.com',):continue
-        result.append({'id':hashlib.sha256(url.encode()).hexdigest()[:20], 'title':re.sub('<[^>]+>','',title),
+        result.append({'id':hashlib.sha256(url.encode()).hexdigest()[:20], 'title':clean_title(title,source.get('name','')),
             'source':source['name'],'source_url':url,'published_at':dt.isoformat(),
             'collected_at':now.isoformat(),'category':source['category'],'original_lang':source['original_lang'],
             'region':source.get('region','US'),'origin_type':('aggregator-discovery' if source.get('access')=='discovery-rss' else 'publisher-feed'),

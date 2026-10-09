@@ -1,5 +1,42 @@
 [
   {
+    "id": "kodiak-charger-dallas-laredo-20261008",
+    "category": "Transporte",
+    "original_lang": "en",
+    "status": "approved",
+    "demo": false,
+    "kind": "news",
+    "published_at": "2026-10-08T00:00:00Z",
+    "source": "The Trucker · Kodiak AI",
+    "source_url": "https://www.thetrucker.com/trucking-news/business/kodiak-ai-and-charger-usa-launch-autonomous-trucking-between-dallas-and-laredo",
+    "verified_at": "2026-10-09T13:30:00Z",
+    "verification_note": "The Trucker report and Kodiak AI announcement dated 2026-10-08 verified. Original summaries, no third-party article copied.",
+    "usage_rights": "owned",
+    "locales": {
+      "pt": {
+        "title": "Kodiak AI e Charger USA iniciam transporte autônomo entre Dallas e Laredo",
+        "summary": "Rota de 435 milhas já transporta cargas secas e refrigeradas no Texas, ainda com motorista de segurança.",
+        "body": "A Kodiak AI e a transportadora Charger USA anunciaram operações de frete com tecnologia de direção autônoma entre Dallas e Laredo, no Texas. A rota de aproximadamente 435 milhas liga terminais da Charger e atende embarcadores de alimentos, bebidas e bens de consumo, com cargas secas e refrigeradas. Segundo as empresas, a primeira entrega ocorreu em 8 de setembro de 2026. Apesar da tecnologia autônoma, os veículos ainda contam com um motorista de segurança na cabine. A retirada desse profissional depende da conclusão da validação de segurança da Kodiak; portanto, não se trata de uma operação rodoviária sem motorista neste momento. A entrada em Laredo é relevante por conectar a tecnologia a um importante corredor de comércio rodoviário entre Estados Unidos e México. As empresas planejam avaliar expansão para outras rotas. Fontes verificadas: reportagem do The Trucker e comunicado oficial da Kodiak AI, publicados em 8 de outubro de 2026."
+      },
+      "en": {
+        "title": "Kodiak AI and Charger USA start autonomous freight service between Dallas and Laredo",
+        "summary": "The 435-mile Texas corridor carries refrigerated and dry freight, currently with a safety driver on board.",
+        "body": "Kodiak AI and carrier Charger USA announced autonomous-driving-enabled freight operations between Dallas and Laredo, Texas. The roughly 435-mile route connects Charger terminals and serves food, beverage and consumer packaged goods shippers with refrigerated and dry loads. The companies reported their first delivery on September 8, 2026. Trucks still carry a safety driver. Removing the driver is a future goal contingent on completing Kodiak's safety case; this is not currently driverless highway service. Laredo is a major US–Mexico land freight gateway. The partners expect to explore additional routes. Sources: The Trucker and Kodiak AI, October 8, 2026."
+      },
+      "es": {
+        "title": "Kodiak AI y Charger USA inician transporte autónomo entre Dallas y Laredo",
+        "summary": "La ruta de 435 millas transporta carga seca y refrigerada en Texas, todavía con conductor de seguridad.",
+        "body": "Kodiak AI y la transportista Charger USA anunciaron operaciones de transporte de mercancías con tecnología de conducción autónoma entre Dallas y Laredo, Texas. La ruta de unas 435 millas conecta terminales de Charger y transporta carga seca y refrigerada para clientes de alimentos, bebidas y bienes de consumo. La primera entrega tuvo lugar el 8 de septiembre de 2026. Los camiones todavía llevan un conductor de seguridad; retirarlo dependerá de completar la validación de seguridad de Kodiak. Por tanto, aún no se trata de un servicio de carretera sin conductor. Laredo es un importante corredor comercial terrestre entre Estados Unidos y México. Fuentes: The Trucker y comunicado de Kodiak AI del 8 de octubre de 2026."
+      }
+    },
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Semi_Truck.jpg/960px-Semi_Truck.jpg",
+    "image_credit": "KOMUnews / Anna Burkart",
+    "image_license": "CC BY 2.0",
+    "image_source_url": "https://commons.wikimedia.org/wiki/File:Semi_Truck.jpg",
+    "image_alt": "Caminhão em rodovia, foto de arquivo ilustrativa; não retrata veículo da Kodiak",
+    "image_context": "illustrative_archive"
+  },
+  {
     "id": "fmcsa-sleeper-study-20261008",
     "category": "Fiscalização",
     "original_lang": "en",
