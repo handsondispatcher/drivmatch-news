@@ -109,12 +109,40 @@ jobs:
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "https://handsondispatcher.github.io/drivmatch-news/assets/news-crawler.js" -o /tmp/drivmatch-crawler.js
           grep -q 'blockedPublisher' /tmp/drivmatch-crawler.js
           echo "READER ACCESS PASS: ticker geoblock filter published"
-          if curl --fail --location --silent --show-error --max-time 12 https://drivmatch.com/news/ -o /tmp/drivmatch-domain.html; then
-            if grep -q 'um produto da Hands On Dispatcher LLC' /tmp/drivmatch-domain.html; then
-              echo "CUSTOM DOMAIN PASS: updated publication footer found"
+          # A footer match does NOT prove the custom domain serves the same
+          # version as GitHub Pages. Request the HTML and release contract via
+          # fresh URLs, then report a version-specific, actionable diagnosis.
+          BUST="$(date +%s)"
+          DOMAIN="https://drivmatch.com/news/"
+          if curl --fail --location --silent --show-error --retry 2 --max-time 18 \
+              -H "Cache-Control: no-cache" \
+              "${DOMAIN}?__release_probe=v33-${BUST}" -o /tmp/drivmatch-domain.html; then
+            if grep -q 'name="drivmatch-news-version" content="v33"' /tmp/drivmatch-domain.html \
+                && grep -q 'data-site-version="v33"' /tmp/drivmatch-domain.html; then
+              echo "CUSTOM DOMAIN V33 PASS: custom domain HTML identifies v33"
             else
-              echo "::warning::Custom domain responded but new publisher footer was not found; check cache or proxy"
+              echo "::warning::CUSTOM DOMAIN V33 MISMATCH: drivmatch.com/news/ does not serve v33 HTML; check Cloudflare route/proxy and caching. GitHub Pages is up-to-date."
+              grep -oE 'name="drivmatch-news-version" content="[^"]+"' /tmp/drivmatch-domain.html || true
+              grep -oE 'data-site-version="[^"]+"' /tmp/drivmatch-domain.html || true
+              echo "CUSTOM DOMAIN HTML first line:"
+              head -c 160 /tmp/drivmatch-domain.html; echo
             fi
           else
-            echo "::warning::Custom domain unavailable to the runner; check DNS or proxy"
+            echo "::warning::CUSTOM DOMAIN UNREACHABLE: confirm Cloudflare DNS, Worker routes and proxy for /news/."
+          fi
+          if curl --fail --location --silent --show-error --retry 2 --max-time 18 \
+              -H "Cache-Control: no-cache" \
+              "https://drivmatch.com/news/data/release.json?__release_probe=v33-${BUST}" \
+              -o /tmp/drivmatch-domain-release.json; then
+            python - <<'PY'
+import json
+with open('/tmp/drivmatch-domain-release.json',encoding='utf-8') as f:
+    try: d=json.load(f)
+    except (json.JSONDecodeError,UnicodeDecodeError): d={}
+print('CUSTOM DOMAIN RELEASE:',d.get('version','missing/invalid manifest'))
+if d.get('version')!='v33':
+    print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v33. Cloudflare routing or cache differs from GitHub Pages.')
+PY
+          else
+            echo "::warning::CUSTOM DOMAIN MANIFEST UNAVAILABLE: /news/data/release.json not served at custom domain."
           fi
