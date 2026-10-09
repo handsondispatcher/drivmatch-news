@@ -14,6 +14,11 @@ const {spawn}=require('node:child_process');
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
+   // The approved v31 editorial composition must not silently downgrade to v18 cards.
+   assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
+   assert.equal(await page.locator('#features > .related-rail article').count(),3,'v31 requires three related stories');
+   assert.equal(await page.locator('.language-shortcuts button[data-site-lang]').count(),3,'v31 language shortcuts must be present');
+   assert.equal(await page.locator('.language-shortcuts button[data-site-lang="pt"]').isVisible(),true);
    if(width===1440){
     const og=await page.request.get('http://127.0.0.1:8765/share/kodiak-charger-dallas-laredo-20261008/');
     assert.equal(og.status(),200,'Approved Kodiak story must have its own OG page');
