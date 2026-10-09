@@ -202,14 +202,16 @@
     // Original remains first-party. Translation happens in browser or Google Translate,
     // not by reproducing a publisher's copyrighted full text.
     const isFreightWaves=src&&/^https:\/\/(?:www\.)?freightwaves\.com\//i.test(src);
-    const translatedUrl=isFreightWaves&&lang!=='en'?'https://translate.google.com/translate?sl=en&tl='+encodeURIComponent(lang)+'&u='+encodeURIComponent(src):'';
-    const translatedLabel=lang==='pt'?'Ler reportagem completa em português ↗':'Leer el reportaje completo en español ↗';
-    const originalLabel=lang==='pt'?'Abrir reportagem original ↗':lang==='es'?'Abrir reportaje original ↗':'Open original report ↗';
-    const translatedButton=translatedUrl?'<a class="article-source-button primary" href="'+escapeHTML(translatedUrl)+'" target="_blank" rel="noopener noreferrer">'+translatedLabel+'</a>':'';
-    const originalButton=src?'<a class="article-source-button '+(translatedButton?'secondary':'primary')+'" href="'+escapeHTML(src)+'" target="_blank" rel="noopener noreferrer">'+originalLabel+'</a>':'';
-    const heading=lang==='pt'?'REPORTAGEM COMPLETA NA FONTE':lang==='es'?'REPORTAJE COMPLETO EN LA FUENTE':'COMPLETE ORIGINAL REPORT';
-    const tip=lang==='pt'?'Se a tradução automática não abrir, clique no original e escolha “Traduzir página” → “Português” no navegador. O acesso depende do veículo de origem.':lang==='es'?'Si falla la traducción, abre el original y usa “Traducir página” en el navegador.':'The full report is on the original publisher website; access is subject to the publisher.';
-    $('article-source').innerHTML=src?'<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+translatedButton+originalButton+'</div><p class="source-access-warning">'+tip+'</p>':escapeHTML(opened.source||'');
+    const translatedUrl=target=>isFreightWaves
+      ?'https://translate.google.com/translate?sl=en&tl='+encodeURIComponent(target)+'&u='+encodeURIComponent(src)
+      :src;
+    const sourceLink=(url,label,flag,primary=false)=>'<a class="article-source-button '+(primary?'primary':'secondary')+'" href="'+escapeHTML(url)+'" target="_blank" rel="noopener noreferrer"><img src="'+flags[flag]+'" alt="" width="19" height="13"><span>'+label+'</span> ↗</a>';
+    const ptButton=src?sourceLink(translatedUrl('pt'),'Português · tradução automática','pt',articleLang==='pt'):'';
+    const enButton=src?sourceLink(src,'English · original','en',articleLang==='en'):'';
+    const esButton=src?sourceLink(translatedUrl('es'),'Español · traducción automática','es',articleLang==='es'):'';
+    const heading=articleLang==='pt'?'REPORTAGEM COMPLETA NA FONTE':articleLang==='es'?'REPORTAJE COMPLETO EN LA FUENTE':'COMPLETE ORIGINAL REPORT';
+    const tip=articleLang==='pt'?'Para português ou espanhol, a tradução automática abre pelo Google Tradutor quando disponível. Nos demais veículos, abra a fonte e use “Traduzir página” no navegador. O acesso depende do veículo.':articleLang==='es'?'La traducción automática depende del navegador o del editor.':'The full report belongs to the publisher. Automatic translation may depend on the browser.';
+    $('article-source').innerHTML=src?'<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+ptButton+enButton+esButton+'</div><p class="source-access-warning">'+tip+'</p>':escapeHTML(opened.source||'');
     const photoCredit=opened.image_source_url && safeUrl(opened.image_source_url)
       ? `<p class="image-credit">Foto ilustrativa: <a href="${escapeHTML(opened.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(opened.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(opened.image_license||'Licença na fonte')}</p>`:'';
     $('article-source').innerHTML+=photoCredit;
