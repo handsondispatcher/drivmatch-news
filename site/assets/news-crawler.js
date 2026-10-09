@@ -3,6 +3,7 @@
 const byId=id=>document.getElementById(id);
 let entries=[],sourceHeadlines=[],sourceCheckedAt='';
 const clean=s=>String(s||'').replace(/[\u0000-\u001f]/g,'').trim();
+const headline=s=>clean(s).replace(/https?:\/\/\S+/gi,'').replace(/\s+-\s+[^-]{2,75}$/,'').replace(/\s*\[original\]\s*/gi,'').trim();
 function display(){
  const bar=byId('dm-news-crawler'),track=byId('dm-crawler-track');if(!bar||!track)return;
  const l=byId('language')?.value||'pt';
@@ -18,7 +19,7 @@ function display(){
  // Supplement with approved stories not already included in the source monitor.
  for(const a of validStories){
    if(seen.has(a.source_url))continue;seen.add(a.source_url);
-   links.push({title:a.locales[l].title,source:a.source||'DrivMatch News',url:a.source_url,external:false,region:'US',date:a.published_at||''});
+   links.push({title:a.locales[l].title,source:a.source||'DrivMatch News',url:a.source_url,external:false,region:'US',date:a.published_at||'',category:a.category||'Transporte'});
  }
  if(!links.length){bar.hidden=true;return;}
  const els=links.slice(0,65).map(a=>{
@@ -26,7 +27,7 @@ function display(){
    const k=document.createElement('span');k.className='dm-crawler-label';const categories={Clima:['CLIMA','WEATHER','CLIMA'],Rodovias:['RODOVIAS','ROADS','CARRETERAS'],Acidentes:['ACIDENTE','ACCIDENT','ACCIDENTE'],Combustíveis:['DIESEL E COMBUSTÍVEIS','DIESEL AND FUEL','DIÉSEL Y COMBUSTIBLES'],Tecnologia:['TECNOLOGIA E TRANSPORTE','TRANSPORT TECHNOLOGY','TECNOLOGÍA Y TRANSPORTE'],Imigração:['IMIGRAÇÃO','IMMIGRATION','INMIGRACIÓN'],Segurança:['SEGURANÇA','SAFETY','SEGURIDAD'],Energia:['ENERGIA','ENERGY','ENERGÍA'],Transporte:['TRANSPORTE','TRANSPORT','TRANSPORTE'],Fretes:['FRETES','FREIGHT','FLETES'],Negócios:['NEGÓCIOS','BUSINESS','NEGOCIOS'],Fiscalização:['FISCALIZAÇÃO','ENFORCEMENT','FISCALIZACIÓN'],Caminhoneiros:['CAMINHONEIROS','TRUCK DRIVERS','CAMIONEROS']};
    const category=categories[a.category]||[clean(a.category||'TRANSPORTE')];
    k.textContent=category[['pt','en','es'].indexOf(l)]||category[0];
-   const t=document.createElement('span');t.textContent=clean(a.title)+(a.untranslated?(l==='pt'?' · [original]':l==='es'?' · [original]':' · [original]'):'');
+   const t=document.createElement('span');t.textContent=headline(a.title);
    link.append(k,t);return link;
  });
  track.replaceChildren(...els,...els.map(e=>e.cloneNode(true)));
