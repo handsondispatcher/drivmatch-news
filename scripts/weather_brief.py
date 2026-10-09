@@ -58,6 +58,20 @@ CITIES = [
     ("Ontario", "CA", 34.0633, -117.6509),
     ("Savannah", "GA", 32.0809, -81.0912),
     ("Reno", "NV", 39.5296, -119.8138),
+    ("Philadelphia", "PA", 39.9526, -75.1636),
+    ("Fresno", "CA", 36.7378, -119.7871),
+    ("Austin", "TX", 30.2672, -97.7431),
+    ("Washington", "DC", 38.9072, -77.0369),
+    ("Fort Lauderdale", "FL", 26.1224, -80.1373),
+    ("Kissimmee", "FL", 28.2919, -81.4076),
+    ("Boca Raton", "FL", 26.3587, -80.0831),
+    ("Pompano Beach", "FL", 26.2379, -80.1248),
+    ("Framingham", "MA", 42.2793, -71.4162),
+    ("Worcester", "MA", 42.2626, -71.8023),
+    ("Danbury", "CT", 41.3948, -73.4540),
+    ("Edison", "NJ", 40.5187, -74.4121),
+    ("San Antonio", "TX", 29.4241, -98.4936),
+    ("Norfolk", "VA", 36.8508, -76.2859),
 ]
 
 def extract_periods(payload):
