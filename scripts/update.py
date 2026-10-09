@@ -287,6 +287,12 @@ def build(offline=False):
             seen={a.get('source_url') for a in articles}
             for item in sorted(rows,key=lambda a:a.get('published_at',''),reverse=True):
                 if item.get('source_url') in seen or not item.get('title') or not item.get('source_url','').startswith('https://'):continue
+                # Discovery feeds are broad. Exclude entertainment/streaming false positives
+                # rather than labeling them as operational weather alerts.
+                headline=item['title'].casefold()
+                if item.get('category')=='Clima' and any(term in headline for term in
+                    ('season 2','season 3','how to watch','streaming','episode','trailer','rocky mountain wreckers')):
+                    continue
                 external_headlines.append({k:item[k] for k in ('title','source','source_url','published_at','category','region','origin_type')})
                 seen.add(item['source_url'])
                 if len(external_headlines)>=90:break
