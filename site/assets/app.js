@@ -24,7 +24,7 @@
   const localizedCategory=c=>catLabels[c]?.[indices[lang]]||c;
   function localeOf(article, chosen=lang){return article.locales?.[chosen] || article.locales?.[article.original_lang] || null}
   function imageOf(a){return safeUrl(a.image) || 'assets/fallback.svg'}
-  function imageHTML(a, suffix=''){const img=imageOf(a);return `<img loading="lazy" src="${escapeHTML(img)}" alt="${escapeHTML(localeOf(a)?.title||'Imagem relacionada')}" onerror="this.onerror=null;this.src='assets/fallback.svg'" ${suffix}>`;}
+  function imageHTML(a, suffix=''){const img=imageOf(a);return `<img loading="lazy" src="${escapeHTML(img)}" alt="${escapeHTML(a.image_alt||localeOf(a)?.title||'Imagem relacionada')}" onerror="this.onerror=null;this.src='assets/fallback.svg'" ${suffix}>`;}
   function pageStories(){return [...(data.articles||[])].filter(s=>s.status==='approved' && !s.demo && ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body)).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
     return score(b)-score(a) || (Date.parse(b.published_at||'2000-01-01')-Date.parse(a.published_at||'2000-01-01'));
@@ -85,7 +85,7 @@
     $('ad-slot').innerHTML=`<span class="ad-label">${labels[lang].ad}</span><a href="${escapeHTML(ad.url)}" target="_blank" rel="noopener noreferrer sponsored">${escapeHTML(ad.title||'')}</a><p>${escapeHTML(ad.text||'')}</p>`;
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
-    $('modalimg').src=imageOf(opened);$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
+    $('modalimg').src=imageOf(opened);$('modalimg').alt=opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
     $('modaltitle').textContent=txt.title;$('modalmeta').textContent=opened.demo?al.demo:opened.published_at?`${al.published}: ${opened.published_at}`:'';
     $('modalbodytext').textContent=txt.body||txt.summary;
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
@@ -93,7 +93,7 @@
     const src=safeUrl(opened.source_url);
     $('article-source').innerHTML=src?`<a href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${al.source} ↗</a>`:escapeHTML(opened.source||'');
     $('articleLanguageTitle').textContent=al.articleTitle;
-    $('articleLanguageButtons').innerHTML=langs.filter(l=>l!==articleLang&&opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button"><img src="${flags[l]}" width="20" height="13" alt="" style="vertical-align:middle;margin-right:5px">${escapeHTML(texts[l].replace(/^\S+ /,''))}</button>`).join('');
+    $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="20" height="13" alt="" style="vertical-align:middle;margin-right:5px">${escapeHTML(texts[l].replace(/^\S+ /,''))}${l===articleLang?' ✓':''}</button>`).join('');
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('shade').classList.add('open');
   }
