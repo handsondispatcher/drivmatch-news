@@ -148,6 +148,8 @@
     $('article-reading').hidden=opened.kind==='external_link';
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('share-feedback').textContent='';
+    $('share-options').hidden=true;
+    $('share-native').setAttribute('aria-expanded','false');
     $('shade').classList.add('open');
   }
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
@@ -202,16 +204,33 @@
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function')window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');};
     const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
-    $('share-native').addEventListener('click',async()=>{
+    const shareOptions=$('share-options');
+    const shareDestinations=(title,url)=>({
+      whatsapp:'https://wa.me/?text='+encodeURIComponent(title+'\\n'+url),
+      facebook:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),
+      threads:'https://www.threads.net/intent/post?text='+encodeURIComponent(title+' '+url),
+      x:'https://twitter.com/intent/tweet?text='+encodeURIComponent(title)+'&url='+encodeURIComponent(url),
+      linkedin:'https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent(url),
+      telegram:'https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(title),
+      reddit:'https://www.reddit.com/submit?url='+encodeURIComponent(url)+'&title='+encodeURIComponent(title),
+      pinterest:'https://pinterest.com/pin/create/button/?url='+encodeURIComponent(url)+'&description='+encodeURIComponent(title),
+      email:'mailto:?subject='+encodeURIComponent(title)+'&body='+encodeURIComponent(url)
+    });
+    $('share-native').addEventListener('click',()=>{
+      if(!opened)return;
+      const expanded=shareOptions.hidden;
+      shareOptions.hidden=!expanded;
+      $('share-native').setAttribute('aria-expanded',String(expanded));
+      if(!expanded)return;
+      const urls=shareDestinations(shareText(),shareUrlOf(opened));
+      shareOptions.querySelectorAll('[data-share-platform]').forEach(a=>{a.href=urls[a.dataset.sharePlatform]||'#';});
+    });
+    $('share-system').addEventListener('click',async()=>{
       if(!opened)return;
       const title=shareText(),url=shareUrlOf(opened);
-      if(typeof navigator!=='undefined' && typeof navigator.share==='function'){
-        try{await navigator.share({title,url});return;}catch(e){if(e?.name==='AbortError')return;}
-      }
-      // Desktop and browsers without Web Share: always provide a working destination.
-      const whatsapp='https://wa.me/?text='+encodeURIComponent(title+'\n'+url);
-      if(typeof window.open==='function')window.open(whatsapp,'_blank','noopener,noreferrer');
-      else $('share-feedback').textContent=url;
+      if(typeof navigator.share==='function'){
+        try{await navigator.share({title,url});}catch(e){if(e?.name!=='AbortError')$('share-feedback').textContent=lang==='pt'?'Use uma das opções acima ou copie o link.':'Choose a destination above or copy the link.';}
+      }else $('share-feedback').textContent=lang==='pt'?'Escolha uma rede acima ou copie o link.':'Choose a network above or copy the link.';
     });
     $('share-copy').addEventListener('click',async()=>{
       if(!opened)return;
