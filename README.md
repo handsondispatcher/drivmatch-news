@@ -2,6 +2,8 @@
 
 **Estado:** Desenvolvimento / Pré-lançamento. **Não autorizado para divulgação como produto concluído.**
 
+**ESTRATÉGIA DE NEGÓCIO / MONETIZAÇÃO:** [WAR ROOM — Estratégia DrivMatch + News + Receita (09/10/2026)](docs/WAR_ROOM_ESTRATEGIA_DRIVMATCH_NEWS_E_RECEITA_2026-10-09.md). Ata integral de 09/10/2026: posicionamento, homepage, News como aquisição, preço-teste, contratação carrier-paid, consultoria, patrocínio, remuneração de parceiros, metas e validações. [Issue #26](https://github.com/handsondispatcher/drivmatch-news/issues/26). **Documento de proposta, não lançamento ou preços já aprovados.**
+
 **ANTES DE COMEÇAR EM OUTRO CHAT:** leia [docs/CONTINUIDADE_DRIVMATCH_NEWS.md](docs/CONTINUIDADE_DRIVMATCH_NEWS.md). O histórico recuperado, as decisões, os PRs, versões e pendências estão preservados aqui para evitar instruções repetidas.
 
 ## Backup íntegro da v32 e desenvolvimento seguro
