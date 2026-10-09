@@ -23,7 +23,7 @@ class PublicationTests(unittest.TestCase):
    with patch.dict('os.environ',{'USDBRL_SPOT_URL':'https://vendor.example/feed','USDBRL_REDISTRIBUTION_AUTHORIZED':'true'}),patch.object(up,'fetch',return_value=json.dumps({'symbol':'USD/BRL','instrument':instrument,'price_type':'commercial'})):
     with self.assertRaises(ValueError):up.authorized_spot()
  def test_authorized_spot(self):
-  d={'symbol':'USD/BRL','instrument':'spot','price_type':'commercial','source':'test fixture','source_url':'https://vendor.example','value':5.1,'observed_at':datetime.now(timezone.utc).isoformat()}
+  d={'symbol':'USD/BRL','instrument':'spot','price_type':'commercial','session_status':'open','source':'test fixture','source_url':'https://vendor.example','value':5.1,'observed_at':datetime.now(timezone.utc).isoformat()}
   with patch.dict('os.environ',{'USDBRL_SPOT_URL':'https://vendor.example/feed','USDBRL_REDISTRIBUTION_AUTHORIZED':'true'}),patch.object(up,'fetch',return_value=json.dumps(d)):
    self.assertEqual(up.authorized_spot()['instrument'],'spot')
  def test_fred_real_header(self):
