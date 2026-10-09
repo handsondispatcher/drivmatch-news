@@ -41,7 +41,9 @@
     if(a.kind!=='external_link')return 'assets/fallback.svg';
     const choices=topicPhotos[a.category]||topicPhotos.Transporte;
     const seed=Array.from(String((a.source_url||'')+'|'+(a.locales?.en?.title||a.locales?.pt?.title||''))).reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
-    return 'https://images.unsplash.com/'+choices[seed%choices.length]+'?auto=format&fit=crop&w=900&q=75';
+    const categoryIndex=pageStories().filter(story=>story.kind==='external_link'&&story.category===a.category).findIndex(story=>story.id===a.id);
+    const photoIndex=categoryIndex>=0?categoryIndex%choices.length:seed%choices.length;
+    return 'https://images.unsplash.com/'+choices[photoIndex]+'?auto=format&fit=crop&w=900&q=75';
   }
   function imageHTML(a, suffix=''){
     const illustrative=a.kind==='external_link'&&!safeUrl(a.image);
