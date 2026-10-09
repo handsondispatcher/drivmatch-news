@@ -9,10 +9,10 @@ function display(){
  const l=byId('language')?.value||'pt';
  const validStories=entries.filter(a=>a.status==='approved'&&!a.demo&&a.locales?.[l]?.title&&a.source_url?.startsWith('https://')&&(l==='en'||a.locales[l].title!==a.locales?.en?.title));
  const links=[],seen=new Set(),seenTitles=new Set();
- const cleanTitle=t=>String(t||'').replace(/\\s*(?:[-–—|])\\s*(?:thetrucker(?:\\.com)?|the trucker|freightwaves|transport topics|truck news|[\\w-]+\\.(?:com|net|org))\\s*$/i,'').trim();
- const fingerprint=t=>cleanTitle(t).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+ const cleanTitle=t=>String(t||'').replace(/\s*(?:[-–—|])\s*(?:thetrucker(?:\.com)?|the trucker|freightwaves|transport topics|truck news|[\w-]+\.(?:com|net|org))\s*$/i,'').trim();
+ const fingerprint=t=>cleanTitle(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
  for(const a of sourceHeadlines){
-   if(a.geo_scope_verified!==true||a.origin_type==='aggregator-discovery'||/news\\.google\\.com/i.test(a.source_url||'')||!a.source_url?.startsWith('https://')||!a.title||!a.titles?.[l]||seen.has(a.source_url))continue;
+   if(a.geo_scope_verified!==true||a.origin_type==='aggregator-discovery'||/news\.google\.com/i.test(a.source_url||'')||!a.source_url?.startsWith('https://')||!a.title||!a.titles?.[l]||seen.has(a.source_url))continue;
    if(l!==(a.original_lang||'en')&&clean(a.titles[l]).toLowerCase()===clean(a.title).toLowerCase())continue;
    const title=cleanTitle(a.titles?.[l]||a.title);
    if(seenTitles.has(fingerprint(title)))continue;
