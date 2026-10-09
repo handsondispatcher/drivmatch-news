@@ -206,6 +206,13 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("fresh(a.published_at,MAX_HEADLINE_AGE_MS)",ticker)
   self.assertIn("MAX_SNAPSHOT_AGE_MS=30*60*1000",ticker)
   self.assertIn("MAX_HEADLINE_AGE_MS=48*60*60*1000",ticker)
+  app=(BASE/'site/assets/app.js').read_text()
+  page=(BASE/'site/index.html').read_text()
+  self.assertIn('featureSize = 4',app)
+  self.assertIn('class="hero-wrap"',app)
+  self.assertIn('class="related-rail"',app)
+  self.assertIn('/* v31 restored from PR #7',page)
+  self.assertIn('data-site-lang="es"',page)
   self.assertNotIn('id="radar-fontes"',(BASE/'site/index.html').read_text())
   sources=json.loads((BASE/'content/sources.json').read_text())['sources']
   self.assertGreaterEqual(sum(bool(x.get('feed_url')) for x in sources),25)

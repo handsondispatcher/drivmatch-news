@@ -4,7 +4,7 @@
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
   let externalHeadlines = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
-  const pageSize = 6, featureSize = 3;
+  const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
   const labels = {
     pt: { panorama:'Panorama do Transporte',news:'Notícias',market:'Mercado em Foco',all:'Todas',prev:'← Anterior',next:'Próximas →',search:'Pesquisar manchetes, temas ou fontes...',filters:'Todas as editorias',allDates:'Todo o arquivo',d2:'Hoje e ontem',d7:'Últimos 7 dias',d30:'Últimos 30 dias',articleTitle:'Ler em outro idioma',demo:'DEMONSTRAÇÃO',source:'Fonte original',unavailable:'—',disclaimerDemo:'Exemplo editorial para testar a interface. Não representa uma notícia real, frete ou vaga disponível.',published:'Publicado',updated:'Verificado',ad:'Publicidade',dataMissing:'Aguardando dados verificados. Sem cotações fictícias.',showing:'matéria(s)', noResults:'Nenhuma matéria encontrada.', archive:'Arquivo de demonstração'},
@@ -118,7 +118,7 @@
       return featured?`<article class="story" tabindex="0" role="button" data-external="true" data-story="${i}">${imageHTML(a)}<div class="info">${body}</div></article>`:`<article class="item" tabindex="0" role="button" data-external="true" data-story="${i}"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></article>`;
     }
     const kicker= a.kind==='opportunity' ? `${cat} · ${lang==='en'?'Opportunity':lang==='es'?'Oportunidad':'Oportunidade'}`:cat;
-    if(featured)return `<article class="story" tabindex="0" role="button" data-external="false" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
+    if(featured)return `<article class="story" tabindex="0" role="button" data-external="false" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><p class="feature-summary">${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
     return `<article class="item" tabindex="0" role="button" data-external="false" data-story="${i}"><div><span class="tag">${cat}</span> ${a.kind==='opportunity'?'<span class="origin-pill">DrivMatch</span>':''}<h3>${escapeHTML(txt.title)}</h3><p>${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div><div class="thumb">${imageHTML(a)}<span class="label">${cat}</span></div></article>`;
   }
   function renderStories(){const f=articlesFiltered();const pages=Math.max(1,Math.ceil(f.length/pageSize));page=Math.min(page,pages-1);
@@ -128,7 +128,11 @@
     $('pagecount').textContent=`${page+1} / ${pages}`;
     $('prev').disabled=page===0; $('next').disabled=page===pages-1;
     const n=Math.max(1,Math.ceil(f.length/featureSize));featurePage=Math.min(featurePage,n-1);const pane=f.slice(featurePage*featureSize,(featurePage+1)*featureSize);
-    $('features').innerHTML=pane.length?pane.map(a=>storyCard(a,indexSet.get(a.id),true)).join(''):`<div class="empty">${labels[lang].noResults}</div>`;
+    const relatedTitle=lang==='pt'?'Leia também':lang==='es'?'Lea también':'Read also';
+    $('features').innerHTML=pane.length
+      ? `<div class="hero-wrap">${storyCard(pane[0],indexSet.get(pane[0].id),true)}</div>${pane.length>1
+        ? `<div class="related-rail" aria-label="${relatedTitle}"><div class="related-head">${relatedTitle}</div>${pane.slice(1).map(a=>storyCard(a,indexSet.get(a.id),true)).join('')}</div>` : ''}`
+      :`<div class="empty">${labels[lang].noResults}</div>`;
     $('featureCount').textContent=`${featurePage+1} / ${n}`;
     $('featurePrev').disabled=featurePage===0; $('featureNext').disabled=featurePage===n-1;
     $('featureDots').innerHTML=Array.from({length:n},(_,i)=>`<button type="button" class="carousel-dot ${i===featurePage?'active':''}" data-slide="${i}" aria-label="${i+1}"></button>`).join('');
@@ -226,6 +230,7 @@
     $('shade').classList.add('open');
   }
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
+    document.querySelectorAll('[data-site-lang]').forEach(b=>{b.classList.toggle('selected',b.dataset.siteLang===next);b.setAttribute('aria-pressed',String(b.dataset.siteLang===next));});
     $('language').value=next;$('languageFlag').src=flags[next];$('languageFlag').alt=next==='pt'?'Bandeira do Brasil':next==='en'?'US flag':'Bandera de España';
     $('share-label').textContent=next==='en'?'Share':next==='es'?'Compartir':'Compartilhar';
     $('share-section-title').textContent=next==='en'?'Share this story':next==='es'?'Comparte esta noticia':'Compartilhe esta notícia';
@@ -280,6 +285,7 @@
     $('edition-date').textContent=new Date().toLocaleDateString('pt-BR');
     // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
+    document.querySelectorAll('.language-shortcuts').forEach(el=>el.addEventListener('click',e=>{const b=e.target.closest('[data-site-lang]');if(b)languageSet(b.dataset.siteLang);}));
     $('search').addEventListener('input',()=>{page=featurePage=0;renderStories();});
     $('category').addEventListener('change',e=>{selected=e.target.value;page=featurePage=0;languageSet(lang);});
     $('age').addEventListener('change',()=>{page=featurePage=0;renderStories();});

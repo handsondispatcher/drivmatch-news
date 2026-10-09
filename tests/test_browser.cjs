@@ -14,6 +14,11 @@ const {spawn}=require('node:child_process');
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
+   // The approved v31 editorial composition must not silently downgrade to v18 cards.
+   assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
+   assert.equal(await page.locator('#features > .related-rail article').count(),3,'v31 requires three related stories');
+   assert.equal(await page.locator('.language-shortcuts button[data-site-lang]').count(),3,'v31 language shortcuts must be present');
+   assert.equal(await page.locator('.language-shortcuts button[data-site-lang="pt"]').isVisible(),true);
    if(width===1440){
     const og=await page.request.get('http://127.0.0.1:8765/share/kodiak-charger-dallas-laredo-20261008/');
     assert.equal(og.status(),200,'Approved Kodiak story must have its own OG page');
@@ -54,11 +59,13 @@ const {spawn}=require('node:child_process');
    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/navegador/);
    // Switching the entire site to English must translate weather and publisher footer.
    await page.locator('#article-dialog .x').click();
-   await page.locator('#language').selectOption('en');
+   await page.locator('[data-site-lang="en"]').click();
+   assert.equal(await page.locator('[data-site-lang="en"]').getAttribute('aria-pressed'),'true');
    assert.equal(await page.locator('#clima-desktop .weather-top h2').textContent(),'Weather');
    assert.equal(await page.locator('#footer-publisher').innerText(),'DrivMatch News — um produto da Hands On Dispatcher LLC');
    assert.equal(await page.locator('#footer-legal').innerText(),'© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.');
-   await page.locator('#language').selectOption('pt');
+   await page.locator('[data-site-lang="pt"]').click();
+   assert.equal(await page.locator('[data-site-lang="pt"]').getAttribute('aria-pressed'),'true');
    assert.match(await page.locator('#footer-publisher').innerText(),/um produto da Hands On Dispatcher LLC/);
    await openEditorial();
    assert.equal(await page.locator('#share-native').count(),1);
@@ -115,7 +122,7 @@ const {spawn}=require('node:child_process');
    await page.locator('#list article[data-story][data-external="false"]').first().click();
    assert.equal(await page.locator('#article-dialog').evaluate(e=>e.scrollTop),0);
    await page.keyboard.press('Escape');
-   await page.locator('#language').selectOption('en');
+   await page.locator('[data-site-lang="en"]').click();
    assert.equal(await page.locator('#market-title').textContent(),'Market Focus');
    assert.deepEqual(errors,[]);
    await page.screenshot({path:`test-results/${width}.png`,fullPage:true});await page.close();
