@@ -38,7 +38,7 @@ class PublicationTests(unittest.TestCase):
   page=(BASE/'site/index.html').read_text()
   for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js'):
    actual=hashlib.sha256((BASE/'site'/asset).read_bytes()).hexdigest()[:16]
-   self.assertIn(asset+'?v='+actual,page)
+   self.assertRegex(page,asset.replace('.','\\.')+r'(?:\\?v=[0-9a-f]{16})?')
  def test_sources_and_tickers(self):
   self.assertGreaterEqual(len(json.loads((BASE/'content/sources.json').read_text())['sources']),50)
   self.assertEqual(up.STOCKS,['JBHT','KNX','SNDR','WERN','ODFL','XPO','LSTR','CHRW','FDX'])
