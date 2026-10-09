@@ -348,7 +348,7 @@ def build(offline=False):
     # Content hashes prevent browsers mixing new HTML with cached runtime/data.
     page=ROOT/'site/index.html'
     markup=page.read_text(encoding='utf-8')
-    for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js','assets/utility-strip.js'):
+    for asset in ('data/bootstrap.js','assets/app.js','assets/news-crawler.js','assets/clima-spot.js','assets/utility-strip.js'):
         version=hashlib.sha256((ROOT/'site'/asset).read_bytes()).hexdigest()[:16]
         markup=re.sub(r'(src="'+re.escape(asset)+r')(?:\?[^"]*)?"',lambda m:m.group(1)+'?v='+version+'"',markup)
     page.write_text(markup,encoding='utf-8')
