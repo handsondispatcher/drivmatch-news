@@ -217,6 +217,8 @@ def build(offline=False):
             unique[a['id']]=translated
         else: errors.append(f'translation_incomplete:{a["id"]}')
     market=make_market(offline)
+    from weather_brief import collect_weather
+    weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
     data={'schema_version':1,'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
@@ -226,11 +228,12 @@ def build(offline=False):
     (path/'runtime.json').write_text(json.dumps(runtime)+'\n',encoding='utf-8')
     (path/'content.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'market.json').write_text(json.dumps(market,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    (path/'weather.json').write_text(json.dumps(weather,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
     # Content hashes prevent browsers mixing new HTML with cached runtime/data.
     page=ROOT/'site/index.html'
     markup=page.read_text(encoding='utf-8')
-    for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js'):
+    for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js','assets/utility-strip.js'):
         version=hashlib.sha256((ROOT/'site'/asset).read_bytes()).hexdigest()[:16]
         markup=re.sub(r'(src="'+re.escape(asset)+r')(?:\?[^"]*)?"',lambda m:m.group(1)+'?v='+version+'"',markup)
     page.write_text(markup,encoding='utf-8')
