@@ -1,3 +1,21 @@
+# DrivMatch News — v32 (baseline consolidada, 09/10/2026)
+
+**Versão atual do produto: v32.** Consolidação da interface editorial v31 com as melhorias posteriores já presentes na `main`. **A v18 é referência histórica, não a versão de trabalho.**
+
+**Estado:** desenvolvimento / pré-lançamento. **Não autorizado para divulgação como produto concluído.** Consulte [a especificação e os critérios de homologação da v32](docs/V32_RELEASE.md) e o [Release Gate #18](https://github.com/handsondispatcher/drivmatch-news/issues/18).
+
+**Implementação:** `site/index.html` + `site/assets/app.js`; conteúdo de matérias em `content/editorial.json`, monitor de fontes em `content/sources.json`, scripts de atualização em `scripts/`, atualizações a cada execução do GitHub Actions `.github/workflows/deploy.yml`, integração de notícias em `site/data/live-feed.json` e share cards em `site/share/` (gerados no build). Versão e status em `content/release.json` e `site/data/release.json`.
+
+**Preservado na v32:** layout v31 com manchete grande e três relacionadas, idiomas e bandeiras, clima Ventusky/NWS, mercado com dados verificados, matérias originais com atribuição, WhatsApp e compartilhamento social, restrições de geografia/frescor/deduplicação, rodapé da Hands On Dispatcher LLC.
+
+**Sem funcionalidades simuladas:** dados comerciais sem provedor autorizado permanecem indisponíveis; links originais não significam tradução integral da publicação; o `/live` e o ticker do site principal são outra aplicação.
+
+---
+
+## Arquivo histórico do pacote inicial — não seguir como baseline atual
+
+O texto abaixo foi preservado para rastreabilidade histórica. Descrições da v18, exemplos demonstrativos ou instruções de instalação antigas **não se aplicam** à v32 e não substituem o documento atual.
+
 ## Desenvolvimento real — branch drivmatch-weather-b3-v22
 
 A documentação atual é [docs/OPERATIONS.md](docs/OPERATIONS.md). O pipeline agora usa somente produção verificada, sem demonstrações. Seções anteriores abaixo descrevem a instalação histórica e não substituem a operação atual.
