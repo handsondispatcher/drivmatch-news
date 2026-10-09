@@ -12,7 +12,7 @@ from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
  def test_visual_and_weather(self):
   page=(BASE/'site/index.html').read_text()
-  for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — uma publicação da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
+  for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — um produto da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
   self.assertLess(page.index('id="clima-desktop"'),page.index('id="market-title"'))
  def test_no_demo_default(self):
   self.assertTrue(all(up.publication_valid(a) for a in json.loads((BASE/'content/editorial.json').read_text())))
@@ -202,6 +202,10 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("k.textContent=category[",ticker)
   self.assertNotIn("showRadar()",ticker)
   self.assertIn("seen.has(a.source_url)",ticker)
+  self.assertIn("fresh(sourceCheckedAt,MAX_SNAPSHOT_AGE_MS)",ticker)
+  self.assertIn("fresh(a.published_at,MAX_HEADLINE_AGE_MS)",ticker)
+  self.assertIn("MAX_SNAPSHOT_AGE_MS=30*60*1000",ticker)
+  self.assertIn("MAX_HEADLINE_AGE_MS=48*60*60*1000",ticker)
   self.assertNotIn('id="radar-fontes"',(BASE/'site/index.html').read_text())
   sources=json.loads((BASE/'content/sources.json').read_text())['sources']
   self.assertGreaterEqual(sum(bool(x.get('feed_url')) for x in sources),25)
