@@ -200,7 +200,7 @@
         if(Array.isArray(next.headlines)){
           const approved=new Set((data.articles||[]).map(x=>x.source_url));
           const seen=new Set();
-          externalHeadlines=next.headlines.filter(x=>x.title&&safeUrl(x.source_url)&&!approved.has(x.source_url)&&!seen.has(x.source_url)&&seen.add(x.source_url)).slice(0,90).map(x=>({
+          externalHeadlines=next.headlines.filter(x=>x.geo_scope_verified===true&&x.title&&safeUrl(x.source_url)&&!approved.has(x.source_url)&&!seen.has(x.source_url)&&seen.add(x.source_url)).slice(0,90).map(x=>({
             id:'source-'+String(x.source_url).slice(-80),kind:'external_link',status:'external_source',demo:false,
             category:CATS.includes(x.category)?x.category:'Transporte',region:x.region||'US',source:x.source,
             source_url:x.source_url,published_at:x.published_at,original_lang:x.original_lang|| (x.region==='MX'?'es':'en'),image:x.image||'',
