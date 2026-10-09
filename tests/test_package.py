@@ -47,6 +47,27 @@ class PublicationTests(unittest.TestCase):
    result=up.localize_source_headlines([fixture],errors,False)[0]
   self.assertEqual(result['titles'],{'en':fixture['title']})
   self.assertTrue(any('headline_translation_incomplete' in x for x in errors))
+ def test_geographic_editorial_gate_blocks_foreign_and_domestic_canada(self):
+  from editorial_gate import eligible
+  def article(title,region='US',url='https://news.google.com/rss/articles/example',category='Transporte'):
+   return {'title':title,'region':region,'source_url':url,'category':category}
+  self.assertFalse(eligible(article('Bus and truck crash in Tanzania kills 28')))
+  self.assertFalse(eligible(article('Diesel prices down, regular fuel up slightly',url='https://yoursaintjohn.ca/diesel-prices-down-regular-fuel-up-slightly/')))
+  self.assertFalse(eligible(article('Da Nang bans trucks from National Highway 14D')))
+  self.assertFalse(eligible(article('Poverty rates take troubling toll on youth')))
+  self.assertFalse(eligible(article('Canada truckers face new provincial rules','CA',url='https://trucknews.com/article')))
+  self.assertTrue(eligible(article('FMCSA tightens CDL English proficiency inspections in Texas')))
+  self.assertTrue(eligible(article('Cargo van drivers face new interstate freight rules in California')))
+  self.assertTrue(eligible(article('Hot shot trailer maintenance costs climb for Texas carriers')))
+  self.assertTrue(eligible(article('US Mexico border freight trucks face delays in Laredo','MX',url='https://example.mx/crossing')))
+  self.assertTrue(eligible(article('Canada US border crossing truck inspections delayed at Detroit','CA',url='https://trucknews.com/cross-border')))
+  self.assertFalse(eligible(article('Truck crash in Tanzania prompts US commentary',url='https://thetrucker.com/world')))
+  self.assertFalse(eligible(article('Freight capacity changes',url='https://news.google.com/rss/articles/ambiguous')))
+  self.assertTrue(eligible(article('Trucking insurance premiums increase',url='https://www.thetrucker.com/news/insurance')))
+ def test_geo_scope_is_required_by_frontend_and_ticker(self):
+  self.assertIn('x.geo_scope_verified===true',(BASE/'site/assets/app.js').read_text())
+  self.assertIn('a.geo_scope_verified!==true',(BASE/'site/assets/news-crawler.js').read_text())
+  self.assertIn("'geo_scope_verified':True",(BASE/'scripts/update.py').read_text())
  def test_topic_images_and_no_duplicate_refresh(self):
   js=(BASE/'site/assets/app.js').read_text()
   self.assertIn('topicPhotos',js)
