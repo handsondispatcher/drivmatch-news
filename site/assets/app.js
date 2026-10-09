@@ -127,7 +127,7 @@
     $('edition-date').textContent=new Date().toLocaleDateString('pt-BR');
     // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
-    document.querySelector?.('.language-shortcuts')?.addEventListener('click',e=>{const b=e.target.closest('[data-site-lang]');if(b)languageSet(b.dataset.siteLang);});
+    document.querySelectorAll?.('.language-shortcuts')?.forEach(el=>el.addEventListener('click',e=>{const b=e.target.closest('[data-site-lang]');if(b)languageSet(b.dataset.siteLang);}));
     $('search').addEventListener('input',()=>{page=featurePage=0;renderStories();});
     $('category').addEventListener('change',e=>{selected=e.target.value;page=featurePage=0;languageSet(lang);});
     $('age').addEventListener('change',()=>{page=featurePage=0;renderStories();});
