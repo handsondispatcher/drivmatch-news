@@ -67,7 +67,8 @@
   function storyCard(a,i,featured=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
     if(a.kind==='external_link'){
       const title=escapeHTML(txt?.title||''), url=escapeHTML(safeUrl(a.source_url)||'#'), attribution=escapeHTML(a.source||'');
-      const note=lang==='pt'?'Manchete da fonte · Abrir original ↗':lang==='es'?'Titular de la fuente · Abrir original ↗':'Source headline · Open original ↗';
+      const translated=a.translated_langs?.includes(lang);const languageNotice=translated?'':(lang==='pt'?' · Título original sem tradução':lang==='es'?' · Titular original sin traducir':' · Original headline (not translated)');
+      const note=(lang==='pt'?'Manchete da fonte · Abrir original ↗':lang==='es'?'Titular de la fuente · Abrir original ↗':'Source headline · Open original ↗')+languageNotice;
       const body=`<div class="kicker">${cat} · ${escapeHTML(a.region||'')}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div><p>${note}</p>`;
       return featured?`<article class="story" tabindex="0" role="link" data-external-url="${url}">${imageHTML(a)}<div class="info">${body}</div></article>`:`<article class="item" tabindex="0" role="link" data-external-url="${url}"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></article>`;
     }
@@ -176,7 +177,7 @@
             id:'source-'+String(x.source_url).slice(-80),kind:'external_link',status:'external_source',demo:false,
             category:CATS.includes(x.category)?x.category:'Transporte',region:x.region||'US',source:x.source,
             source_url:x.source_url,published_at:x.published_at,original_lang:x.original_lang|| (x.region==='MX'?'es':'en'),image:x.image||'',
-            locales:Object.fromEntries(langs.map(l=>[l,{title:x.title,summary:'',body:''}]))
+            locales:Object.fromEntries(langs.map(l=>[l,{title:x.titles?.[l]||x.title,summary:'',body:''}])),translated_langs:Object.keys(x.titles||{})
           }));
         }
       }
