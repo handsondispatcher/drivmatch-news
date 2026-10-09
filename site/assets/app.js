@@ -205,7 +205,8 @@
     $('modalimg').src=imageOf(opened);$('modalimg').onerror=()=>{$('modalimg').onerror=null;$('modalimg').src=storyGraphic(opened);};$('modalimg').alt=opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
     $('modaltitle').textContent=cleanHeadline(txt.title);$('modalmeta').textContent=opened.demo?al.demo:opened.published_at?`${al.published}: ${opened.published_at}`:'';
     const isExternal=opened.kind==='external_link';
-    $('article-dialog').classList.toggle('external-article',isExternal);
+    if(isExternal)$('article-dialog').classList.add('external-article');
+    else $('article-dialog').classList.remove('external-article');
     $('modalbodytext').textContent=isExternal
       ?(lang==='pt'?'Leia a reportagem completa na fonte pelos botões abaixo. O texto integral pertence ao veículo de origem; não apresentamos um resumo genérico como se fosse a matéria.':lang==='es'?'Lea el reportaje completo en la fuente con los enlaces de abajo.':'Read the full original report using the links below.')
       :(txt.body||txt.summary||'');
