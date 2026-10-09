@@ -89,7 +89,7 @@
     try {
       const id=new URLSearchParams(location.search).get('story');
       const story=id&&pageStories().find(a=>a.id===id);
-      if(story){opened=story;articleLang=lang;$('article-dialog').scrollTop=0;renderArticle();}
+      if(story){opened=story;articleLang=lang;renderArticle();$('article-dialog').scrollTop=0;}
     }catch(_){}
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
@@ -143,7 +143,7 @@
     $('featurePrev').addEventListener('click',()=>{featurePage--;renderStories();});
     $('featureNext').addEventListener('click',()=>{featurePage++;renderStories();});
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
-    const clickArticle=e=>{const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){$('article-dialog').scrollTop=0;renderArticle();}};
+    const clickArticle=e=>{const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){renderArticle();$('article-dialog').scrollTop=0;}};
     const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
     $('share-native').addEventListener('click',async()=>{
       if(!opened)return;
