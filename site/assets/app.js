@@ -206,9 +206,9 @@
       ?'https://translate.google.com/translate?sl=en&tl='+encodeURIComponent(target)+'&u='+encodeURIComponent(src)
       :src;
     const sourceLink=(url,label,flag,primary=false)=>'<a class="article-source-button '+(primary?'primary':'secondary')+'" href="'+escapeHTML(url)+'" target="_blank" rel="noopener noreferrer"><img src="'+flags[flag]+'" alt="" width="19" height="13"><span>'+label+'</span> ↗</a>';
-    const ptButton=src?sourceLink(translatedUrl('pt'),'Português · tradução automática','pt',articleLang==='pt'):'';
+    const ptButton=src?sourceLink(translatedUrl('pt'),isFreightWaves?'Português · tradução automática':'Português · traduzir no navegador','pt',articleLang==='pt'):'';
     const enButton=src?sourceLink(src,'English · original','en',articleLang==='en'):'';
-    const esButton=src?sourceLink(translatedUrl('es'),'Español · traducción automática','es',articleLang==='es'):'';
+    const esButton=src?sourceLink(translatedUrl('es'),isFreightWaves?'Español · traducción automática':'Español · traducir en navegador','es',articleLang==='es'):'';
     const heading=articleLang==='pt'?'REPORTAGEM COMPLETA NA FONTE':articleLang==='es'?'REPORTAJE COMPLETO EN LA FUENTE':'COMPLETE ORIGINAL REPORT';
     const tip=articleLang==='pt'?'Para português ou espanhol, a tradução automática abre pelo Google Tradutor quando disponível. Nos demais veículos, abra a fonte e use “Traduzir página” no navegador. O acesso depende do veículo.':articleLang==='es'?'La traducción automática depende del navegador o del editor.':'The full report belongs to the publisher. Automatic translation may depend on the browser.';
     $('article-source').innerHTML=src?'<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+ptButton+enButton+esButton+'</div><p class="source-access-warning">'+tip+'</p>':escapeHTML(opened.source||'');
