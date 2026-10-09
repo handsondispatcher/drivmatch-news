@@ -46,7 +46,7 @@
       const title=escapeHTML(txt?.title||''), url=escapeHTML(safeUrl(a.source_url)||'#'), attribution=escapeHTML(a.source||'');
       const note=lang==='pt'?'Manchete da fonte · Abrir original ↗':lang==='es'?'Titular de la fuente · Abrir original ↗':'Source headline · Open original ↗';
       const body=`<div class="kicker">${cat} · ${escapeHTML(a.region||'')}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div><p>${note}</p>`;
-      return featured?`<a class="story" href="${url}" target="_blank" rel="noopener noreferrer">${imageHTML(a)}<div class="info">${body}</div></a>`:`<a class="item" href="${url}" target="_blank" rel="noopener noreferrer"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></a>`;
+      return featured?`<article class="story" tabindex="0" role="link" data-external-url="${url}">${imageHTML(a)}<div class="info">${body}</div></article>`:`<article class="item" tabindex="0" role="link" data-external-url="${url}"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></article>`;
     }
     const kicker= a.kind==='opportunity' ? `${cat} · ${lang==='en'?'Opportunity':lang==='es'?'Oportunidad':'Oportunidade'}`:cat;
     if(featured)return `<article class="story" tabindex="0" role="button" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
@@ -173,7 +173,7 @@
     $('featurePrev').addEventListener('click',()=>{featurePage--;renderStories();});
     $('featureNext').addEventListener('click',()=>{featurePage++;renderStories();});
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
-    const clickArticle=e=>{const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){renderArticle();$('article-dialog').scrollTop=0;}};
+    const clickArticle=e=>{const external=e.target.closest('[data-external-url]');if(external){window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');return;}const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){renderArticle();$('article-dialog').scrollTop=0;}};
     const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
     $('share-native').addEventListener('click',async()=>{
       if(!opened)return;
