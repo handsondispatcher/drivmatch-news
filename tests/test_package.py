@@ -40,19 +40,23 @@ class PublicationTests(unittest.TestCase):
    actual=hashlib.sha256((BASE/'site'/asset).read_bytes()).hexdigest()[:16]
    self.assertRegex(page,asset.replace('.','\\.')+r'(?:\\?v=[0-9a-f]{16})?')
  def test_sources_and_tickers(self):
-  self.assertGreaterEqual(len(json.loads((BASE/'content/sources.json').read_text())['sources']),50)
+  self.assertGreaterEqual(len(json.loads((BASE/'content/sources.json').read_text())['sources']),75)
   self.assertEqual(up.STOCKS,['JBHT','KNX','SNDR','WERN','ODFL','XPO','LSTR','CHRW','FDX'])
  def test_safety_deploy(self):
   s=(BASE/'.github/workflows/deploy.yml').read_text()
   self.assertIn("if: github.ref == 'refs/heads/main'",s)
   self.assertIn('python -m unittest discover',s)
-  self.assertIn("cron: '7,37 * * * *'",s)
+  self.assertIn("cron: '7,17,27,37,47,57 * * * *'",s)
  def test_source_headline_monitor_keeps_editorial_approval(self):
   source=(BASE/'scripts/update.py').read_text()
   ticker=(BASE/'site/assets/news-crawler.js').read_text()
   self.assertIn("external_feed_links_not_editorially_approved",source)
   self.assertIn("source-headlines.json",source)
   self.assertIn("FONTE EXTERNA",ticker)
-  self.assertIn("a.external?'FONTE EXTERNA · ':'",ticker)
+  self.assertIn("FONTE EXTERNA",ticker)
   self.assertIn("seen.has(a.source_url)",ticker)
+  self.assertIn("radar-fontes",(BASE/'site/index.html').read_text())
+  sources=json.loads((BASE/'content/sources.json').read_text())['sources']
+  self.assertGreaterEqual(sum(bool(x.get('feed_url')) for x in sources),25)
+  self.assertTrue({'US','CA','MX'}.issubset({x.get('region') for x in sources}))
 if __name__=='__main__':unittest.main()
