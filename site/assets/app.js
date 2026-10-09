@@ -105,6 +105,8 @@
     $('articleLanguageTitle').textContent=lang==='en'?'Language of the summary above:':lang==='es'?'Idioma del resumen anterior:':'Idioma do resumo acima:';
     $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
+    $('share-feedback').textContent='';
+    $('share-native').hidden=!(typeof navigator!=='undefined' && typeof navigator.share==='function');
     $('shade').classList.add('open');
   }
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
@@ -132,6 +134,36 @@
     $('featureNext').addEventListener('click',()=>{featurePage++;renderStories();});
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened)renderArticle();};
+    const shareUrl=()=>opened?'https://drivmatch.com/news/share/'+encodeURIComponent(opened.id)+'/':'';
+    const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
+    $('share-whatsapp').addEventListener('click',()=>{
+      if(!opened)return;
+      const url='https://wa.me/?text='+encodeURIComponent(shareText()+'\n'+shareUrl());
+      if(typeof window.open==='function')window.open(url,'_blank','noopener,noreferrer');
+      else $('share-feedback').textContent=shareUrl();
+    });
+    $('share-copy').addEventListener('click',async()=>{
+      if(!opened)return;
+      const url=shareUrl();
+      try{
+        if(typeof navigator!=='undefined' && navigator.clipboard?.writeText){
+          await navigator.clipboard.writeText(url);
+          $('share-feedback').textContent='Link copiado!';
+        }else{$('share-feedback').textContent='Link: '+url;}
+      }catch(_){$('share-feedback').textContent='Link: '+url;}
+    });
+    $('share-native').addEventListener('click',async()=>{
+      if(!opened||typeof navigator==='undefined'||!navigator.share)return;
+      try{await navigator.share({title:shareText(),url:shareUrl()});}catch(_){}
+    });
+    const storyFromUrl=()=>{
+      if(typeof location==='undefined'||!location.search)return;
+      const id=new URLSearchParams(location.search).get('story');
+      if(!id)return;
+      const found=pageStories().find(a=>a.id===id);
+      if(found){opened=found;articleLang=lang;renderArticle();}
+    };
+    storyFromUrl();
     $('list').addEventListener('click',clickArticle);$('features').addEventListener('click',clickArticle);
     const keyArticle=e=>{if(e.key==='Enter'||e.key===' '){const item=e.target.closest('[data-story]');if(item){e.preventDefault();clickArticle({target:item});}}};
     $('list').addEventListener('keydown',keyArticle);$('features').addEventListener('keydown',keyArticle);
