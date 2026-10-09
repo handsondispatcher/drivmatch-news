@@ -1,0 +1,11 @@
+{
+  "symbol": "USD/BRL",
+  "instrument": "spot",
+  "price_type": "commercial",
+  "session_status": "closed",
+  "close_value": 5.024,
+  "close_date": "2026-10-08",
+  "source": "Reuters",
+  "source_url": "https://www.bol.uol.com.br/economia/2026/10/08/dolar-a-vista-fecha-em-alta-de-017-a-r50240-na-venda.htm",
+  "change_pct": 0.17
+}
