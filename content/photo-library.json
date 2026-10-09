@@ -401,6 +401,129 @@
         "rodovia",
         "preço"
       ]
+    },
+    {
+      "id": "route-138a-road-sign-next-to-a-commercial-truck-jpg",
+      "file": "Route 138A road sign next to a commercial truck.jpg",
+      "credit": "ZeLonewolf",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Route_138A_road_sign_next_to_a_commercial_truck.jpg",
+      "description": "Placa rodoviária ao lado de caminhão comercial nos EUA",
+      "keywords": [
+        "rodovia",
+        "road",
+        "highway",
+        "traffic",
+        "tráfego",
+        "congestionamento",
+        "road signs",
+        "estrada"
+      ]
+    },
+    {
+      "id": "ups-worker-unloads-boxes-from-semi-trailer-truck-onto-conveyor-belt-jp",
+      "file": "UPS worker unloads boxes from semi trailer truck onto conveyor belt.jpg",
+      "credit": "Lance Cheung / USDA",
+      "license": "Domínio público (USDA)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:UPS_worker_unloads_boxes_from_semi_trailer_truck_onto_conveyor_belt.jpg",
+      "description": "Trabalhador descarregando mercadorias de caminhão em esteira",
+      "keywords": [
+        "ups",
+        "unloading",
+        "entrega",
+        "package",
+        "amazon",
+        "walmart",
+        "warehouse",
+        "centro logístico",
+        "remessas"
+      ]
+    },
+    {
+      "id": "nb-amazon-prime-container-truck-wpb-service-plaza-jpg",
+      "file": "NB Amazon Prime Container Truck @ WPB Service Plaza.jpg",
+      "credit": "DanTD",
+      "license": "CC BY 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:NB_Amazon_Prime_Container_Truck_%40_WPB_Service_Plaza.jpg",
+      "description": "Caminhão Amazon Prime em área de serviço na Flórida",
+      "keywords": [
+        "amazon",
+        "prime",
+        "distribution",
+        "frete",
+        "florida",
+        "service plaza",
+        "rodovia"
+      ]
+    },
+    {
+      "id": "2023-denver-auto-show-international-emv-electric-boom-truck-jpg",
+      "file": "2023 Denver Auto Show International eMV electric boom truck.jpg",
+      "credit": "Corqe",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2023_Denver_Auto_Show_International_eMV_electric_boom_truck.jpg",
+      "description": "Caminhão elétrico exposto em feira nos EUA",
+      "keywords": [
+        "eletric",
+        "electric",
+        "elétrico",
+        "tecnologia",
+        "caminhão",
+        "veículos",
+        "energia",
+        "carregamento"
+      ]
+    },
+    {
+      "id": "denny-s-truck-parking-lot-flying-j-in-pasco-fl-jpg",
+      "file": "Denny's & Truck Parking Lot @ Flying J in Pasco, FL.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Denny's_%26_Truck_Parking_Lot_%40_Flying_J_in_Pasco%2C_FL.jpg",
+      "description": "Estacionamento de caminhões em parada Flying J na Flórida",
+      "keywords": [
+        "flying j",
+        "truck stop",
+        "motorista",
+        "estacionamento",
+        "parking",
+        "restaurante",
+        "rodovia"
+      ]
+    },
+    {
+      "id": "trucking-semi-truck-under-overpass-jpg",
+      "file": "Trucking semi truck under overpass.jpg",
+      "credit": "Chris Yarzab",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Trucking_semi_truck_under_overpass.jpg",
+      "description": "Caminhão rodando sob viaduto em estrada nos EUA",
+      "keywords": [
+        "truck",
+        "freight",
+        "caminhão",
+        "highway",
+        "rodovia",
+        "fiscalização",
+        "transportadora"
+      ]
+    },
+    {
+      "id": "estados-unidos-camiones-1989-20-jpg",
+      "file": "Estados Unidos, camiones 1989 20.jpg",
+      "credit": "LBM1948",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Estados_Unidos%2C_camiones_1989_20.jpg",
+      "description": "Caminhão e veículo de recreação em parada nos EUA, foto de arquivo",
+      "keywords": [
+        "truck",
+        "parada",
+        "estacionamento",
+        "parking",
+        "highway",
+        "história",
+        "rodovia"
+      ]
     }
   ]
 }
