@@ -44,6 +44,15 @@ const {spawn}=require('node:child_process');
     assert.equal(await page.locator('[data-share-platform="'+platform+'"]').count(),1);
     assert.ok((await page.locator('[data-share-platform="'+platform+'"]').getAttribute('href')).length>10);
    }
+   assert.match(await page.locator('[data-share-platform="whatsapp"]').getAttribute('href'),/^https:\/\/web\.whatsapp\.com\/send\?text=/);
+   assert.equal(await page.locator('#share-whatsapp-copy').isVisible(),true);
+   assert.equal(await page.locator('#share-story').isVisible(),true);
+   if(width===1440){
+    const storyDownload=page.waitForEvent('download',{timeout:12000});
+    await page.locator('#share-story').click();
+    const download=await storyDownload;
+    assert.equal(download.suggestedFilename(),'drivmatch-news-story.png');
+   }
    await page.locator('#share-native').click();
    assert.equal(await page.locator('#share-options').isVisible(),false);
    assert.equal(await page.locator('#article-reading [data-article-lang]').count(),3);
