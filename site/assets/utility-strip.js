@@ -41,7 +41,7 @@ function showCity(){
  const celsius = f => Math.round((f-32)*5/9);const cHi=hi==='—'?'—':celsius(Number(c.max_f))+'°C';const cLo=lo==='—'?'—':celsius(Number(c.min_f))+'°C';
  el('top-range-f').textContent='Máx. '+hi+' · Mín. '+lo;
  el('top-range-c').textContent='Máx. '+cHi+' · Mín. '+cLo;
- el('top-condition').title=good?'NWS · '+c.forecast_updated_at:'';
+ el('top-condition').title=good?(lang()==='en'?'Forecast updated: ':lang()==='es'?'Pronóstico actualizado: ':'Previsão atualizada: ')+c.forecast_updated_at:'';
 }
 async function weather(){
  try{
