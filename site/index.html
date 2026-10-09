@@ -54,6 +54,14 @@ a{color:inherit} button,input,select{font:inherit} button{cursor:pointer}
 .related-rail .story .byline{font-size:10px}
 @media(max-width:850px){.features{grid-template-columns:minmax(0,1fr)}.hero-wrap .story img{height:270px}.related-rail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.related-head{grid-column:1/-1}.related-rail .story{display:block;border-bottom:0;padding:3px 0}.related-rail .story img{width:100%;height:100px}.related-rail .story h3{font-size:13px}}
 @media(max-width:560px){.related-rail{display:block}.related-rail .story{display:grid;grid-template-columns:95px minmax(0,1fr);gap:10px;border-bottom:1px solid #e7edf2;padding:10px 0}.related-rail .story img{width:95px;height:80px}.hero-wrap .story img{height:215px}.hero-wrap .story h3{font-size:22px}}
+#original-reading{margin:20px 0 10px;padding:16px 18px;border:2px solid #167bd0;border-radius:7px;background:#f0f7ff;box-shadow:0 3px 13px #0e3b6912}
+#original-reading .full-article-heading{margin:0 0 8px;font:800 14px/1.3 Arial,sans-serif;color:#063c69}
+#original-reading .source-translations{margin:8px 0;display:flex;flex-wrap:wrap;gap:10px}
+#original-reading .article-source-button.primary{flex-basis:100%;font-size:16px;min-height:58px}
+#original-reading .article-source-button img{width:28px;height:19px}
+#original-reading .image-credit{font-size:10px;color:#647a8a;margin:10px 0 0}
+.modal .trans{margin:10px 0 0;padding:8px 0;border-top:1px solid #d8e3ec;background:transparent}
+.modal .trans button{font-size:11px;padding:4px 7px}
 #noticias{scroll-margin-top:14px}
 @media(max-width:990px){.main{grid-template-columns:minmax(0,1fr)} .form{grid-template-columns:1fr 1fr} .form input{grid-column:1/-1} .opp-grid{grid-template-columns:1fr} }
 @media(max-width:740px){.features{grid-template-columns:1fr} .item{grid-template-columns:1fr} .thumb img{height:180px} .opp{grid-template-columns:1fr} .opp img{width:100%;height:160px} }
@@ -161,13 +169,13 @@ article[role=button]{outline-offset:2px}
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
 <footer class="footer"><span class="smalltext">DrivMatch News — um produto da Hands On Dispatcher LLC</span><br><span class="smalltext">Cobertura editorial independente • Notícias e indicadores identificados por fonte e data.</span></footer>
-<div class="modalshade" id="shade"><article class="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody"><h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div><p id="modalbodytext"></p><p class="disclosure" id="article-disclosure"></p><p id="article-source"></p><div class="trans">
+<div class="modalshade" id="shade"><article class="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody"><h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div><p id="modalbodytext"></p><p class="disclosure" id="article-disclosure"></p><section id="original-reading" aria-label="Reportagem original traduzida"><div id="article-source"></div></section><div class="trans">
 <strong id="articleLanguageTitle">Ler esta notícia em outro idioma</strong>
 <div id="articleLanguageButtons" class="article-language-buttons"></div>
 <p id="translation" class="smalltext"></p>
 </div></div></article></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=3fcd616e589cfa3d" defer></script>
+<script src="assets/app.js?v=0e481057e368dde5" defer></script>
 <script src="assets/utility-strip.js" defer></script>
 <script src="assets/news-crawler.js" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
