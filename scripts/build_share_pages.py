@@ -53,7 +53,16 @@ def _line_wrap(draw, value, font, width, max_lines=4):
 
 
 def _image_for_story(story):
-    """Only reuse specifically credited Commons images; never scrape publisher art."""
+    """First choose the verified local archive photo; never scrape publisher art."""
+    local_uri = str(story.get("image") or "")
+    if re.fullmatch(r"assets/news-photos/[a-z0-9-]+[.]jpg", local_uri) and story.get("image_license") and story.get("image_credit"):
+        local_path = SITE / local_uri
+        try:
+            with Image.open(local_path) as local:
+                local.load()
+                return local.convert("RGB")
+        except (OSError, ValueError):
+            pass
     uri = str(story.get("image") or "")
     if not story.get("image_license") or not story.get("image_credit"):
         return None
@@ -187,6 +196,8 @@ def build() -> int:
     directory=SITE/"share"
     directory.mkdir(parents=True,exist_ok=True)
     count=0
+    gallery_path = SITE / "data" / "news-images.json"
+    images = json.loads(gallery_path.read_text(encoding="utf-8")).get("images", {}) if gallery_path.is_file() else {}
     for story in feed.get("articles",[]):
         if story.get("status")!="approved" or story.get("demo"):continue
         slug=story.get("id","")
@@ -194,7 +205,8 @@ def build() -> int:
         locale=story.get("locales",{}).get("pt") or {}
         title=str(locale.get("title","")).strip()
         description=str(locale.get("summary","") or locale.get("body","")).strip()
-        if title and description and _write_page(directory,story,slug,title,description):count+=1
+        combined={**story, **images.get(slug,{})}
+        if title and description and _write_page(directory,combined,slug,title,description):count+=1
     monitor=SITE/"data"/"source-headlines.json"
     if monitor.is_file():
         rows=json.loads(monitor.read_text(encoding="utf-8")).get("headlines",[])
@@ -212,7 +224,8 @@ def build() -> int:
                 description="DrivMatch News: manchete e contexto sobre transporte rodoviário nos EUA. Fonte: "+str(story.get("source") or "veículo original")+". Consulte o resumo e a fonte."
             else:
                 description="DrivMatch News: US trucking headline and context. Source: "+str(story.get("source") or "original publisher")+". Read the context and source."
-            if _write_page(directory,story,slug,title,description,locale):count+=1
+            combined={**story, **images.get(slug,{})}
+            if _write_page(directory,combined,slug,title,description,locale):count+=1
     print(f"SHARE PAGES WITH BRANDED 1200x630 CARDS: {count} articles and external headlines")
     return count
 

@@ -44,6 +44,8 @@ jobs:
           CLASS8_REDISTRIBUTION_AUTHORIZED: ${{ vars.CLASS8_REDISTRIBUTION_AUTHORIZED }}
           USDBRL_SPOT_TOKEN: ${{ secrets.USDBRL_SPOT_TOKEN }}
         run: python scripts/update.py
+      - name: Verificar, baixar e servir fotos editoriais licenciadas
+        run: python scripts/build_news_photos.py --ci
       - name: Gerar links exclusivos e prévias para compartilhamento
         run: python scripts/build_share_pages.py
       - uses: actions/upload-artifact@v4
@@ -96,6 +98,11 @@ jobs:
           RELEASE="https://handsondispatcher.github.io/drivmatch-news/data/release.json"
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v32-release.json
           python -c 'import json; x=json.load(open("/tmp/drivmatch-v32-release.json")); assert x["version"]=="v32" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v32 PASS: prelaunch contract consistent")'
+          PHOTOS="https://handsondispatcher.github.io/drivmatch-news/data/news-images.json"
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$PHOTOS" -o /tmp/drivmatch-news-images.json
+          PHOTO=$(python -c 'import json; m=json.load(open("/tmp/drivmatch-news-images.json")); a=list(m["images"].values()); assert m["license_policy"]=="curated_commons" and len(a)>=16 and all(x["image"].startswith("assets/news-photos/") and x["image_credit"] and x["image_license"] for x in a); print(a[0]["image"])')
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "https://handsondispatcher.github.io/drivmatch-news/$PHOTO" -o /tmp/drivmatch-real-thumbnail.jpg
+          python -c 'from PIL import Image; p=Image.open("/tmp/drivmatch-real-thumbnail.jpg"); p.verify(); print("PHOTO THUMBNAILS PASS: verified JPEG served from local origin")'
           LIVE="https://handsondispatcher.github.io/drivmatch-news/data/live-feed.json"
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$LIVE" -o /tmp/drivmatch-live-feed.json
           python -c 'import json; x=json.load(open("/tmp/drivmatch-live-feed.json")); assert x["schema_version"]==1 and x["operational_alerts_integrated"] is False; assert all(not i["is_active_incident"] and i["severity"] is None for i in x["items"]); print("LIVE NEWS FEED PASS:",len(x["items"]),"fresh non-urgent items")'

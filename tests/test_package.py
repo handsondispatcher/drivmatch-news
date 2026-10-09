@@ -169,6 +169,30 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('x.geo_scope_verified===true',(BASE/'site/assets/app.js').read_text())
   self.assertIn('a.geo_scope_verified!==true',(BASE/'site/assets/news-crawler.js').read_text())
   self.assertIn("'geo_scope_verified':True",(BASE/'scripts/update.py').read_text())
+ def test_licensed_photo_catalog_and_unique_selection(self):
+  from build_news_photos import choose_photos
+  library=json.loads((BASE/'content/photo-library.json').read_text(encoding='utf-8'))
+  self.assertGreaterEqual(len(library['photos']),8)
+  self.assertEqual(len({p['id'] for p in library['photos']}),len(library['photos']))
+  for p in library['photos']:
+   self.assertTrue(p['source_url'].startswith('https://commons.wikimedia.org/wiki/File:'))
+   self.assertTrue(p['credit'] and p['license'] and p['keywords'])
+  sample=[{'id':'news-autonomy','title':'FMCSA autonomous trucks regulation','category':'Caminhoneiros'},
+          {'id':'news-warehouse','title':'Walmart warehouse logistics distribution','category':'Fretes'}]
+  available=[{'index':i,'keywords':entry['keywords'],'meta':{
+              'image':'assets/news-photos/'+entry['id']+'.jpg','image_credit':entry['credit'],
+              'image_license':entry['license'],'image_source_url':entry['source_url'],
+              'source_library_id':entry['id']}} for i,entry in enumerate(library['photos'])]
+  selected=choose_photos(sample,available)
+  self.assertEqual(set(selected),{'news-autonomy','news-warehouse'})
+  self.assertEqual(len({x['image'] for x in selected.values()}),2)
+  app=(BASE/'site/assets/app.js').read_text(encoding='utf-8')
+  self.assertIn('data/news-images.json?ts=',app)
+  self.assertIn('safeNewsPhotoUrl',app)
+  self.assertIn('licensedPhotoOf',app)
+  self.assertIn('Foto ilustrativa de arquivo',app)
+  self.assertNotIn("img:not([src^=",app)
+
  def test_topic_images_and_no_duplicate_refresh(self):
   js=(BASE/'site/assets/app.js').read_text()
   self.assertIn('storyVisuals()',js)

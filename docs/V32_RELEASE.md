@@ -20,6 +20,15 @@ v32 is a consolidation of the **v31 editorial interface**, the approved visual b
 - **Markets:** diesel and Brent with dated attribution, USD/BRL **commercial spot only** or clearly marked verified closing reference, Class 8 and named trucking equities only when provider data and redistribution permissions exist. No synthetic market quotes.
 - **Integration output:** `/data/live-feed.json` with the last 24 hours of time-bounded news headlines in PT/EN/ES for the **separate** DrivMatch Live application. This does **not** activate traffic, crash or severe-weather alerts on the separate application.
 
+## Photographic news thumbnails — v32 correction (09/10/2026)
+
+- **Screenshot regression resolved in source:** previously `site/assets/app.js` intentionally forced `external_link` stories to use unique SVG headline illustrations. A headline from the source pipeline consequently appeared as a blue graphic instead of an image.
+- **New build workflow:** `content/photo-library.json` lists reviewed Commons photos and license/credit/source URL; `scripts/build_news_photos.py` downloads and verifies actual JPEGs, resizes them, and writes `site/assets/news-photos/*.jpg` plus `site/data/news-images.json`. It refuses unknown domains and never scrapes photographs from publishers.
+- **Consumer UI:** `site/assets/app.js` loads `data/news-images.json` alongside live headlines, selecting unique, topical photos from the manifest for hero, related, list and article modal, with photo credit linked to Wikimedia Commons. When no valid image is available, it uses a unique labeled vector card rather than a broken image.
+- **Social compatibility:** `scripts/build_share_pages.py` reuses the verified local images when composing 1200×630 social previews.
+- **Editorial accuracy:** These are **illustrative archival photographs**; they are **not** claimed to depict the reported event, carrier, weather incident or location. Attribution includes license, author and crop/resizing. Actual event-specific publisher photographs can only be added when reuse/redistribution rights are obtained.
+- **Gate:** The v32 photo downloader must produce at least 16 verified local JPEGs and cover at least 12 current external headlines when the feed has 12+ items. Mobile and desktop Playwright checks validate real loaded dimensions, local asset URLs and illustrative-photo disclosure. On network failure, the deployment gate fails closed, retaining the last successful published edition rather than silently replacing all photographs with graphics.
+
 ## Single source of truth
 
 - `content/release.json` defines v32 and keeps `public_launch_approved=false`.

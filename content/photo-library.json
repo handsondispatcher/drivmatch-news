@@ -1,0 +1,606 @@
+{
+  "schema_version": 1,
+  "editorial_policy": "Permitted Commons/public-domain archive photographs, illustrative only; never claim they depict breaking-news events.",
+  "photos": [
+    {
+      "id": "semi-truck-jpg",
+      "file": "Semi Truck.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Semi_Truck.jpg/960px-Semi_Truck.jpg",
+      "credit": "KOMUnews / Anna Burkart",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Semi_Truck.jpg",
+      "description": "Caminhão em rodovia, foto de arquivo ilustrativa; não retrata veículo da Kodiak",
+      "keywords": [
+        "truck",
+        "trucking",
+        "transporte",
+        "freight",
+        "caminhão",
+        "caminhoneiro",
+        "motorista",
+        "rodovia",
+        "highway"
+      ]
+    },
+    {
+      "id": "sleeper-box-patrice-raunet-picture-los-angeles-california-jpg",
+      "file": "SLEEPER BOX PATRICE RAUNET PICTURE LOS ANGELES CALIFORNIA.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/SLEEPER_BOX_PATRICE_RAUNET_PICTURE_LOS_ANGELES_CALIFORNIA.jpg/960px-SLEEPER_BOX_PATRICE_RAUNET_PICTURE_LOS_ANGELES_CALIFORNIA.jpg",
+      "credit": "Raunet",
+      "license": "Domínio público",
+      "source_url": "https://commons.wikimedia.org/wiki/File:SLEEPER_BOX_PATRICE_RAUNET_PICTURE_LOS_ANGELES_CALIFORNIA.jpg",
+      "description": "Cabine sleeper de caminhão, imagem de arquivo",
+      "keywords": [
+        "sleeper",
+        "sleep",
+        "rest",
+        "descanso",
+        "hos",
+        "motorista",
+        "caminhoneiro",
+        "cabine"
+      ]
+    },
+    {
+      "id": "cdltrainingtruck-jpg",
+      "file": "Cdltrainingtruck.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Cdltrainingtruck.jpg/960px-Cdltrainingtruck.jpg",
+      "credit": "Lucylonghauler",
+      "license": "CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Cdltrainingtruck.jpg",
+      "description": "Caminhão utilizado para treinamento de CDL, imagem ilustrativa",
+      "keywords": [
+        "cdl",
+        "escola",
+        "treinamento",
+        "training",
+        "license",
+        "licença",
+        "driver",
+        "caminhoneiro"
+      ]
+    },
+    {
+      "id": "interstate-95-rest-area-20332-truck-parking-lot-jpg",
+      "file": "Interstate 95 Rest Area 20332; Truck Parking Lot.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Interstate_95_Rest_Area_20332%3B_Truck_Parking_Lot.jpg/960px-Interstate_95_Rest_Area_20332%3B_Truck_Parking_Lot.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Interstate_95_Rest_Area_20332%3B_Truck_Parking_Lot.jpg",
+      "description": "Estacionamento de caminhões em rodovia, imagem ilustrativa",
+      "keywords": [
+        "parking",
+        "estacionamento",
+        "parada",
+        "truck stop",
+        "descanso",
+        "infraestrutura",
+        "road"
+      ]
+    },
+    {
+      "id": "kenworth-t660-of-srt-jpg",
+      "file": "Kenworth T660 of SRT.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Kenworth_T660_of_SRT.jpg/960px-Kenworth_T660_of_SRT.jpg",
+      "credit": "Mr.choppers",
+      "license": "CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Kenworth_T660_of_SRT.jpg",
+      "description": "Caminhão pesado Kenworth Class 8, imagem ilustrativa",
+      "keywords": [
+        "kenworth",
+        "truck",
+        "caminhão",
+        "class 8",
+        "veteranos",
+        "transportadora",
+        "freight"
+      ]
+    },
+    {
+      "id": "uber-otto-autonomous-driving-truck-jpg",
+      "file": "Uber OTTO autonomous driving truck.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Uber_OTTO_autonomous_driving_truck.jpg/960px-Uber_OTTO_autonomous_driving_truck.jpg",
+      "credit": "Steve Jurvetson",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Uber_OTTO_autonomous_driving_truck.jpg",
+      "description": "Caminhão autônomo de arquivo, imagem ilustrativa; não retrata necessariamente o operador da notícia",
+      "keywords": [
+        "autonomous",
+        "autônom",
+        "sem motorista",
+        "driverless",
+        "fmcsa",
+        "aurora",
+        "kodiak",
+        "automação"
+      ]
+    },
+    {
+      "id": "port-of-savannah-2021-jpg",
+      "file": "Port of Savannah - 2021.jpg",
+      "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Port_of_Savannah_-_2021.jpg/960px-Port_of_Savannah_-_2021.jpg",
+      "credit": "CBP Photography / Jerry Glaser",
+      "license": "Domínio público (governo dos EUA)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Port_of_Savannah_-_2021.jpg",
+      "description": "Foto do Porto de Savannah, 2021; imagem de arquivo",
+      "keywords": [
+        "port",
+        "porto",
+        "container",
+        "savannah",
+        "shipping",
+        "importação",
+        "exportação",
+        "frete"
+      ]
+    },
+    {
+      "id": "aahus-port-container-loading-jpg",
+      "file": "Aahus port container loading.JPG",
+      "credit": "Jan Pešula",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Aahus_port_container_loading.JPG",
+      "description": "Carregamento de contêiner em caminhão em porto",
+      "keywords": [
+        "container",
+        "delivery",
+        "carga",
+        "freight",
+        "porto",
+        "terminal",
+        "logística"
+      ]
+    },
+    {
+      "id": "warehouse-loading-dock-jpg",
+      "file": "Warehouse Loading Dock.JPG",
+      "credit": "Jandrinov",
+      "license": "Domínio público",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Warehouse_Loading_Dock.JPG",
+      "description": "Doca de carga e descarga em centro logístico",
+      "keywords": [
+        "warehouse",
+        "centro logístico",
+        "armazém",
+        "walmart",
+        "logística",
+        "distribution",
+        "amazon",
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "container-transfer-02a-jpg",
+      "file": "Container transfer 02A.jpg",
+      "credit": "Joe Mabel",
+      "license": "CC BY-SA 3.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Container_transfer_02A.jpg",
+      "description": "Transferência de contêiner de um caminhão em terminal",
+      "keywords": [
+        "container",
+        "freight",
+        "terminal",
+        "shipping",
+        "carga",
+        "rail",
+        "port"
+      ]
+    },
+    {
+      "id": "united-states-postal-service-truck-jpg",
+      "file": "United States Postal Service Truck.jpg",
+      "credit": "aomarks",
+      "license": "Domínio público",
+      "source_url": "https://commons.wikimedia.org/wiki/File:United_States_Postal_Service_Truck.jpg",
+      "description": "Caminhão de serviço postal",
+      "keywords": [
+        "mail",
+        "correio",
+        "parcel",
+        "usps",
+        "entrega",
+        "remessa",
+        "delivery",
+        "post"
+      ]
+    },
+    {
+      "id": "transport-truck-and-container-jpg",
+      "file": "Transport truck and container.jpg",
+      "credit": "Governo dos EUA",
+      "license": "Domínio público (governo dos EUA)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Transport_truck_and_container.jpg",
+      "description": "Transporte de contêiner em caminhão",
+      "keywords": [
+        "truck",
+        "container",
+        "load",
+        "carga",
+        "freight",
+        "port",
+        "transport"
+      ]
+    },
+    {
+      "id": "freight-truck-as-seen-on-highway-jpg",
+      "file": "Freight truck as seen on highway.jpg",
+      "credit": "Soulful sunshine",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Freight_truck_as_seen_on_highway.jpg",
+      "description": "Caminhão de cargas trafegando em rodovia",
+      "keywords": [
+        "road",
+        "rodovia",
+        "highway",
+        "trucking",
+        "freight",
+        "estrada",
+        "caminhão"
+      ]
+    },
+    {
+      "id": "freight-trucks-running-on-highway-jpg",
+      "file": "Freight trucks running on highway.jpg",
+      "credit": "Soulful sunshine",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Freight_trucks_running_on_highway.jpg",
+      "description": "Caminhões de cargas trafegando em rodovia",
+      "keywords": [
+        "highway",
+        "rodovia",
+        "transport",
+        "caminhoneiro",
+        "congestionamento",
+        "logística"
+      ]
+    },
+    {
+      "id": "truck-and-warehouse-geograph-org-uk-852506-jpg",
+      "file": "Truck and Warehouse - geograph.org.uk - 852506.jpg",
+      "credit": "Sebastian Ballard",
+      "license": "CC BY-SA 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Truck_and_Warehouse_-_geograph.org.uk_-_852506.jpg",
+      "description": "Caminhão ao lado de um depósito logístico",
+      "keywords": [
+        "warehouse",
+        "armazém",
+        "logística",
+        "distribuição",
+        "delivery",
+        "supply chain"
+      ]
+    },
+    {
+      "id": "southeastern-freight-lines-truck-jpg",
+      "file": "Southeastern Freight Lines truck.jpg",
+      "credit": "Indy beetle",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Southeastern_Freight_Lines_truck.jpg",
+      "description": "Caminhão de transportadora em doca de carga",
+      "keywords": [
+        "freight",
+        "lft",
+        "transportadora",
+        "warehouse",
+        "armazém",
+        "logística",
+        "fretes",
+        "caminhão"
+      ]
+    },
+    {
+      "id": "warehouse-in-new-jersey-where-trucks-deliver-granite-slabs-jpg",
+      "file": "Warehouse in New Jersey where trucks deliver granite slabs.jpg",
+      "credit": "Tomwsulcer",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Warehouse_in_New_Jersey_where_trucks_deliver_granite_slabs.jpg",
+      "description": "Galpão e acesso de carga em Nova Jersey",
+      "keywords": [
+        "warehouse",
+        "galpão",
+        "armazém",
+        "walmart",
+        "centro",
+        "logístico",
+        "logistics"
+      ]
+    },
+    {
+      "id": "eb-i-10-suwannee-co-rest-area-truck-parking-gore-2-jpg",
+      "file": "EB I-10 Suwannee Co Rest Area; Truck Parking Gore-2.jpg",
+      "credit": "DanTD",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:EB_I-10_Suwannee_Co_Rest_Area%3B_Truck_Parking_Gore-2.jpg",
+      "description": "Sinalização de vagas para caminhões na Interstate 10",
+      "keywords": [
+        "rodovia",
+        "parking",
+        "estacionamento",
+        "highway",
+        "interstate",
+        "truck stop",
+        "área de descanso"
+      ]
+    },
+    {
+      "id": "eb-i-10-suwanee-co-rest-area-truck-parking-jpg",
+      "file": "EB I-10 Suwanee Co Rest Area; Truck Parking.jpg",
+      "credit": "DanTD",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:EB_I-10_Suwanee_Co_Rest_Area%3B_Truck_Parking.jpg",
+      "description": "Sinalização de estacionamento para caminhões em rodovia",
+      "keywords": [
+        "rodovia",
+        "estacionamento",
+        "parking",
+        "truck stop",
+        "sem motorista"
+      ]
+    },
+    {
+      "id": "wb-i-10-columbia-co-rest-area-tandem-truck-parking-sign-1-jpg",
+      "file": "WB I-10 Columbia Co Rest Area; Tandem Truck Parking Sign-1.jpg",
+      "credit": "DanTD",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:WB_I-10_Columbia_Co_Rest_Area%3B_Tandem_Truck_Parking_Sign-1.jpg",
+      "description": "Estacionamento de caminhões e placa de vagas em rodovia",
+      "keywords": [
+        "road",
+        "rodovia",
+        "parking",
+        "caminhoneiros",
+        "descanso"
+      ]
+    },
+    {
+      "id": "our-company-truck-in-front-of-new-warehouse-jpg",
+      "file": "Our company truck in front of new warehouse.jpg",
+      "credit": "Meiborg trucking",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Our_company_truck_in_front_of_new_warehouse.jpg",
+      "description": "Caminhão diante de armazém logístico",
+      "keywords": [
+        "kenworth",
+        "warehouse",
+        "armazém",
+        "transportadora",
+        "logística",
+        "caminhão"
+      ]
+    },
+    {
+      "id": "truck-stop-5006605670-jpg",
+      "file": "Truck Stop (5006605670).jpg",
+      "credit": "Damian Gadal",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Truck_Stop_(5006605670).jpg",
+      "description": "Caminhões estacionados em truck stop na Califórnia",
+      "keywords": [
+        "california",
+        "truck stop",
+        "parada",
+        "descanso",
+        "drivers",
+        "motorista",
+        "caminhoneiro"
+      ]
+    },
+    {
+      "id": "diesel-truck-jpg",
+      "file": "Diesel truck.jpg",
+      "credit": "Ben Ostrowsky",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Diesel_truck.jpg",
+      "description": "Caminhão a diesel em foto de arquivo",
+      "keywords": [
+        "diesel",
+        "combustível",
+        "freight",
+        "truck",
+        "caminhão",
+        "rodovia",
+        "preço"
+      ]
+    },
+    {
+      "id": "route-138a-road-sign-next-to-a-commercial-truck-jpg",
+      "file": "Route 138A road sign next to a commercial truck.jpg",
+      "credit": "ZeLonewolf",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Route_138A_road_sign_next_to_a_commercial_truck.jpg",
+      "description": "Placa rodoviária ao lado de caminhão comercial nos EUA",
+      "keywords": [
+        "rodovia",
+        "road",
+        "highway",
+        "traffic",
+        "tráfego",
+        "congestionamento",
+        "road signs",
+        "estrada"
+      ]
+    },
+    {
+      "id": "ups-worker-unloads-boxes-from-semi-trailer-truck-onto-conveyor-belt-jp",
+      "file": "UPS worker unloads boxes from semi trailer truck onto conveyor belt.jpg",
+      "credit": "Lance Cheung / USDA",
+      "license": "Domínio público (USDA)",
+      "source_url": "https://commons.wikimedia.org/wiki/File:UPS_worker_unloads_boxes_from_semi_trailer_truck_onto_conveyor_belt.jpg",
+      "description": "Trabalhador descarregando mercadorias de caminhão em esteira",
+      "keywords": [
+        "ups",
+        "unloading",
+        "entrega",
+        "package",
+        "amazon",
+        "walmart",
+        "warehouse",
+        "centro logístico",
+        "remessas"
+      ]
+    },
+    {
+      "id": "nb-amazon-prime-container-truck-wpb-service-plaza-jpg",
+      "file": "NB Amazon Prime Container Truck @ WPB Service Plaza.jpg",
+      "credit": "DanTD",
+      "license": "CC BY 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:NB_Amazon_Prime_Container_Truck_%40_WPB_Service_Plaza.jpg",
+      "description": "Caminhão Amazon Prime em área de serviço na Flórida",
+      "keywords": [
+        "amazon",
+        "prime",
+        "distribution",
+        "frete",
+        "florida",
+        "service plaza",
+        "rodovia"
+      ]
+    },
+    {
+      "id": "2023-denver-auto-show-international-emv-electric-boom-truck-jpg",
+      "file": "2023 Denver Auto Show International eMV electric boom truck.jpg",
+      "credit": "Corqe",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:2023_Denver_Auto_Show_International_eMV_electric_boom_truck.jpg",
+      "description": "Caminhão elétrico exposto em feira nos EUA",
+      "keywords": [
+        "eletric",
+        "electric",
+        "elétrico",
+        "tecnologia",
+        "caminhão",
+        "veículos",
+        "energia",
+        "carregamento"
+      ]
+    },
+    {
+      "id": "denny-s-truck-parking-lot-flying-j-in-pasco-fl-jpg",
+      "file": "Denny's & Truck Parking Lot @ Flying J in Pasco, FL.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Denny's_%26_Truck_Parking_Lot_%40_Flying_J_in_Pasco%2C_FL.jpg",
+      "description": "Estacionamento de caminhões em parada Flying J na Flórida",
+      "keywords": [
+        "flying j",
+        "truck stop",
+        "motorista",
+        "estacionamento",
+        "parking",
+        "restaurante",
+        "rodovia"
+      ]
+    },
+    {
+      "id": "trucking-semi-truck-under-overpass-jpg",
+      "file": "Trucking semi truck under overpass.jpg",
+      "credit": "Chris Yarzab",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Trucking_semi_truck_under_overpass.jpg",
+      "description": "Caminhão rodando sob viaduto em estrada nos EUA",
+      "keywords": [
+        "truck",
+        "freight",
+        "caminhão",
+        "highway",
+        "rodovia",
+        "fiscalização",
+        "transportadora"
+      ]
+    },
+    {
+      "id": "estados-unidos-camiones-1989-20-jpg",
+      "file": "Estados Unidos, camiones 1989 20.jpg",
+      "credit": "LBM1948",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Estados_Unidos%2C_camiones_1989_20.jpg",
+      "description": "Caminhão e veículo de recreação em parada nos EUA, foto de arquivo",
+      "keywords": [
+        "truck",
+        "parada",
+        "estacionamento",
+        "parking",
+        "highway",
+        "história",
+        "rodovia"
+      ]
+    },
+    {
+      "id": "eb-i-4-seminole-co-rest-area-truck-parking-1-jpg",
+      "file": "EB I-4 Seminole Co Rest Area; Truck Parking-1.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:EB_I-4_Seminole_Co_Rest_Area%3B_Truck_Parking-1.jpg",
+      "description": "Estacionamento para caminhões na rodovia Interstate 4, Flórida",
+      "keywords": [
+        "parking",
+        "estacionamento",
+        "rodovia",
+        "motorista",
+        "rodovias",
+        "truck stop"
+      ]
+    },
+    {
+      "id": "truck-stop-belgrade-montana-jpg",
+      "file": "Truck Stop, Belgrade, Montana.jpg",
+      "credit": "born1945",
+      "license": "CC BY-SA 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Truck_Stop%2C_Belgrade%2C_Montana.jpg",
+      "description": "Caminhões em parada de estrada em Montana",
+      "keywords": [
+        "diesel",
+        "truck stop",
+        "abastecimento",
+        "caminhoneiro",
+        "estrada",
+        "montana"
+      ]
+    },
+    {
+      "id": "sb-i-95-truck-parking-area-south-of-exit-18-3-jpg",
+      "file": "SB I-95; Truck Parking Area south of Exit 18-3.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:SB_I-95%3B_Truck_Parking_Area_south_of_Exit_18-3.jpg",
+      "description": "Área de estacionamento para caminhões na I-95, Carolina do Sul",
+      "keywords": [
+        "rodovia",
+        "parking",
+        "caminhão",
+        "motorista",
+        "estacionamento"
+      ]
+    },
+    {
+      "id": "sb-i-75-rest-area-alachua-co-fla-24-jpg",
+      "file": "SB I-75 Rest Area, Alachua Co, FLA-24.jpg",
+      "credit": "DanTD",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:SB_I-75_Rest_Area%2C_Alachua_Co%2C_FLA-24.jpg",
+      "description": "Caminhões em área de descanso na Interstate 75, Flórida",
+      "keywords": [
+        "parking",
+        "descanso",
+        "caminhão",
+        "rodovia",
+        "caminhoneiro"
+      ]
+    },
+    {
+      "id": "wb-i-10-columbia-co-rest-area-tandem-truck-parking-sign-2-jpg",
+      "file": "WB I-10 Columbia Co Rest Area; Tandem Truck Parking Sign-2.jpg",
+      "credit": "DanTD",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:WB_I-10_Columbia_Co_Rest_Area%3B_Tandem_Truck_Parking_Sign-2.jpg",
+      "description": "Sinalização de estacionamento para caminhões na Interstate 10",
+      "keywords": [
+        "parking",
+        "parada",
+        "truck stop",
+        "estacionamento",
+        "caminhoneiros"
+      ]
+    }
+  ]
+}
