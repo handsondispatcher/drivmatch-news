@@ -13,7 +13,7 @@ function display(){
    seen.add(a.source_url);
    const title=a.titles?.[l]||a.title;
    const untranslated=!a.titles?.[l];
-   links.push({title,untranslated,source:a.source||'External source',url:a.source_url,external:true,region:a.region||'US',date:a.published_at||''});
+   links.push({title,untranslated,source:a.source||'External source',url:a.source_url,external:true,region:a.region||'US',date:a.published_at||'',category:a.category||'Transporte'});
  }
  // Supplement with approved stories not already included in the source monitor.
  for(const a of validStories){
@@ -23,7 +23,9 @@ function display(){
  if(!links.length){bar.hidden=true;return;}
  const els=links.slice(0,65).map(a=>{
    const link=document.createElement('a');link.className='dm-crawler-link';link.href=a.url;link.target='_blank';link.rel='noopener noreferrer';
-   const k=document.createElement('span');k.className='dm-crawler-label';k.textContent=(a.external?(l==='en'?'SOURCE · ':l==='es'?'FUENTE · ':'FONTE · '):'')+clean(a.region)+' · '+clean(a.source);
+   const k=document.createElement('span');k.className='dm-crawler-label';const categories={Clima:['CLIMA','WEATHER','CLIMA'],Rodovias:['RODOVIAS','ROADS','CARRETERAS'],Acidentes:['ACIDENTE','ACCIDENT','ACCIDENTE'],Combustíveis:['DIESEL E COMBUSTÍVEIS','DIESEL AND FUEL','DIÉSEL Y COMBUSTIBLES'],Tecnologia:['TECNOLOGIA E TRANSPORTE','TRANSPORT TECHNOLOGY','TECNOLOGÍA Y TRANSPORTE'],Imigração:['IMIGRAÇÃO','IMMIGRATION','INMIGRACIÓN'],Segurança:['SEGURANÇA','SAFETY','SEGURIDAD'],Energia:['ENERGIA','ENERGY','ENERGÍA'],Transporte:['TRANSPORTE','TRANSPORT','TRANSPORTE'],Fretes:['FRETES','FREIGHT','FLETES'],Negócios:['NEGÓCIOS','BUSINESS','NEGOCIOS'],Fiscalização:['FISCALIZAÇÃO','ENFORCEMENT','FISCALIZACIÓN'],Caminhoneiros:['CAMINHONEIROS','TRUCK DRIVERS','CAMIONEROS']};
+   const category=categories[a.category]||[clean(a.category||'TRANSPORTE')];
+   k.textContent=category[['pt','en','es'].indexOf(l)]||category[0];
    const t=document.createElement('span');t.textContent=clean(a.title)+(a.untranslated?(l==='pt'?' · [original]':l==='es'?' · [original]':' · [original]'):'');
    link.append(k,t);return link;
  });
