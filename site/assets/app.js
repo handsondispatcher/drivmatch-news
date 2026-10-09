@@ -3,7 +3,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
-  let data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
+  let externalHeadlines = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
   const pageSize = 6, featureSize = 3;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
   const labels = {
@@ -25,7 +25,7 @@
   function localeOf(article, chosen=lang){return article.locales?.[chosen] || article.locales?.[article.original_lang] || null}
   function imageOf(a){return safeUrl(a.image) || 'assets/fallback.svg'}
   function imageHTML(a, suffix=''){const img=imageOf(a);return `<img loading="lazy" src="${escapeHTML(img)}" alt="${escapeHTML(a.image_alt||localeOf(a)?.title||'Imagem relacionada')}" onerror="this.onerror=null;this.src='assets/fallback.svg'" ${suffix}>`;}
-  function pageStories(){return [...(data.articles||[])].filter(s=>s.status==='approved' && !s.demo && ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body)).sort((a,b)=>{
+  function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>s.status==='approved' && !s.demo && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
     return score(b)-score(a) || (Date.parse(b.published_at||'2000-01-01')-Date.parse(a.published_at||'2000-01-01'));
   });}
@@ -42,6 +42,12 @@
     return `${labels[lang].published}: ${escapeHTML(new Date(a.published_at).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{dateStyle:'short',timeStyle:'short'}))}`;
   }
   function storyCard(a,i,featured=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
+    if(a.kind==='external_link'){
+      const title=escapeHTML(txt?.title||''), url=escapeHTML(safeUrl(a.source_url)||'#'), attribution=escapeHTML(a.source||'');
+      const note=lang==='pt'?'Manchete da fonte · Abrir original ↗':lang==='es'?'Titular de la fuente · Abrir original ↗':'Source headline · Open original ↗';
+      const body=`<div class="kicker">${cat} · ${escapeHTML(a.region||'')}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div><p>${note}</p>`;
+      return featured?`<a class="story" href="${url}" target="_blank" rel="noopener noreferrer">${imageHTML(a)}<div class="info">${body}</div></a>`:`<a class="item" href="${url}" target="_blank" rel="noopener noreferrer"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></a>`;
+    }
     const kicker= a.kind==='opportunity' ? `${cat} · ${lang==='en'?'Opportunity':lang==='es'?'Oportunidad':'Oportunidade'}`:cat;
     if(featured)return `<article class="story" tabindex="0" role="button" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
     return `<article class="item" tabindex="0" role="button" data-story="${i}"><div><span class="tag">${cat}</span> ${a.kind==='opportunity'?'<span class="origin-pill">DrivMatch</span>':''}<h3>${escapeHTML(txt.title)}</h3><p>${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div><div class="thumb">${imageHTML(a)}<span class="label">${cat}</span></div></article>`;
@@ -131,7 +137,30 @@
     [...$('category').options].slice(1).forEach(o=>o.textContent=localizedCategory(o.value));
     if(rerender){renderStories();renderMarket();renderAds();if(opened)renderArticle();}
   }
-  function install(){CATS.forEach(c=>$('category').add(new Option(c,c)));
+  async function refreshNews(){
+    try{
+      const [editorial,external]=await Promise.all([
+        fetch('data/content.json?ts='+Date.now(),{cache:'no-store'}),
+        fetch('data/source-headlines.json?ts='+Date.now(),{cache:'no-store'})
+      ]);
+      if(editorial.ok){const next=await editorial.json();if(Array.isArray(next.articles))data={...data,...next};}
+      if(external.ok){
+        const next=await external.json();
+        if(Array.isArray(next.headlines)){
+          const approved=new Set((data.articles||[]).map(x=>x.source_url));
+          const seen=new Set();
+          externalHeadlines=next.headlines.filter(x=>x.title&&safeUrl(x.source_url)&&!approved.has(x.source_url)&&!seen.has(x.source_url)&&seen.add(x.source_url)).slice(0,90).map(x=>({
+            id:'source-'+String(x.source_url).slice(-80),kind:'external_link',status:'approved',demo:false,
+            category:CATS.includes(x.category)?x.category:'Transporte',region:x.region||'US',source:x.source,
+            source_url:x.source_url,published_at:x.published_at,original_lang:x.region==='MX'?'es':'en',
+            locales:Object.fromEntries(langs.map(l=>[l,{title:x.title,summary:'',body:''}]))
+          }));
+        }
+      }
+      if(!opened)renderStories();
+    }catch(e){/* Keep last successfully loaded issue when offline. */}
+  }
+  function install(){if(location.protocol.startsWith('http')){refreshNews();setInterval(refreshNews,60000);}CATS.forEach(c=>$('category').add(new Option(c,c)));
     $('edition-date').textContent=new Date().toLocaleDateString('pt-BR');
     // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
