@@ -14,7 +14,7 @@ class Element {
  get classList(){return {add(){},remove(){}};}
  scrollIntoView(){}
 }
-const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','article-reading','article-dialog','translation','shade','noticias'];
+const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-dialog','translation','shade','noticias'];
 for(const id of ids)elements[id]=new Element(id);
 for(const id of ['panorama .heading','noticias .heading','market-title','.demo'])selectors['#'+id]=new Element(id);
 selectors['.demo']=new Element('demo');
@@ -23,7 +23,7 @@ const document={documentElement:{lang:''},getElementById:id=>elements[id]||(()=>
  querySelector:key=>selectors[key]||(()=>{throw Error('Missing selector: '+key)})(),
  addEventListener(event,cb){if(event==='DOMContentLoaded')this.ready=cb;}};
 const window={DRIVMATCH_BOOTSTRAP:data};
-const sandbox={document,window,location:{search:'',protocol:'file:'},URLSearchParams,Option:function(t,v){return {text:t,value:v}},
+const sandbox={document,window,navigator:{userAgent:'Desktop smoke test'},location:{search:'',protocol:'file:'},URLSearchParams,Option:function(t,v){return {text:t,value:v}},
  console,Date,Number,String,Array,Object,Map,Set,Intl,setInterval};
 vm.runInNewContext(fs.readFileSync(path.join(root,'site/assets/app.js'),'utf8'),sandbox,{timeout:1000});
 document.ready();
