@@ -233,9 +233,22 @@ def build(offline=False):
             raise ValueError('Production article lacks owned/licensed content rights')
     articles += public_offers(errors,offline)
     articles = [a for a in articles if publication_valid(a)]
+    # Headlines are attributed external links, never auto-approved DrivMatch articles.
+    external_headlines=[]
     if not offline:
         from collect_sources import collect
         collect()
+        candidates_path=ROOT/'build/news-candidates.json'
+        try:
+            rows=read_json(candidates_path)
+            seen={a.get('source_url') for a in articles}
+            for item in sorted(rows,key=lambda a:a.get('published_at',''),reverse=True):
+                if item.get('source_url') in seen or not item.get('title') or not item.get('source_url','').startswith('https://'):continue
+                external_headlines.append({k:item[k] for k in ('title','source','source_url','published_at','category')})
+                seen.add(item['source_url'])
+                if len(external_headlines)>=35:break
+        except (OSError,ValueError,TypeError,KeyError) as exc:
+            errors.append('external_headlines:'+type(exc).__name__)
     unique={}
     for a in articles:
         if a['id'] in unique:continue
@@ -254,6 +267,7 @@ def build(offline=False):
     runtime={'spot_url':public_spot if public_spot.startswith('https://') else ''}
     (path/'runtime.json').write_text(json.dumps(runtime)+'\n',encoding='utf-8')
     (path/'content.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    (path/'source-headlines.json').write_text(json.dumps({'generated_at':NOW().isoformat(timespec='seconds'),'editorial_status':'external_feed_links_not_editorially_approved','headlines':external_headlines},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'market.json').write_text(json.dumps(market,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'weather.json').write_text(json.dumps(weather,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
