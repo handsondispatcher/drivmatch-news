@@ -135,14 +135,14 @@ jobs:
               "https://drivmatch.com/news/data/release.json?__release_probe=v33-${BUST}" \
               -o /tmp/drivmatch-domain-release.json; then
             python - <<'PY'
-import json
-with open('/tmp/drivmatch-domain-release.json',encoding='utf-8') as f:
-    try: d=json.load(f)
-    except (json.JSONDecodeError,UnicodeDecodeError): d={}
-print('CUSTOM DOMAIN RELEASE:',d.get('version','missing/invalid manifest'))
-if d.get('version')!='v33':
-    print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v33. Cloudflare routing or cache differs from GitHub Pages.')
-PY
+          import json
+          with open('/tmp/drivmatch-domain-release.json',encoding='utf-8') as f:
+              try: d=json.load(f)
+              except (json.JSONDecodeError,UnicodeDecodeError): d={}
+          print('CUSTOM DOMAIN RELEASE:',d.get('version','missing/invalid manifest'))
+          if d.get('version')!='v33':
+              print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v33. Cloudflare routing or cache differs from GitHub Pages.')
+          PY
           else
             echo "::warning::CUSTOM DOMAIN MANIFEST UNAVAILABLE: /news/data/release.json not served at custom domain."
           fi
