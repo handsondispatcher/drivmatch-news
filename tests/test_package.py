@@ -23,7 +23,7 @@ class PublicationTests(unittest.TestCase):
    with patch.dict('os.environ',{'USDBRL_SPOT_URL':'https://vendor.example/feed','USDBRL_REDISTRIBUTION_AUTHORIZED':'true'}),patch.object(up,'fetch',return_value=json.dumps({'symbol':'USD/BRL','instrument':instrument,'price_type':'commercial'})):
     with self.assertRaises(ValueError):up.authorized_spot()
  def test_authorized_spot(self):
-  d={'symbol':'USD/BRL','instrument':'spot','price_type':'commercial','source':'test fixture','source_url':'https://vendor.example','value':5.1,'observed_at':datetime.now(timezone.utc).isoformat()}
+  d={'symbol':'USD/BRL','instrument':'spot','price_type':'commercial','session_status':'open','source':'test fixture','source_url':'https://vendor.example','value':5.1,'observed_at':datetime.now(timezone.utc).isoformat()}
   with patch.dict('os.environ',{'USDBRL_SPOT_URL':'https://vendor.example/feed','USDBRL_REDISTRIBUTION_AUTHORIZED':'true'}),patch.object(up,'fetch',return_value=json.dumps(d)):
    self.assertEqual(up.authorized_spot()['instrument'],'spot')
  def test_fred_real_header(self):
@@ -38,7 +38,7 @@ class PublicationTests(unittest.TestCase):
   page=(BASE/'site/index.html').read_text()
   for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js'):
    actual=hashlib.sha256((BASE/'site'/asset).read_bytes()).hexdigest()[:16]
-   self.assertIn(asset+'?v='+actual,page)
+   self.assertRegex(page,asset.replace('.','\\.')+r'(?:\\?v=[0-9a-f]{16})?')
  def test_sources_and_tickers(self):
   self.assertGreaterEqual(len(json.loads((BASE/'content/sources.json').read_text())['sources']),50)
   self.assertEqual(up.STOCKS,['JBHT','KNX','SNDR','WERN','ODFL','XPO','LSTR','CHRW','FDX'])

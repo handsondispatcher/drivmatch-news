@@ -110,24 +110,47 @@ def publication_valid(a):
     except (ValueError, TypeError):return False
 
 
+def normalize_spot_quote(d):
+    """One market instrument: commercial USD/BRL spot, never PTAX or futures."""
+    if d.get('symbol')!='USD/BRL' or d.get('instrument')!='spot' or d.get('price_type')!='commercial':
+        raise ValueError('Not commercial USD/BRL spot')
+    if not d.get('source') or not d.get('source_url','').startswith('https://'):
+        raise ValueError('Source and attribution required')
+    state=d.get('session_status')
+    if state=='closed':
+        close_date=d.get('close_date')
+        close_dt=datetime.strptime(close_date,'%Y-%m-%d').date()
+        if close_dt>NOW().date():raise ValueError('Future closing date')
+        price=float(d.get('close_value'))
+        q=dated_quote(price,d['source'],close_date,d.get('change_pct'),d['source_url'])
+        q.update(symbol='USD/BRL',instrument='spot',price_type='commercial',session_status='closed',
+                 close_date=close_date,close_value=price,quote_status='last_verified_close')
+        return q
+    if state!='open':
+        # During auction, halt or unknown status, never manufacture a traded quote.
+        raise ValueError('No fresh tradable quote; retain last verified close')
+    dt=datetime.fromisoformat(d['observed_at'].replace('Z','+00:00'))
+    if dt.tzinfo is None or dt>NOW()+timedelta(seconds=30) or NOW()-dt>timedelta(minutes=5):
+        raise ValueError('Stale or future session quote')
+    q=dated_quote(float(d['value']),d['source'],dt.isoformat(),d.get('change_pct'),d['source_url'])
+    q.update(symbol='USD/BRL',instrument='spot',price_type='commercial',session_status='open',
+             quote_status='live_snapshot')
+    return q
+
+
 def authorized_spot():
-    # Vendor-specific ingestion belongs in the authenticated backend adapter.
     url=os.getenv('USDBRL_SPOT_URL','')
     if not url or os.getenv('USDBRL_REDISTRIBUTION_AUTHORIZED')!='true':
         raise ValueError('Authorized spot provider not configured')
     if not url.startswith('https://'):raise ValueError('HTTPS required')
     token=os.getenv('USDBRL_SPOT_TOKEN','')
     d=json.loads(fetch(url,headers={'Authorization':'Bearer '+token} if token else {}))
-    if d.get('symbol')!='USD/BRL' or d.get('instrument')!='spot' or d.get('price_type')!='commercial':
-        raise ValueError('Not commercial USD/BRL spot')
-    if not d.get('source') or not d.get('source_url','').startswith('https://'):raise ValueError('Missing attribution')
-    dt=datetime.fromisoformat(d['observed_at'].replace('Z','+00:00'))
-    if dt.tzinfo is None or dt>NOW()+timedelta(seconds=30) or NOW()-dt>timedelta(days=5):
-        raise ValueError('Invalid timestamp')
-    q=dated_quote(d['value'],d['source'],dt.isoformat(),d.get('change_pct'),d['source_url'])
-    q['quote_status']='delayed' if NOW()-dt>timedelta(seconds=60) else 'snapshot'
-    q['instrument']='spot';q['price_type']='commercial'
-    return q
+    return normalize_spot_quote(d)
+
+
+def verified_previous_close():
+    """Dated, attributed close for fallback; never presented as a live quote."""
+    return normalize_spot_quote(read_json(ROOT/'content/usdbrl_last_close.json'))
 
 
 def fred_latest(series, source):
@@ -189,7 +212,11 @@ def make_market(offline=False):
     for key,fn in [('usdbrl',authorized_spot),('diesel',lambda:fred_latest('GASDESW','EIA / FRED (semanal)')),
                    ('brent',lambda:fred_latest('DCOILBRENTEU','EIA / FRED (diário)'))]:
         try:market['indicators'][key]=fn()
-        except Exception as exc:market['errors'].append(f'{key}:{type(exc).__name__}')
+        except Exception as exc:
+            market['errors'].append(f'{key}:{type(exc).__name__}')
+            if key=='usdbrl':
+                try:market['indicators'][key]=verified_previous_close()
+                except Exception as exc2:market['errors'].append('usdbrl_previous_close:'+type(exc2).__name__)
     market['stocks']=finnhub_quotes(market['errors'])
     market['indicators'].update(class8_quotes(market['errors']))
     return market
@@ -217,6 +244,8 @@ def build(offline=False):
             unique[a['id']]=translated
         else: errors.append(f'translation_incomplete:{a["id"]}')
     market=make_market(offline)
+    from weather_brief import collect_weather
+    weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
     data={'schema_version':1,'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
@@ -226,11 +255,12 @@ def build(offline=False):
     (path/'runtime.json').write_text(json.dumps(runtime)+'\n',encoding='utf-8')
     (path/'content.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'market.json').write_text(json.dumps(market,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    (path/'weather.json').write_text(json.dumps(weather,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
     # Content hashes prevent browsers mixing new HTML with cached runtime/data.
     page=ROOT/'site/index.html'
     markup=page.read_text(encoding='utf-8')
-    for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js'):
+    for asset in ('data/bootstrap.js','assets/app.js','assets/clima-spot.js','assets/utility-strip.js'):
         version=hashlib.sha256((ROOT/'site'/asset).read_bytes()).hexdigest()[:16]
         markup=re.sub(r'(src="'+re.escape(asset)+r')(?:\?[^"]*)?"',lambda m:m.group(1)+'?v='+version+'"',markup)
     page.write_text(markup,encoding='utf-8')

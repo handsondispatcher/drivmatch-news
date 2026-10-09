@@ -10,7 +10,7 @@
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.55 Arial,Helvetica,sans-serif}
 a{color:inherit} button,input,select{font:inherit} button{cursor:pointer}
-.demo{background:#e8f5ff;border-bottom:1px solid #c2e5fc;color:#185781;text-align:center;padding:8px 14px;font-size:12px}
+
 .header{background:#070c12;color:#fff} .header-inner{max-width:1390px;margin:auto;padding:14px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .brand{display:flex;align-items:center;gap:2px} .brand img{width:375px;max-width:100%;height:auto;object-fit:contain;display:block} .brand .news{font-family:Arial,Helvetica,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.4px;color:#168ff0;line-height:1} 
 .edition{font-size:10px;letter-spacing:1.1px;color:#b5c1ce;text-align:right}.edition select{background:#0b1826;color:#ecf6ff;border:1px solid #314b63;border-radius:5px;padding:8px 10px;font-size:12px;letter-spacing:0;max-width:190px}
@@ -70,16 +70,57 @@ article[role=button]{outline-offset:2px}
 .weather-card iframe{width:100%;height:275px;border:0;border-radius:5px;background:#dae6ed}
 .weather-mobile{display:none}
 @media(max-width:990px){.weather-desktop{display:none}.weather-mobile{display:block}.weather-mobile .weather-card{background:#0f2c45;margin:12px 0 14px}.weather-mobile .weather-card iframe{height:56vh;min-height:350px;max-height:560px}}
+
+.weather-card .weather-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.weather-card .weather-open{color:#b8e5ff;font-size:11px;text-decoration:none;font-weight:700;white-space:nowrap}
+.weather-card .weather-open:hover{text-decoration:underline}
+.weather-card iframe{height:315px}
+@media(max-width:990px){.weather-mobile .weather-card iframe{height:56vh;min-height:350px;max-height:540px}}
+
+.dm-utility{background:#fff;border-bottom:1px solid #dbe4ec;color:#193950;font:14px/1.4 Arial,Helvetica,sans-serif}
+.dm-util-inner{max-width:1390px;margin:auto;display:flex;align-items:center;gap:20px;padding:10px 26px;min-height:70px}
+.dm-util-quote{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.dm-util-quote>span{font-size:14px;font-weight:600;white-space:nowrap}
+.dm-util-quote strong{font-size:17px;color:#176637;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dm-util-quote small{font-size:12px;color:#596b7c;white-space:nowrap}
+.dm-util-city{display:flex;align-items:center;gap:11px;margin-left:auto;min-width:0}
+.dm-util-city #top-weather-icon{font-size:27px;line-height:1}
+.dm-util-city span:nth-child(2){display:flex;flex-direction:column;min-width:0}
+.dm-util-city #top-city{font-size:15px;font-weight:700}
+.dm-util-city #top-condition{font-size:13px;color:#50697b;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm-util-temps{display:flex;flex-direction:column;gap:3px;align-items:flex-end;white-space:nowrap;margin-left:4px;font-variant-numeric:tabular-nums}
+.dm-util-temp-row{font-weight:700;font-size:14px}
+.dm-util-temp-row.secondary{color:#536a7c;font-weight:600}
+@media(max-width:1050px){.dm-util-inner{gap:10px;flex-wrap:wrap}.dm-util-city{margin-left:0;flex:1 1 100%;padding-top:7px;border-top:1px solid #e1e7ed}}
+@media(max-width:750px){.dm-util-inner{padding:9px 12px;gap:9px 15px}
+.dm-util-quote{flex:1 1 135px;gap:3px 7px}.dm-util-quote small{font-size:11px}
+.dm-util-city{gap:8px}.dm-util-temps{margin-left:auto}.dm-util-temp-row{font-size:13.5px}
+.dm-util-city #top-condition{max-width:140px}
+}
+
+.dm-util-city[hidden],.dm-weather-risk[hidden],.dm-news-crawler[hidden]{display:none!important}
+.dm-util-city .dm-weather-risk{color:#a33f17;font-size:12px;font-weight:700;max-width:225px}
+.dm-news-crawler{border-bottom:1px solid #d1e2ec;background:#0b2236;color:#f3f7fa;font-family:Arial,Helvetica,sans-serif}
+.dm-crawler-viewport{overflow:hidden;white-space:nowrap;padding:9px 0}
+.dm-crawler-track{display:flex;width:max-content;align-items:center;gap:36px;animation:dm-ticker 68s linear infinite;will-change:transform}
+.dm-crawler-track:hover,.dm-crawler-track:focus-within{animation-play-state:paused}
+.dm-crawler-link{color:#f3f7fa;text-decoration:none;font-size:13px;display:inline-flex;gap:8px;align-items:center}
+.dm-crawler-link:hover,.dm-crawler-link:focus-visible{text-decoration:underline}
+.dm-crawler-label{font-weight:700;color:#68bfff;font-size:11px;letter-spacing:.4px}
+@keyframes dm-ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.dm-crawler-track{animation:none;flex-wrap:wrap;width:auto;padding:0 12px}.dm-crawler-viewport{white-space:normal}}
+@media(max-width:750px){.dm-crawler-track{animation-duration:50s}.dm-crawler-link{font-size:12px}.dm-crawler-viewport{padding:10px 0}}
 </style>
 </head>
 <body>
-<div class="demo">DRIVMATCH NEWS • Notícias verificadas por fonte e data</div>
 <header class="header"><div class="header-inner"><div class="brand"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></div><div class="edition">EDIÇÃO DIGITAL · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></span></div></div></header>
+<section id="dm-utility" class="dm-utility" aria-label="Mercado e tempo"><div class="dm-util-inner"><div class="dm-util-quote"><span id="top-usd-label">Dólar</span> <strong id="top-usd-value">—</strong><small id="top-usd-date" title="Última cotação verificada">Sem cotação</small></div><div class="dm-util-quote"><span id="top-diesel-label">Diesel EUA</span> <strong id="top-diesel-value">—</strong><small id="top-diesel-date" title="Referência média semanal">EIA · semanal</small></div><div class="dm-util-city" aria-live="off" hidden><span id="top-weather-icon" aria-hidden="true">🌤️</span><span><strong id="top-city">Tempo nos EUA</strong><small id="top-condition"></small><small id="top-risk" class="dm-weather-risk" hidden></small></span><div class="dm-util-temps" aria-label="Temperaturas previstas"><div class="dm-util-temp-row" id="top-range-f">Máx. —°F · Mín. —°F</div><div class="dm-util-temp-row secondary" id="top-range-c">Máx. —°C · Mín. —°C</div></div></div></div></section>
+<section id="dm-news-crawler" class="dm-news-crawler" aria-label="Manchetes recentes" hidden><div class="dm-crawler-viewport" id="dm-crawler-viewport"><div class="dm-crawler-track" id="dm-crawler-track"></div></div></section>
 
 <div class="main">
 <main>
 <div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div>
-<div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><button class="weather-load" type="button" aria-expanded="false">Ver mapa animado</button></div><p class="weather-note">Previsão meteorológica para planejamento de rotas. Consulte alertas oficiais antes de viajar.</p><div class="weather-map" hidden><iframe title="Mapa meteorológico Ventusky" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><div class="weather-links"><a href="https://www.weather.gov/alerts" target="_blank" rel="noopener noreferrer">Alertas NWS ↗</a> · <a href="https://www.fhwa.dot.gov/trafficinfo/" target="_blank" rel="noopener noreferrer">DOT / 511 ↗</a> · <a href="https://www.ventusky.com/" target="_blank" rel="noopener noreferrer">Ventusky ↗</a></div></section></div>
+<div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div>
 <section id="panorama">
   <div class="topline"><h2 class="heading">Panorama do Transporte</h2><div class="carousel-controls"><button class="btn secondary" id="featurePrev">← Anterior</button><span class="sub" id="featureCount"></span><button class="btn" id="featureNext">Próximas →</button></div></div>
   <div class="features" id="features"></div><div class="carousel-dots" id="featureDots"></div>
@@ -93,7 +134,7 @@ article[role=button]{outline-offset:2px}
 </section>
 <section id="fontes" class="panel" style="padding:21px;margin-top:22px"><h2 class="heading">Fontes & Transparência</h2><p>Monitoramos imprensa especializada, órgãos oficiais, associações e empresas de transporte nos Estados Unidos, Canadá e México. A coleta não equivale a aprovação editorial: cada publicação exige fonte, data, verificação e texto próprio ou licenciado nos três idiomas.</p><p>Alertas de clima e rodovias devem ser confirmados no NWS e no DOT / 511 antes de viajar.</p><p><a href="data/source-health.json" target="_blank" rel="noopener">Estado da coleta e fontes ↗</a></p></section>
 </main>
-<aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><button class="weather-load" type="button" aria-expanded="false">Ver mapa animado</button></div><p class="weather-note">Previsão meteorológica para planejamento de rotas. Consulte alertas oficiais antes de viajar.</p><div class="weather-map" hidden><iframe title="Mapa meteorológico Ventusky" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><div class="weather-links"><a href="https://www.weather.gov/alerts" target="_blank" rel="noopener noreferrer">Alertas NWS ↗</a> · <a href="https://www.fhwa.dot.gov/trafficinfo/" target="_blank" rel="noopener noreferrer">DOT / 511 ↗</a> · <a href="https://www.ventusky.com/" target="_blank" rel="noopener noreferrer">Ventusky ↗</a></div></section></div><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
+<aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
 <footer class="footer"><span class="smalltext">DrivMatch News — um produto da Hands On Dispatcher LLC</span><br><span class="smalltext">Cobertura editorial independente • Notícias e indicadores identificados por fonte e data.</span></footer>
@@ -104,5 +145,7 @@ article[role=button]{outline-offset:2px}
 </div></div></article></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=3fcd616e589cfa3d" defer></script>
+<script src="assets/utility-strip.js" defer></script>
+<script src="assets/news-crawler.js" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>

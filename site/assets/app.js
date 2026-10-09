@@ -110,7 +110,7 @@
   }
   function install(){CATS.forEach(c=>$('category').add(new Option(c,c)));
     $('edition-date').textContent=new Date().toLocaleDateString('pt-BR');
-    if(data.publication_mode==='production')document.querySelector('.demo').textContent='DRIVMATCH NEWS • Atualização conforme fontes disponíveis';
+    // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
     $('search').addEventListener('input',()=>{page=featurePage=0;renderStories();});
     $('category').addEventListener('change',e=>{selected=e.target.value;page=featurePage=0;languageSet(lang);});

@@ -17,11 +17,10 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#market-title').textContent(),'Mercado em Foco');
    assert.equal(await page.locator('#mercados').innerText().then(x=>x.includes('FDX')),true);
    const card=width>990?'#clima-desktop':'#clima-mobile';
-   if(width<=990) {
-    assert.equal(await page.locator(card+' iframe').getAttribute('src'),null);
-    await page.locator(card+' button').click();
-   }
+   // Approved layout: Ventusky is visible immediately, without a toggle.
    assert.match(await page.locator(card+' iframe').getAttribute('src'),/^https:\/\/embed\.ventusky\.com/);
+   assert.equal(await page.locator(card+' iframe').isVisible(),true);
+   assert.equal(await page.locator(card+' .weather-open').count(),1);
    await page.locator('#list article').first().click();
    await page.locator('[data-article-lang="es"]').click();
    assert.equal(await page.locator('#language').inputValue(),'pt');
