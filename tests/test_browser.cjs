@@ -36,6 +36,10 @@ const {spawn}=require('node:child_process');
    // Reader flows top to bottom; the language selector must not hide in the footer.
    const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','modalbodytext','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
    assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-share-footer'] && order['article-share-footer']<order['article-original'],`article flow ${JSON.stringify(order)}`);
+   const sourceLinks=await page.locator('#article-source .article-source-button').evaluateAll(nodes=>nodes.map(n=>n.href));
+   assert.equal(sourceLinks.length,3);
+   assert.ok(sourceLinks.every(url=>!url.includes('translate.google.com')&&!url.includes('.translate.goog')),'Primary source links must not use blocked translation proxies');
+   assert.match(await page.locator('#article-source .source-access-warning').innerText(),/Traduzir página/);
    assert.equal(await page.locator('#share-native').count(),1);
    assert.equal(await page.locator('#share-copy').count(),1);
    await page.locator('#share-native').click();
