@@ -40,13 +40,13 @@ class PublicationTests(unittest.TestCase):
    actual=hashlib.sha256((BASE/'site'/asset).read_bytes()).hexdigest()[:16]
    self.assertRegex(page,asset.replace('.','\\.')+r'(?:\\?v=[0-9a-f]{16})?')
  def test_sources_and_tickers(self):
-  self.assertGreaterEqual(len(json.loads((BASE/'content/sources.json').read_text())['sources']),50)
+  self.assertGreaterEqual(len(json.loads((BASE/'content/sources.json').read_text())['sources']),75)
   self.assertEqual(up.STOCKS,['JBHT','KNX','SNDR','WERN','ODFL','XPO','LSTR','CHRW','FDX'])
  def test_safety_deploy(self):
   s=(BASE/'.github/workflows/deploy.yml').read_text()
   self.assertIn("if: github.ref == 'refs/heads/main'",s)
   self.assertIn('python -m unittest discover',s)
-  self.assertIn("cron: '7,37 * * * *'",s)
+  self.assertIn("cron: '7,17,27,37,47,57 * * * *'",s)
  def test_source_headline_monitor_keeps_editorial_approval(self):
   source=(BASE/'scripts/update.py').read_text()
   ticker=(BASE/'site/assets/news-crawler.js').read_text()
