@@ -25,7 +25,7 @@ const {spawn}=require('node:child_process');
    const openEditorial=async()=>{
     for(let attempt=0;attempt<25;attempt++){
      if(await page.locator('#list article[data-story]').count()){
-      await openEditorial();return;
+      await page.locator('#list article[data-story]').first().click();return;
      }
      if(await page.locator('#next').isDisabled())break;
      await page.locator('#next').click();
