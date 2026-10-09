@@ -170,6 +170,24 @@ article[role=button]{outline-offset:2px}
 #article-dialog .share-options[hidden]{display:none!important}
 #article-dialog .share-options a,#article-dialog .share-options button{font:600 12px Arial,sans-serif;border:1px solid #c5d9e9;background:#f1f7fc;color:#125581;border-radius:5px;padding:9px 12px;text-decoration:none;cursor:pointer}
 #article-dialog .share-options .share-hint{width:100%;font:11px/1.4 Arial,sans-serif;color:#576b7c;margin:2px 0}
+
+/* Reader fit: no lateral scrollbar; essential controls above the fold on desktop. */
+#article-dialog{width:min(920px,calc(100vw - 28px));max-width:920px;max-height:calc(100dvh - 24px);overflow-x:hidden;overflow-y:auto;box-sizing:border-box;padding-bottom:10px}
+#article-dialog .modalhero img{height:112px}
+#article-dialog .modalhead{padding:6px 20px}
+#article-dialog .modalbody{padding:0 20px}
+#article-dialog h1{font-size:clamp(20px,2.1vw,25px);margin:7px 0}
+#article-dialog .article-reading{margin:8px 0;padding:7px 10px}
+#article-dialog .article-reading .article-language-buttons button{min-height:32px;padding:5px 9px}
+#article-dialog #modalbodytext{margin:7px 0;line-height:1.35;max-height:100px;overflow:hidden}
+#article-dialog .article-share-footer{position:static;margin:7px 0;padding:8px 0;box-shadow:none;border-top:1px solid #dce7f0}
+#article-dialog .article-share-actions{margin:5px 0}
+#article-dialog .article-share-actions button{min-height:36px;padding:7px 10px}
+#article-dialog .article-original{margin-top:8px;padding-top:9px}
+#article-dialog .source-translations{margin:6px 0;gap:6px}
+#article-dialog .article-source-button,#article-dialog .article-source-button.primary{min-height:38px;padding:7px 9px;font-size:12px;flex-basis:auto;flex:1 1 180px}
+#article-dialog .full-article-heading{margin-top:6px}
+@media(max-width:600px){#article-dialog{width:100vw;max-height:100dvh;border-radius:0}#article-dialog .modalhero img{height:85px}#article-dialog .modalbody{padding:0 12px}#article-dialog .modalhead{padding:5px 12px}}
 </style>
 </head>
 <body>
