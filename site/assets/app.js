@@ -23,9 +23,32 @@
   const safeUrl = url => /^https:\/\//i.test(String(url||'')) ? String(url) : '';
   const localizedCategory=c=>catLabels[c]?.[indices[lang]]||c;
   function localeOf(article, chosen=lang){return article.locales?.[chosen] || article.locales?.[article.original_lang] || null}
-  function imageOf(a){return safeUrl(a.image) || 'assets/fallback.svg'}
-  function imageHTML(a, suffix=''){const img=imageOf(a);return `<img loading="lazy" src="${escapeHTML(img)}" alt="${escapeHTML(a.image_alt||localeOf(a)?.title||'Imagem relacionada')}" onerror="this.onerror=null;this.src='assets/fallback.svg'" ${suffix}>`;}
-  function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>s.status==='approved' && !s.demo && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
+  // Curated Unsplash licensed illustrations, never passed off as photographs of an incident.
+  const topicPhotos={
+    Clima:['photo-1534274988757-a28bf1a57c17','photo-1500530855697-b586d89ba3ee','photo-1534088568595-a066f410bcda'],
+    Rodovias:['photo-1500534623283-312aade485b7','photo-1449965408869-eaa3f722e40d'],
+    Acidentes:['photo-1449965408869-eaa3f722e40d'],
+    Combustíveis:['photo-1519608487953-e999c86e7455'],
+    Tecnologia:['photo-1518770660439-4636190af475'],
+    Negócios:['photo-1486406146926-c627a92ad1ab'],
+    Fretes:['photo-1494412519320-aa613dfb7738'],
+    Transporte:['photo-1494412519320-aa613dfb7738'],
+    Caminhões:['photo-1494412519320-aa613dfb7738'],
+    Caminhoneiros:['photo-1494412519320-aa613dfb7738']
+  };
+  function imageOf(a){
+    const supplied=safeUrl(a.image);if(supplied)return supplied;
+    if(a.kind!=='external_link')return 'assets/fallback.svg';
+    const choices=topicPhotos[a.category]||topicPhotos.Transporte;
+    const seed=Array.from(String(a.source_url||a.title||'')).reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
+    return 'https://images.unsplash.com/'+choices[seed%choices.length]+'?auto=format&fit=crop&w=900&q=75';
+  }
+  function imageHTML(a, suffix=''){
+    const illustrative=a.kind==='external_link'&&!safeUrl(a.image);
+    const alt=illustrative?(lang==='pt'?'Foto ilustrativa, não é registro do evento':lang==='es'?'Fotografía ilustrativa, no representa el evento':'Illustrative photo, not a photograph of the event'):(a.image_alt||localeOf(a)?.title||'Imagem relacionada');
+    return `<img loading="lazy" src="${escapeHTML(imageOf(a))}" alt="${escapeHTML(alt)}" title="${illustrative?'Imagem ilustrativa / Unsplash':''}" onerror="this.onerror=null;this.src='assets/fallback.svg'" ${suffix}>`;
+  }
+  function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
     return score(b)-score(a) || (Date.parse(b.published_at||'2000-01-01')-Date.parse(a.published_at||'2000-01-01'));
   });}
@@ -150,9 +173,9 @@
           const approved=new Set((data.articles||[]).map(x=>x.source_url));
           const seen=new Set();
           externalHeadlines=next.headlines.filter(x=>x.title&&safeUrl(x.source_url)&&!approved.has(x.source_url)&&!seen.has(x.source_url)&&seen.add(x.source_url)).slice(0,90).map(x=>({
-            id:'source-'+String(x.source_url).slice(-80),kind:'external_link',status:'approved',demo:false,
+            id:'source-'+String(x.source_url).slice(-80),kind:'external_link',status:'external_source',demo:false,
             category:CATS.includes(x.category)?x.category:'Transporte',region:x.region||'US',source:x.source,
-            source_url:x.source_url,published_at:x.published_at,original_lang:x.region==='MX'?'es':'en',
+            source_url:x.source_url,published_at:x.published_at,original_lang:x.original_lang|| (x.region==='MX'?'es':'en'),image:x.image||'',
             locales:Object.fromEntries(langs.map(l=>[l,{title:x.title,summary:'',body:''}]))
           }));
         }
@@ -229,12 +252,7 @@
         refreshSpot();setInterval(refreshSpot,15000);
       }).catch(()=>{});
     }
-    // On deployed HTTP pages, reload data without reloading the whole page every 30 min.
-    if(location.protocol.startsWith('http'))setInterval(async()=>{
-      try{const stamp='?v='+Date.now();const res=await fetch('data/content.json'+stamp,{cache:'no-store'});if(!res.ok)return;
-        const fresh=await res.json();if(!fresh.articles||!fresh.market)return;data=fresh;page=featurePage=0;languageSet(lang);
-      }catch(e){console.warn('Data refresh failed; retaining last verified snapshot',e);}
-    },60*1000);
+    // refreshNews() is the single coordinated poll for editorial and external source data.
   }
   document.addEventListener('DOMContentLoaded',install);
 })();
