@@ -9,7 +9,7 @@ function display(){
  const validStories=entries.filter(a=>a.status==='approved'&&!a.demo&&a.locales?.[l]?.title&&a.source_url?.startsWith('https://'));
  const links=[],seen=new Set();
  for(const a of sourceHeadlines){
-   if(!a.source_url?.startsWith('https://')||!a.title||seen.has(a.source_url))continue;
+   if(!a.source_url?.startsWith('https://')||!a.title||!a.titles?.[l]||seen.has(a.source_url))continue;
    seen.add(a.source_url);
    const title=a.titles?.[l]||a.title;
    const untranslated=!a.titles?.[l];
