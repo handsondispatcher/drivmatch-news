@@ -34,9 +34,11 @@ def parse_feed(raw, source, now=None):
         hostname=urlparse(url).hostname or ''
         expected=urlparse(source['url']).hostname or ''
         if not url.startswith('https://') or hostname.removeprefix('www.')!=expected.removeprefix('www.') or not title:continue
+        if source.get('access')=='discovery-rss' and hostname not in ('news.google.com',):continue
         result.append({'id':hashlib.sha256(url.encode()).hexdigest()[:20], 'title':re.sub('<[^>]+>','',title),
             'source':source['name'],'source_url':url,'published_at':dt.isoformat(),
             'collected_at':now.isoformat(),'category':source['category'],'original_lang':source['original_lang'],
+            'region':source.get('region','US'),'origin_type':('aggregator-discovery' if source.get('access')=='discovery-rss' else 'publisher-feed'),
             'status':'pending_review','publication_blockers':['verify-event-and-original-date','write-owned-summary','complete-three-languages','approve-editorially']})
     return result
 
@@ -46,16 +48,17 @@ def collect():
         if not source.get('feed_url'):return [],dict(id=source['id'],status='manual-review',url=source['url'])
         try:
             req=Request(source['feed_url'],headers={'User-Agent':'DrivMatchNews/1.0 (+https://drivmatch.com/news)'})
-            with urlopen(req,timeout=12) as res:raw=res.read(2_000_000)
+            with urlopen(req,timeout=9) as res:raw=res.read(2_000_000)
             if len(raw)>=2_000_000:raise ValueError('Oversized feed')
             rows=parse_feed(raw,source)
             return rows,dict(id=source['id'],status='ok',candidates=len(rows),url=source['feed_url'])
         except Exception as exc:return [],dict(id=source['id'],status='failed',error=type(exc).__name__,url=source['feed_url'])
     candidates={};health=[]
-    with ThreadPoolExecutor(max_workers=6) as pool:
+    with ThreadPoolExecutor(max_workers=12) as pool:
         for rows,status in pool.map(check,sources):
             health.append(status)
-            for row in rows:candidates[row['source_url']]=row
+            for row in rows:
+                if row['source_url'] not in candidates:candidates[row['source_url']]=row
     out=ROOT/'build';out.mkdir(exist_ok=True)
     (out/'news-candidates.json').write_text(json.dumps(list(candidates.values()),ensure_ascii=False,indent=2)+'\n')
     report={'checked_at':datetime.now(timezone.utc).isoformat(),'sources':health,'candidate_count':len(candidates)}
