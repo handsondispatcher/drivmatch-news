@@ -43,7 +43,7 @@ const {spawn}=require('node:child_process');
    // Switching the entire site to English must translate weather and publisher footer.
    await page.locator('#article-dialog .x').click();
    await page.locator('#language').selectOption('en');
-   assert.equal(await page.locator('#clima-desktop .weather-top h2').innerText(),'Weather');
+   assert.equal(await page.locator('#clima-desktop .weather-top h2').textContent(),'Weather');
    assert.match(await page.locator('#footer-publisher').innerText(),/A publication of Hands On Dispatcher LLC/);
    assert.match(await page.locator('#footer-legal').innerText(),/All rights reserved/);
    await page.locator('#language').selectOption('pt');
