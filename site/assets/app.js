@@ -84,6 +84,14 @@
     $('ad-slot').hidden=!ad;if(!ad)return;
     $('ad-slot').innerHTML=`<span class="ad-label">${labels[lang].ad}</span><a href="${escapeHTML(ad.url)}" target="_blank" rel="noopener noreferrer sponsored">${escapeHTML(ad.title||'')}</a><p>${escapeHTML(ad.text||'')}</p>`;
   }
+  const shareUrlOf = a => 'https://drivmatch.com/news/share/'+encodeURIComponent(a.id)+'/';
+  function openSharedStory(){
+    try{
+      const id=new URLSearchParams(location.search).get('story');
+      const story=id&&pageStories().find(a=>a.id===id);
+      if(story){opened=story;articleLang=lang;renderArticle();}
+    }catch(_){}
+  }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
     $('modalimg').src=imageOf(opened);$('modalimg').alt=opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
     $('modaltitle').textContent=txt.title;$('modalmeta').textContent=opened.demo?al.demo:opened.published_at?`${al.published}: ${opened.published_at}`:'';
@@ -107,6 +115,7 @@
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('share-feedback').textContent='';
     $('share-native').hidden=!(typeof navigator!=='undefined' && typeof navigator.share==='function');
+    $('shareFeedback').textContent='';
     $('shade').classList.add('open');
   }
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
@@ -124,6 +133,25 @@
     $('edition-date').textContent=new Date().toLocaleDateString('pt-BR');
     // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
+    $('shareWhatsapp').addEventListener('click',()=>{
+      if(!opened)return;
+      const url=shareUrlOf(opened),title=localeOf(opened)?.title||'DrivMatch News';
+      window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(title+' — '+url),'_blank','noopener,noreferrer');
+    });
+    $('shareCopy').addEventListener('click',()=>{
+      if(!opened)return;
+      const url=shareUrlOf(opened);
+      if(typeof navigator!=='undefined' && navigator.clipboard?.writeText)navigator.clipboard.writeText(url).then(()=>$('shareFeedback').textContent='Link copiado!',()=>$('shareFeedback').textContent='Não foi possível copiar.').catch(()=>{});
+      else $('shareFeedback').textContent=url;
+    });
+    if(typeof navigator!=='undefined' && navigator.share){
+      $('shareNative').hidden=false;
+      $('shareNative').addEventListener('click',()=>{
+        if(!opened)return;
+        navigator.share({title:localeOf(opened)?.title||'DrivMatch News',url:shareUrlOf(opened)}).catch(()=>{});
+      });
+    }
+
     $('search').addEventListener('input',()=>{page=featurePage=0;renderStories();});
     $('category').addEventListener('change',e=>{selected=e.target.value;page=featurePage=0;languageSet(lang);});
     $('age').addEventListener('change',()=>{page=featurePage=0;renderStories();});
@@ -174,6 +202,7 @@
     const closeModal=()=>{$('shade').classList.remove('open');opened=null;};window.closeModal=closeModal;
     window.translateTo=l=>{articleLang=l;renderArticle();};
     languageSet('pt');
+    openSharedStory();
     // Optional credential-free public proxy; provider secrets never enter the browser.
     if(location.protocol.startsWith('http')) {
       fetch('data/runtime.json',{cache:'no-store'}).then(r=>r.json()).then(config=>{
