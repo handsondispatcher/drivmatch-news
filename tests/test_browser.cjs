@@ -14,6 +14,16 @@ const {spawn}=require('node:child_process');
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
+   if(width===1440){
+    const og=await page.request.get('http://127.0.0.1:8765/share/kodiak-charger-dallas-laredo-20261008/');
+    assert.equal(og.status(),200,'Approved Kodiak story must have its own OG page');
+    const html=await og.text();
+    assert.match(html,/property="og:image" content="https:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\/kodiak-/);
+    assert.match(html,/og:image:width" content="1200"/);
+    const image=await page.request.get('http://127.0.0.1:8765/share/kodiak-charger-dallas-laredo-20261008/social.jpg');
+    assert.equal(image.status(),200,'OG photo must be served');
+    assert.match(image.headers()['content-type'],/image\/jpeg/);
+   }
    assert.equal(await page.locator('#market-title').textContent(),'Mercado em Foco');
    assert.equal(await page.locator('#mercados').innerText().then(x=>x.includes('FDX')),true);
    const card=width>990?'#clima-desktop':'#clima-mobile';
