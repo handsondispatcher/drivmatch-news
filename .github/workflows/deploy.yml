@@ -89,6 +89,13 @@ jobs:
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "${SHARE}social.jpg" -o /tmp/drivmatch-social.jpg
           test "$(wc -c < /tmp/drivmatch-social.jpg)" -gt 10000
           echo "PUBLIC SOCIAL PREVIEW PASS: Open Graph HTML and photo JPEG are accessible"
+          INDEX="https://handsondispatcher.github.io/drivmatch-news/"
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$INDEX" -o /tmp/drivmatch-v32-index.html
+          grep -q 'name="drivmatch-news-version" content="v32"' /tmp/drivmatch-v32-index.html
+          grep -q 'data-site-version="v32"' /tmp/drivmatch-v32-index.html
+          RELEASE="https://handsondispatcher.github.io/drivmatch-news/data/release.json"
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v32-release.json
+          python -c 'import json; x=json.load(open("/tmp/drivmatch-v32-release.json")); assert x["version"]=="v32" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v32 PASS: prelaunch contract consistent")'
           LIVE="https://handsondispatcher.github.io/drivmatch-news/data/live-feed.json"
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$LIVE" -o /tmp/drivmatch-live-feed.json
           python -c 'import json; x=json.load(open("/tmp/drivmatch-live-feed.json")); assert x["schema_version"]==1 and x["operational_alerts_integrated"] is False; assert all(not i["is_active_incident"] and i["severity"] is None for i in x["items"]); print("LIVE NEWS FEED PASS:",len(x["items"]),"fresh non-urgent items")'
