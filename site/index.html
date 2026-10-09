@@ -233,6 +233,14 @@ article[role=button]{outline-offset:2px}
 #story-preview-download{display:block;background:#0668b3;color:white;font:700 14px Arial,sans-serif;border-radius:7px;text-decoration:none;padding:12px}
 #story-preview-hint{font:12px/1.4 Arial,sans-serif;color:#456075;margin:8px 0 0}
 @media(max-width:600px){.story-preview-overlay{padding:5px}.story-preview-panel{max-height:calc(100dvh - 10px)}#story-preview-image{max-height:70dvh}}
+
+#article-dialog.external-article #modalbodytext{margin:10px 0 4px;color:#33536d;font-size:13px}
+#article-dialog.external-article .article-original{margin:8px 0 15px}
+#article-dialog.external-article .full-article-heading{margin-top:7px}
+#article-dialog.external-article .source-translations{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:10px}
+#article-dialog.external-article .article-source-button{min-height:52px;justify-content:center;text-align:center;flex-basis:auto}
+#article-dialog.external-article .article-source-button.secondary{background:#eaf3fc;color:#0a4b81;border-color:#9dc3e5}
+#article-dialog.external-article .source-access-warning{font-size:12px;color:#385b77;line-height:1.5}
 </style>
 </head>
 <body>
@@ -260,7 +268,7 @@ article[role=button]{outline-offset:2px}
 <aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
-<footer class="footer" aria-label="Informações institucionais"><div class="footer-publisher" id="footer-publisher">DrivMatch News — uma publicação da Hands On Dispatcher LLC</div><div class="footer-description" id="footer-description">Informação sobre transporte rodoviário nos Estados Unidos e corredores com Canadá e México. Fontes e datas identificadas.</div><div class="footer-legal" id="footer-legal">© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.</div></footer>
+<footer class="footer" aria-label="Informações institucionais"><div class="footer-publisher" id="footer-publisher">DrivMatch News — uma publicação da Hands On Dispatcher LLC</div><div class="footer-legal" id="footer-legal">© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.</div></footer>
 <div class="modalshade" id="shade"><article class="modal" id="article-dialog" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody">
 <h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div>
 <section class="trans article-reading" id="article-reading" aria-label="Idioma de leitura">
@@ -269,6 +277,7 @@ article[role=button]{outline-offset:2px}
 <p id="translation" class="smalltext"></p>
 </section>
 <p id="modalbodytext"></p><p class="disclosure" id="article-disclosure"></p>
+<section class="article-original" id="article-original" aria-label="Reportagem completa na fonte"><div id="article-source"></div></section>
 <section class="article-share-footer" id="article-share-footer" aria-label="Compartilhamento da notícia">
 <strong id="share-section-title">Compartilhe esta notícia</strong>
 <div class="article-share-actions" id="article-share-actions" aria-label="Compartilhar matéria">
@@ -284,7 +293,7 @@ article[role=button]{outline-offset:2px}
 <a data-share-platform="pinterest" aria-label="Compartilhar no Pinterest" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/pinterest/BD081C" alt="" width="26" height="26" loading="lazy"><span>Pinterest</span></a>
 <a data-share-platform="email" aria-label="Compartilhar no E-mail" target="_self" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/gmail/EA4335" alt="" width="26" height="26" loading="lazy"><span>E-mail</span></a><button id="share-story" type="button" class="share-picker-story" aria-label="Criar imagem para publicar em Stories do Instagram, TikTok ou WhatsApp"><span class="story-icons" aria-hidden="true"><img src="https://cdn.simpleicons.org/instagram/E4405F" alt="" width="23" height="23"><img src="https://cdn.simpleicons.org/tiktok/111111" alt="" width="23" height="23"></span><span id="share-story-label">Card Stories</span></button><button id="share-system" type="button" class="share-picker-system" hidden><span aria-hidden="true">↗</span><span id="share-system-label">Outros apps</span></button></div><button id="share-whatsapp-copy" type="button" class="share-whatsapp-copy">Já está no WhatsApp Web? Copiar mensagem para colar na conversa</button><p class="share-hint" id="share-stories-hint">Stories: salve a imagem e publique no seu aplicativo. Não há publicação automática em Stories.</p><p id="share-picker-feedback" role="status" aria-live="polite"></p></div>
 <span id="share-feedback" role="status" aria-live="polite"></span>
-</div></section><section class="article-original" id="article-original" aria-label="Reportagem completa na fonte"><div id="article-source"></div></section>
+</div></section>
 
 </div></article></div>
 <div class="story-preview-overlay" id="story-preview" hidden role="dialog" aria-modal="true" aria-labelledby="story-preview-title"><div class="story-preview-panel"><div class="story-preview-head"><strong id="story-preview-title">Prévia do Story</strong><button id="story-preview-close" type="button" aria-label="Fechar prévia">×</button></div><div class="story-preview-scroll"><img id="story-preview-image" alt="Prévia da imagem vertical da notícia para Stories"></div><div class="story-preview-actions"><a id="story-preview-download" download="drivmatch-news-story.png" href="#">Salvar imagem PNG</a><p id="story-preview-hint">Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.</p></div></div></div>

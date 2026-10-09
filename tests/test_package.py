@@ -39,6 +39,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('href="https://drivmatch.com/"',page)
   self.assertIn('id="footer-publisher"',page)
   self.assertIn('id="footer-legal"',page)
+  self.assertNotIn('id="footer-description"',page)
   self.assertIn("'.weather-top h2'",app)
   self.assertIn("sourceBrief(opened,articleLang)",app)
   self.assertIn('id="story-preview-download"',page)
@@ -119,6 +120,9 @@ class PublicationTests(unittest.TestCase):
  def test_topic_images_and_no_duplicate_refresh(self):
   js=(BASE/'site/assets/app.js').read_text()
   self.assertIn('topicPhotos',js)
+  self.assertIn('storyVisuals()',js)
+  self.assertIn('used.add(next)',js)
+  self.assertIn('storyGraphic(a)',js)
   self.assertIn('images.unsplash.com',js)
   self.assertIn('translated_langs',js)
   self.assertIn('Título original sem tradução',js)
