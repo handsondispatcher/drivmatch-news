@@ -122,7 +122,7 @@ const {spawn}=require('node:child_process');
    await page.locator('#list article[data-story][data-external="false"]').first().click();
    assert.equal(await page.locator('#article-dialog').evaluate(e=>e.scrollTop),0);
    await page.keyboard.press('Escape');
-   await page.locator('#language').selectOption('en');
+   await page.locator('[data-site-lang="en"]').click();
    assert.equal(await page.locator('#market-title').textContent(),'Market Focus');
    assert.deepEqual(errors,[]);
    await page.screenshot({path:`test-results/${width}.png`,fullPage:true});await page.close();
