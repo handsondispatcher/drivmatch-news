@@ -1,7 +1,9 @@
 (() => {
 'use strict';
 const el=id=>document.getElementById(id);
-const fixed=[['Orlando','FL'],['Houston','TX'],['New York City','NY'],['Newark','NJ'],['San Francisco','CA'],['Atlanta','GA'],['El Paso','TX'],['Buffalo','NY'],['Salt Lake City','UT'],['Las Vegas','NV'],['Chattanooga','TN'],['Nashville','TN'],['Chicago','IL'],['Los Angeles','CA'],['Dallas','TX'],['Miami','FL'],['Tampa','FL'],['Jacksonville','FL'],['Memphis','TN'],['Indianapolis','IN'],['Columbus','OH'],['Cincinnati','OH'],['Louisville','KY'],['Kansas City','MO'],['St. Louis','MO'],['Denver','CO'],['Phoenix','AZ'],['Albuquerque','NM'],['Seattle','WA'],['Portland','OR'],['Detroit','MI'],['Laredo','TX'],['San Diego','CA'],['Charlotte','NC'],['Birmingham','AL'],['Oklahoma City','OK'],['Harrisburg','PA'],['Sacramento','CA'],['Cleveland','OH'],['Boston','MA'],['McAllen','TX'],['Ontario','CA'],['Savannah','GA'],['Reno','NV']];
+const fixed=[['Orlando','FL'],['Houston','TX'],['New York City','NY'],['Newark','NJ'],['San Francisco','CA'],['Atlanta','GA'],['El Paso','TX'],['Buffalo','NY'],['Salt Lake City','UT'],['Las Vegas','NV'],['Chattanooga','TN'],['Nashville','TN'],['Chicago','IL'],['Los Angeles','CA'],['Dallas','TX'],['Miami','FL'],['Tampa','FL'],['Jacksonville','FL'],['Memphis','TN'],['Indianapolis','IN'],['Columbus','OH'],['Cincinnati','OH'],['Louisville','KY'],['Kansas City','MO'],['St. Louis','MO'],['Denver','CO'],['Phoenix','AZ'],['Albuquerque','NM'],['Seattle','WA'],['Portland','OR'],['Detroit','MI'],['Laredo','TX'],['San Diego','CA'],['Charlotte','NC'],['Birmingham','AL'],['Oklahoma City','OK'],['Harrisburg','PA'],['Sacramento','CA'],['Cleveland','OH'],['Boston','MA'],['McAllen','TX'],['Ontario','CA'],['Savannah','GA'],['Reno','NV'],['Philadelphia','PA'],['Fresno','CA'],['Austin','TX'],['Washington','DC'],['Fort Lauderdale','FL'],['Kissimmee','FL'],['Boca Raton','FL'],['Pompano Beach','FL'],['Framingham','MA'],['Worcester','MA'],['Danbury','CT'],['Edison','NJ'],['San Antonio','TX'],['Norfolk','VA']];
+const shuffle = list => {const a=[...list];for(let j=a.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[a[j],a[k]]=[a[k],a[j]];}return a;};
+let order=shuffle(fixed.map(([city,state])=>city+'|'+state));
 let cities=fixed.map(([city,state])=>({city,state,status:'unavailable'})),i=0,market={},spot=null;
 const lang=()=>el('language')?.value||'pt';
 function number(v,d){return Number(v).toLocaleString(lang()==='pt'?'pt-BR':lang()==='es'?'es-ES':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
@@ -26,11 +28,14 @@ function icon(d){
  return '🌤️';
 }
 function showCity(){
- const c=cities[i++%cities.length];el('top-city').textContent=c.city+', '+c.state;
+ if(i>=order.length){order=shuffle(order);i=0;}
+ const [name,state]=order[i++].split('|');const c=cities.find(x=>x.city===name&&x.state===state)||{city:name,state,status:'unavailable'};el('top-city').textContent=c.city+', '+c.state;
  const age=Date.now()-Date.parse(c.forecast_updated_at||'');
  const good=c.status==='forecast'&&Number.isFinite(age)&&age>=0&&age<36*3600000;
- el('top-weather-icon').textContent=good?icon(c.condition_en):'🌐';
- el('top-condition').textContent=good?c.condition_en:(lang()==='en'?'Forecast unavailable':lang()==='es'?'Pronóstico no disponible':'Previsão indisponível');
+ el('top-weather-icon').textContent=good?icon(c.condition_en):'☁️';
+ const condition=String(c.condition_en||'').toLowerCase();
+ const risk=good?(/blizzard|winter storm|heavy snow/.test(condition)?'❄️ Snow risk':/thunderstorm|severe storm/.test(condition)?'⚡ Storm risk':/heavy rain|flood/.test(condition)?'🌧️ Heavy rain':/dense fog/.test(condition)?'🌫️ Low visibility':''):'';
+ el('top-condition').textContent=good?(risk||c.condition_en):(lang()==='en'?'Forecast unavailable':lang()==='es'?'Pronóstico no disponible':'Previsão indisponível');
  const hi=good&&Number.isFinite(Number(c.max_f))&&c.max_f!==null?Math.round(c.max_f)+'°F':'—';
  const lo=good&&Number.isFinite(Number(c.min_f))&&c.min_f!==null?Math.round(c.min_f)+'°F':'—';
  const celsius = f => Math.round((f-32)*5/9);const cHi=hi==='—'?'—':celsius(Number(c.max_f))+'°C';const cLo=lo==='—'?'—':celsius(Number(c.min_f))+'°C';
@@ -62,7 +67,7 @@ function init(){
  if(!el('top-city'))return;
  showMarket();showCity();
  if(location.protocol.startsWith('http')){weather();quotes();live();setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);}
- setInterval(showCity,60000);el('language')?.addEventListener('change',()=>{showMarket();i=(i+fixed.length-1)%fixed.length;showCity()});
+ setInterval(showCity,60000);el('language')?.addEventListener('change',()=>{showMarket();i=Math.max(0,i-1);showCity()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
