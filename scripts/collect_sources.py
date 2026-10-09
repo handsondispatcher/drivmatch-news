@@ -59,7 +59,7 @@ def collect():
     out=ROOT/'build';out.mkdir(exist_ok=True)
     (out/'news-candidates.json').write_text(json.dumps(list(candidates.values()),ensure_ascii=False,indent=2)+'\n')
     report={'checked_at':datetime.now(timezone.utc).isoformat(),'sources':health,'candidate_count':len(candidates)}
-    (ROOT/'site/data/source-health.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    (out/'source-health.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('Sources:',len(sources),'candidates:',len(candidates),'feed failures:',sum(x['status']=='failed' for x in health))
     return report
 if __name__=='__main__':collect()

@@ -91,17 +91,19 @@
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
     const src=safeUrl(opened.source_url);
-    const translatedSource = src ? langs.map(l=>{
+    const translatedSource=src?langs.map(l=>{
       const url='https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(l)+'&u='+encodeURIComponent(src);
-      const label=l==='pt'?'🇧🇷 Matéria original em Português':l==='en'?'🇺🇸 Original article in English':'🇪🇸 Artículo original en Español';
-      return `<a class="source-translate-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" hreflang="${l}">${label} ↗</a>`;
-    }).join('') : '';
-    $('article-source').innerHTML=src?`<a href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${al.source} ↗</a><div class="source-translations">${translatedSource}</div>`:escapeHTML(opened.source||'');
+      const label=l==='pt'?'Matéria completa em Português':l==='en'?'Full article in English':'Artículo completo en Español';
+      return `<a class="article-source-button ${l==='pt'?'primary':''}" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" hreflang="${l}"><img src="${flags[l]}" width="28" height="19" alt=""><span>${label} ↗</span></a>`;
+    }).join(''):'';
+    const fullHeading=lang==='en'?'Read the full report at the publisher':lang==='es'?'Leer el reportaje completo en la fuente':'LEIA A REPORTAGEM COMPLETA NA FONTE';
+    const sourceOriginal=lang==='en'?'Original article without translation':lang==='es'?'Artículo original sin traducción':'Abrir fonte original sem tradução';
+    $('article-source').innerHTML=src?`<div class="full-article-heading">${fullHeading}</div><div class="source-translations">${translatedSource}</div><a class="source-original" href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${sourceOriginal} ↗</a>`:escapeHTML(opened.source||'');
     const photoCredit=opened.image_source_url && safeUrl(opened.image_source_url)
       ? `<p class="image-credit">Foto ilustrativa: <a href="${escapeHTML(opened.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(opened.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(opened.image_license||'Licença na fonte')}</p>`:'';
     $('article-source').innerHTML+=photoCredit;
-    $('articleLanguageTitle').textContent=al.articleTitle;
-    $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="20" height="13" alt="" style="vertical-align:middle;margin-right:5px">${escapeHTML(texts[l].replace(/^\S+ /,''))}${l===articleLang?' ✓':''}</button>`).join('');
+    $('articleLanguageTitle').textContent=lang==='en'?'Language of the summary above:':lang==='es'?'Idioma del resumen anterior:':'Idioma do resumo acima:';
+    $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('shade').classList.add('open');
   }
