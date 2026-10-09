@@ -47,4 +47,12 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("if: github.ref == 'refs/heads/main'",s)
   self.assertIn('python -m unittest discover',s)
   self.assertIn("cron: '7,37 * * * *'",s)
+ def test_source_headline_monitor_keeps_editorial_approval(self):
+  source=(BASE/'scripts/update.py').read_text()
+  ticker=(BASE/'site/assets/news-crawler.js').read_text()
+  self.assertIn("external_feed_links_not_editorially_approved",source)
+  self.assertIn("source-headlines.json",source)
+  self.assertIn("FONTE EXTERNA",ticker)
+  self.assertIn("a.external?'FONTE EXTERNA · ':'",ticker)
+  self.assertIn("seen.has(a.source_url)",ticker)
 if __name__=='__main__':unittest.main()
