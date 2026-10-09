@@ -342,6 +342,11 @@ def build(offline=False):
              'editorial_status':'external_feed_links_not_editorially_approved',
              'headlines':external_headlines}
     (path/'source-headlines.json').write_text(json.dumps(monitor,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    # A safe current-news endpoint for the separately deployed DrivMatch Live site.
+    # Do not confuse this with verified active traffic or weather incidents.
+    from live_feed import make_live_feed
+    live=make_live_feed(list(unique.values()),external_headlines,NOW())
+    (path/'live-feed.json').write_text(json.dumps(live,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
     (path/'market.json').write_text(json.dumps(market,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'weather.json').write_text(json.dumps(weather,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
