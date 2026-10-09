@@ -9,7 +9,7 @@ const {spawn}=require('node:child_process');
   await new Promise((resolve,reject)=>{server.stdout.on('data',resolve);server.stderr.on('data',resolve);server.on('error',reject);setTimeout(resolve,1000)});
   browser=await chromium.launch({headless:true});
   for(const width of [360,390,768,1440]) {
-   const page=await browser.newPage({viewport:{width,height:900}});const errors=[];
+   const page=await browser.newPage({viewport:{width,height:width<=390?680:900}});const errors=[];
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
@@ -51,9 +51,27 @@ const {spawn}=require('node:child_process');
     throw new Error('No approved editorial article reachable through news pagination');
    };
    await openEditorial();
-   // Reader flows top to bottom; the language selector must not hide in the footer.
+   // Semantic reading order is preserved; mobile share controls are viewport fixed.
    const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','modalbodytext','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
-   assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-original'] && order['article-original']<order['article-share-footer'],`article flow ${JSON.stringify(order)}`);
+   assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-original'],`article reading flow ${JSON.stringify(order)}`);
+   assert.equal(await page.evaluate(()=>Boolean(document.getElementById('article-original').compareDocumentPosition(document.getElementById('article-share-footer')) & Node.DOCUMENT_POSITION_FOLLOWING)),true,'Original source precedes sharing in semantic order');
+   if(width<=390) {
+    const dock=await page.evaluate(()=>{
+     const footer=document.getElementById('article-share-footer');
+     const box=footer.getBoundingClientRect(),share=document.getElementById('share-native').getBoundingClientRect(),copy=document.getElementById('share-copy').getBoundingClientRect();
+     return {position:getComputedStyle(footer).position,box:{top:box.top,bottom:box.bottom,left:box.left,right:box.right},share:{top:share.top,bottom:share.bottom,left:share.left,right:share.right},copy:{top:copy.top,bottom:copy.bottom,left:copy.left,right:copy.right},height:innerHeight,width:innerWidth};
+    });
+    assert.equal(dock.position,'fixed','Mobile sharing must be viewport-fixed');
+    assert.ok(dock.share.top>=-1&&dock.share.bottom<=dock.height+1,`Share must show without scrolling: ${JSON.stringify(dock)}`);
+    assert.ok(dock.copy.top>=-1&&dock.copy.bottom<=dock.height+1,'Copy link must show without scrolling');
+    assert.ok(dock.share.right<dock.copy.left,'Share left, Copy link right');
+    assert.ok(dock.box.left>=-1&&dock.box.right<=dock.width+1,'Dock never overflows horizontally');
+    await page.locator('#article-dialog').evaluate(el=>el.scrollTop=el.scrollHeight);
+    const afterScroll=await page.locator('#share-native').boundingBox();
+    assert.ok(afterScroll&&afterScroll.y>=0&&afterScroll.y+afterScroll.height<=680,'Share remains visible after scrolling');
+    await page.locator('#article-dialog').evaluate(el=>el.scrollTop=0);
+    await page.screenshot({path:`test-results/reader-share-dock-${width}.png`});
+   }
    const sourceLinks=await page.locator('#article-source .article-source-button').evaluateAll(nodes=>nodes.map(n=>n.href));
    assert.equal(sourceLinks.length,3,'Portuguese English and Spanish original-source buttons must remain available');
    assert.ok(sourceLinks.some(url=>!url.includes('translate.google.com')&&!url.includes('.translate.goog')),'Direct original publisher must always remain available');
@@ -74,6 +92,15 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#share-copy').count(),1);
    await page.locator('#share-native').click();
    assert.equal(await page.locator('#share-options').isVisible(),true);
+   if(width<=390) {
+    const picker=await page.evaluate(()=>{
+     const rect=document.getElementById('share-options').getBoundingClientRect();
+     return {top:rect.top,bottom:rect.bottom,left:rect.left,right:rect.right,viewportWidth:innerWidth,viewportHeight:innerHeight};
+    });
+    assert.ok(picker.top>=-1&&picker.bottom<=picker.viewportHeight+1,`Share chooser must fit mobile viewport: ${JSON.stringify(picker)}`);
+    assert.ok(picker.left>=-1&&picker.right<=picker.viewportWidth+1,'Share chooser must not crop horizontally');
+    await page.screenshot({path:`test-results/reader-share-picker-${width}.png`});
+   }
    for(const platform of ['whatsapp','facebook','threads','x','linkedin','telegram','reddit','pinterest','email']){
     assert.equal(await page.locator('[data-share-platform="'+platform+'"]').count(),1);
     assert.ok((await page.locator('[data-share-platform="'+platform+'"]').getAttribute('href')).length>10);
