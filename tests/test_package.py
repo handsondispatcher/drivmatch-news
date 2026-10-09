@@ -91,7 +91,7 @@ class PublicationTests(unittest.TestCase):
   ticker=(BASE/'site/assets/news-crawler.js').read_text()
   self.assertIn("external_feed_links_not_editorially_approved",source)
   self.assertIn("source-headlines.json",source)
-  self.assertIn("FONTE · ",ticker)
+  self.assertIn("k.textContent=category[",ticker)
   self.assertNotIn("showRadar()",ticker)
   self.assertIn("seen.has(a.source_url)",ticker)
   self.assertNotIn('id="radar-fontes"',(BASE/'site/index.html').read_text())
