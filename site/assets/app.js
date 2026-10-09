@@ -115,7 +115,7 @@
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     $('share-feedback').textContent='';
     $('share-native').hidden=!(typeof navigator!=='undefined' && typeof navigator.share==='function');
-    $('shareFeedback').textContent='';
+    $('share-feedback').textContent='';
     $('shade').classList.add('open');
   }
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
@@ -133,21 +133,21 @@
     $('edition-date').textContent=new Date().toLocaleDateString('pt-BR');
     // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
-    $('shareWhatsapp').addEventListener('click',()=>{
+    $('share-whatsapp').addEventListener('click',()=>{
       if(!opened)return;
       const url=shareUrlOf(opened),title=localeOf(opened)?.title||'DrivMatch News';
       window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(title+' — '+url),'_blank','noopener,noreferrer');
     });
-    $('shareCopy').addEventListener('click',()=>{
+    $('share-copy').addEventListener('click',()=>{
       if(!opened)return;
       const url=shareUrlOf(opened);
       if(typeof navigator!=='undefined' && navigator.clipboard?.writeText)
-        navigator.clipboard.writeText(url).then(()=>$('shareFeedback').textContent='Link copiado!',()=>$('shareFeedback').textContent='Não foi possível copiar.');
-      else $('shareFeedback').textContent=url;
+        navigator.clipboard.writeText(url).then(()=>$('share-feedback').textContent='Link copiado!',()=>$('share-feedback').textContent='Não foi possível copiar.');
+      else $('share-feedback').textContent=url;
     });
     if(typeof navigator!=='undefined' && navigator.share){
-      $('shareNative').hidden=false;
-      $('shareNative').addEventListener('click',()=>{
+      $('share-native').hidden=false;
+      $('share-native').addEventListener('click',()=>{
         if(!opened)return;
         navigator.share({title:localeOf(opened)?.title||'DrivMatch News',url:shareUrlOf(opened)}).catch(()=>{});
       });
