@@ -269,6 +269,138 @@
         "delivery",
         "supply chain"
       ]
+    },
+    {
+      "id": "southeastern-freight-lines-truck-jpg",
+      "file": "Southeastern Freight Lines truck.jpg",
+      "credit": "Indy beetle",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Southeastern_Freight_Lines_truck.jpg",
+      "description": "Caminhão de transportadora em doca de carga",
+      "keywords": [
+        "freight",
+        "lft",
+        "transportadora",
+        "warehouse",
+        "armazém",
+        "logística",
+        "fretes",
+        "caminhão"
+      ]
+    },
+    {
+      "id": "warehouse-in-new-jersey-where-trucks-deliver-granite-slabs-jpg",
+      "file": "Warehouse in New Jersey where trucks deliver granite slabs.jpg",
+      "credit": "Tomwsulcer",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Warehouse_in_New_Jersey_where_trucks_deliver_granite_slabs.jpg",
+      "description": "Galpão e acesso de carga em Nova Jersey",
+      "keywords": [
+        "warehouse",
+        "galpão",
+        "armazém",
+        "walmart",
+        "centro",
+        "logístico",
+        "logistics"
+      ]
+    },
+    {
+      "id": "eb-i-10-suwannee-co-rest-area-truck-parking-gore-2-jpg",
+      "file": "EB I-10 Suwannee Co Rest Area; Truck Parking Gore-2.jpg",
+      "credit": "DanTD",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:EB_I-10_Suwannee_Co_Rest_Area%3B_Truck_Parking_Gore-2.jpg",
+      "description": "Sinalização de vagas para caminhões na Interstate 10",
+      "keywords": [
+        "rodovia",
+        "parking",
+        "estacionamento",
+        "highway",
+        "interstate",
+        "truck stop",
+        "área de descanso"
+      ]
+    },
+    {
+      "id": "eb-i-10-suwanee-co-rest-area-truck-parking-jpg",
+      "file": "EB I-10 Suwanee Co Rest Area; Truck Parking.jpg",
+      "credit": "DanTD",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:EB_I-10_Suwanee_Co_Rest_Area%3B_Truck_Parking.jpg",
+      "description": "Sinalização de estacionamento para caminhões em rodovia",
+      "keywords": [
+        "rodovia",
+        "estacionamento",
+        "parking",
+        "truck stop",
+        "sem motorista"
+      ]
+    },
+    {
+      "id": "wb-i-10-columbia-co-rest-area-tandem-truck-parking-sign-1-jpg",
+      "file": "WB I-10 Columbia Co Rest Area; Tandem Truck Parking Sign-1.jpg",
+      "credit": "DanTD",
+      "license": "CC0 1.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:WB_I-10_Columbia_Co_Rest_Area%3B_Tandem_Truck_Parking_Sign-1.jpg",
+      "description": "Estacionamento de caminhões e placa de vagas em rodovia",
+      "keywords": [
+        "road",
+        "rodovia",
+        "parking",
+        "caminhoneiros",
+        "descanso"
+      ]
+    },
+    {
+      "id": "our-company-truck-in-front-of-new-warehouse-jpg",
+      "file": "Our company truck in front of new warehouse.jpg",
+      "credit": "Meiborg trucking",
+      "license": "CC BY-SA 4.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Our_company_truck_in_front_of_new_warehouse.jpg",
+      "description": "Caminhão diante de armazém logístico",
+      "keywords": [
+        "kenworth",
+        "warehouse",
+        "armazém",
+        "transportadora",
+        "logística",
+        "caminhão"
+      ]
+    },
+    {
+      "id": "truck-stop-5006605670-jpg",
+      "file": "Truck Stop (5006605670).jpg",
+      "credit": "Damian Gadal",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Truck_Stop_(5006605670).jpg",
+      "description": "Caminhões estacionados em truck stop na Califórnia",
+      "keywords": [
+        "california",
+        "truck stop",
+        "parada",
+        "descanso",
+        "drivers",
+        "motorista",
+        "caminhoneiro"
+      ]
+    },
+    {
+      "id": "diesel-truck-jpg",
+      "file": "Diesel truck.jpg",
+      "credit": "Ben Ostrowsky",
+      "license": "CC BY 2.0",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Diesel_truck.jpg",
+      "description": "Caminhão a diesel em foto de arquivo",
+      "keywords": [
+        "diesel",
+        "combustível",
+        "freight",
+        "truck",
+        "caminhão",
+        "rodovia",
+        "preço"
+      ]
     }
   ]
 }
