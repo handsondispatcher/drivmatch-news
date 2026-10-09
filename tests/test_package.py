@@ -10,6 +10,24 @@ sys.path.insert(0,str(BASE/'scripts'))
 import update as up
 from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
+ def test_v32_release_contract(self):
+  version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
+  self.assertEqual(version['version'],'v32')
+  self.assertFalse(version['public_launch_approved'])
+  self.assertEqual(version['lifecycle'],'development_prelaunch')
+  page=(BASE/'site/index.html').read_text(encoding='utf-8')
+  app=(BASE/'site/assets/app.js').read_text(encoding='utf-8')
+  update=(BASE/'scripts/update.py').read_text(encoding='utf-8')
+  self.assertIn('data-site-version="v32"',page)
+  self.assertIn('name="drivmatch-news-version" content="v32"',page)
+  self.assertIn('id="site-version" aria-label="Versão 32">v32',page)
+  self.assertIn('DrivMatch News v32',app)
+  self.assertIn("site_version':release['version']",update)
+  self.assertIn("path/'release.json'",update)
+  self.assertIn('class="hero-wrap"',app)
+  self.assertIn('class="related-rail"',app)
+  self.assertIn('shareDestinations',app)
+  self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
  def test_visual_and_weather(self):
   page=(BASE/'site/index.html').read_text()
   for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — um produto da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
