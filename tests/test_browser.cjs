@@ -61,10 +61,19 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#share-whatsapp-copy').isVisible(),true);
    assert.equal(await page.locator('#share-story').isVisible(),true);
    if(width===1440){
-    const storyDownload=page.waitForEvent('download',{timeout:12000});
     await page.locator('#share-story').click();
+    assert.equal(await page.locator('#story-preview').isVisible(),true);
+    const size=await page.locator('#story-preview-image').evaluate(async img=>{
+      if(!img.complete)await new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;});
+      return [img.naturalWidth,img.naturalHeight];
+    });
+    assert.deepEqual(size,[1080,1920]);
+    const storyDownload=page.waitForEvent('download',{timeout:12000});
+    await page.locator('#story-preview-download').click();
     const download=await storyDownload;
     assert.equal(download.suggestedFilename(),'drivmatch-news-story.png');
+    await page.locator('#story-preview-close').click();
+    assert.equal(await page.locator('#story-preview').isVisible(),false);
    }
    await page.locator('#share-native').click();
    assert.equal(await page.locator('#share-options').isVisible(),false);
