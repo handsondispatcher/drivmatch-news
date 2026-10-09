@@ -33,6 +33,17 @@ class PublicationTests(unittest.TestCase):
   feed='<rss><channel><item><title>Transport event</title><link>https://example.com/news/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item><item><title>Bad date</title><link>https://example.com/2</link></item><item><title>Wrong host</title><link>https://evil.example/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item></channel></rss>'
   rows=parse_feed(feed,{'url':'https://example.com','name':'Fixture','category':'Transporte','original_lang':'en'},datetime(2026,10,8,23,tzinfo=timezone.utc))
   self.assertEqual(len(rows),1);self.assertEqual(rows[0]['status'],'pending_review')
+ def test_publisher_branding_and_story_preview(self):
+  page=(BASE/'site/index.html').read_text()
+  app=(BASE/'site/assets/app.js').read_text()
+  self.assertIn('href="https://drivmatch.com/"',page)
+  self.assertIn('id="footer-publisher"',page)
+  self.assertIn('id="footer-legal"',page)
+  self.assertIn("'.weather-top h2'",app)
+  self.assertIn("sourceBrief(opened,articleLang)",app)
+  self.assertIn('id="story-preview-download"',page)
+  self.assertIn("$('story-preview').hidden=false",app)
+  self.assertNotIn("a.download='drivmatch-news-story.png'",app)
  def test_source_headline_translation_and_language_fallback(self):
   fixture={'title':'Snow closes Montana highway','source':'Fixture','source_url':'https://example.com/snow','published_at':'2026-10-09T09:00:00+00:00','category':'Clima','region':'US','origin_type':'rss'}
   def translate(title,source,target):
