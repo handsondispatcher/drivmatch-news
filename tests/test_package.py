@@ -32,6 +32,11 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('class="hero-wrap"',app)
   self.assertIn('class="related-rail"',app)
   self.assertIn('shareDestinations',app)
+  workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
+  self.assertIn('CUSTOM DOMAIN V33 PASS',workflow)
+  self.assertIn('CUSTOM DOMAIN V33 MISMATCH',workflow)
+  self.assertIn('drivmatch.com/news/data/release.json',workflow)
+
   self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
  def test_visual_and_weather(self):
   page=(BASE/'site/index.html').read_text()
