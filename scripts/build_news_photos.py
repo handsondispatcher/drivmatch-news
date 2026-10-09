@@ -55,24 +55,30 @@ def _download_photo(photo: dict):
         return None
     if not str(photo["source_url"]).startswith("https://commons.wikimedia.org/wiki/File:"):
         return None
+    diagnostics=[]
     for url in _candidate_urls(photo):
         try:
             req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "image/jpeg,image/png,image/webp,image/*;q=0.5"})
             with urlopen(req, timeout=9) as resp:
                 if not resp.headers.get("Content-Type", "").lower().startswith("image/"):
+                    diagnostics.append("not-image:" + str(resp.headers.get("Content-Type", ""))[:40])
                     continue
                 # Reject unexpected file hosts and huge files.
-                if urlsplit(resp.geturl()).hostname not in {"upload.wikimedia.org", "commons.wikimedia.org"}:
+                if urlsplit(resp.geturl()).hostname not in {"upload.wikimedia.org", "commons.wikimedia.org", "thumb.wikimedia.org"}:
+                    diagnostics.append("bad-redirect:" + str(urlsplit(resp.geturl()).hostname))
                     continue
                 raw = resp.read(3_500_001)
                 if len(raw) > 3_500_000:
+                    diagnostics.append("oversize")
                     continue
             with Image.open(BytesIO(raw)) as source:
                 source.load()
                 im = ImageOps.exif_transpose(source).convert("RGB")
                 if im.width < 340 or im.height < 180:
+                    diagnostics.append("too-small")
                     continue
                 if max(ImageStat.Stat(im.resize((32, 24))).stddev) < 7:
+                    diagnostics.append("not-photograph")
                     continue
                 im.thumbnail((1040, 760), Image.Resampling.LANCZOS)
                 DEST.mkdir(parents=True, exist_ok=True)
@@ -87,8 +93,10 @@ def _download_photo(photo: dict):
                         "image_alt": photo.get("description") or "Fotografia de arquivo ilustrativa",
                         "image_context": "illustrative_archive",
                         "source_library_id": ident}
-        except (OSError, TimeoutError, ValueError, UnidentifiedImageError):
+        except (OSError, TimeoutError, ValueError, UnidentifiedImageError) as exc:
+            diagnostics.append(f"{type(exc).__name__}:{getattr(exc,'code','')}")
             continue
+    print(f"NEWS PHOTO UNAVAILABLE {ident}: {','.join(diagnostics[:4])}")
     return None
 
 
@@ -139,7 +147,7 @@ def build(minimum=0):
     for p in DEST.glob("*.jpg"):
         p.unlink()
     downloaded = {}
-    with ThreadPoolExecutor(max_workers=6) as pool:
+    with ThreadPoolExecutor(max_workers=2) as pool:
         pending = {pool.submit(_download_photo, p): p for p in photos}
         for future in as_completed(pending):
             photo = pending[future]
