@@ -3,7 +3,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
-  let externalHeadlines = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
+  let externalHeadlines = [], photoByStory = {}, data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
   const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
   const labels = {
@@ -22,6 +22,13 @@
   const escapeHTML = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl = url => /^https:\/\//i.test(String(url||'')) ? String(url) : '';
   const blockedPublisher=url=>/^https:\/\/(?:[a-z0-9-]+\.)*thetrucker\.com(?:[\/:?#]|$)/i.test(String(url||''));
+  // A separate build fetches licensed archive photographs, verifies JPEGs and hosts
+  // them locally; browser never scrapes or hotlinks third-party publisher artwork.
+  const safeNewsPhotoUrl=url=>/^assets\/news-photos\/[a-z0-9-]+\.jpg$/.test(String(url||''))?String(url):'';
+  const licensedPhotoOf=a=>{
+    const image=photoByStory[a.id];
+    return image&&safeNewsPhotoUrl(image.image)&&safeUrl(image.image_source_url)&&image.image_credit&&image.image_license?image:null;
+  };
   const localizedCategory=c=>catLabels[c]?.[indices[lang]]||c;
   function localeOf(article, chosen=lang){return article.locales?.[chosen] || article.locales?.[article.original_lang] || null}
   // Editorial image gate: no two distinct stories may reuse the same photograph.
@@ -41,12 +48,13 @@
   }
   let visualCacheKey='',visualCache=new Map();
   function storyVisuals(){
-    const stories=pageStories(),key=stories.map(a=>(a.id||a.source_url)+'|'+(a.image||'')).join('~');
+    const stories=pageStories(),key=stories.map(a=>(a.id||a.source_url)+'|'+(licensedPhotoOf(a)?.image||a.image||'')).join('~');
     if(key===visualCacheKey)return visualCache;
     const used=new Set(),map=new Map();
     for(const a of stories){
+      const cached=licensedPhotoOf(a);
       const credited=a.kind!=='external_link'&&a.image_license&&a.image_credit;
-      const supplied=credited?safeUrl(a.image):'';
+      const supplied=cached?safeNewsPhotoUrl(cached.image):(credited?safeUrl(a.image):'');
       const unique=supplied&&!used.has(supplied)?supplied:'';
       if(unique)used.add(unique);
       map.set(a.id,unique||storyGraphic(a));
@@ -56,10 +64,10 @@
   function imageOf(a){return storyVisuals().get(a.id)||storyGraphic(a);}
   function imageHTML(a,suffix=''){
     const url=imageOf(a),fallback=storyGraphic(a),graphic=url.startsWith('data:image/svg');
-    const illustrative=url!==safeUrl(a.image);
+    const photo=licensedPhotoOf(a),illustrative=Boolean(photo)||graphic||a.image_context==='illustrative_archive';
     const alt=graphic?(lang==='pt'?'Ilustração editorial desta manchete':'Editorial illustration'):
-      illustrative?(lang==='pt'?'Fotografia ilustrativa, não retrata o evento':'Illustrative photo, not the event'):(a.image_alt||localeOf(a)?.title||'Imagem');
-    return '<img loading="lazy" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(illustrative?'Imagem ilustrativa':'Imagem da fonte')+'" onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
+      illustrative?(lang==='pt'?'Fotografia de arquivo ilustrativa; não retrata necessariamente o acontecimento':lang==='es'?'Fotografía de archivo ilustrativa; no representa necesariamente el acontecimiento':'Illustrative archive photograph; not necessarily the reported event'):(a.image_alt||localeOf(a)?.title||'Imagem');
+    return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
   }
   function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
@@ -192,7 +200,8 @@
     return `DRIVMATCH NEWS • LEITURA RÁPIDA\n\nO veículo ${sourceName} publicou a manchete: “${headline}”.\n\nPor que importa: ${context}\n\nEste texto de contextualização é original e se baseia somente na manchete e nos metadados disponíveis. Não é a reportagem integral nem uma confirmação independente do acontecimento.`;
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
-    $('modalimg').src=imageOf(opened);$('modalimg').onerror=()=>{$('modalimg').onerror=null;$('modalimg').src=storyGraphic(opened);};$('modalimg').alt=opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
+    const storyPhoto=licensedPhotoOf(opened);
+    $('modalimg').src=imageOf(opened);$('modalimg').onerror=()=>{$('modalimg').onerror=null;$('modalimg').src=storyGraphic(opened);};$('modalimg').alt=storyPhoto?.image_alt||opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
     $('modaltitle').textContent=cleanHeadline(txt.title);$('modalmeta').textContent=opened.demo?al.demo:opened.published_at?`${al.published}: ${opened.published_at}`:'';
     const isExternal=opened.kind==='external_link';
     if(isExternal)$('article-dialog').classList.add('external-article');
@@ -216,8 +225,9 @@
     const heading=articleLang==='pt'?'REPORTAGEM COMPLETA NA FONTE':articleLang==='es'?'REPORTAJE COMPLETO EN LA FUENTE':'COMPLETE ORIGINAL REPORT';
     const tip=articleLang==='pt'?'Para português ou espanhol, a tradução automática abre pelo Google Tradutor quando disponível. Nos demais veículos, abra a fonte e use “Traduzir página” no navegador. O acesso depende do veículo.':articleLang==='es'?'La traducción automática depende del navegador o del editor.':'The full report belongs to the publisher. Automatic translation may depend on the browser.';
     $('article-source').innerHTML=src?'<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+ptButton+enButton+esButton+'</div><p class="source-access-warning">'+tip+'</p>':escapeHTML(opened.source||'');
-    const photoCredit=opened.image_source_url && safeUrl(opened.image_source_url)
-      ? `<p class="image-credit">Foto ilustrativa: <a href="${escapeHTML(opened.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(opened.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(opened.image_license||'Licença na fonte')}</p>`:'';
+    const attribution=storyPhoto||opened;
+    const photoCredit=attribution.image_source_url && safeUrl(attribution.image_source_url)
+      ? `<p class="image-credit">${articleLang==='en'?'Illustrative archive photo':articleLang==='es'?'Foto ilustrativa de archivo':'Foto ilustrativa de arquivo'} (não é imagem do acontecimento): <a href="${escapeHTML(attribution.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(attribution.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(attribution.image_license||'Licença na fonte')} · corte/redimensionamento</p>`:'';
     $('article-source').innerHTML+=photoCredit;
     $('articleLanguageTitle').textContent=lang==='en'?'Article language':lang==='es'?'Idioma de la noticia':'Idioma da notícia';
     $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]&&(opened.kind!=='external_link'||opened.translated_langs?.includes(l))).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
@@ -259,9 +269,10 @@
   }
   async function refreshNews(){
     try{
-      const [editorial,external]=await Promise.all([
+      const [editorial,external,photographs]=await Promise.all([
         fetch('data/content.json?ts='+Date.now(),{cache:'no-store'}),
-        fetch('data/source-headlines.json?ts='+Date.now(),{cache:'no-store'})
+        fetch('data/source-headlines.json?ts='+Date.now(),{cache:'no-store'}),
+        fetch('data/news-images.json?ts='+Date.now(),{cache:'no-store'})
       ]);
       if(editorial.ok){const next=await editorial.json();if(Array.isArray(next.articles))data={...data,...next};}
       if(external.ok){
@@ -277,7 +288,14 @@
           }));
         }
       }
-      if(!opened)renderStories();
+      if(photographs.ok){
+        const gallery=await photographs.json();
+        if(gallery.schema_version===1&&gallery.license_policy==='curated_commons'&&gallery.images&&typeof gallery.images==='object'){
+          photoByStory=gallery.images; visualCacheKey='';
+        }
+      }
+      renderStories();
+      if(opened)renderArticle();
       openSharedStory();
     }catch(e){/* Keep last successfully loaded issue when offline. */}
   }
