@@ -97,6 +97,9 @@
       return `<a class="source-translate-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" hreflang="${l}">${label} ↗</a>`;
     }).join('') : '';
     $('article-source').innerHTML=src?`<a href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">${al.source} ↗</a><div class="source-translations">${translatedSource}</div>`:escapeHTML(opened.source||'');
+    const photoCredit=opened.image_source_url && safeUrl(opened.image_source_url)
+      ? `<p class="image-credit">Foto ilustrativa: <a href="${escapeHTML(opened.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(opened.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(opened.image_license||'Licença na fonte')}</p>`:'';
+    $('article-source').innerHTML+=photoCredit;
     $('articleLanguageTitle').textContent=al.articleTitle;
     $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="20" height="13" alt="" style="vertical-align:middle;margin-right:5px">${escapeHTML(texts[l].replace(/^\S+ /,''))}${l===articleLang?' ✓':''}</button>`).join('');
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
