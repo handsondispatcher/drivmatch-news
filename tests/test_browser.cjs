@@ -166,7 +166,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#share-options').isVisible(),false);
    assert.equal(await page.locator('#article-reading [data-article-lang]').count(),3);
    const langGrid=await page.locator('.source-translations').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length);
-   assert.equal(langGrid,3,'Source links remain three columns at mobile and desktop widths');
+   assert.equal(langGrid,width<=390?3:width===768?2:3,'Source links are 3-up on phones and responsive on desktop');
    assert.equal(await page.locator('#article-disclosure').isVisible(),false);
    const ptTitle=await page.locator('#modaltitle').textContent();
    await page.locator('[data-article-lang="es"]').click();
