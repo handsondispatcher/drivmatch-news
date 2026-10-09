@@ -62,7 +62,7 @@
     return !q||t.toLocaleLowerCase(lang).includes(q);
   }
   function articlesFiltered(){
-    const pool=pageStories().filter(a=>(a.kind!=='external_link'||a.translated_langs?.includes(lang))&&matches(a));
+    const pool=pageStories().filter(a=>(a.kind!=='external_link'||(a.translated_langs?.includes(lang)&&a.locales?.[lang]?.title))&&matches(a));
     // Editorial sequencing: keep recency while avoiding consecutive stories about the same event.
     const result=[],remaining=pool.slice();
     const topicKey=a=>{
