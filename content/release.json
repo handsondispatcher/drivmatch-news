@@ -1,0 +1,10 @@
+{
+  "product": "DrivMatch News",
+  "version": "v32",
+  "baseline": "v31 + post-v31 improvements (2026-10-09)",
+  "lifecycle": "development_prelaunch",
+  "public_launch_approved": false,
+  "publisher": "Hands On Dispatcher LLC",
+  "consolidated_on": "2026-10-09",
+  "editorial_alerts_are_live_incidents": false
+}

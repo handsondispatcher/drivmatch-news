@@ -1,4 +1,4 @@
-/* DrivMatch News • GitHub/Ricardo installation candidate • v18 visual baseline */
+/* DrivMatch News v32 — composição editorial v31 + atualizações posteriores; v18 é apenas referência histórica. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);

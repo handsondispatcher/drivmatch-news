@@ -13,6 +13,8 @@ const {spawn}=require('node:child_process');
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v32','public page has v32 version');
+   assert.equal(await page.locator('#site-version').innerText(),'v32','public masthead identifies v32');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
