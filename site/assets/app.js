@@ -206,7 +206,7 @@
     const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
     const shareOptions=$('share-options');
     const shareDestinations=(title,url)=>({
-      whatsapp:'https://wa.me/?text='+encodeURIComponent(title+'\\n'+url),
+      whatsapp:'https://wa.me/?text='+encodeURIComponent(title+'\n'+url),
       facebook:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),
       threads:'https://www.threads.net/intent/post?text='+encodeURIComponent(title+' '+url),
       x:'https://twitter.com/intent/tweet?text='+encodeURIComponent(title)+'&url='+encodeURIComponent(url),
