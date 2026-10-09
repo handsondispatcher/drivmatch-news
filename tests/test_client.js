@@ -8,6 +8,9 @@ class Element {
  addEventListener(event,cb){this._listeners[event]=cb;}
  dispatch(event,arg){if(!this._listeners[event])throw Error('Missing handler '+this.id+'.'+event);this._listeners[event](arg);}
  add(option){this.options.push(option);}
+ setAttribute(name,value){this[name]=value;}
+ querySelectorAll(){return [];}
+
  get classList(){return {add(){},remove(){}};}
  scrollIntoView(){}
 }
