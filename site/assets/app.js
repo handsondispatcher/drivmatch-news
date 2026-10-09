@@ -21,23 +21,12 @@
   const indexSet=new Map();
   const escapeHTML = value => String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl = url => /^https:\/\//i.test(String(url||'')) ? String(url) : '';
+  const blockedPublisher=url=>/^https:\/\/(?:[a-z0-9-]+\.)*thetrucker\.com(?:[\/:?#]|$)/i.test(String(url||''));
   const localizedCategory=c=>catLabels[c]?.[indices[lang]]||c;
   function localeOf(article, chosen=lang){return article.locales?.[chosen] || article.locales?.[article.original_lang] || null}
   // Editorial image gate: no two distinct stories may reuse the same photograph.
   // Exhausted/unavailable images get a UNIQUE story-specific illustrated card.
-  const topicPhotos={
-    Clima:['photo-1534274988757-a28bf1a57c17','photo-1534088568595-a066f410bcda','photo-1500673922987-e212871fec22','photo-1464822759023-fed622ff2c3b','photo-1519681393784-d120267933ba'],
-    Rodovias:['photo-1449965408869-eaa3f722e40d','photo-1500534623283-312aade485b7','photo-1469854523086-cc02fe5d8800','photo-1533105079780-92b9be482077'],
-    Acidentes:['photo-1449965408869-eaa3f722e40d'],
-    Combustíveis:['photo-1519608487953-e999c86e7455','photo-1504917595217-d4dc5ebe6122'],
-    Tecnologia:['photo-1518770660439-4636190af475','photo-1485827404703-89b55fcc595e','photo-1516321318423-f06f85e504b3'],
-    Negócios:['photo-1486406146926-c627a92ad1ab','photo-1497366811353-6870744d04b2','photo-1454165804606-c3d57bc86b40'],
-    Fretes:['photo-1494412519320-aa613dfb7738','photo-1586528116311-ad8dd3c8310d','photo-1566576912321-d58ddd7a6088','photo-1553413077-190dd305871c'],
-    Transporte:['photo-1601584115197-04ecc0da31d7','photo-1566939881691-4ba2bc67b0c4','photo-1519003722824-194d4455a60c','photo-1501700493788-fa1a4fc9fe62'],
-    Caminhões:['photo-1601584115197-04ecc0da31d7','photo-1519003722824-194d4455a60c'],
-    Caminhoneiros:['photo-1519003722824-194d4455a60c']
-  };
-  const allPhotoIds=[...new Set(Object.values(topicPhotos).flat())];
+  // Only licensed, credited, story-specific photography; no generic stock repetition.
   function storyGraphic(a){
     const title=cleanHeadline(localeOf(a)?.title||'NOTÍCIAS DO TRANSPORTE');
     const seed=[...String(a.id||a.source_url||title)].reduce((v,c)=>(v*33+c.charCodeAt(0))>>>0,5381);
@@ -56,18 +45,15 @@
     if(key===visualCacheKey)return visualCache;
     const used=new Set(),map=new Map();
     for(const a of stories){
-      const supplied=safeUrl(a.image);let url='';
-      if(supplied&&!used.has(supplied)){url=supplied;used.add(supplied);}
-      else{
-        const candidates=[...new Set([...(topicPhotos[a.category]||[]),...allPhotoIds])];
-        const next=candidates.find(id=>!used.has(id));
-        if(next){used.add(next);url='https://images.unsplash.com/'+next+'?auto=format&fit=crop&w=900&q=75';}
-      }
-      map.set(a.id,url||storyGraphic(a));
+      const credited=a.kind!=='external_link'&&a.image_license&&a.image_credit;
+      const supplied=credited?safeUrl(a.image):'';
+      const unique=supplied&&!used.has(supplied)?supplied:'';
+      if(unique)used.add(unique);
+      map.set(a.id,unique||storyGraphic(a));
     }
     visualCacheKey=key;visualCache=map;return map;
   }
-  function imageOf(a){return storyVisuals().get(a.id)||safeUrl(a.image)||storyGraphic(a);}
+  function imageOf(a){return storyVisuals().get(a.id)||storyGraphic(a);}
   function imageHTML(a,suffix=''){
     const url=imageOf(a),fallback=storyGraphic(a),graphic=url.startsWith('data:image/svg');
     const illustrative=url!==safeUrl(a.image);
@@ -75,7 +61,7 @@
       illustrative?(lang==='pt'?'Fotografia ilustrativa, não retrata o evento':'Illustrative photo, not the event'):(a.image_alt||localeOf(a)?.title||'Imagem');
     return '<img loading="lazy" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(illustrative?'Imagem ilustrativa':'Imagem da fonte')+'" onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
   }
-  function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
+  function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
     return score(b)-score(a) || (Date.parse(b.published_at||'2000-01-01')-Date.parse(a.published_at||'2000-01-01'));
   });}
