@@ -173,7 +173,7 @@
     $('featurePrev').addEventListener('click',()=>{featurePage--;renderStories();});
     $('featureNext').addEventListener('click',()=>{featurePage++;renderStories();});
     $('featureDots').addEventListener('click',e=>{const el=e.target.closest('[data-slide]');if(!el)return;featurePage=Number(el.dataset.slide);renderStories();});
-    const clickArticle=e=>{const external=e.target.closest('[data-external-url]');if(external){window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');return;}const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){renderArticle();$('article-dialog').scrollTop=0;}};
+    const clickArticle=e=>{const external=e.target.closest('[data-external-url]');if(external){if(typeof window.open==='function')window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');return;}const item=e.target.closest('[data-story]');if(!item)return;opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){renderArticle();$('article-dialog').scrollTop=0;}};
     const shareText=()=>opened?((localeOf(opened,lang)?.title||'DrivMatch News')+' — DrivMatch News'):'DrivMatch News';
     $('share-native').addEventListener('click',async()=>{
       if(!opened)return;
