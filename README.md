@@ -1,6 +1,6 @@
 # DrivMatch News — v32 (baseline consolidada, 09/10/2026)
 
-**Versão atual do produto: v32.** Consolidação da interface editorial v31 com as melhorias posteriores já presentes na `main`. **A v18 é referência histórica, não a versão de trabalho.**
+**CONTINUIDADE ENTRE CHATS (01 / 02 / 03 / próximos):** [Leia PRIMEIRO o registro canônico do projeto](docs/CONTINUIDADE_DRIVMATCH_NEWS.md). Este registro reúne decisões, versões, links de PRs/deploys, pendências e a instrução de **não exigir que o usuário repita o histórico**.\n\n**Versão atual do produto: v32.** Consolidação da interface editorial v31 com as melhorias posteriores já presentes na `main`. **A v18 é referência histórica, não a versão de trabalho.**
 
 **Estado:** desenvolvimento / pré-lançamento. **Não autorizado para divulgação como produto concluído.** Consulte [a especificação e os critérios de homologação da v32](docs/V32_RELEASE.md) e o [Release Gate #18](https://github.com/handsondispatcher/drivmatch-news/issues/18).
 
