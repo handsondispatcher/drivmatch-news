@@ -118,7 +118,21 @@ article[role=button]{outline-offset:2px}
 @keyframes dm-ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(prefers-reduced-motion:reduce){.dm-crawler-track{animation:none;flex-wrap:wrap;width:auto;padding:0 12px}.dm-crawler-viewport{white-space:normal}}
 @media(max-width:750px){.dm-crawler-track{animation-duration:50s}.dm-crawler-link{font-size:12px}.dm-crawler-viewport{padding:10px 0}}
-.article-share{margin:18px 0;padding:12px;border:1px solid #cbdcec;border-radius:6px;background:#f5faff}.article-share strong{display:block;font-size:12px;color:#1c4b70;margin-bottom:7px}.article-share-actions{display:flex;gap:8px;flex-wrap:wrap}.article-share-actions button{padding:9px 12px;border:1px solid #9dc1de;border-radius:5px;background:#e4f1fc;color:#0a4c80;font-weight:700}.article-share-actions #share-whatsapp{background:#137749;border-color:#137749;color:white}.article-share #share-feedback{font-size:12px;color:#27634c}</style>
+.article-share{margin:18px 0;padding:12px;border:1px solid #cbdcec;border-radius:6px;background:#f5faff}.article-share strong{display:block;font-size:12px;color:#1c4b70;margin-bottom:7px}.article-share-actions{display:flex;gap:8px;flex-wrap:wrap}.article-share-actions button{padding:9px 12px;border:1px solid #9dc1de;border-radius:5px;background:#e4f1fc;color:#0a4c80;font-weight:700}.article-share-actions #share-whatsapp{background:#137749;border-color:#137749;color:white}.article-share #share-feedback{font-size:12px;color:#27634c}
+/* Article controls: a single pair; desktop source links in one row; mobile stacks. */
+.modalbody .article-share-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:10px;row-gap:8px;align-items:stretch;margin:15px 0 18px}
+.modalbody .article-share-actions button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-width:0;min-height:46px;border-radius:6px;padding:11px 14px;font-size:14px;font-weight:700;line-height:1.2}
+.modalbody .article-share-actions .share-primary{color:#fff;background:#096ab8;border-color:#096ab8}
+.modalbody .article-share-actions .share-secondary{color:#07528b;background:#f0f7fd;border-color:#b5d2e8}
+.modalbody .article-share-actions button svg{flex:0 0 auto}
+.modalbody .article-share-actions #share-feedback{grid-column:1/-1;overflow-wrap:anywhere;min-height:0}
+.source-translations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;align-items:stretch}
+.source-translations .article-source-button,.source-translations .article-source-button.primary{box-sizing:border-box;display:flex;flex-basis:auto;align-items:center;justify-content:flex-start;min-width:0;min-height:60px;width:100%;padding:10px 12px;font-size:13px;line-height:1.3;text-decoration:none}
+.source-translations .article-source-button span{min-width:0;overflow-wrap:break-word}
+.source-translations .article-source-button.primary,.source-translations .article-source-button.primary span{background:#096ab8;color:#fff!important;border-color:#096ab8}
+@media(max-width:650px){.source-translations{grid-template-columns:1fr}.source-translations .article-source-button,.source-translations .article-source-button.primary{min-height:50px}}
+@media(max-width:360px){.modalbody .article-share-actions{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <header class="header"><div class="header-inner"><div class="brand"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></div><div class="edition">EDIÇÃO DIGITAL · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></span></div></div></header>
@@ -146,13 +160,13 @@ article[role=button]{outline-offset:2px}
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
 <footer class="footer"><span class="smalltext">DrivMatch News — um produto da Hands On Dispatcher LLC</span><br><span class="smalltext">Cobertura editorial independente • Notícias e indicadores identificados por fonte e data.</span></footer>
-<div class="modalshade" id="shade"><article class="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody"><h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div><div class="article-share-actions" id="article-share-actions"><button id="share-whatsapp" type="button">WhatsApp ↗</button><button id="share-copy" type="button">Copiar link</button><button id="share-native" type="button" hidden>Compartilhar</button><span id="share-feedback" role="status" aria-live="polite"></span></div><p id="modalbodytext"></p><p class="disclosure" id="article-disclosure"></p><div class="article-share"><strong>Compartilhe esta notícia</strong><div class="article-share-actions"><button type="button" id="share-whatsapp">WhatsApp ↗</button><button type="button" id="share-copy">Copiar link</button><button type="button" id="share-native" hidden>Compartilhar</button></div><span id="share-feedback" role="status"></span></div><p id="article-source"></p><div class="trans">
+<div class="modalshade" id="shade"><article class="modal" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody"><h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div><div class="article-share-actions" id="article-share-actions" aria-label="Compartilhar matéria"><button id="share-native" class="share-primary" type="button"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.5 6.6-4m-6.6 9 6.6 4"/></svg><span id="share-label">Compartilhar</span></button><button id="share-copy" class="share-secondary" type="button">Copiar link</button><span id="share-feedback" role="status" aria-live="polite"></span></div><p id="modalbodytext"></p><p class="disclosure" id="article-disclosure"></p><p id="article-source"></p><div class="trans">
 <strong id="articleLanguageTitle">Ler esta notícia em outro idioma</strong>
 <div id="articleLanguageButtons" class="article-language-buttons"></div>
 <p id="translation" class="smalltext"></p>
 </div></div></article></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=share-rebase-20261009" defer></script>
+<script src="assets/app.js?v=sharefix-20261009-r1" defer></script>
 <script src="assets/utility-strip.js" defer></script>
 <script src="assets/news-crawler.js" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
