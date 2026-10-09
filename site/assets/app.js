@@ -4,7 +4,7 @@
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
   let data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
-  const pageSize = 6, featureSize = 3;
+  const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
   const labels = {
     pt: { panorama:'Panorama do Transporte',news:'Notícias',market:'Mercado em Foco',all:'Todas',prev:'← Anterior',next:'Próximas →',search:'Pesquisar manchetes, temas ou fontes...',filters:'Todas as editorias',allDates:'Todo o arquivo',d2:'Hoje e ontem',d7:'Últimos 7 dias',d30:'Últimos 30 dias',articleTitle:'Ler em outro idioma',demo:'DEMONSTRAÇÃO',source:'Fonte original',unavailable:'—',disclaimerDemo:'Exemplo editorial para testar a interface. Não representa uma notícia real, frete ou vaga disponível.',published:'Publicado',updated:'Verificado',ad:'Publicidade',dataMissing:'Aguardando dados verificados. Sem cotações fictícias.',showing:'matéria(s)', noResults:'Nenhuma matéria encontrada.', archive:'Arquivo de demonstração'},
@@ -43,7 +43,7 @@
   }
   function storyCard(a,i,featured=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
     const kicker= a.kind==='opportunity' ? `${cat} · ${lang==='en'?'Opportunity':lang==='es'?'Oportunidad':'Oportunidade'}`:cat;
-    if(featured)return `<article class="story" tabindex="0" role="button" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
+    if(featured)return `<article class="story" tabindex="0" role="button" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><p class="feature-summary">${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
     return `<article class="item" tabindex="0" role="button" data-story="${i}"><div><span class="tag">${cat}</span> ${a.kind==='opportunity'?'<span class="origin-pill">DrivMatch</span>':''}<h3>${escapeHTML(txt.title)}</h3><p>${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div><div class="thumb">${imageHTML(a)}<span class="label">${cat}</span></div></article>`;
   }
   function renderStories(){const f=articlesFiltered();const pages=Math.max(1,Math.ceil(f.length/pageSize));page=Math.min(page,pages-1);
@@ -53,7 +53,11 @@
     $('pagecount').textContent=`${page+1} / ${pages}`;
     $('prev').disabled=page===0; $('next').disabled=page===pages-1;
     const n=Math.max(1,Math.ceil(f.length/featureSize));featurePage=Math.min(featurePage,n-1);const pane=f.slice(featurePage*featureSize,(featurePage+1)*featureSize);
-    $('features').innerHTML=pane.length?pane.map(a=>storyCard(a,indexSet.get(a.id),true)).join(''):`<div class="empty">${labels[lang].noResults}</div>`;
+    const relatedTitle=lang==='pt'?'Leia também':lang==='es'?'Lea también':'Read also';
+    $('features').innerHTML=pane.length
+      ? `<div class="hero-wrap">${storyCard(pane[0],indexSet.get(pane[0].id),true)}</div>${pane.length>1
+        ? `<div class="related-rail" aria-label="${relatedTitle}"><div class="related-head">${relatedTitle}</div>${pane.slice(1).map(a=>storyCard(a,indexSet.get(a.id),true)).join('')}</div>` : ''}`
+      :`<div class="empty">${labels[lang].noResults}</div>`;
     $('featureCount').textContent=`${featurePage+1} / ${n}`;
     $('featurePrev').disabled=featurePage===0; $('featureNext').disabled=featurePage===n-1;
     $('featureDots').innerHTML=Array.from({length:n},(_,i)=>`<button type="button" class="carousel-dot ${i===featurePage?'active':''}" data-slide="${i}" aria-label="${i+1}"></button>`).join('');
