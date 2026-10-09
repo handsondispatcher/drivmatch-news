@@ -1,5 +1,9 @@
 # DrivMatch News — CONTINUIDADE CANÔNICA / LEIA PRIMEIRO
 
+## NOVA ATA PRESERVADA — WAR ROOM ESTRATÉGICO/COMERCIAL 09/10/2026
+
+**A pedido do usuário (“Salvar”)**, a reunião com Tônio, Vinny Jr., Sra. Deloitte, Paulo Guedes, Chico e agentes de War Room foi preservada integralmente em [WAR_ROOM_ESTRATEGIA_DRIVMATCH_NEWS_E_RECEITA_2026-10-09.md](WAR_ROOM_ESTRATEGIA_DRIVMATCH_NEWS_E_RECEITA_2026-10-09.md), com rastreio na [issue #26](https://github.com/handsondispatcher/drivmatch-news/issues/26). **Reaproveitar este plano nos próximos chats sem solicitar nova explicação**. Conteúdo: posicionamento DrivMatch vs News, brasileiros → hispanos → americanos, layout da homepage, notícias como motor de aquisição, serviços B2B, pilotos de US$1.200 por contratação, consultoria, patrocínios, parceiros, métricas e plano de 90 dias. **São propostas de preço e modelos para teste; nenhuma receita, valuation, cobrança ou aprovação de lançamento foi criada por esta ata**. `main` atual v33 permanece pré-lançamento, e backup v32 intocado.
+
 ## ATUALIZAÇÃO CANÔNICA 09/10/2026 — V33 E BACKUP V32
 
 **Versão em desenvolvimento atual: v33**, com base na v32 (v31 + melhorias posteriores); **lançamento ainda bloqueado**, `public_launch_approved=false`. A v32 foi salvaguardada no GitHub sob **`backup/v32-approved-2026-10-09`**, commit exato **`659a146b8f48c342c2a62d86a1330d59760116d4`**, antes de qualquer alteração v33. **Não apagar/mover essa branch**, não force-push e não confundir `release/drivmatch-news-v32-20261009` (branch antiga) com o backup de agora. A especificação v33 e o procedimento de retorno estão em **[V33_RELEASE.md](V33_RELEASE.md)**.
