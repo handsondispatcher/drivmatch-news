@@ -84,7 +84,8 @@
     $('ad-slot').hidden=!ad;if(!ad)return;
     $('ad-slot').innerHTML=`<span class="ad-label">${labels[lang].ad}</span><a href="${escapeHTML(ad.url)}" target="_blank" rel="noopener noreferrer sponsored">${escapeHTML(ad.title||'')}</a><p>${escapeHTML(ad.text||'')}</p>`;
   }
-  const shareUrlOf = a => 'https://drivmatch.com/news/share/'+encodeURIComponent(a.id)+'/';
+  // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.
+  const shareUrlOf = a => 'https://handsondispatcher.github.io/drivmatch-news/share/'+encodeURIComponent(a.id)+'/';
   function openSharedStory(){
     try {
       const id=new URLSearchParams(location.search).get('story');
