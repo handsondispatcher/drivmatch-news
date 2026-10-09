@@ -24,8 +24,8 @@ const {spawn}=require('node:child_process');
    // External source cards may fill page one; locate an approved editorial card through pagination.
    const openEditorial=async()=>{
     for(let attempt=0;attempt<25;attempt++){
-     if(await page.locator('#list article[data-story]').count()){
-      await page.locator('#list article[data-story]').first().click();return;
+     if(await page.locator('#list article[data-story]:not(:has-text("Manchete da fonte"))').count()){
+      await page.locator('#list article[data-story]:not(:has-text("Manchete da fonte"))').first().click();return;
      }
      if(await page.locator('#next').isDisabled())break;
      await page.locator('#next').click();
@@ -47,7 +47,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#modaltitle').innerText().then(x=>x.includes('descanso')),true);
    await page.locator('#article-dialog').evaluate(e=>e.scrollTop=e.scrollHeight);
    await page.keyboard.press('Escape');
-   await page.locator('#list article[data-story]').first().click();
+   await page.locator('#list article[data-story]:not(:has-text("Manchete da fonte"))').first().click();
    assert.equal(await page.locator('#article-dialog').evaluate(e=>e.scrollTop),0);
    await page.keyboard.press('Escape');
    await page.locator('#language').selectOption('en');
