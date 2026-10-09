@@ -51,6 +51,49 @@ def google_translate(text, target):
     return html_module.unescape(result['data']['translations'][0]['translatedText'])
 
 
+def translate_source_headline(title, source_lang, target_lang):
+    """Best-effort no-key headline translation. Unofficial public endpoint can fail.
+    Failure is explicit: the browser must identify the original language."""
+    if target_lang==source_lang:return title
+    params=urllib.parse.urlencode({'client':'gtx','sl':source_lang,'tl':target_lang,'dt':'t','q':title})
+    raw=fetch('https://translate.googleapis.com/translate_a/single?'+params,timeout=5)
+    result=json.loads(raw)
+    translated=''.join(part[0] for part in result[0] if isinstance(part,list) and part and isinstance(part[0],str)).strip()
+    if not translated or len(translated)>1000:raise ValueError('Empty or invalid headline translation')
+    return translated
+
+
+def localize_source_headlines(headlines, errors, offline):
+    """Only the source headline is translated; never fabricate a translated article."""
+    if offline:return headlines
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    def process(item):
+        item=dict(item)
+        source_lang=item.get('original_lang') or ('es' if item.get('region')=='MX' else 'en')
+        if source_lang not in ('pt','en','es'):source_lang='en'
+        titles={source_lang:item['title']}
+        for target in ('pt','en','es'):
+            if target==source_lang:continue
+            try:titles[target]=translate_source_headline(item['title'],source_lang,target)
+            except Exception:pass
+        item['titles']=titles
+        item['original_lang']=source_lang
+        return item
+    # Bound external requests so translation outages cannot stall publishing.
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        futures={pool.submit(process,item):i for i,item in enumerate(headlines)}
+        output=[None]*len(headlines)
+        for future in as_completed(futures):
+            i=futures[future]
+            try:output[i]=future.result()
+            except Exception as exc:
+                output[i]=headlines[i]
+                errors.append('headline_translation:'+type(exc).__name__)
+    failures=sum(any(lang not in item.get('titles',{}) for lang in ('pt','en','es')) for item in output)
+    if failures:errors.append(f'headline_translation_incomplete:{failures}')
+    return output
+
+
 def translate_missing(article, errors, offline):
     article=dict(article)
     article['locales']=dict(article.get('locales') or {})
@@ -249,6 +292,7 @@ def build(offline=False):
                 if len(external_headlines)>=90:break
         except (OSError,ValueError,TypeError,KeyError) as exc:
             errors.append('external_headlines:'+type(exc).__name__)
+    external_headlines=localize_source_headlines(external_headlines,errors,offline)
     unique={}
     for a in articles:
         if a['id'] in unique:continue
