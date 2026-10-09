@@ -11,7 +11,9 @@ function display(){
  for(const a of sourceHeadlines){
    if(!a.source_url?.startsWith('https://')||!a.title||seen.has(a.source_url))continue;
    seen.add(a.source_url);
-   links.push({title:a.title,source:a.source||'External source',url:a.source_url,external:true,region:a.region||'US',date:a.published_at||''});
+   const title=a.titles?.[l]||a.title;
+   const untranslated=!a.titles?.[l];
+   links.push({title,untranslated,source:a.source||'External source',url:a.source_url,external:true,region:a.region||'US',date:a.published_at||''});
  }
  // Supplement with approved stories not already included in the source monitor.
  for(const a of validStories){
@@ -21,8 +23,8 @@ function display(){
  if(!links.length){bar.hidden=true;return;}
  const els=links.slice(0,65).map(a=>{
    const link=document.createElement('a');link.className='dm-crawler-link';link.href=a.url;link.target='_blank';link.rel='noopener noreferrer';
-   const k=document.createElement('span');k.className='dm-crawler-label';k.textContent=(a.external?'FONTE · ':'')+clean(a.region)+' · '+clean(a.source);
-   const t=document.createElement('span');t.textContent=clean(a.title);
+   const k=document.createElement('span');k.className='dm-crawler-label';k.textContent=(a.external?(l==='en'?'SOURCE · ':l==='es'?'FUENTE · ':'FONTE · '):'')+clean(a.region)+' · '+clean(a.source);
+   const t=document.createElement('span');t.textContent=clean(a.title)+(a.untranslated?(l==='pt'?' · [original]':l==='es'?' · [original]':' · [original]'):'');
    link.append(k,t);return link;
  });
  track.replaceChildren(...els,...els.map(e=>e.cloneNode(true)));
