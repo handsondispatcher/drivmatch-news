@@ -53,5 +53,6 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("external_feed_links_not_editorially_approved",source)
   self.assertIn("source-headlines.json",source)
   self.assertIn("FONTE EXTERNA",ticker)
-  self.assertNotIn("status:'approved'",ticker)
+  self.assertIn("a.external?'FONTE EXTERNA · ':'",ticker)
+  self.assertIn("seen.has(a.source_url)",ticker)
 if __name__=='__main__':unittest.main()
