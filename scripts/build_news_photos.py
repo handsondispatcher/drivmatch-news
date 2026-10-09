@@ -15,6 +15,7 @@ from urllib.request import Request, urlopen
 import json
 import re
 import sys
+import hashlib
 
 from PIL import Image, ImageOps, ImageStat, UnidentifiedImageError
 
@@ -37,7 +38,14 @@ def _candidate_urls(photo: dict):
     if urlsplit(remote).hostname == "upload.wikimedia.org":
         yield remote
     filename = str(photo["file"]).replace(" ", "_")
-    yield "https://commons.wikimedia.org/wiki/Special:Redirect/file/" + quote(filename, safe="") + "?width=960"
+    encoded = quote(filename, safe="")
+    digest = hashlib.md5(filename.encode("utf-8")).hexdigest()
+    base = f"https://upload.wikimedia.org/wikipedia/commons"
+    # Wikimedia Commons stores files under the normalized filename's MD5 path.
+    # A canonical local JPG thumb is much more reliable than Special:Redirect.
+    yield f"{base}/thumb/{digest[0]}/{digest[:2]}/{encoded}/640px-{encoded}"
+    yield f"{base}/{digest[0]}/{digest[:2]}/{encoded}"
+    yield "https://commons.wikimedia.org/wiki/Special:Redirect/file/" + encoded + "?width=640"
 
 
 def _download_photo(photo: dict):
