@@ -238,7 +238,7 @@
     document.querySelectorAll('.weather-card').forEach(el=>el.setAttribute('aria-label',next==='en'?'Weather':next==='es'?'Clima':'Clima'));
     document.querySelector('.edition').childNodes[0].textContent=(next==='en'?'DIGITAL EDITION':next==='es'?'EDICIÓN DIGITAL':'EDIÇÃO DIGITAL')+' · ';
     $('edition-date').textContent=new Date().toLocaleDateString(next==='en'?'en-US':next==='es'?'es-MX':'pt-BR');
-    $('footer-publisher').textContent='DrivMatch News — uma publicação da Hands On Dispatcher LLC';
+    $('footer-publisher').textContent='DrivMatch News — um produto da Hands On Dispatcher LLC';
     $('footer-legal').textContent='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.';
     $('story-preview-title').textContent=next==='en'?'Story preview':next==='es'?'Vista previa de Story':'Prévia do Story';
     $('story-preview-download').textContent=next==='en'?'Save PNG image':next==='es'?'Guardar imagen PNG':'Salvar imagem PNG';
