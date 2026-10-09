@@ -10,7 +10,7 @@
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.55 Arial,Helvetica,sans-serif}
 a{color:inherit} button,input,select{font:inherit} button{cursor:pointer}
-.demo{background:#e8f5ff;border-bottom:1px solid #c2e5fc;color:#185781;text-align:center;padding:8px 14px;font-size:12px}
+
 .header{background:#070c12;color:#fff} .header-inner{max-width:1390px;margin:auto;padding:14px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .brand{display:flex;align-items:center;gap:2px} .brand img{width:375px;max-width:100%;height:auto;object-fit:contain;display:block} .brand .news{font-family:Arial,Helvetica,sans-serif;font-size:19px;font-weight:700;letter-spacing:-.4px;color:#168ff0;line-height:1} 
 .edition{font-size:10px;letter-spacing:1.1px;color:#b5c1ce;text-align:right}.edition select{background:#0b1826;color:#ecf6ff;border:1px solid #314b63;border-radius:5px;padding:8px 10px;font-size:12px;letter-spacing:0;max-width:190px}
@@ -76,11 +76,21 @@ article[role=button]{outline-offset:2px}
 .weather-card .weather-open:hover{text-decoration:underline}
 .weather-card iframe{height:315px}
 @media(max-width:990px){.weather-mobile .weather-card iframe{height:56vh;min-height:350px;max-height:540px}}
+
+.dm-utility{background:#fff;border-bottom:1px solid #dbe4ec;color:#193950;font:12px/1.35 Arial,sans-serif}
+.dm-util-inner{max-width:1390px;margin:auto;display:flex;align-items:center;gap:22px;padding:9px 26px;min-height:58px}
+.dm-util-quote{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.dm-util-quote strong{font-size:14px;color:#136c38}.dm-util-quote small{font-size:10px;color:#6c7988}
+.dm-util-city{display:flex;align-items:center;gap:9px;margin-left:auto;min-width:0}
+.dm-util-city #top-weather-icon{font-size:24px}.dm-util-city span:nth-child(2){display:flex;flex-direction:column;min-width:0}
+.dm-util-city #top-city{font-size:12px}.dm-util-city #top-condition{font-size:10px;color:#62788c;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dm-util-city #top-range{white-space:nowrap;font-size:12px}
+@media(max-width:750px){.dm-util-inner{padding:8px 12px;flex-wrap:wrap;gap:9px 15px}.dm-util-city{width:100%;margin-left:0;border-top:1px solid #e5eaf0;padding-top:7px}.dm-util-quote small{font-size:9px}}
 </style>
 </head>
 <body>
-<div class="demo">DRIVMATCH NEWS • Notícias verificadas por fonte e data</div>
 <header class="header"><div class="header-inner"><div class="brand"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></div><div class="edition">EDIÇÃO DIGITAL · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></span></div></div></header>
+<section id="dm-utility" class="dm-utility" aria-label="Mercado e tempo"><div class="dm-util-inner"><div class="dm-util-quote"><span id="top-usd-label">Dólar</span> <strong id="top-usd-value">—</strong><small id="top-usd-date" title="Última cotação verificada">Sem cotação</small></div><div class="dm-util-quote"><span id="top-diesel-label">Diesel EUA</span> <strong id="top-diesel-value">—</strong><small id="top-diesel-date" title="Referência média semanal">EIA · semanal</small></div><div class="dm-util-city" aria-live="off"><span id="top-weather-icon" aria-hidden="true">🌤️</span><span><strong id="top-city">Tempo nos EUA</strong><small id="top-condition">Aguardando previsão oficial</small></span><strong id="top-range">—</strong></div></div></section>
 
 <div class="main">
 <main>
@@ -110,5 +120,6 @@ article[role=button]{outline-offset:2px}
 </div></div></article></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=3fcd616e589cfa3d" defer></script>
+<script src="assets/utility-strip.js" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>
