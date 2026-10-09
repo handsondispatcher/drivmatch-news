@@ -202,6 +202,13 @@ article[role=button]{outline-offset:2px}
 #article-dialog .share-picker-grid .share-picker-system span:first-child{font-size:26px;color:#096ab8}
 #article-dialog .share-options .share-hint{margin:9px 0 0;font:11px/1.4 Arial,sans-serif;color:#5b7083}
 @media(max-width:450px){#article-dialog .share-picker-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Sharing: honest device capabilities and a clear existing-WhatsApp-Web path. */
+#article-dialog .share-picker-grid .story-icons{display:flex;align-items:center;gap:2px}
+#article-dialog .share-picker-grid .story-icons img{width:23px;height:23px}
+#article-dialog .share-picker-grid button[hidden]{display:none!important}
+#article-dialog .share-options .share-whatsapp-copy{display:block;width:100%;text-align:center;border:1px solid #a6d7bc;background:#edf9f2;color:#126a42;border-radius:7px;padding:9px 7px;margin-top:9px;font:600 11px Arial,sans-serif;cursor:pointer}
+#article-dialog .share-options .share-whatsapp-copy:hover{background:#dff3e7}
 </style>
 </head>
 <body>
@@ -251,7 +258,7 @@ article[role=button]{outline-offset:2px}
 <a data-share-platform="telegram" aria-label="Compartilhar no Telegram" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="" width="26" height="26" loading="lazy"><span>Telegram</span></a>
 <a data-share-platform="reddit" aria-label="Compartilhar no Reddit" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/reddit/FF4500" alt="" width="26" height="26" loading="lazy"><span>Reddit</span></a>
 <a data-share-platform="pinterest" aria-label="Compartilhar no Pinterest" target="_blank" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/pinterest/BD081C" alt="" width="26" height="26" loading="lazy"><span>Pinterest</span></a>
-<a data-share-platform="email" aria-label="Compartilhar no E-mail" target="_self" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/gmail/EA4335" alt="" width="26" height="26" loading="lazy"><span>E-mail</span></a><button id="share-system" type="button" class="share-picker-system"><span aria-hidden="true">↗</span><span>Mais opções</span></button></div><p class="share-hint">Para Instagram e TikTok, use Copiar link ou Mais opções do dispositivo.</p></div>
+<a data-share-platform="email" aria-label="Compartilhar no E-mail" target="_self" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/gmail/EA4335" alt="" width="26" height="26" loading="lazy"><span>E-mail</span></a><button id="share-story" type="button" class="share-picker-story" aria-label="Criar imagem para publicar em Stories do Instagram, TikTok ou WhatsApp"><span class="story-icons" aria-hidden="true"><img src="https://cdn.simpleicons.org/instagram/E4405F" alt="" width="23" height="23"><img src="https://cdn.simpleicons.org/tiktok/111111" alt="" width="23" height="23"></span><span>Card Stories</span></button><button id="share-system" type="button" class="share-picker-system" hidden><span aria-hidden="true">↗</span><span>Outros apps</span></button></div><button id="share-whatsapp-copy" type="button" class="share-whatsapp-copy">Já está no WhatsApp Web? Copiar mensagem para colar na conversa</button><p class="share-hint">Stories: salve a imagem e publique no seu aplicativo. Não há publicação automática em Stories.</p></div>
 <span id="share-feedback" role="status" aria-live="polite"></span>
 </div></section><section class="article-original" id="article-original" aria-label="Reportagem completa na fonte"><div id="article-source"></div></section>
 
