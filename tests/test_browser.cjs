@@ -59,11 +59,13 @@ const {spawn}=require('node:child_process');
    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/navegador/);
    // Switching the entire site to English must translate weather and publisher footer.
    await page.locator('#article-dialog .x').click();
-   await page.locator('#language').selectOption('en');
+   await page.locator('[data-site-lang="en"]').click();
+   assert.equal(await page.locator('[data-site-lang="en"]').getAttribute('aria-pressed'),'true');
    assert.equal(await page.locator('#clima-desktop .weather-top h2').textContent(),'Weather');
    assert.equal(await page.locator('#footer-publisher').innerText(),'DrivMatch News — um produto da Hands On Dispatcher LLC');
    assert.equal(await page.locator('#footer-legal').innerText(),'© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.');
-   await page.locator('#language').selectOption('pt');
+   await page.locator('[data-site-lang="pt"]').click();
+   assert.equal(await page.locator('[data-site-lang="pt"]').getAttribute('aria-pressed'),'true');
    assert.match(await page.locator('#footer-publisher').innerText(),/um produto da Hands On Dispatcher LLC/);
    await openEditorial();
    assert.equal(await page.locator('#share-native').count(),1);
