@@ -214,6 +214,9 @@
     $('modalbodytext').textContent=isExternal
       ?(lang==='pt'?'Leia a reportagem completa na fonte pelos botões abaixo. O texto integral pertence ao veículo de origem; não apresentamos um resumo genérico como se fosse a matéria.':lang==='es'?'Lea el reportaje completo en la fuente con los enlaces de abajo.':'Read the full original report using the links below.')
       :(txt.body||txt.summary||'');
+    $('modalbrief').textContent=isExternal
+      ? (articleLang==='pt'?'Leia a reportagem completa no veículo original pelos links abaixo.':articleLang==='es'?'Lea el reportaje en el medio original mediante los enlaces.':'Read the complete report at the original publisher via the links.')
+      : '';
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
     const src=safeUrl(opened.source_url);
@@ -223,16 +226,22 @@
     const translatedUrl=target=>isFreightWaves
       ?'https://translate.google.com/translate?sl=en&tl='+encodeURIComponent(target)+'&u='+encodeURIComponent(src)
       :src;
-    const sourceLink=(url,label,flag,primary=false)=>'<a class="article-source-button '+(primary?'primary':'secondary')+'" href="'+escapeHTML(url)+'" target="_blank" rel="noopener noreferrer"><img src="'+flags[flag]+'" alt="" width="19" height="13"><span>'+label+'</span> ↗</a>';
+    const sourceLink=(url,label,flag,primary=false)=>{
+      // Compact mobile labels keep all three source actions on one row.
+      // Full translation/attribution wording remains visible on desktop.
+      const concise=flag==='en'?'English · original':flag==='pt'?'Português':'Español';
+      return '<a class="article-source-button '+(primary?'primary':'secondary')+'" href="'+escapeHTML(url)+'" target="_blank" rel="noopener noreferrer"><img src="'+flags[flag]+'" alt="" width="19" height="13"><span class="source-label-full">'+escapeHTML(label)+'</span><span class="source-label-mobile">'+escapeHTML(concise)+'</span><span class="source-link-arrow" aria-hidden="true">↗</span></a>';
+    };
     const ptButton=src?sourceLink(translatedUrl('pt'),isFreightWaves?'Português · tradução automática':'Português · traduzir no navegador','pt',articleLang==='pt'):'';
     const enButton=src?sourceLink(src,'English · original','en',articleLang==='en'):'';
     const esButton=src?sourceLink(translatedUrl('es'),isFreightWaves?'Español · traducción automática':'Español · traducir en navegador','es',articleLang==='es'):'';
     const heading=articleLang==='pt'?'REPORTAGEM COMPLETA NA FONTE':articleLang==='es'?'REPORTAJE COMPLETO EN LA FUENTE':'COMPLETE ORIGINAL REPORT';
     const tip=articleLang==='pt'?'Para português ou espanhol, a tradução automática abre pelo Google Tradutor quando disponível. Nos demais veículos, abra a fonte e use “Traduzir página” no navegador. O acesso depende do veículo.':articleLang==='es'?'La traducción automática depende del navegador o del editor.':'The full report belongs to the publisher. Automatic translation may depend on the browser.';
-    $('article-source').innerHTML=src?'<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+ptButton+enButton+esButton+'</div><p class="source-access-warning">'+tip+'</p>':escapeHTML(opened.source||'');
+    const shortTip=articleLang==='pt'?'Português e espanhol: tradução pelo navegador, quando disponível.':articleLang==='es'?'Traducción mediante el navegador, cuando esté disponible.':'Translation through the browser, when available.';
+    $('article-source').innerHTML=src?'<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+ptButton+enButton+esButton+'</div><p class="source-access-warning">'+tip+'</p><p class="source-access-short">'+shortTip+'</p>':escapeHTML(opened.source||'');
     const attribution=storyPhoto||opened;
     const photoCredit=attribution.image_source_url && safeUrl(attribution.image_source_url)
-      ? `<p class="image-credit">${articleLang==='en'?'Illustrative archive photo':articleLang==='es'?'Foto ilustrativa de archivo':'Foto ilustrativa de arquivo'} (não é imagem do acontecimento): <a href="${escapeHTML(attribution.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(attribution.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(attribution.image_license||'Licença na fonte')} · corte/redimensionamento</p>`:'';
+      ? `<p class="image-credit"><span class="photo-credit-label">${articleLang==='en'?'Illustrative archive photo':articleLang==='es'?'Foto ilustrativa de archivo':'Foto ilustrativa de arquivo'} (não é imagem do acontecimento): </span><a href="${escapeHTML(attribution.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(attribution.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(attribution.image_license||'Licença na fonte')} <span class="photo-transform-note">· corte/redimensionamento</span></p>`:'';
     $('article-source').innerHTML+=photoCredit;
     $('articleLanguageTitle').textContent=lang==='en'?'Article language':lang==='es'?'Idioma de la noticia':'Idioma da notícia';
     $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]&&(opened.kind!=='external_link'||opened.translated_langs?.includes(l))).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');

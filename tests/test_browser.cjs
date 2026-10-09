@@ -39,6 +39,21 @@ const {spawn}=require('node:child_process');
    assert.match(await page.locator(card+' iframe').getAttribute('src'),/^https:\/\/embed\.ventusky\.com/);
    assert.equal(await page.locator(card+' iframe').isVisible(),true);
    assert.equal(await page.locator(card+' .weather-open').count(),1);
+   if(width<=390){
+    // Real RSS headlines have longer titles; test source buttons and share for an actual external story.
+    const ext=page.locator('#features article[data-external="true"]').first();
+    assert.ok(await ext.count()>0,'At least one live external source story should appear');
+    await ext.click();
+    const actual=await page.evaluate(()=>{
+      const dialog=document.getElementById('article-dialog');
+      const bottom=document.getElementById('share-copy').getBoundingClientRect().bottom;
+      return {scroll:dialog.scrollHeight,client:dialog.clientHeight,bottom,visible:innerHeight};
+    });
+    assert.ok(actual.scroll<=actual.client+2,`Live external story should not need vertical scroll: ${JSON.stringify(actual)}`);
+    assert.ok(actual.bottom<=actual.visible,'Share must be visible on actual external story');
+    await page.screenshot({path:`test-results/mobile-live-headline-${width}.png`});
+    await page.locator('#article-dialog .x').click();
+   }
    // External source cards may fill page one; locate an approved editorial card through pagination.
    const openEditorial=async()=>{
     for(let attempt=0;attempt<25;attempt++){
@@ -51,32 +66,40 @@ const {spawn}=require('node:child_process');
     throw new Error('No approved editorial article reachable through news pagination');
    };
    await openEditorial();
-   // Semantic reading order is preserved; mobile share controls are viewport fixed.
-   const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','modalbodytext','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
-   assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order.modalbodytext && order.modalbodytext<order['article-original'],`article reading flow ${JSON.stringify(order)}`);
-   assert.equal(await page.evaluate(()=>Boolean(document.getElementById('article-original').compareDocumentPosition(document.getElementById('article-share-footer')) & Node.DOCUMENT_POSITION_FOLLOWING)),true,'Original source precedes sharing in semantic order');
-   if(width<=390) {
-    const dock=await page.evaluate(()=>{
-     const footer=document.getElementById('article-share-footer');
-     const box=footer.getBoundingClientRect(),share=document.getElementById('share-native').getBoundingClientRect(),copy=document.getElementById('share-copy').getBoundingClientRect();
-     return {position:getComputedStyle(footer).position,box:{top:box.top,bottom:box.bottom,left:box.left,right:box.right},share:{top:share.top,bottom:share.bottom,left:share.left,right:share.right},copy:{top:copy.top,bottom:copy.bottom,left:copy.left,right:copy.right},height:innerHeight,width:innerWidth};
+   // On mobile, sharing must fit in the article, not need a fixed overlay or scrollbar.
+   const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
+   assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order['article-original'] && order['article-original']<order['article-share-footer'],`semantic reading flow ${JSON.stringify(order)}`);
+   if(width<=390){
+    const fit=await page.evaluate(()=>{
+     const dialog=document.getElementById('article-dialog');
+     const share=document.getElementById('share-native').getBoundingClientRect();
+     const copy=document.getElementById('share-copy').getBoundingClientRect();
+     return {scrollHeight:dialog.scrollHeight,clientHeight:dialog.clientHeight,
+       position:getComputedStyle(document.getElementById('article-share-footer')).position,
+       share:{top:share.top,bottom:share.bottom,left:share.left,right:share.right,height:share.height},
+       copy:{top:copy.top,bottom:copy.bottom,left:copy.left,right:copy.right,height:copy.height},
+       viewportWidth:innerWidth,viewportHeight:innerHeight};
     });
-    assert.equal(dock.position,'fixed','Mobile sharing must be viewport-fixed');
-    assert.ok(dock.share.top>=-1&&dock.share.bottom<=dock.height+1,`Share must show without scrolling: ${JSON.stringify(dock)}`);
-    assert.ok(dock.copy.top>=-1&&dock.copy.bottom<=dock.height+1,'Copy link must show without scrolling');
-    assert.ok(dock.share.right<dock.copy.left,'Share left, Copy link right');
-    assert.ok(dock.box.left>=-1&&dock.box.right<=dock.width+1,'Dock never overflows horizontally');
-    await page.locator('#article-dialog').evaluate(el=>el.scrollTop=el.scrollHeight);
-    const afterScroll=await page.locator('#share-native').boundingBox();
-    assert.ok(afterScroll&&afterScroll.y>=0&&afterScroll.y+afterScroll.height<=680,'Share remains visible after scrolling');
-    await page.locator('#article-dialog').evaluate(el=>el.scrollTop=0);
-    await page.screenshot({path:`test-results/reader-share-dock-${width}.png`});
+    assert.equal(fit.position,'relative','Share controls must follow the article in normal flow; the picker anchors above them');
+    assert.ok(fit.share.top>=0&&fit.share.bottom<=fit.viewportHeight,`Share visible without scroll ${JSON.stringify(fit)}`);
+    assert.ok(fit.copy.top>=0&&fit.copy.bottom<=fit.viewportHeight,'Copy visible without scroll');
+    assert.ok(fit.share.right<fit.copy.left,'Share and copy must be side by side');
+    assert.ok(fit.share.height<=38&&fit.copy.height<=38,'Primary share buttons must be short');
+    assert.ok(fit.scrollHeight<=fit.clientHeight+2,`Article must fit without internal scroll at ${width}px: ${JSON.stringify(fit)}`);
+    await page.screenshot({path:`test-results/mobile-compact-reader-${width}.png`});
    }
    const sourceLinks=await page.locator('#article-source .article-source-button').evaluateAll(nodes=>nodes.map(n=>n.href));
    assert.equal(sourceLinks.length,3,'Portuguese English and Spanish original-source buttons must remain available');
    assert.ok(sourceLinks.some(url=>!url.includes('translate.google.com')&&!url.includes('.translate.goog')),'Direct original publisher must always remain available');
    assert.equal(await page.locator('#article-source .article-source-button img').count(),3,'Each language source button must display its flag');
-   assert.match(await page.locator('#article-source .source-access-warning').innerText(),/navegador/);
+   if(width<=390){
+    assert.match(await page.locator('#article-source .source-access-short').innerText(),/navegador/);
+    const sources=await page.locator('#article-source .article-source-button').evaluateAll(a=>a.map(e=>({height:e.getBoundingClientRect().height,top:e.getBoundingClientRect().top})));
+    assert.ok(sources.every(x=>x.height<=38),'Source language buttons must be 35px, not tall stacked cards');
+    assert.ok(Math.max(...sources.map(x=>x.top))-Math.min(...sources.map(x=>x.top))<=2,'Three source language buttons must fit on one row');
+   }else{
+    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/navegador/);
+   }
    // Switching the entire site to English must translate weather and publisher footer.
    await page.locator('#article-dialog .x').click();
    await page.locator('[data-site-lang="en"]').click();
@@ -143,7 +166,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#share-options').isVisible(),false);
    assert.equal(await page.locator('#article-reading [data-article-lang]').count(),3);
    const langGrid=await page.locator('.source-translations').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length);
-   assert.equal(langGrid,width>650?3:1);
+   assert.equal(langGrid,3,'The source links must stay on a single row, also at 768px');
    assert.equal(await page.locator('#article-disclosure').isVisible(),false);
    const ptTitle=await page.locator('#modaltitle').textContent();
    await page.locator('[data-article-lang="es"]').click();
