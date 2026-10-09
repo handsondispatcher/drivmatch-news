@@ -1,3 +1,11 @@
+# Operação atual — DrivMatch News v32 (09/10/2026)
+
+A fonte canônica de versão é `content/release.json` e o estado é **DEVELOPMENT_PRELAUNCH**, sem autorização para divulgação. A v32 integra layout v31 e atualizações posteriores. [Documento operacional atualizado](V32_RELEASE.md). A inspeção datada de 08/10 abaixo é histórica, não descreve o inventário atual de fontes, eventos ou rotas.
+
+---
+
+## Registro histórico de 08/10/2026 (não vigente como baseline)
+
 # Operação DrivMatch News
 
 ## Auditoria em 08/10/2026
