@@ -134,7 +134,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('assets/news-crawler.js?v=',(BASE/'site/index.html').read_text())
  def test_external_headlines_restore_article_modal(self):
   js=(BASE/'site/assets/app.js').read_text()
-  self.assertIn('role="button" data-story="${i}"',js)
+  self.assertIn('role="button" data-external="false" data-story="${i}"',js)
   self.assertNotIn('role="link" data-external-url=',js)
   self.assertNotIn('${cat} · ${escapeHTML(a.region',js)
   self.assertIn("const shareUrlOf = a => 'https://handsondispatcher.github.io/drivmatch-news/share/'",js)
