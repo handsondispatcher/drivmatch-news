@@ -15,9 +15,24 @@ const {spawn}=require('node:child_process');
    await page.route('https://www.youtube-nocookie.com/**',route=>route.fulfill({status:200,body:'<!doctype html><title>Official player test stub</title>'}));
    // Stub CamStreamer only inside CI; iframe insertion does not certify real-world playback.
    await page.route('https://camstreamer.com/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>CamStreamer native embed test stub</title>'}));
+   // Native NWS API is mocked only in CI. Real deployment must call the true
+   // forecast for the Census location; no demo city data leaks to production.
+   await page.route('https://api.weather.gov/**',route=>{
+     const url=route.request().url();
+     const isIL=/\/points\/41\./.test(url)||url.includes('/ILX/');
+     const base={status:200,contentType:'application/geo+json',
+       headers:{'access-control-allow-origin':'*'}};
+     const result=url.includes('/points/')?
+       {properties:{forecast:'https://api.weather.gov/gridpoints/'+(isIL?'ILX':'LSX')+'/1,1/forecast'}}:
+       {properties:{updated:new Date().toISOString(),periods:[
+         {shortForecast:isIL?'Mostly Sunny':'Partly Cloudy',isDaytime:true,temperature:72,temperatureUnit:'F'},
+         {shortForecast:'Clear',isDaytime:false,temperature:52,temperatureUnit:'F'}
+       ]}};
+     return route.fulfill({...base,body:JSON.stringify(result)});
+   });
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.10','public page has v34.10 version');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.11','public page has v34.11 version');
    assert.equal(await page.locator('#site-version').isVisible(),false,'Internal release must not appear in public masthead');
    assert.equal(await page.locator('.header').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(2, 4, 8)',
      'Keep approved gradient logo untouched on neutral-black background');
@@ -94,8 +109,10 @@ const {spawn}=require('node:child_process');
    assert.match(topAd,/DrivMatch/,'No fake third-party paid advertiser');
    assert.equal(await page.locator('#top-city-query').count(),1,'Reader has a typed city/state search input');
    assert.equal(await page.locator('#top-city-query').inputValue(),'','Without user choice, forecast rotates every 10 seconds');
-   assert.equal(await page.locator('#top-city-apply').count(),1);
-   assert.equal(await page.locator('#top-city-auto').count(),1);
+   assert.equal(await page.locator('#top-city-search').count(),1,'One search icon only');
+   assert.equal(await page.locator('#top-city-search-form').count(),1);
+   assert.equal(await page.locator('#top-city-auto,#top-city-apply,#top-city-type').count(),0,'No confusing three-button row');
+   assert.equal(await page.locator('#top-city-select-label').innerText(),'Previsão do tempo');
    assert.equal(await page.locator('#count').isVisible(),false,'Do not reveal article count');
    assert.equal((await page.locator('#news-commercial-banner').innerText()).includes('PUBLICIDADE'),false);
    assert.equal(await page.locator('#news-commercial-banner .ad-kicker').count(),0);
@@ -109,28 +126,45 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#category').inputValue(),'Fretes','Footer archive filter still works');
    await page.locator('#category').selectOption('Todas');
    assert.equal(await page.locator('#category').inputValue(),'Todas','Footer reset still works');
-   const options=await page.locator('#top-city-options option').count();
-   if(options>0){
-     const city=await page.locator('#top-city-options option').first().getAttribute('value');
-     await page.locator('#top-city-query').fill(city);
+   if(width===1440) {
+     const census=await page.request.get('http://127.0.0.1:8765/data/us-places.json');
+     assert.equal(census.status(),200,'Census national place index must actually be deployed');
+     const entries=(await census.json()).places;
+     assert.ok(entries.length>20000,'Full national index replaces small hardcoded city list');
+     assert.ok(entries.some(p=>p[0]==='St. Charles'&&p[1]==='MO'));
+     assert.ok(entries.some(p=>p[0]==='St. Charles'&&p[1]==='IL'));
+   }
+   // The user's exact bug: Saint/St. Charles is not in the 170-city static rotation.
+   await page.locator('#top-city-query').fill('St Charles');
+   await page.locator('#top-city-query').press('Enter');
+   await page.locator('#top-city-feedback').filter({hasText:/MO.*IL|IL.*MO/}).waitFor({timeout:4000});
+   assert.ok((await page.locator('#top-city-feedback').innerText()).includes('IL'),
+     'Ambiguous US cities must require state, never guess');
+   for(const state of ['MO','IL']){
+     await page.locator('#top-city-query').fill('St. Charles, '+state);
      await page.locator('#top-city-query').press('Enter');
-     assert.equal(await page.locator('#top-city-query').inputValue(),city,'Typed city/state is pinned');
-     assert.equal((await page.locator('#top-city').innerText()).trim(),city,
-       'Forecast should display the explicitly selected real city');
-     assert.equal(await page.locator('#top-city-auto').isEnabled(),true);
-     if(width===1440){
-       await page.waitForTimeout(10500);
-       assert.equal((await page.locator('#top-city').innerText()).trim(),city,
-         'Manual selection must remain stable past a 10 second automatic tick');
-     }
-     await page.locator('#top-city-auto').click();
-     assert.equal(await page.locator('#top-city-query').inputValue(),'','Automatic city rotation can be restored');
+     await page.waitForFunction(st=>document.getElementById('top-city')?.textContent==='St. Charles, '+st,
+       state,{timeout:8000});
+     assert.equal((await page.locator('#top-city').innerText()).trim(),'St. Charles, '+state);
+     assert.match(await page.locator('#top-condition').innerText(),/nublado|limpo|Cloud|Sunny/i);
+     assert.match(await page.locator('#top-range-f').innerText(),/72°F/);
+   }
+   if(width===1440){
+     await page.waitForTimeout(10300);
+     assert.equal((await page.locator('#top-city').innerText()).trim(),'St. Charles, IL',
+       'Pinned NWS forecast must stay fixed through 10-second automatic rotation');
+     await page.reload({waitUntil:'networkidle'});
+     await page.waitForFunction(()=>document.getElementById('top-city')?.textContent==='St. Charles, IL',{timeout:8000});
+     assert.equal(await page.locator('#top-city-query').inputValue(),'St. Charles, IL',
+       'Pinned place restored after reload from local preference');
    }
    await page.locator('#top-city-query').fill('FictionalCity, ZZ');
    await page.locator('#top-city-query').press('Enter');
    assert.ok((await page.locator('#top-city-feedback').innerText()).length>0,
      'Unknown city must show availability feedback rather than made-up weather');
-   await page.locator('#top-city-auto').click();
+   await page.locator('#top-city-query').fill('');
+   await page.locator('#top-city-query').press('Enter');
+   assert.equal(await page.locator('#top-city-query').inputValue(),'','Clearing search re-enables rotation');
    if(width===1440) {
      const hero=await page.locator('#features .hero-wrap article').evaluate(el=>({position:getComputedStyle(el).position,visible:el.getBoundingClientRect().width>0}));
      assert.ok(hero.visible,'Newsroom has a visible hero headline');
@@ -162,7 +196,7 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   // v34.10: show one direct camera video embed, never a tiny map or links-only tile.
+   // v34.11: show one direct camera video embed, never a tiny map or links-only tile.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
    assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
@@ -288,10 +322,10 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#clima-desktop .weather-top h2').textContent(),'Weather');
    assert.equal(await page.locator('#footer-publisher').innerText(),'DrivMatch News — um produto da Hands On Dispatcher LLC');
    assert.equal(await page.locator('#footer-legal').innerText(),
-     '© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. · v34.10');
-   assert.equal(await page.locator('#footer-version').innerText(),'· v34.10');
+     '© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. · v34.11');
+   assert.equal(await page.locator('#footer-version').innerText(),'· v34.11');
    await page.locator('[data-site-lang="pt"]').click();
-   assert.equal(await page.locator('#footer-version').textContent(),'· v34.10',
+   assert.equal(await page.locator('#footer-version').textContent(),'· v34.11',
      'Release footer must persist when changing language');
    assert.equal(await page.locator('[data-site-lang="pt"]').getAttribute('aria-pressed'),'true');
    assert.match(await page.locator('#footer-publisher').innerText(),/um produto da Hands On Dispatcher LLC/);

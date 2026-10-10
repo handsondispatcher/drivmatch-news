@@ -410,8 +410,8 @@ def build(offline=False):
     weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
     release=read_json(ROOT/'content/release.json')
-    if release.get('version')!='v34.10' or release.get('public_launch_approved') is not False:
-        raise ValueError('Invalid release contract: v34.10 must remain prelaunch')
+    if release.get('version')!='v34.11' or release.get('public_launch_approved') is not False:
+        raise ValueError('Invalid release contract: v34.11 must remain prelaunch')
     data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)

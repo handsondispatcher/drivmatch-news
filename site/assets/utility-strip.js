@@ -4,8 +4,9 @@ const el=id=>document.getElementById(id);
 const fixed=[['Orlando','FL'],['Houston','TX'],['New York City','NY'],['Newark','NJ'],['San Francisco','CA'],['Atlanta','GA'],['El Paso','TX'],['Buffalo','NY'],['Salt Lake City','UT'],['Las Vegas','NV'],['Chattanooga','TN'],['Nashville','TN'],['Chicago','IL'],['Los Angeles','CA'],['Dallas','TX'],['Miami','FL'],['Tampa','FL'],['Jacksonville','FL'],['Memphis','TN'],['Indianapolis','IN'],['Columbus','OH'],['Cincinnati','OH'],['Louisville','KY'],['Kansas City','MO'],['St. Louis','MO'],['Denver','CO'],['Phoenix','AZ'],['Albuquerque','NM'],['Seattle','WA'],['Portland','OR'],['Detroit','MI'],['Laredo','TX'],['San Diego','CA'],['Charlotte','NC'],['Birmingham','AL'],['Oklahoma City','OK'],['Harrisburg','PA'],['Sacramento','CA'],['Cleveland','OH'],['Boston','MA'],['McAllen','TX'],['Ontario','CA'],['Savannah','GA'],['Reno','NV'],['Philadelphia','PA'],['Fresno','CA'],['Austin','TX'],['Washington','DC'],['Fort Lauderdale','FL'],['Kissimmee','FL'],['Boca Raton','FL'],['Pompano Beach','FL'],['Framingham','MA'],['Worcester','MA'],['Danbury','CT'],['Edison','NJ'],['San Antonio','TX'],['Norfolk','VA'],['Tacoma','WA'],['Bellingham','WA'],['Spokane','WA'],['Eugene','OR'],['Medford','OR'],['Redding','CA'],['Stockton','CA'],['Bakersfield','CA'],['San Bernardino','CA'],['Barstow','CA'],['Long Beach','CA'],['Oakland','CA'],['Tucson','AZ'],['Nogales','AZ'],['Flagstaff','AZ'],['Yuma','AZ'],['Kingman','AZ'],['Las Cruces','NM'],['Amarillo','TX'],['Waco','TX'],['Fort Worth','TX'],['Beaumont','TX'],['Lubbock','TX'],['Eagle Pass','TX'],['Brownsville','TX'],['Midland','TX'],['Corpus Christi','TX'],['Tulsa','OK'],['Wichita','KS'],['Topeka','KS'],['Salina','KS'],['Lincoln','NE'],['Omaha','NE'],['North Platte','NE'],['Cheyenne','WY'],['Rock Springs','WY'],['Ogden','UT'],['St. George','UT'],['Colorado Springs','CO'],['Grand Junction','CO'],['Des Moines','IA'],['Cedar Rapids','IA'],['Minneapolis','MN'],['Duluth','MN'],['Fargo','ND'],['Pembina','ND'],['Sioux Falls','SD'],['Little Rock','AR'],['Jackson','MS'],['Baton Rouge','LA'],['New Orleans','LA'],['Lafayette','LA'],['Shreveport','LA'],['Mobile','AL'],['Montgomery','AL'],['Huntsville','AL'],['Pensacola','FL'],['Tallahassee','FL'],['Ocala','FL'],['Gainesville','FL'],['Valdosta','GA'],['Macon','GA'],['Augusta','GA'],['Charleston','SC'],['Columbia','SC'],['Greenville','SC'],['Florence','SC'],['Fayetteville','NC'],['Greensboro','NC'],['Raleigh','NC'],['Asheville','NC'],['Richmond','VA'],['Fredericksburg','VA'],['Roanoke','VA'],['Winchester','VA'],['Lexington','KY'],['Bowling Green','KY'],['Knoxville','TN'],['Jackson','TN'],['Gary','IN'],['South Bend','IN'],['Toledo','OH'],['Dayton','OH'],['Youngstown','OH'],['Pittsburgh','PA'],['Carlisle','PA'],['Allentown','PA'],['Scranton','PA'],['Baltimore','MD'],['Hagerstown','MD'],['Wilmington','DE'],['Trenton','NJ'],['Elizabeth','NJ'],['New Haven','CT'],['Hartford','CT'],['Providence','RI'],['Portland','ME'],['Albany','NY'],['Syracuse','NY'],['Binghamton','NY'],['Rochester','NY'],['Niagara Falls','NY'],['Port Huron','MI'],['Grand Rapids','MI'],['Milwaukee','WI'],['Madison','WI'],['Green Bay','WI'],['Joliet','IL'],['Rockford','IL'],['Springfield','IL']];
 // Deterministic NWS-backed city rotation is requested at 10-second intervals. No 10-second external API polling.
 let cities=fixed.map(([city,state])=>({city,state,status:'unavailable'})),market={},spot=null;
-let weatherSelection='auto',weatherRotateIndex=0;
-try{const stored=localStorage.getItem('drivmatch_weather_city_v1');if(stored&&/^.{1,80}\|[A-Z]{2}$/.test(stored))weatherSelection=stored;}catch(_){};
+let weatherSelection='auto',weatherRotateIndex=0,userForecast=null,places=[],placesReady=false,placesError=false,weatherRequestId=0;
+let localForecastCache=new Map(),suggestionTimer=null;
+try{const stored=localStorage.getItem('drivmatch_weather_city_v1');if(stored&&/^.{1,80}\|[A-Z]{2}$/.test(stored))weatherSelection=stored;}catch(_){}
 const lang=()=>el('language')?.value||'pt';
 function number(v,d){return Number(v).toLocaleString(lang()==='pt'?'pt-BR':lang()==='es'?'es-ES':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
 // v34.7: identical reader-facing quote composition to the approved screenshot.
@@ -59,24 +60,40 @@ function localizedCondition(desc){const d=String(desc||'').toLowerCase(),l=lang(
  const cases=[[/blizzard|heavy snow|snow|sleet|flurr/,['Neve','Snow','Nieve']],[/thunder|storm/,['Tempestades','Thunderstorms','Tormentas']],[/heavy rain|rain|showers|drizzle/,['Chuva','Rain','Lluvia']],[/gust|wind/,['Rajadas de vento','Wind gusts','Ráfagas de viento']],[/fog|haze/,['Neblina','Fog','Niebla']],[/partly cloudy|partly sunny/,['Parcialmente nublado','Partly cloudy','Parcialmente nublado']],[/cloud|overcast/,['Nublado','Cloudy','Nublado']],[/clear|sun|fair/,['Céu limpo','Clear skies','Cielo despejado']]];
  const c=cases.find(([re])=>re.test(d));return c?c[1][{pt:0,en:1,es:2}[l]||0]:String(desc||'').slice(0,60);
 }
-function validCities(){const now=Date.now();return cities.filter(c=>c.status==='forecast'&&typeof c.condition_en==='string'&&c.condition_en.trim()&&
- Number.isFinite(c.max_f)&&Number.isFinite(c.min_f)&&Number.isFinite(Date.parse(c.forecast_updated_at||''))&&now-Date.parse(c.forecast_updated_at)>=0&&now-Date.parse(c.forecast_updated_at)<36*3600000);}
+function validCities(){
+ const now=Date.now();return cities.filter(c=>c.status==='forecast'&&typeof c.condition_en==='string'&&c.condition_en.trim()&&
+ Number.isFinite(c.max_f)&&Number.isFinite(c.min_f)&&Number.isFinite(Date.parse(c.forecast_updated_at||''))&&
+ now-Date.parse(c.forecast_updated_at)>=0&&now-Date.parse(c.forecast_updated_at)<36*3600000);
+}
+function cleanCityName(t){
+ return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+   .replace(/\bsaint\b/g,'st').replace(/[^\p{L}\p{N} ]/gu,' ').replace(/\s+/g,' ').trim();
+}
+function displayCity(key){
+ const parts=String(key||'').split('|');
+ return parts.length===2?parts[0]+', '+parts[1]:key;
+}
+function feedback(kind,pt,en,es,location){
+ const e=el('top-city-feedback');if(!e)return;
+ const l=lang();e.dataset.state=kind||'';
+ e.textContent=({pt,en,es}[l]||pt)||'';
+ if(location){
+   const link=document.createElement('a');
+   link.href='https://forecast.weather.gov/MapClick.php?lat='+location[2]+'&lon='+location[3];
+   link.target='_blank';link.rel='noopener noreferrer';
+   link.textContent=l==='en'?' · Official forecast ↗':l==='es'?' · Pronóstico oficial ↗':' · Previsão oficial ↗';
+   e.appendChild(link);
+ }
+}
 function showCity(){
  const good=validCities(),panel=document.querySelector('.dm-util-city');
- if(!good.length){panel.hidden=true;return;}
- panel.hidden=false;
- const avail=new Map(good.map(c=>[c.city+'|'+c.state,c]));
- const ordered=[avail.get('Tampa|FL'),...good.filter(c=>c.city!=='Tampa'||c.state!=='FL')].filter(Boolean);
- // Explicit reader preference pins one verified city; otherwise rotate every ten seconds.
- const picked=weatherSelection==='auto'?ordered[weatherRotateIndex%ordered.length]:
-              avail.get(weatherSelection);
- if(!picked){
-   // Pinned cities must not quietly switch to a different place when NWS is unavailable.
-   panel.hidden=true;
-   if(weatherSelection!=='auto')cityFeedback('Previsão da cidade temporariamente indisponível.',
-       'Weather unavailable for the selected city.','Pronóstico de la ciudad no disponible.');
-   return;
- }
+ const byKey=new Map(good.map(c=>[c.city+'|'+c.state,c]));
+ const automatic=[byKey.get('Tampa|FL'),...good.filter(c=>c.city!=='Tampa'||c.state!=='FL')].filter(Boolean);
+ const picked=weatherSelection==='auto'?
+   (automatic.length?automatic[weatherRotateIndex%automatic.length]:null):
+   (userForecast&&(userForecast.city+'|'+userForecast.state)===weatherSelection?userForecast:byKey.get(weatherSelection));
+ if(!picked){if(panel)panel.hidden=true;return;}
+ if(panel)panel.hidden=false;
  el('top-city').textContent=picked.city+', '+picked.state;
  el('top-weather-icon').textContent=icon(picked.condition_en);
  el('top-condition').textContent=localizedCondition(picked.condition_en);
@@ -85,81 +102,186 @@ function showCity(){
    /thunder|severe storm/.test(d)?['⚡ Risco de tempestade','⚡ Storm risk','⚡ Riesgo de tormenta']:
    /heavy rain|flood/.test(d)?['Chuva intensa','Heavy rain','Lluvia intensa']:
    /dense fog/.test(d)?['Visibilidade reduzida','Low visibility','Visibilidad reducida']:null;
- const riskEl=el('top-risk');riskEl.hidden=!risk;riskEl.textContent=risk?risk[{pt:0,en:1,es:2}[lang()]||0]:'';
- const fhi=Math.round(picked.max_f),flo=Math.round(picked.min_f);
- el('top-range-f').textContent='Máx. '+fhi+'°F · Mín. '+flo+'°F';
- el('top-range-c').textContent='Máx. '+Math.round((fhi-32)*5/9)+'°C · Mín. '+Math.round((flo-32)*5/9)+'°C';
- el('top-condition').title='';
+ const riskEl=el('top-risk');riskEl.hidden=!risk;
+ riskEl.textContent=risk?risk[{pt:0,en:1,es:2}[lang()]||0]:'';
+ const hi=Math.round(picked.max_f),lo=Math.round(picked.min_f),l=lang();
+ const max=l==='en'?'High':l==='es'?'Máx.':'Máx.',min=l==='en'?'Low':l==='es'?'Mín.':'Mín.';
+ el('top-range-f').textContent=max+' '+hi+'°F · '+min+' '+lo+'°F';
+ el('top-range-c').textContent=max+' '+Math.round((hi-32)*5/9)+'°C · '+min+' '+Math.round((lo-32)*5/9)+'°C';
+ el('top-condition').title=picked.source||'NOAA / NWS forecast';
 }
-
-function cityFeedback(pt,en,es){
- const node=el('top-city-feedback');if(node)node.textContent=({pt,en,es}[lang()]||pt)||'';
-}
-function cleanCityName(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();}
-function chosenText(k){
- const city=validCities().find(c=>c.city+'|'+c.state===k);
- return city?city.city+', '+city.state:String(k||'').replace('|',', ');
-}
-function populateWeatherChoices(){
- const query=el('top-city-query'),list=el('top-city-options');
- if(!query||!list)return;
- const l=lang(),lab=el('top-city-select-label');
- if(lab)lab.textContent=l==='en'?'Weather forecast':l==='es'?'Pronóstico del tiempo':'Previsão do tempo';
- const placeholder=l==='en'?'Select or enter your city':l==='es'?'Elige o escribe tu ciudad':'Selecione ou digite sua cidade';
- query.placeholder=placeholder;
- query.setAttribute('aria-label',l==='en'?'Enter city and state, for example Tampa, FL':
-   l==='es'?'Escribe ciudad y estado, por ejemplo Tampa, FL':
-   'Digite cidade e estado, por exemplo Tampa, FL');
- const buttonType=el('top-city-type');
- if(buttonType){
-   buttonType.textContent=l==='en'?'Type':l==='es'?'Escribir':'Digitar';
-   buttonType.setAttribute('aria-label',l==='en'?'Type your city':
-     l==='es'?'Escribe tu ciudad':'Digitar sua cidade');
+function setSearchLocale(){
+ const l=lang(),q=el('top-city-query'),label=el('top-city-select-label'),button=el('top-city-search');
+ if(label)label.textContent=l==='en'?'Weather forecast':l==='es'?'Pronóstico del tiempo':'Previsão do tempo';
+ if(q){
+   q.placeholder=l==='en'?'City, state':l==='es'?'Ciudad, estado':'Cidade, estado';
+   q.setAttribute('aria-label',l==='en'?'Search weather by US city and state':
+     l==='es'?'Buscar el pronóstico por ciudad y estado':'Buscar previsão por cidade e estado');
  }
- const apply=el('top-city-apply');
- if(apply)apply.setAttribute('aria-label',l==='en'?'Confirm location':l==='es'?'Confirmar ciudad':'Confirmar cidade');
- list.replaceChildren();
- for(const c of validCities())list.appendChild(new Option(c.city+', '+c.state,c.city+', '+c.state));
- if(document.activeElement!==query)query.value=weatherSelection==='auto'?'':chosenText(weatherSelection);
- const button=el('top-city-auto');
  if(button){
-   button.disabled=weatherSelection==='auto'&&!query.value.trim();
-   button.title=l==='en'?'Rotate weather cities automatically':l==='es'?'Alternar las ciudades automáticamente':'Alternar cidades automaticamente';
-   button.setAttribute('aria-label',button.title);
+   const action=l==='en'?'Search forecast':l==='es'?'Buscar pronóstico':'Buscar previsão';
+   button.title=action;button.setAttribute('aria-label',action);
+ }
+ if(weatherSelection!=='auto'&&q&&document.activeElement!==q)q.value=displayCity(weatherSelection);
+}
+function searchMatches(raw,limit=10){
+ const text=String(raw||'').trim();
+ if(!text||text.length<2||!places.length)return [];
+ // Support comma, "St Charles MO", and direct datalist values.
+ const comma=text.lastIndexOf(',');
+ const endState=text.match(/^(.*?)\s+([A-Za-z]{2})$/);
+ let city=text,state='';
+ if(comma>=0){city=text.slice(0,comma);state=text.slice(comma+1).trim().toUpperCase();}
+ else if(endState&&endState[1].trim().length>=2){city=endState[1];state=endState[2].toUpperCase();}
+ const needle=cleanCityName(city);
+ if(!needle||state&&!/^[A-Z]{1,2}$/.test(state))return [];
+ const hits=[];
+ for(const p of places){
+   if(state&&!p[1].startsWith(state))continue;
+   const name=cleanCityName(p[0]);
+   if(name===needle||name.startsWith(needle)||(!state&&name.includes(' '+needle))){
+     hits.push({place:p,rank:name===needle?0:name.startsWith(needle)?1:2});
+   }
+ }
+ hits.sort((a,b)=>a.rank-b.rank||a.place[0].length-b.place[0].length||
+   a.place[0].localeCompare(b.place[0])||a.place[1].localeCompare(b.place[1]));
+ return hits.slice(0,limit).map(v=>v.place);
+}
+function showSuggestions(){
+ const q=el('top-city-query'),list=el('top-city-options');if(!q||!list)return;
+ list.replaceChildren();
+ for(const p of searchMatches(q.value,12)){
+   const option=document.createElement('option');option.value=p[0]+', '+p[1];
+   list.appendChild(option);
  }
 }
-function applyCityQuery(){
- const query=el('top-city-query');if(!query)return;
- const raw=query.value.trim();
- if(!raw){resetCityAuto();return;}
- const m=/^(.{2,60}?)\s*(?:,|\s)\s*([A-Za-z]{2})$/.exec(raw);
- if(!m){cityFeedback('Digite Cidade, UF. Ex.: Tampa, FL',
-                     'Enter City, ST, e.g. Tampa, FL',
-                     'Escribe Ciudad, EE, p. ej. Tampa, FL');return;}
- const match=validCities().find(c=>c.state.toUpperCase()===m[2].toUpperCase()&&
-                   cleanCityName(c.city)===cleanCityName(m[1]));
- if(!match){
-   cityFeedback('Cidade ainda sem previsão disponível. Use uma sugestão da lista.',
-     'City forecast unavailable. Choose a suggestion.',
-     'Pronóstico no disponible. Elige una sugerencia.');
+async function loadPlaces(){
+ try{
+   const r=await fetch('data/us-places.json',{cache:'force-cache'});
+   if(!r.ok)throw Error('Census index unavailable');
+   const data=await r.json();
+   if(data.schema_version!==1||data.source_url!=='https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2025_Gazetteer/2025_Gaz_place_national.zip'
+      ||!Array.isArray(data.places)||data.places.length<20000)throw Error('Unexpected city index');
+   places=data.places.filter(p=>Array.isArray(p)&&p.length===4&&typeof p[0]==='string'&&
+     /^[A-Z]{2}$/.test(p[1])&&Number.isFinite(p[2])&&Number.isFinite(p[3]));
+   if(places.length<20000)throw Error('Insufficient city coverage');
+   placesReady=true;placesError=false;
+   showSuggestions();
+   if(weatherSelection!=='auto'){
+     const p=places.find(p=>p[0]+'|'+p[1]===weatherSelection);
+     if(p)await choosePlace(p,true);
+     else {weatherSelection='auto';try{localStorage.removeItem('drivmatch_weather_city_v1');}catch(_){}}
+   }
+ }catch(_){placesError=true;placesReady=false;
+   feedback('error','Busca nacional temporariamente indisponível.','Nationwide city search temporarily unavailable.',
+     'Búsqueda nacional temporalmente no disponible.');
+ }
+}
+function nwsForecastFromJSON(place,payload){
+ const props=payload&&payload.properties||{},periods=props.periods;
+ if(!Array.isArray(periods)||!periods.length)throw Error('No forecast periods');
+ const first=periods[0];
+ if(typeof first.shortForecast!=='string'||!first.shortForecast.trim())throw Error('Missing weather condition');
+ const d=periods.slice(0,6).find(x=>x.isDaytime===true&&x.temperatureUnit==='F'&&Number.isFinite(x.temperature));
+ const n=periods.slice(0,6).find(x=>x.isDaytime===false&&x.temperatureUnit==='F'&&Number.isFinite(x.temperature));
+ const updated=props.updated||props.generatedAt;
+ const age=Date.now()-Date.parse(updated);
+ if(!d||!n||!Number.isFinite(age)||age< -2*3600000||age>36*3600000)throw Error('Incomplete or stale forecast');
+ return {city:place[0],state:place[1],condition_en:first.shortForecast.trim().slice(0,120),
+   max_f:d.temperature,min_f:n.temperature,forecast_updated_at:updated,
+   source:'NOAA / National Weather Service',status:'forecast'};
+}
+async function officialForecast(place){
+ const key=place[0]+'|'+place[1],cached=localForecastCache.get(key);
+ if(cached&&Date.now()-cached.checked<15*60000)return cached.forecast;
+ const lat=Number(place[2]),lon=Number(place[3]);
+ if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<17||lat>72||lon< -180||lon> -64)
+   throw Error('Invalid locality coordinates');
+ const coords=lat.toFixed(5)+','+lon.toFixed(5);
+ const response=await fetch('https://api.weather.gov/points/'+coords,{
+   headers:{'Accept':'application/geo+json'},mode:'cors'});
+ if(!response.ok)throw Error('NOAA location metadata unavailable');
+ const doc=await response.json();
+ const url=doc&&doc.properties&&doc.properties.forecast;
+ const validated=new URL(url);
+ if(validated.protocol!=='https:'||validated.hostname!=='api.weather.gov')
+   throw Error('Untrusted NOAA forecast endpoint');
+ const r=await fetch(validated.href,{headers:{'Accept':'application/geo+json'},mode:'cors'});
+ if(!r.ok)throw Error('NOAA forecast unavailable');
+ const weather=nwsForecastFromJSON(place,await r.json());
+ localForecastCache.set(key,{checked:Date.now(),forecast:weather});
+ return weather;
+}
+async function choosePlace(place,restoring=false){
+ const req=++weatherRequestId,q=el('top-city-query'),button=el('top-city-search');
+ const key=place[0]+'|'+place[1];
+ if(q)q.value=place[0]+', '+place[1];
+ if(button)button.disabled=true;
+ feedback('loading','Consultando previsão oficial…','Loading official forecast…','Consultando pronóstico oficial…');
+ try{
+   const weather=await officialForecast(place);
+   if(req!==weatherRequestId)return;
+   weatherSelection=key;userForecast=weather;weatherRotateIndex=0;
+   try{localStorage.setItem('drivmatch_weather_city_v1',key);}catch(_){}
+   showCity();setSearchLocale();
+   feedback('success','Previsão de '+place[0]+', '+place[1],
+     'Forecast: '+place[0]+', '+place[1],
+     'Pronóstico: '+place[0]+', '+place[1]);
+ }catch(_){
+   if(req!==weatherRequestId)return;
+   if(restoring){
+     weatherSelection='auto';userForecast=null;
+     try{localStorage.removeItem('drivmatch_weather_city_v1');}catch(_){}
+     showCity();
+   }
+   feedback('error','Previsão temporariamente indisponível para '+place[0]+', '+place[1]+'.',
+     'Forecast temporarily unavailable for '+place[0]+', '+place[1]+'.',
+     'Pronóstico no disponible para '+place[0]+', '+place[1]+'.',place);
+ }finally{if(req===weatherRequestId&&button)button.disabled=false;}
+}
+async function searchCity(){
+ const q=el('top-city-query');if(!q)return;
+ const raw=q.value.trim();
+ if(!raw){resetToRotation();return;}
+ if(!placesReady){
+   feedback('error','Aguarde o carregamento do catálogo de cidades.',
+     'Please wait for the city directory.','Espera el catálogo de ciudades.');
    return;
  }
- weatherSelection=match.city+'|'+match.state;
- weatherRotateIndex=0;
- try{localStorage.setItem('drivmatch_weather_city_v1',weatherSelection)}catch(_){}
- cityFeedback('','','');populateWeatherChoices();showCity();
+ const hits=searchMatches(raw,30),matched=hits.filter(p=>
+   cleanCityName(p[0])===cleanCityName(raw.replace(/,\s*[a-z]{1,2}$/i,'')
+     .replace(/\s+[a-z]{2}$/i,'')));
+ let choice=matched.length===1?matched[0]:null;
+ if(!choice&&hits.length===1)choice=hits[0];
+ if(!choice){
+   const l=lang();
+   if(matched.length>1||hits.length>1){
+     // Large duplicate-city families (including 11 St. Charles locations)
+     // must expose ALL matching state abbreviations, not arbitrary top four.
+     const states=[...new Set((matched.length?matched:hits).map(p=>p[1]))].sort().join(', ');
+     feedback('error', 'Selecione o estado: '+states,
+       'Select the state: '+states,'Selecciona el estado: '+states);
+   }else{
+     feedback('error','Cidade não encontrada. Digite cidade e sigla do estado.',
+       'City not found. Enter city and state.','Ciudad no encontrada. Escribe ciudad y estado.');
+   }
+   showSuggestions();return;
+ }
+ await choosePlace(choice);
 }
-function resetCityAuto(){
- weatherSelection='auto';weatherRotateIndex=0;
- try{localStorage.removeItem('drivmatch_weather_city_v1')}catch(_){}
- cityFeedback('','','');populateWeatherChoices();showCity();
+function resetToRotation(){
+ ++weatherRequestId;weatherSelection='auto';weatherRotateIndex=0;userForecast=null;
+ try{localStorage.removeItem('drivmatch_weather_city_v1');}catch(_){}
+ const q=el('top-city-query');if(q)q.value='';
+ feedback('','','','');showCity();
 }
 async function weather(){
  try{
   const r=await fetch('data/weather.json?d='+Date.now(),{cache:'no-store'});if(!r.ok)return;
   const j=await r.json();if(!Array.isArray(j.cities))return;
-  const m=new Map(j.cities.map(c=>[c.city+'|'+c.state,c]));
-  cities=fixed.map(([city,state])=>Object.assign({city,state,status:'unavailable'},m.get(city+'|'+state)||{}));populateWeatherChoices();showCity();
+  const map=new Map(j.cities.map(c=>[c.city+'|'+c.state,c]));
+  cities=fixed.map(([city,state])=>Object.assign({city,state,status:'unavailable'},map.get(city+'|'+state)||{}));
+  showCity();
  }catch(_){}
 }
 async function quotes(){
@@ -176,22 +298,27 @@ async function live(){
 }
 function init(){
  if(!el('top-city'))return;
- showMarket();showCity();
- if(location.protocol.startsWith('http')){weather();quotes();live();setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);}
- setInterval(()=>{if(weatherSelection==='auto'&&validCities().length){weatherRotateIndex++;showCity()}},10*1000);
- el('top-city-type')?.addEventListener('click',()=>{const e=el('top-city-query');e?.focus();e?.select();});
- el('top-city-apply')?.addEventListener('click',applyCityQuery);
- el('top-city-query')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyCityQuery();}});
+ showMarket();showCity();setSearchLocale();
+ el('top-city-search-form')?.addEventListener('submit',e=>{e.preventDefault();searchCity();});
  el('top-city-query')?.addEventListener('input',()=>{
-   const query=el('top-city-query'),auto=el('top-city-auto');
-   if(auto)auto.disabled=weatherSelection==='auto'&&!query?.value.trim();
-   cityFeedback('','','');
+   if(suggestionTimer)clearTimeout(suggestionTimer);
+   suggestionTimer=setTimeout(showSuggestions,120);
+   feedback('','','','');
  });
- el('top-city-auto')?.addEventListener('click',resetCityAuto);
- el('language')?.addEventListener('change',()=>{showMarket();populateWeatherChoices();showCity()});
- document.addEventListener('drivmatch:language',()=>{
-   showMarket();populateWeatherChoices();showCity();
- });
+ el('top-city-query')?.addEventListener('search',()=>{if(!el('top-city-query')?.value)resetToRotation();});
+ el('language')?.addEventListener('change',()=>{showMarket();showCity();setSearchLocale()});
+ document.addEventListener('drivmatch:language',()=>{showMarket();showCity();setSearchLocale()});
+ if(location.protocol.startsWith('http')){
+   weather();quotes();live();loadPlaces();
+   setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);
+ }
+ setInterval(()=>{if(weatherSelection==='auto'&&validCities().length){weatherRotateIndex++;showCity()}},10*1000);
+ setInterval(()=>{
+   if(weatherSelection!=='auto'&&placesReady){
+     const p=places.find(p=>p[0]+'|'+p[1]===weatherSelection);
+     if(p)choosePlace(p,true);
+   }
+ },20*60000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
