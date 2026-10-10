@@ -11,10 +11,12 @@ const {spawn}=require('node:child_process');
   for(const width of [360,390,768,1440]) {
    const page=await browser.newPage({viewport:{width,height:width<=390?680:900}});const errors=[];
    page.on('pageerror',e=>errors.push(e.message));
+   // YouTube content is owned by the creator; do not depend on its network in CI.
+   await page.route('https://www.youtube-nocookie.com/**',route=>route.fulfill({status:200,body:'<!doctype html><title>Official player test stub</title>'}));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.2','public page has v34.2 version');
-   assert.equal(await page.locator('#site-version').innerText(),'v34.2','public masthead identifies v34.2');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.3','public page has v34.3 version');
+   assert.equal(await page.locator('#site-version').innerText(),'v34.3','public masthead identifies v34.3');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
@@ -78,34 +80,22 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   assert.equal(await page.locator(tv+' iframe[data-roadtv-frame]').count(),0,'No video loaded before tap');
-   assert.notEqual(await page.locator(tv+' [data-roadtv-badge]').textContent(),'AO VIVO','Never invent live without platform verification');
-   if(width<=390){
-     assert.equal(await page.locator('#mobile-market').isVisible(),true);
-     assert.equal(await page.locator('#mercados').isVisible(),false);
-   }
-   if(width===1440){
-     // Browser-only mock (not shipped). Genuine API secrets never enter browser.
-     const fixture={schema_version:2,generated_at:new Date().toISOString(),
-       live_checked_at:new Date().toISOString(),live_status:'verified_live',
-       channels:[],candidates:[{
-         platform:'youtube',video_id:'A1b2C3d4E5f',
-         video_url:'https://www.youtube.com/watch?v=A1b2C3d4E5f',
-         channel_url:'https://www.youtube.com/channel/UCAAAAAAAAAAAAAAAAAAAAAA',
-         channel_name:'Automated test (not published)',
-         title:'USA semi truck forward windshield dashcam',live:true,status:'live',
-         geo_evidence:'publisher metadata',camera_evidence:'publisher metadata',
-         verification:'automated test'}]};
-     await page.route('**/data/road-tv.json?*',route=>route.fulfill({
-       status:200,contentType:'application/json',body:JSON.stringify(fixture)}));
-     await page.reload({waitUntil:'networkidle'});
-     assert.equal((await page.locator('#roadtv-desktop [data-roadtv-badge]').textContent()).trim(),'AO VIVO');
-     assert.equal(await page.locator('#roadtv-desktop iframe[data-roadtv-frame]').count(),0,'Play requires tap');
-     await page.route('**/www.youtube-nocookie.com/**',route=>route.fulfill({
-       status:200,body:'<!doctype html><title>Fixture player</title>'}));
-     await page.locator('#roadtv-desktop [data-roadtv-play]').click();
-     assert.match(await page.locator('#roadtv-desktop iframe[data-roadtv-frame]').getAttribute('src'),
-       /^https:\/\/www\.youtube-nocookie\.com\/embed\//);
+   // The viewer asked for exactly ROAD TV + one official player,
+   // without creator chips, text explaining the test, or dead status badges.
+   const tvCard=page.locator(tv);
+   assert.equal(await tvCard.locator('h2').innerText(),'ROAD TV');
+   assert.equal(await tvCard.locator('.roadtv-screen iframe').count(),1);
+   assert.equal(await tvCard.locator('button').count(),0,'No public Road TV buttons');
+   assert.equal(await tvCard.locator('a').count(),0,'No public channel links');
+   assert.equal(await tvCard.locator('.roadtv-screen').count(),1);
+   assert.equal(await tvCard.locator('.roadtv-screen iframe').getAttribute('src').then(x=>x.startsWith('https://www.youtube-nocookie.com/embed/to8SHIQHyQo')),true);
+   assert.equal(await tvCard.locator('[data-roadtv-badge], .roadtv-channels, .roadtv-credit, .roadtv-toolbar, .roadtv-disclosure').count(),0);
+   assert.equal(await tvCard.locator('h2, .roadtv-screen').count(),2);
+   assert.equal(await page.locator('#mercados').isVisible(),width>990);
+   assert.equal(await page.locator('#mobile-market').isVisible(),width<=990);
+   if(width<=390) {
+     const dims=await tvCard.locator('iframe').evaluate(el=>({height:el.getBoundingClientRect().height,width:el.getBoundingClientRect().width}));
+     assert.ok(dims.width>=260&&dims.height>=195,'Road TV mobile player must be visible without long empty blocks');
    }
    const card=width>990?'#clima-desktop':'#clima-mobile';
    assert.equal(await page.locator('#dm-crawler-track a[href*="thetrucker.com"]').count(),0,'Known geo-blocked publisher must not appear in ticker');

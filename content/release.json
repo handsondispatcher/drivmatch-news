@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.2",
-  "baseline": "v34.1 frozen at backup/v34-1-approved-2026-10-09; Road TV embedded below Ventusky before verified USD/BRL, diesel and Brent",
+  "version": "v34.3",
+  "baseline": "v34.2 preserved in backup/v34-2-2026-10-09; Road TV clean official railcam embed for interface validation",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -24,7 +24,10 @@
     "usa_cargo_forward_cab_metadata_gate",
     "recent_48h_replay_clock_alignment",
     "road_tv_channel_rotation",
-    "weather_road_tv_market_order"
+    "weather_road_tv_market_order",
+    "single_embedded_railcam",
+    "remove_roadtv_channel_buttons_and_public_fallback_text",
+    "no_false_live_badge"
   ],
   "prior_backups": [
     {
@@ -33,8 +36,8 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "backup/v34-1-approved-2026-10-09",
-  "previous_release_commit": "77b6d50fa159a0b18a9619a2fcf6db4b652646cd",
+  "previous_release_branch": "backup/v34-2-2026-10-09",
+  "previous_release_commit": "c5bcc13ea8ed61677a85f7ee8807ea34d48229c9",
   "road_tv_policy": {
     "youtube_twitch_only": true,
     "live_claim_requires_authorized_api": true,
@@ -43,6 +46,11 @@
     "recorded_today_or_yesterday_only": true,
     "clock_aligned_actual_broadcast_metadata_only": true,
     "no_live_and_no_recent_verified_recording": "show_unavailable_state",
-    "automatic_restreaming": false
+    "automatic_restreaming": false,
+    "player_test": "single_official_youtube_railcam_embed",
+    "roadtv_ui": "heading_plus_unmodified_youtube_player_only",
+    "roadtv_dynamic_discovery_currently_active": false,
+    "recording_or_current_live_status": "platform_controlled_not_claimed_by_drivmatch",
+    "retain_backend_for_future_review": true
   }
 }
