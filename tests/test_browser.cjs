@@ -13,8 +13,8 @@ const {spawn}=require('node:child_process');
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.1','public page has v34.1 version');
-   assert.equal(await page.locator('#site-version').innerText(),'v34.1','public masthead identifies v34.1');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.2','public page has v34.2 version');
+   assert.equal(await page.locator('#site-version').innerText(),'v34.2','public masthead identifies v34.2');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
@@ -70,6 +70,43 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#market').innerText().then(x=>/Class 8|J.B. Hunt|Knight-Swift|FedEx|FDX/.test(x)),false,'Do not show dead tickers');
    assert.ok(await page.locator('#market .market-live-row').count()<=3,'Only three verified indicator categories allowed');
    assert.equal(await page.locator('#market .market-live-row').count()+(await page.locator('#market .market-unavailable').count())>0,true,'Either verified data or one explanation is visible');
+   // Road TV sits between visible Ventusky and USD/diesel/Brent on all screens.
+   const tv=width>990?'#roadtv-desktop':'#roadtv-mobile';
+   const flow=await page.evaluate(width=>{
+     const ids=width>990?['clima-desktop','roadtv-desktop','market-title']:
+                           ['clima-mobile','roadtv-mobile','market-title-mobile'];
+     return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
+   },width);
+   assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
+   assert.equal(await page.locator(tv+' iframe[data-roadtv-frame]').count(),0,'No video loaded before tap');
+   assert.notEqual(await page.locator(tv+' [data-roadtv-badge]').textContent(),'AO VIVO','Never invent live without platform verification');
+   if(width<=390){
+     assert.equal(await page.locator('#mobile-market').isVisible(),true);
+     assert.equal(await page.locator('#mercados').isVisible(),false);
+   }
+   if(width===1440){
+     // Browser-only mock (not shipped). Genuine API secrets never enter browser.
+     const fixture={schema_version:2,generated_at:new Date().toISOString(),
+       live_checked_at:new Date().toISOString(),live_status:'verified_live',
+       channels:[],candidates:[{
+         platform:'youtube',video_id:'A1b2C3d4E5f',
+         video_url:'https://www.youtube.com/watch?v=A1b2C3d4E5f',
+         channel_url:'https://www.youtube.com/channel/UCAAAAAAAAAAAAAAAAAAAAAA',
+         channel_name:'Automated test (not published)',
+         title:'USA semi truck forward windshield dashcam',live:true,status:'live',
+         geo_evidence:'publisher metadata',camera_evidence:'publisher metadata',
+         verification:'automated test'}]};
+     await page.route('**/data/road-tv.json?*',route=>route.fulfill({
+       status:200,contentType:'application/json',body:JSON.stringify(fixture)}));
+     await page.reload({waitUntil:'networkidle'});
+     assert.equal((await page.locator('#roadtv-desktop [data-roadtv-badge]').textContent()).trim(),'AO VIVO');
+     assert.equal(await page.locator('#roadtv-desktop iframe[data-roadtv-frame]').count(),0,'Play requires tap');
+     await page.route('**/www.youtube-nocookie.com/**',route=>route.fulfill({
+       status:200,body:'<!doctype html><title>Fixture player</title>'}));
+     await page.locator('#roadtv-desktop [data-roadtv-play]').click();
+     assert.match(await page.locator('#roadtv-desktop iframe[data-roadtv-frame]').getAttribute('src'),
+       /^https:\/\/www\.youtube-nocookie\.com\/embed\//);
+   }
    const card=width>990?'#clima-desktop':'#clima-mobile';
    assert.equal(await page.locator('#dm-crawler-track a[href*="thetrucker.com"]').count(),0,'Known geo-blocked publisher must not appear in ticker');
    // Approved layout: Ventusky is visible immediately, without a toggle.
