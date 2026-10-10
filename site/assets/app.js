@@ -1,4 +1,4 @@
-/* DrivMatch News v34 — newsroom editorial on verified v33; v33 snapshot and mobile reader preserved. */
+/* DrivMatch News v34.1 — newsroom, only verified market values; v34/v33 snapshots and mobile reader preserved. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -158,23 +158,48 @@
     const cls=v>0?'market-up':v<0?'market-down':'market-flat';const arrow=v>0?'▲':v<0?'▼':'—';const n=(v>0?'+':'')+v.toLocaleString(lang==='pt'?'pt-BR':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     return `<span class="${cls}">${arrow} ${n}%</span>`;
   }
-  function marketValue(v,key){if(v==null||!Number.isFinite(Number(v.value)))return `<span class="market-flat">—</span>`;
-    const age=Date.now()-Date.parse(v.observed_at);
-    if(key==='usdbrl'&&(!Number.isFinite(age)||age< -30000||age>432000000))return '<span class="market-flat">—</span>';
-    const status=key==='usdbrl'?(age>60000?'cotação com atraso':'snapshot do fornecedor'):(v.quote_status||'última observação disponível');
-    const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':'en-US',{minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
-    return `<b>${key==='usdbrl'?'R$':key.startsWith('class8')?'unidades':'US$'} ${n}</b>${percentBadge(Number(v.change_pct))}<small class="market-asof">${escapeHTML(v.observed_at||'')} · ${escapeHTML(v.source||'')} · ${escapeHTML(status)}</small>`;}
-  function mrow(name,ticker,v,key){return `<div class="sideitem"><div><strong>${escapeHTML(name)}</strong><small>${escapeHTML(ticker)}</small></div><div class="value">${marketValue(v,key)}</div></div>`;}
-  function renderMarket(){const market=data.market||{}, inds=market.indicators||{}, stocks=market.stocks||{};
-    let body=mrow(lang==='pt'?'Dólar comercial':'USD / BRL','USD/BRL',inds.usdbrl,'usdbrl')+
-      mrow(lang==='en'?'US Diesel':lang==='es'?'Diésel en EE. UU.':'Diesel nos EUA','EIA · US$/gal',inds.diesel,'diesel')+
-      mrow(lang==='en'?'Brent crude':lang==='es'?'Petróleo Brent':'Petróleo Brent','BRENT · US$/bbl',inds.brent,'brent');
-    const ready=listed.filter(([sym])=>stocks[sym]&&Number.isFinite(Number(stocks[sym].value)));
-    body+=mrow('Class 8 · pedidos líquidos','ACT / FTR · mensal',inds.class8_orders,'class8_orders');
-    body+=mrow('Class 8 · vendas','ACT / FTR · mensal',inds.class8_sales,'class8_sales');
-    body+=`<div class="sidegroup">${lang==='pt'?'Ações do setor':lang==='en'?'Transportation stocks':'Acciones del transporte'}</div>`+listed.map(([sym,name,exchange])=>mrow(name,`${sym} · ${exchange}`,stocks[sym],sym)).join('');
-    $('market').innerHTML=body;
-    $('market-note').textContent=(market.generated_at?`Verificado pelo sistema: ${market.generated_at}. `:'')+(ready.length?'':labels[lang].dataMissing);
+  // V34.1 market contract: if we cannot provide a real, dated, attributed
+  // number, we do not display a dead ticker row or a fabricated zero.
+  function verifiedMarketQuote(v,key){
+    if(!v || typeof v!=='object' || v.value===null || v.value===undefined || v.value==='')return false;
+    const value=Number(v.value),observed=Date.parse(v.observed_at||'');
+    if(!Number.isFinite(value)||value<=0||!Number.isFinite(observed)||!String(v.source||'').trim())return false;
+    const age=Date.now()-observed;
+    const maxAge={usdbrl:5,diesel:35,brent:14}[key]*86400000;
+    return age>=-86400000 && age<=maxAge;
+  }
+  function marketValue(v,key){
+    const status=key==='usdbrl'
+      ? (lang==='pt'?'Última cotação verificada':lang==='es'?'Última cotización verificada':'Last verified quote')
+      : (v.quote_status||({pt:'Último dado disponível',es:'Último dato disponible',en:'Last available observation'}[lang]));
+    const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
+    const unit=key==='usdbrl'?'R$': 'US$';
+    const observed=String(v.observed_at||'').slice(0,16).replace('T',' ');
+    const change=v.change_pct===null||v.change_pct===undefined||v.change_pct===''?'':percentBadge(Number(v.change_pct));
+    return `<b>${unit} ${n}</b>${change}<small class="market-asof">${escapeHTML(observed)} · ${escapeHTML(v.source||'')} · ${escapeHTML(status)}</small>`;
+  }
+  function mrow(name,ticker,v,key){
+    if(!verifiedMarketQuote(v,key))return '';
+    return `<div class="sideitem market-live-row" data-market-key="${key}"><div><strong>${escapeHTML(name)}</strong><small>${escapeHTML(ticker)}</small></div><div class="value">${marketValue(v,key)}</div></div>`;
+  }
+  function renderMarket(){
+    const market=data.market||{},inds=market.indicators||{};
+    const body=[
+      mrow(lang==='pt'?'Dólar comercial':lang==='es'?'Dólar comercial':'USD / BRL','USD/BRL',inds.usdbrl,'usdbrl'),
+      mrow(lang==='en'?'US Diesel':lang==='es'?'Diésel en EE. UU.':'Diesel nos EUA','EIA · US$/gal',inds.diesel,'diesel'),
+      mrow(lang==='en'?'Brent crude':lang==='es'?'Petróleo Brent':'Petróleo Brent','BRENT · US$/bbl',inds.brent,'brent')
+    ].filter(Boolean);
+    // Securities and Class 8 data were never reliably available on the public
+    // News site. They are deliberately not shown, even as placeholders.
+    // Keep original provider contracts documented for future, licensed use.
+    const empty=lang==='pt'?'Sem indicadores recentes e verificados nesta atualização. Não exibimos cotações fictícias.':
+      lang==='es'?'No hay indicadores recientes y verificados. No mostramos cotizaciones ficticias.':
+      'No recent verified market indicators are available. No invented quotes.';
+    $('market').innerHTML=body.length?body.join(''):`<p class="market-unavailable">${empty}</p>`;
+    const note=lang==='pt'?'Dados de referência, não cotações em tempo real.':
+      lang==='es'?'Datos de referencia, no cotizaciones en tiempo real.':
+      'Reference data, not real-time prices.';
+    $('market-note').textContent=body.length?note:'';
   }
   function renderAds(){let ad=(data.ads?.enabled && data.ads.placements||[]).find(x=>x.enabled && x.slot==='below_panorama' && safeUrl(x.url));
     $('ad-slot').hidden=!ad;if(!ad)return;
