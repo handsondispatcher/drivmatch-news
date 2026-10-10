@@ -123,7 +123,7 @@ function populateWeatherChoices(){
  if(document.activeElement!==query)query.value=weatherSelection==='auto'?'':chosenText(weatherSelection);
  const button=el('top-city-auto');
  if(button){
-   button.disabled=weatherSelection==='auto';
+   button.disabled=weatherSelection==='auto'&&!query.value.trim();
    button.title=l==='en'?'Rotate weather cities automatically':l==='es'?'Alternar las ciudades automáticamente':'Alternar cidades automaticamente';
    button.setAttribute('aria-label',button.title);
  }
@@ -182,6 +182,11 @@ function init(){
  el('top-city-type')?.addEventListener('click',()=>{const e=el('top-city-query');e?.focus();e?.select();});
  el('top-city-apply')?.addEventListener('click',applyCityQuery);
  el('top-city-query')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyCityQuery();}});
+ el('top-city-query')?.addEventListener('input',()=>{
+   const query=el('top-city-query'),auto=el('top-city-auto');
+   if(auto)auto.disabled=weatherSelection==='auto'&&!query?.value.trim();
+   cityFeedback('','','');
+ });
  el('top-city-auto')?.addEventListener('click',resetCityAuto);
  el('language')?.addEventListener('change',()=>{showMarket();populateWeatherChoices();showCity()});
 }
