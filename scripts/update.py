@@ -357,7 +357,10 @@ def build(offline=False):
     articles=read_json(ROOT/'content/editorial.json')
     mode='production'
     if mode=='production':articles=[a for a in articles if not a.get('demo')]
+    from claim_integrity import social_origin_ready_for_publication
     for article in articles:
+        if article.get('origin_type')=='social-post' and not social_origin_ready_for_publication(article):
+            raise ValueError('Social-origin editorial item has incomplete verification, provenance or rights')
         if article.get('status')!='approved':raise ValueError('Unapproved editorial article in publication file')
         if article.get('demo') is not True and article.get('usage_rights') not in ('owned','licensed'):
             raise ValueError('Production article lacks owned/licensed content rights')
