@@ -1,18 +1,27 @@
 {
   "product": "DrivMatch News",
-  "version": "v33",
-  "baseline": "v32 preserved at backup/v32-approved-2026-10-09 + v33 editorial polish (2026-10-09)",
+  "version": "v34",
+  "baseline": "v33 frozen at backup/v33-approved-2026-10-09; v34 restrained editorial redesign; v32 also preserved",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
   "consolidated_on": "2026-10-09",
   "editorial_alerts_are_live_incidents": false,
-  "backup_branch": "backup/v32-approved-2026-10-09",
-  "backup_commit": "659a146b8f48c342c2a62d86a1330d59760116d4",
+  "backup_branch": "backup/v33-approved-2026-10-09",
+  "backup_commit": "fea227dde034e101ace8299357579ddfe98fe256",
   "polish_scope": [
-    "responsive_typography",
-    "carousel_accessibility_and_swipe",
-    "market_sidebar_readability",
-    "five_headline_briefing"
+    "premium_newsroom_layout",
+    "masthead_and_sections",
+    "photo_hero_and_related_news",
+    "licensed_five_headline_visual_briefing",
+    "mobile_accessibility",
+    "nonintrusive_platform_referrals_without_new_matching"
+  ],
+  "prior_backups": [
+    {
+      "version": "v32",
+      "branch": "backup/v32-approved-2026-10-09",
+      "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
+    }
   ]
 }
