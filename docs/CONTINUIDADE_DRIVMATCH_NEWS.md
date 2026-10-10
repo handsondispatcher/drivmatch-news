@@ -1,5 +1,9 @@
 # DrivMatch News — CONTINUIDADE CANÔNICA / LEIA PRIMEIRO
 
+## CORREÇÃO v34.4 — EVIDÊNCIA ANDROID E AUDITORIA (10/10/2026)
+
+Usuário identificou a câmera ferroviária v34.3 com erro “Vídeo indisponível”, ticker móvel pequeno e matérias não renovadas em muitas horas. **Não considerar embed estático = live funcionando.** Road TV deve mostrar apenas título e player: retirar câmera `to8SHIQHyQo` e usar estado ao vivo validado pela API com rotação por `onError`/`onStateChange`, sem botões de streamers ou disclaimer fora do player. **Sem credenciais de YouTube/Twitch, o correto é mostrar player indisponível sem inventar live.** Ticker 16px em mobile e fonte consultada/hora real da matéria separadas. Pipeline público continua não homologado: `public_launch_approved=false`. **Backup v34.3** em `backup/v34-3-mobile-audit-2026-10-10` SHA `578a713ce3e3a3e90402d2026319756754dca911`. Todos os backups anteriores preservados. [Ata integral](V34_4_AUDIT.md).
+
 ## ATUALIZAÇÃO v34.3 — ROAD TV SÓ COM VÍDEO (09/10/2026)
 
 Usuário enviou screenshot da v34.2 e ordenou explicitamente **apenas ROAD TV + player**, sem a linha “Road TV · YouTube / Twitch”, nenhum botão de próximo, nenhum chip ou lista dos quatro streamers, nenhuma nota pública de regra/teste. Deve-se implementar e publicar normalmente a v34.3 com **um feed ferroviário anunciado como live** para validar o player (Virtual Railfan, Oklahoma City `to8SHIQHyQo` via player YouTube oficial), **sem usar selo AO VIVO próprio não verificado**. Manter clima → player → USD/BRL, diesel e petróleo. A descoberta original YouTube/Twitch fica tecnicamente congelada no script anterior e no backend, mas NÃO ativa na janela desta revisão. Detalhes: [V34_3_ROAD_TV_CLEAN.md](V34_3_ROAD_TV_CLEAN.md). Backup v34.2 antes de alterar `backup/v34-2-2026-10-09` SHA `c5bcc13ea8ed61677a85f7ee8807ea34d48229c9`, junto aos demais. Nunca ressuscitar textos do painel anterior sem pedido do usuário.

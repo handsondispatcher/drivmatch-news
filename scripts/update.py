@@ -320,8 +320,8 @@ def build(offline=False):
     weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
     release=read_json(ROOT/'content/release.json')
-    if release.get('version')!='v34.3' or release.get('public_launch_approved') is not False:
-        raise ValueError('Invalid release contract: v34.3 must remain prelaunch')
+    if release.get('version')!='v34.4' or release.get('public_launch_approved') is not False:
+        raise ValueError('Invalid release contract: v34.4 must remain prelaunch')
     data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
@@ -340,12 +340,25 @@ def build(offline=False):
                     'failed':sum(x.get('status')=='failed' for x in statuses),
                     'manual':sum(x.get('status')=='manual-review' for x in statuses)}
     latest=max((x.get('published_at','') for x in external_headlines),default='')
+    now=NOW()
+    fresh_6h=sum(1 for x in external_headlines if x.get('published_at') and
+                 0<=(now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds()<=6*3600)
+    fresh_12h=sum(1 for x in external_headlines if x.get('published_at') and
+                  0<=(now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds()<=12*3600)
+    newest_age_h=(now-datetime.fromisoformat(latest.replace('Z','+00:00'))).total_seconds()/3600 if latest else None
+    if newest_age_h is None or newest_age_h>8:
+        print('::warning::NEWS FRESHNESS: no eligible headline published in the past 8 hours. '
+              'Successful deployment is not a new editorial story.')
     monitor={'generated_at':NOW().isoformat(timespec='seconds'),
              'last_source_check':source_health.get('checked_at'),
              'latest_headline_at':latest,'source_metrics':source_metrics,
+             'fresh_6h':fresh_6h,'fresh_12h':fresh_12h,
+             'newest_headline_age_hours':round(newest_age_h,2) if newest_age_h is not None else None,
              'editorial_status':'external_feed_links_not_editorially_approved',
              'headlines':external_headlines}
     (path/'source-headlines.json').write_text(json.dumps(monitor,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    print('NEWS FRESHNESS:',len(external_headlines),'eligible', 'fresh_6h:',fresh_6h,
+          'fresh_12h:',fresh_12h,'latest_age_h:',round(newest_age_h,1) if newest_age_h is not None else 'unknown')
     # A safe current-news endpoint for the separately deployed DrivMatch Live site.
     # Do not confuse this with verified active traffic or weather incidents.
     from live_feed import make_live_feed
@@ -362,7 +375,7 @@ def build(offline=False):
     # Content hashes prevent browsers mixing new HTML with cached runtime/data.
     page=ROOT/'site/index.html'
     markup=page.read_text(encoding='utf-8')
-    for asset in ('data/bootstrap.js','assets/app.js','assets/news-crawler.js','assets/clima-spot.js','assets/utility-strip.js'):
+    for asset in ('data/bootstrap.js','assets/app.js','assets/road-tv-live.js','assets/news-crawler.js','assets/clima-spot.js','assets/utility-strip.js'):
         version=hashlib.sha256((ROOT/'site'/asset).read_bytes()).hexdigest()[:16]
         markup=re.sub(r'(src="'+re.escape(asset)+r')(?:\?[^"]*)?"',lambda m:m.group(1)+'?v='+version+'"',markup)
     page.write_text(markup,encoding='utf-8')
