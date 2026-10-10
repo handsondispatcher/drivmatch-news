@@ -66,6 +66,20 @@ const {spawn}=require('node:child_process');
    assert.equal(shadow,'none','Selected language has its own border but no overlaid shadow');
    assert.equal(await page.locator('#search').isVisible(),true);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
+   // Government alert icons may be illustrations, never zoomed/cropped
+   // photographs. Verify computed object-fit after every responsive breakpoint.
+   const bulletinImages=page.locator('#panorama img[data-bulletin="true"], #noticias img[data-bulletin="true"], #highlights img[data-bulletin="true"]');
+   if(await bulletinImages.count()){
+    const pictures=await bulletinImages.evaluateAll(imgs=>imgs.map(img=>({
+     fit:getComputedStyle(img).objectFit,
+     graphic:img.getAttribute('src')?.startsWith('data:image/svg'),
+     source:img.getAttribute('src')
+    })));
+    assert.ok(pictures.every(p=>p.fit==='contain'),'Bulletin graphics must not be cropped at '+width+'px');
+    assert.ok(pictures.every(p=>p.graphic),'NWS bulletins must not inherit truck archive images');
+    assert.ok(pictures.some(p=>decodeURIComponent(p.source).includes('viewBox="0 0 960 540"')),
+      'Weather illustration uses restrained 16:9 graphic with safe margins');
+   }
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
    assert.equal(await page.locator('#features > .related-rail article').count(),3,'v31 requires three related stories');
    assert.equal(await page.locator('.language-shortcuts button[data-site-lang]').count(),3,'v31 language shortcuts must be present');
