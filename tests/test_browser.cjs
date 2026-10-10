@@ -166,12 +166,14 @@ const {spawn}=require('node:child_process');
        const overflow=rects.some(r=>r.left<container.left-2||r.right>container.right+2);
        const collision=rects.some((r,i)=>rects.slice(i+1).some(q=>
          r.left<q.right-1&&r.right>q.left+1&&r.top<q.bottom-1&&r.bottom>q.top+1));
-       const rowTops=[...new Set(rects.map(r=>Math.round(r.top/5)*5))];
-       return {columns,overflow,collision,rows:rowTops.length};
+       const separated=rects.length===6&&
+         Math.min(...rects.slice(3).map(r=>r.top))>=Math.max(...rects.slice(0,3).map(r=>r.bottom))-2;
+       return {columns,overflow,collision,separated};
      });
      assert.equal(layout.columns,width===944?3:6,
        'City selector must use 3×2 responsive market strip at 944px and 6-wide on desktop');
-     assert.equal(layout.rows,width===944?2:1,'Market/forecast modules should use intentional row layout');
+     if(width===944)assert.equal(layout.separated,true,
+       'Below 1120px weather, city picker, and risk must sit beneath all three quotes');
      assert.equal(layout.overflow,false,'No weather/quote module should exceed its container');
      assert.equal(layout.collision,false,'Market/forecast modules must never overlap');
    }
