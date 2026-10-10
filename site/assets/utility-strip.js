@@ -4,6 +4,8 @@ const el=id=>document.getElementById(id);
 const fixed=[['Orlando','FL'],['Houston','TX'],['New York City','NY'],['Newark','NJ'],['San Francisco','CA'],['Atlanta','GA'],['El Paso','TX'],['Buffalo','NY'],['Salt Lake City','UT'],['Las Vegas','NV'],['Chattanooga','TN'],['Nashville','TN'],['Chicago','IL'],['Los Angeles','CA'],['Dallas','TX'],['Miami','FL'],['Tampa','FL'],['Jacksonville','FL'],['Memphis','TN'],['Indianapolis','IN'],['Columbus','OH'],['Cincinnati','OH'],['Louisville','KY'],['Kansas City','MO'],['St. Louis','MO'],['Denver','CO'],['Phoenix','AZ'],['Albuquerque','NM'],['Seattle','WA'],['Portland','OR'],['Detroit','MI'],['Laredo','TX'],['San Diego','CA'],['Charlotte','NC'],['Birmingham','AL'],['Oklahoma City','OK'],['Harrisburg','PA'],['Sacramento','CA'],['Cleveland','OH'],['Boston','MA'],['McAllen','TX'],['Ontario','CA'],['Savannah','GA'],['Reno','NV'],['Philadelphia','PA'],['Fresno','CA'],['Austin','TX'],['Washington','DC'],['Fort Lauderdale','FL'],['Kissimmee','FL'],['Boca Raton','FL'],['Pompano Beach','FL'],['Framingham','MA'],['Worcester','MA'],['Danbury','CT'],['Edison','NJ'],['San Antonio','TX'],['Norfolk','VA'],['Tacoma','WA'],['Bellingham','WA'],['Spokane','WA'],['Eugene','OR'],['Medford','OR'],['Redding','CA'],['Stockton','CA'],['Bakersfield','CA'],['San Bernardino','CA'],['Barstow','CA'],['Long Beach','CA'],['Oakland','CA'],['Tucson','AZ'],['Nogales','AZ'],['Flagstaff','AZ'],['Yuma','AZ'],['Kingman','AZ'],['Las Cruces','NM'],['Amarillo','TX'],['Waco','TX'],['Fort Worth','TX'],['Beaumont','TX'],['Lubbock','TX'],['Eagle Pass','TX'],['Brownsville','TX'],['Midland','TX'],['Corpus Christi','TX'],['Tulsa','OK'],['Wichita','KS'],['Topeka','KS'],['Salina','KS'],['Lincoln','NE'],['Omaha','NE'],['North Platte','NE'],['Cheyenne','WY'],['Rock Springs','WY'],['Ogden','UT'],['St. George','UT'],['Colorado Springs','CO'],['Grand Junction','CO'],['Des Moines','IA'],['Cedar Rapids','IA'],['Minneapolis','MN'],['Duluth','MN'],['Fargo','ND'],['Pembina','ND'],['Sioux Falls','SD'],['Little Rock','AR'],['Jackson','MS'],['Baton Rouge','LA'],['New Orleans','LA'],['Lafayette','LA'],['Shreveport','LA'],['Mobile','AL'],['Montgomery','AL'],['Huntsville','AL'],['Pensacola','FL'],['Tallahassee','FL'],['Ocala','FL'],['Gainesville','FL'],['Valdosta','GA'],['Macon','GA'],['Augusta','GA'],['Charleston','SC'],['Columbia','SC'],['Greenville','SC'],['Florence','SC'],['Fayetteville','NC'],['Greensboro','NC'],['Raleigh','NC'],['Asheville','NC'],['Richmond','VA'],['Fredericksburg','VA'],['Roanoke','VA'],['Winchester','VA'],['Lexington','KY'],['Bowling Green','KY'],['Knoxville','TN'],['Jackson','TN'],['Gary','IN'],['South Bend','IN'],['Toledo','OH'],['Dayton','OH'],['Youngstown','OH'],['Pittsburgh','PA'],['Carlisle','PA'],['Allentown','PA'],['Scranton','PA'],['Baltimore','MD'],['Hagerstown','MD'],['Wilmington','DE'],['Trenton','NJ'],['Elizabeth','NJ'],['New Haven','CT'],['Hartford','CT'],['Providence','RI'],['Portland','ME'],['Albany','NY'],['Syracuse','NY'],['Binghamton','NY'],['Rochester','NY'],['Niagara Falls','NY'],['Port Huron','MI'],['Grand Rapids','MI'],['Milwaukee','WI'],['Madison','WI'],['Green Bay','WI'],['Joliet','IL'],['Rockford','IL'],['Springfield','IL']];
 // Approved layout requires stable location, never random city changes between visits.
 let cities=fixed.map(([city,state])=>({city,state,status:'unavailable'})),market={},spot=null;
+let weatherSelection='auto',weatherRotateIndex=0;
+try{const stored=localStorage.getItem('drivmatch_weather_city_v1');if(stored&&/^.{1,80}\|[A-Z]{2}$/.test(stored))weatherSelection=stored;}catch(_){};
 const lang=()=>el('language')?.value||'pt';
 function number(v,d){return Number(v).toLocaleString(lang()==='pt'?'pt-BR':lang()==='es'?'es-ES':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
 // v34.7: identical reader-facing quote composition to the approved screenshot.
@@ -64,9 +66,10 @@ function showCity(){
  if(!good.length){panel.hidden=true;return;}
  panel.hidden=false;
  const avail=new Map(good.map(c=>[c.city+'|'+c.state,c]));
- // Tampa is the fixed approved reference location when the feed is available.
- // Otherwise use a predictable real city, never a random carousel.
- const picked=avail.get('Tampa|FL')||good[0];
+ const ordered=[avail.get('Tampa|FL'),...good.filter(c=>c.city!=='Tampa'||c.state!=='FL')].filter(Boolean);
+ // Explicit reader preference pins one verified city; otherwise advance every 10min.
+ const picked=weatherSelection==='auto'?ordered[weatherRotateIndex%ordered.length]:
+              avail.get(weatherSelection)||ordered[weatherRotateIndex%ordered.length];
  if(!picked){panel.hidden=true;return;}
  el('top-city').textContent=picked.city+', '+picked.state;
  el('top-weather-icon').textContent=icon(picked.condition_en);
@@ -83,12 +86,28 @@ function showCity(){
  el('top-condition').title='';
 }
 
+function populateWeatherChoices(){
+ const select=el('top-city-select');if(!select)return;
+ const l=lang();
+ const auto=l==='en'?'Auto · every 10 min':l==='es'?'Auto · cada 10 min':'Automático · 10 min';
+ const label=el('top-city-select-label');
+ if(label)label.textContent=l==='en'?'City / State':l==='es'?'Ciudad / Estado':'Cidade / Estado';
+ const good=validCities();
+ select.replaceChildren(new Option(auto,'auto'));
+ for(const c of good){select.add(new Option(c.city+', '+c.state,c.city+'|'+c.state));}
+ if(weatherSelection!=='auto'&&!good.some(c=>c.city+'|'+c.state===weatherSelection)){
+   // No valid forecast for the chosen city: revert to actual available observations.
+   weatherSelection='auto';
+   try{localStorage.removeItem('drivmatch_weather_city_v1')}catch(_){}
+ }
+ select.value=weatherSelection;
+}
 async function weather(){
  try{
   const r=await fetch('data/weather.json?d='+Date.now(),{cache:'no-store'});if(!r.ok)return;
   const j=await r.json();if(!Array.isArray(j.cities))return;
   const m=new Map(j.cities.map(c=>[c.city+'|'+c.state,c]));
-  cities=fixed.map(([city,state])=>Object.assign({city,state,status:'unavailable'},m.get(city+'|'+state)||{}));showCity();
+  cities=fixed.map(([city,state])=>Object.assign({city,state,status:'unavailable'},m.get(city+'|'+state)||{}));populateWeatherChoices();showCity();
  }catch(_){}
 }
 async function quotes(){
@@ -107,7 +126,15 @@ function init(){
  if(!el('top-city'))return;
  showMarket();showCity();
  if(location.protocol.startsWith('http')){weather();quotes();live();setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);}
- el('language')?.addEventListener('change',()=>{showMarket();showCity()});
+ setInterval(()=>{if(weatherSelection==='auto'&&validCities().length){weatherRotateIndex++;showCity()}},10*60000);
+ el('top-city-select')?.addEventListener('change',e=>{
+   weatherSelection=e.target.value||'auto';
+   weatherRotateIndex=0;
+   try{if(weatherSelection==='auto')localStorage.removeItem('drivmatch_weather_city_v1');
+       else localStorage.setItem('drivmatch_weather_city_v1',weatherSelection);}catch(_){}
+   showCity();
+ });
+ el('language')?.addEventListener('change',()=>{showMarket();populateWeatherChoices();showCity()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
