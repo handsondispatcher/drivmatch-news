@@ -197,7 +197,9 @@
   }
   function marketValue(v,key){
     const status=key==='usdbrl'
-      ? (lang==='pt'?'Última cotação verificada':lang==='es'?'Última cotización verificada':'Last verified quote')
+      ?(v.instrument==='ptax_reference'
+         ?(lang==='pt'?'Última PTAX oficial de venda':lang==='es'?'Última PTAX oficial de venta':'Last official BCB PTAX sell reference')
+         :(lang==='pt'?'Último fechamento comercial verificado':lang==='es'?'Último cierre comercial verificado':'Last verified commercial close'))
       : (v.quote_status||({pt:'Último dado disponível',es:'Último dato disponible',en:'Last available observation'}[lang]));
     const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
     const unit=key==='usdbrl'?'R$': 'US$';
@@ -212,7 +214,8 @@
   function renderMarket(){
     const market=data.market||{},inds=market.indicators||{};
     const body=[
-      mrow(lang==='pt'?'Dólar comercial':lang==='es'?'Dólar comercial':'USD / BRL','USD/BRL',inds.usdbrl,'usdbrl'),
+      mrow(inds.usdbrl?.instrument==='ptax_reference'?(lang==='en'?'USD PTAX (BCB)':lang==='es'?'Dólar PTAX (BCB)':'Dólar PTAX (BCB)'):
+        (lang==='pt'?'Dólar comercial':lang==='es'?'Dólar comercial':'USD / BRL'),'USD/BRL',inds.usdbrl,'usdbrl'),
       mrow(lang==='en'?'US Diesel':lang==='es'?'Diésel en EE. UU.':'Diesel nos EUA','EIA · US$/gal',inds.diesel,'diesel'),
       mrow(lang==='en'?'Brent crude':lang==='es'?'Petróleo Brent':'Petróleo Brent','BRENT · US$/bbl',inds.brent,'brent')
     ].filter(Boolean);
