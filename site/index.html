@@ -811,6 +811,16 @@ body{background:#f7f9fc;color:#14283c}
 .header .language-shortcuts button.selected{box-shadow:none!important}
 @media(max-width:850px){.dm-util-inner{grid-template-columns:repeat(3,minmax(0,1fr))}.dm-util-city{grid-column:1/2}.dm-util-city-select{grid-column:2/3;padding:5px 8px}.dm-util-risk{grid-column:3;justify-self:end}}
 @media(max-width:650px){.dm-util-inner{grid-template-columns:repeat(2,minmax(0,1fr))}.dm-util-quote:nth-child(3){grid-column:1/3}.dm-util-city{grid-column:1/3}.dm-util-city-select{grid-column:1/2;padding:7px}.dm-util-risk{grid-column:2/3;justify-self:end}.ad-placement-news{flex-direction:column;align-items:stretch;padding:15px 17px}.ad-placement-news .ad-link{align-self:flex-start}.ad-placement-side{min-height:230px}}
+
+/* v34.9 audit: middle desktop viewport cannot fit six media tiles on one line. */
+@media(min-width:851px) and (max-width:1120px){
+ .dm-util-inner{grid-template-columns:repeat(3,minmax(0,1fr))!important;row-gap:8px;padding:8px 13px}
+ .dm-util-quote{grid-column:auto;grid-row:1}
+ .dm-util-quote:nth-child(3){border-right:0}
+ .dm-util-city{grid-column:1;grid-row:2;padding:5px 10px;border-right:1px solid #afc0d2;min-width:0}
+ .dm-util-city-select{grid-column:2;grid-row:2;padding:4px 10px;min-width:0}
+ .dm-util-risk{grid-column:3;grid-row:2;justify-self:end;max-width:100%;margin:0 5px;white-space:normal;text-align:center}
+}
 </style>
 </head>
 <body>
