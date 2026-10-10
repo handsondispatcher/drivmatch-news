@@ -186,13 +186,13 @@ class PublicationTests(unittest.TestCase):
  def test_census_national_city_index_and_duplicate_city_disambiguation(self):
   import io,zipfile
   from build_us_places import parse_gazetteer,validate_cache,SOURCE_URL
-  rows=['USPS\\tNAME\\tINTPTLAT\\tINTPTLONG']
-  rows.extend(['MO\\tSt. Charles city\\t38.78400\\t-90.48100',
-               'IL\\tSt. Charles city\\t41.91400\\t-88.30800'])
-  rows.extend(f'TX\\tDemoTown{i:05d} city\\t31.00000\\t-97.00000' for i in range(20000))
+  rows=['USPS\tNAME\tINTPTLAT\tINTPTLONG']
+  rows.extend(['MO\tSt. Charles city\t38.78400\t-90.48100',
+               'IL\tSt. Charles city\t41.91400\t-88.30800'])
+  rows.extend(f'TX\tDemoTown{i:05d} city\t31.00000\t-97.00000' for i in range(20000))
   b=io.BytesIO()
   with zipfile.ZipFile(b,'w',compression=zipfile.ZIP_DEFLATED) as z:
-   z.writestr('2025_Gaz_place_national.txt','\\n'.join(rows))
+   z.writestr('2025_Gaz_place_national.txt','\n'.join(rows))
   places=parse_gazetteer(b.getvalue())
   self.assertEqual(len(places),20002)
   self.assertEqual({p[1] for p in places if p[0]=='St. Charles'},{'MO','IL'})
