@@ -30,7 +30,10 @@ def parse_gazetteer(blob:bytes):
         if info.file_size>12_000_000:raise ValueError("Census TSV too large")
         raw=archive.read(files[0])
     text=raw.decode("utf-8-sig")
-    rows=csv.DictReader(io.StringIO(text),delimiter="\t")
+    # Census 2025 publishes the national places file pipe-delimited, not TSV.
+    first_line=text.splitlines()[0]
+    delimiter="|" if first_line.count("|")>=8 else "\t"
+    rows=csv.DictReader(io.StringIO(text),delimiter=delimiter)
     required={"USPS","NAME","INTPTLAT","INTPTLONG"}
     if not rows.fieldnames or not required.issubset({n.strip() for n in rows.fieldnames}):
         raise ValueError(f"Census National Places columns unexpected: {rows.fieldnames!r}")
