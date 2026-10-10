@@ -46,6 +46,20 @@
       "enabled": true
     },
     {
+      "id": "truckdrivernews-primary",
+      "name": "Truck Driver News",
+      "url": "https://truckdrivernews.com",
+      "category": "Caminhoneiros",
+      "feed_url": "https://truckdrivernews.com/feed/",
+      "original_lang": "en",
+      "access": "rss",
+      "publication": "review-required",
+      "enabled": true,
+      "region": "US",
+      "source_type": "publisher-feed",
+      "attribution": "US CDL, HOS, truck-driver safety, regulation; original article link and timestamp only"
+    },
+    {
       "id": "supply-chain-dive",
       "name": "Supply Chain Dive",
       "url": "https://www.supplychaindive.com",
