@@ -111,6 +111,37 @@ jobs:
           RELEASE="https://handsondispatcher.github.io/drivmatch-news/data/release.json"
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v34.8-release.json
           python -c 'import json; x=json.load(open("/tmp/drivmatch-v34.8-release.json")); assert x["version"]=="v34.8" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v34.8 PASS: prelaunch contract consistent")'
+          # Separate truth gate: actual market payload deployed to the public origin.
+          # A successful build is not proof of a current rate or correct instrument.
+          MARKET_JSON="https://handsondispatcher.github.io/drivmatch-news/data/market.json"
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$MARKET_JSON" -o /tmp/drivmatch-public-market.json
+          python - <<'PY'
+          import json
+          from datetime import date
+          from urllib.parse import urlparse
+          d=json.load(open('/tmp/drivmatch-public-market.json',encoding='utf-8'))
+          q=d.get('indicators',{}).get('usdbrl')
+          assert q is not None,'USD BRL absent: cannot certify updated quote'
+          value=float(q.get('value',0))
+          observed=date.fromisoformat(q['observed_at'][:10])
+          age=(date.today()-observed).days
+          assert 0<value<50 and 0<=age<=5,(value,observed,age)
+          assert urlparse(q.get('source_url','')).scheme=='https'
+          typ=q.get('instrument','')
+          if typ=='spot':
+              assert q.get('price_type')=='commercial'
+              assert q.get('session_status')=='closed' or q.get('quote_status')=='live_snapshot'
+              if q.get('close_date')=='2026-10-09':
+                  assert abs(value-4.9850)<1e-5,'Commercial 09/10 close must not revert to outdated 08/10 rate'
+          elif typ=='ptax_reference':
+              assert q.get('price_type')=='ptax_venda'
+              assert 'Banco Central' in q.get('source','')
+          else:
+              raise AssertionError('Unknown USD BRL rate instrument: '+repr(typ))
+          print('PUBLIC USD BRL PROVENANCE PASS:',
+                f'value={value:.4f}',f'observed={observed}',f'source={q["source"]}',
+                f'instrument={typ}',f'age_days={age}')
+          PY
           PHOTOS="https://handsondispatcher.github.io/drivmatch-news/data/news-images.json"
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$PHOTOS" -o /tmp/drivmatch-news-images.json
           PHOTO=$(python -c 'import json; m=json.load(open("/tmp/drivmatch-news-images.json")); a=list(m["images"].values()); assert m["license_policy"]=="curated_commons" and len(a)>=16 and all(x["image"].startswith("assets/news-photos/") and x["image_credit"] and x["image_license"] for x in a); print(a[0]["image"])')
