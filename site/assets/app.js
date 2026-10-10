@@ -176,7 +176,13 @@
     $('featureCount').textContent=`${featurePage+1} / ${n}`;
     $('featurePrev').disabled=featurePage===0; $('featureNext').disabled=featurePage===n-1;
     const slideLabel=lang==='pt'?'Ir para página':lang==='es'?'Ir a la página':'Go to page';
-    $('featureDots').innerHTML=Array.from({length:n},(_,i)=>`<button type="button" class="carousel-dot ${i===featurePage?'active':''}" data-slide="${i}" aria-label="${slideLabel} ${i+1} / ${n}" aria-pressed="${i===featurePage}" ${i===featurePage?'aria-current="page"':''}></button>`).join('');
+    // A bounded window keeps the control clickable with 11+ story pages.
+    const visibleDots=Math.min(n,7);
+    const firstDot=Math.max(0,Math.min(featurePage-Math.floor(visibleDots/2),n-visibleDots));
+    $('featureDots').innerHTML=Array.from({length:visibleDots},(_,i)=>{
+      const target=firstDot+i;
+      return `<button type="button" class="carousel-dot ${target===featurePage?'active':''}" data-slide="${target}" aria-label="${slideLabel} ${target+1} / ${n}" aria-pressed="${target===featurePage}" ${target===featurePage?'aria-current="page"':''}></button>`;
+    }).join('');
     const shortlist=f.slice(0,5);
     $('highlights-title').textContent=lang==='pt'?'5 manchetes em foco':lang==='es'?'5 titulares destacados':'5 headlines in focus';
     $('highlightList').innerHTML=shortlist.map(a=>{
