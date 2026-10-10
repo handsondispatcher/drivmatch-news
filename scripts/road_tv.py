@@ -27,8 +27,11 @@ CARGO = re.compile(r'\b(?:semi[\s-]?truck|18[\s-]?wheeler|tractor[\s-]?trailer|t
 STOP = re.compile(r'\b(?:parked|parking break|rest stop|sleeping|shower|truck stop break|off duty|not driving|stopped|lunch break|taking a break|end of stream)\b', re.I)
 QUERIES = (
     'USA semi truck driver POV windshield live interstate',
+    'Trucking Duke DriveCam POV live Ohio Texas trucking',
     'USA box truck cargo van dashcam front cab live',
+    'live trucker POV driving semi truck USA road',
     'USA pickup truck hotshot trucking forward road live',
+    'box truck cargo van pickup driving POV live USA',
     'Florida I-4 interstate live traffic camera highway',
     'Peace Bridge Buffalo USA entrance live border traffic webcam trucks',
 )
@@ -332,11 +335,16 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     # Live first, sorting recent starts; only one player's video is ever loaded.
     lives=[x for x in approved if x.get('live')]
     replays=[x for x in approved if not x.get('live')]
-    lives.sort(key=lambda v:(v.get('source_rank',99),v.get('channel_name','')))
-    replays.sort(key=lambda v:(v.get('source_rank',99),v.get('ended_at','')))
-    result['candidates']=(lives+replays)[:12]
-    result['current_live']=lives[0] if lives else None
-    result['featured_recording']=replays[0] if replays else None
+    # Explicit owner priority: live truck-cab POV, then qualifying truck-cab
+    # same-day clock-aligned recording, then other live highway/border cameras.
+    # A road camera may be live but must not displace a real cab POV replay.
+    priority=lambda v: (0 if v.get('view_type')=='cargo_cab' and v.get('live') else
+                        1 if v.get('view_type')=='cargo_cab' else
+                        2 if v.get('live') else 3)
+    approved.sort(key=lambda v:(priority(v),v.get('source_rank',99),v.get('channel_name','')))
+    result['candidates']=approved[:12]
+    result['current_live']=next((v for v in approved if v.get('live')),None)
+    result['featured_recording']=next((v for v in approved if not v.get('live')),None)
     result['live_status']='verified_live' if lives else ('verified_replay' if replays else 'none_verified')
     return result
 
