@@ -287,7 +287,7 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
                 diagnostics.get('targeted_channel_checked')=='Ride Along Gang' and
                 ident in diagnostics.get('_targeted_video_ids',[]) and
                 str(info.get('channelId') or '')==diagnostics.get('_targeted_channel_id') and
-                re.search(r'\\bDenver\\s*(?:CO|Colorado)\\b.*\\bSchuyler\\s*(?:NE|Nebraska)\\b', title, re.I) and
+                re.search(r'\bDenver\s*(?:CO|Colorado)\b.*\bSchuyler\s*(?:NE|Nebraska)\b', title, re.I) and
                 CAB.search(title) and not STOP.search(title+' '+desc))
             if owner_ride_along:
                 diagnostics['targeted_title_match']=True
