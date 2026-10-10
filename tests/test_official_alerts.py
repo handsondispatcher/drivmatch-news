@@ -56,6 +56,18 @@ class NwsBulletinTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_alerts({'data':[]},now=NOW)
 
+    def test_us_trucking_source_may_publish_relevant_undated_location_headlines(self):
+        import json
+        from editorial_gate import eligible
+        roots=json.loads((Path(__file__).resolve().parents[1]/'content/sources.json').read_text())
+        source=next(x for x in roots['sources'] if x['id']=='truckdrivernews-primary')
+        self.assertEqual(source['feed_url'],'https://truckdrivernews.com/feed/')
+        valid={'title':'Truck Driver Pay Rises in New ATA Compensation Study',
+               'region':'US','category':'Caminhoneiros',
+               'source_url':'https://truckdrivernews.com/truck-driver-pay-rises-in-new-ata-compensation-study/'}
+        self.assertTrue(eligible(valid))
+        self.assertFalse(eligible({**valid,'title':'Celebrity sports betting news'}))
+
     def test_fetch_injection_is_not_network_required(self):
         self.assertEqual(len(collect_nws_alerts(NOW,lambda:{'features':[make_alert()]})),1)
 
