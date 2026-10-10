@@ -35,10 +35,18 @@ assert(elements.features.innerHTML.includes('Como interpretar o preço do diesel
 assert(elements.list.innerHTML.includes('Como interpretar o preço do diesel'));
 assert(elements.highlightList.innerHTML.includes('highlight-photo'),'v34 newsroom brief photo elements are rendered');
 assert.strictEqual(elements['newsroom-cta-title'].textContent,'Oportunidades no transporte');
-assert(elements.market.innerHTML.includes('Dólar comercial'));
-assert(elements.market.innerHTML.includes('FDX'));
-assert(elements.market.innerHTML.includes('Class 8'));
+assert(!elements.market.innerHTML.includes('FDX'),'Do not render unavailable securities');
+assert(!elements.market.innerHTML.includes('Class 8'),'Do not render unavailable Class 8 statistics');
 assert(!elements.market.innerHTML.includes('SIMULAÇÃO'));
+assert(elements.market.innerHTML.includes('Sem indicadores recentes e verificados'),'Empty market should have one honest message instead of blank rows');
+assert.strictEqual(elements['market-note'].textContent,'');
+data.market.indicators.diesel={value:3.72,observed_at:new Date().toISOString(),source:'EIA / FRED (semanal)',quote_status:'última observação disponível',change_pct:null};
+// Market data is consumed from the bootstrapped object: assert the renderer's
+// real-data branch through language render, which re-renders Market Focus.
+elements.language.value='en';elements.language.dispatch('change',{target:{value:'en'}});
+assert(elements.market.innerHTML.includes('3.72'),'Dated verified fuel value should be displayed');
+assert(!elements.market.innerHTML.includes('FDX'));
+elements.language.value='pt';elements.language.dispatch('change',{target:{value:'pt'}});
 const sample=0;
 elements.list.dispatch('click',{target:{closest:key=>({dataset:{story:String(sample)}})}});
 assert(elements.modalbodytext.textContent.includes('O preço do diesel'));
