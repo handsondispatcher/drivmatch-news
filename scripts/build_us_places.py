@@ -19,7 +19,7 @@ SOURCE_URL="https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2025_Gazet
 CACHE=ROOT/"build/us-places-cache.json"
 OUTPUT=ROOT/"site/data/us-places.json"
 STATE_CODES=set("AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY PR".split())
-NAME_SUFFIX=re.compile(r"\\s+(?:city|town|village|borough|municipality|CDP|census designated place|urban community)$",re.IGNORECASE)
+NAME_SUFFIX=re.compile(r"\s+(?:city|town|village|borough|municipality|CDP|census designated place|urban community)$",re.IGNORECASE)
 
 def parse_gazetteer(blob:bytes):
     if len(blob)>4_000_000:raise ValueError("Census archive exceeds expected size")
@@ -30,7 +30,7 @@ def parse_gazetteer(blob:bytes):
         if info.file_size>12_000_000:raise ValueError("Census TSV too large")
         raw=archive.read(files[0])
     text=raw.decode("utf-8-sig")
-    rows=csv.DictReader(io.StringIO(text),delimiter="\\t")
+    rows=csv.DictReader(io.StringIO(text),delimiter="\t")
     required={"USPS","NAME","INTPTLAT","INTPTLONG"}
     if not rows.fieldnames or not required.issubset({n.strip() for n in rows.fieldnames}):
         raise ValueError("Census National Places columns unexpected")
@@ -70,7 +70,7 @@ def build(fetch=None):
         try:
             doc=validate_cache(json.loads(CACHE.read_text(encoding="utf-8")))
             OUTPUT.parent.mkdir(parents=True,exist_ok=True)
-            OUTPUT.write_text(json.dumps(doc,ensure_ascii=False,separators=(",",":"))+"\\n",encoding="utf-8")
+            OUTPUT.write_text(json.dumps(doc,ensure_ascii=False,separators=(",",":"))+"\n",encoding="utf-8")
             print("CENSUS PLACE INDEX PASS (cached):",len(doc["places"]))
             return doc
         except (OSError,ValueError,TypeError,KeyError):
@@ -87,9 +87,9 @@ def build(fetch=None):
          "places":places}
     validate_cache(doc)
     CACHE.parent.mkdir(parents=True,exist_ok=True)
-    CACHE.write_text(json.dumps(doc,ensure_ascii=False,separators=(",",":"))+"\\n",encoding="utf-8")
+    CACHE.write_text(json.dumps(doc,ensure_ascii=False,separators=(",",":"))+"\n",encoding="utf-8")
     OUTPUT.parent.mkdir(parents=True,exist_ok=True)
-    OUTPUT.write_text(json.dumps(doc,ensure_ascii=False,separators=(",",":"))+"\\n",encoding="utf-8")
+    OUTPUT.write_text(json.dumps(doc,ensure_ascii=False,separators=(",",":"))+"\n",encoding="utf-8")
     print("CENSUS PLACE INDEX PASS (downloaded):",len(places),
           "St. Charles states:",[p[1] for p in places if p[0]=="St. Charles"])
 
