@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR" data-site-version="v34.10">
+<html lang="pt-BR" data-site-version="v34.11">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="drivmatch-news-version" content="v34.10"/>
+<meta name="drivmatch-news-version" content="v34.11"/>
 <meta name="drivmatch-news-release-status" content="development-prelaunch"/>
 <title>DrivMatch News — Transporte e logística nos EUA</title>
 <style>
@@ -850,10 +850,30 @@ body{background:#f7f9fc;color:#14283c}
 .dm-util-city-controls #top-city-query{min-width:60px}
 @media(min-width:851px) and (max-width:1280px){.dm-util-city-controls #top-city-query{min-width:80px}}
 @media(max-width:650px){.dm-util-city-controls{flex-wrap:wrap}.dm-util-city-controls input{min-width:100%;flex-basis:100%}.dm-util-city-controls button{flex:1 1 25%;max-width:90px}}
+
+/* v34.11 single-action nationwide weather search — visually quiet, no multi-button cluster. */
+.dm-util-city-select{min-width:0;max-width:100%;gap:3px}
+.dm-util-city-controls{display:flex!important;flex-wrap:nowrap!important;align-items:stretch;gap:0;max-width:100%;height:34px;min-width:0;margin:0}
+.dm-util-city-controls #top-city-query{height:34px;min-height:34px;flex:1 1 auto;min-width:0!important;width:1px!important;
+ border:1px solid #9dbdd4;border-right:0;border-radius:5px 0 0 5px!important;background:#fff;
+ padding:5px 7px;font:600 11px/1.2 Arial,sans-serif;text-overflow:ellipsis}
+.dm-util-city-controls #top-city-search{flex:0 0 34px!important;min-width:34px!important;max-width:34px!important;
+ height:34px;min-height:34px;border:1px solid #9dbdd4;border-radius:0 5px 5px 0!important;
+ background:#ecf6ff;color:#075592;padding:0;display:flex;align-items:center;justify-content:center}
+.dm-util-city-controls #top-city-search:hover{background:#cce9fc}
+.dm-util-city-controls :is(input,button):focus-visible{outline:2px solid #007bcb;outline-offset:2px}
+.dm-util-city-select #top-city-feedback{font-size:10px;line-height:1.25;color:#a32f24;max-height:none}
+.dm-util-city-select #top-city-feedback[data-state="loading"]{color:#315a75}
+.dm-util-city-select #top-city-feedback[data-state="success"]{color:#28764e}
+@media(max-width:650px){
+ .dm-util-city-controls{flex-wrap:nowrap!important}
+ .dm-util-city-controls #top-city-query{min-width:0!important;flex-basis:auto!important}
+ .dm-util-city-controls #top-city-search{flex-basis:34px!important}
+}
 </style>
 </head>
 <body>
-<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.10</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
+<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.11</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
 
 <section id="dm-utility" class="dm-utility" aria-label="Cotações e condições do tempo">
  <div class="dm-util-inner">
@@ -881,15 +901,17 @@ body{background:#f7f9fc;color:#14283c}
    <span class="dm-util-temps" aria-label="Temperaturas previstas"><span id="top-range-f">Máx. —°F · Mín. —°F</span><span id="top-range-c">Máx. —°C · Mín. —°C</span></span></span>
   </div>
   <div class="dm-util-city-select">
-<label for="top-city-query" id="top-city-select-label">Previsão do tempo</label>
-<div class="dm-util-city-controls">
-<input id="top-city-query" type="search" list="top-city-options" autocomplete="off" spellcheck="false" maxlength="80" placeholder="Selecione ou digite sua cidade" aria-describedby="top-city-feedback" aria-label="Digite cidade e sigla do estado, por exemplo Tampa, FL">
-<datalist id="top-city-options"></datalist>
-<button id="top-city-type" type="button" aria-label="Digitar sua cidade">Digitar</button>
-<button id="top-city-apply" type="button" aria-label="Confirmar cidade">OK</button>
-<button id="top-city-auto" type="button" aria-label="Voltar à rotação de cidades a cada 10 segundos" title="Alternar cidades automaticamente">↻</button>
-</div>
-<span id="top-city-feedback" role="status" aria-live="polite"></span>
+ <label for="top-city-query" id="top-city-select-label">Previsão do tempo</label>
+ <form id="top-city-search-form" class="dm-util-city-controls" role="search" autocomplete="off">
+  <input id="top-city-query" type="search" list="top-city-options" autocomplete="off" spellcheck="false"
+         maxlength="85" placeholder="Buscar cidade, estado" aria-label="Buscar previsão por cidade e estado"
+         aria-describedby="top-city-feedback">
+  <datalist id="top-city-options"></datalist>
+  <button id="top-city-search" type="submit" aria-label="Buscar previsão" title="Buscar previsão">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 5 5"/></svg>
+  </button>
+ </form>
+ <span id="top-city-feedback" role="status" aria-live="polite"></span>
 </div>
   <div class="dm-util-risk" id="top-risk" hidden></div>
  </div>
@@ -935,7 +957,7 @@ body{background:#f7f9fc;color:#14283c}
   </div>
 </aside>
 <section class="search-footer" id="pesquisa-noticias" aria-label="Pesquisar notícias e arquivo"><div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div></section>
-<footer class="footer" aria-label="Informações institucionais"><div class="footer-publisher" id="footer-publisher">DrivMatch News — um produto da Hands On Dispatcher LLC</div><div class="footer-legal" id="footer-legal">© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.10</span></div></footer>
+<footer class="footer" aria-label="Informações institucionais"><div class="footer-publisher" id="footer-publisher">DrivMatch News — um produto da Hands On Dispatcher LLC</div><div class="footer-legal" id="footer-legal">© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.11</span></div></footer>
 <div class="modalshade" id="shade"><article class="modal" id="article-dialog" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody">
 <h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div>
 <section class="trans article-reading" id="article-reading" aria-label="Idioma de leitura">
@@ -967,7 +989,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=v34-10-warroom-20261010" defer></script>
 <script src="assets/road-tv-live.js?v=v34-10-interstate-rotation-20261010" defer></script>
-<script src="assets/utility-strip.js?v=v34-10-city-search-20261010" defer></script>
+<script src="assets/utility-strip.js?v=v34-11-national-weather-20261010" defer></script>
 <script src="assets/news-crawler.js?v=v34-10-20261010" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>
