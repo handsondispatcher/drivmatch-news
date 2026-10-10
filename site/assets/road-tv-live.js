@@ -262,7 +262,10 @@
    }finally{refreshing=false}
  }
  function rotate(){
-   const target=nextVideo(active&&key(active));
+   // Only rotate WITHIN the active priority tier. A live driver must never
+   // be replaced by a lower-ranked generic highway camera just to rotate.
+   const target=active&&videos.find(v=>priority(v)===priority(active)&&
+     key(v)!==key(active)&&!markedBad(v));
    if(target)start(target);
    else if(active&&now()-started>18*60000)refresh();
  }
@@ -286,7 +289,10 @@
    if(active&&active.platform==='youtube'&&!playing&&attemptingAt&&now()-attemptingAt>35000){
      playbackError(active,epoch);return;
    }
-   if(active&&now()-started>12*60000&&videos.length>1)rotate();
+   // Five-minute rotation applies to platform-verified highway cameras too;
+   // driver POV broadcasts remain on screen longer unless they fail.
+   if(active&&videos.length>1&&now()-started>=
+       (active.view_type==='cargo_cab'?12*60000:CAMERA_ROTATION_MS))rotate();
  },15000);
  setInterval(rotatePublisherCamera,10000);
  setInterval(refresh,120000);
