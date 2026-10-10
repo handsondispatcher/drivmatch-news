@@ -1,4 +1,4 @@
-/* DrivMatch News v34.10 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
+/* DrivMatch News v34.11 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -369,7 +369,7 @@
     $('newsroom-cta-driver').textContent=newsroomCopy.driver;
     $('newsroom-cta-carrier').textContent=newsroomCopy.carrier;
     $('footer-publisher').textContent='DrivMatch News — um produto da Hands On Dispatcher LLC';
-    $('footer-legal').innerHTML='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.10</span>';
+    $('footer-legal').innerHTML='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.11</span>';
     $('story-preview-title').textContent=next==='en'?'Story preview':next==='es'?'Vista previa de Story':'Prévia do Story';
     $('story-preview-download').textContent=next==='en'?'Save PNG image':next==='es'?'Guardar imagen PNG':'Salvar imagem PNG';
     $('story-preview-hint').textContent=next==='en'?'Review the card, then post it to Instagram, TikTok or WhatsApp Status.':next==='es'?'Revisa la imagen y luego publícala en Instagram, TikTok o el estado de WhatsApp.':'Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.';
