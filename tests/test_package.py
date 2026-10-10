@@ -130,6 +130,29 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('drivmatch.com/news/data/release.json',workflow)
 
   self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
+ def test_fresh_primary_publisher_feeds_are_auditable_not_auto_editorials(self):
+  from editorial_gate import eligible
+  sources=json.loads((BASE/'content/sources.json').read_text(encoding='utf-8'))['sources']
+  ids=[x['id'] for x in sources]
+  self.assertEqual(len(set(ids)),len(ids),'No duplicated editorial source identities')
+  for ident,feed in [('supply-chain-dive','https://www.supplychaindive.com/feeds/news/'),
+                     ('automotive-fleet','https://www.automotive-fleet.com/rss/')]:
+   entry=next(x for x in sources if x['id']==ident)
+   self.assertEqual(entry['feed_url'],feed)
+   self.assertEqual(entry['access'],'rss')
+   self.assertEqual(entry['publication'],'review-required')
+  source=next(x for x in sources if x['id']=='supply-chain-dive')
+  now=datetime(2026,10,10,11,0,tzinfo=timezone.utc)
+  xml=b'<rss><channel><item><title>Texas truck carriers expand freight hauling</title><link>https://www.supplychaindive.com/news/test-truck-freight/</link><pubDate>Sat, 10 Oct 2026 10:30:00 GMT</pubDate></item></channel></rss>'
+  rows=parse_feed(xml,source,now=now)
+  self.assertEqual(len(rows),1)
+  self.assertEqual(rows[0]['status'],'pending_review')
+  self.assertIn('approve-editorially',rows[0]['publication_blockers'])
+  self.assertTrue(eligible(rows[0]))
+  foreign=b'<rss><channel><item><title>UK ocean freight port expansion</title><link>https://www.supplychaindive.com/news/test-ocean/</link><pubDate>Sat, 10 Oct 2026 10:30:00 GMT</pubDate></item></channel></rss>'
+  self.assertFalse(eligible(parse_feed(foreign,source,now=now)[0]))
+  stale=b'<rss><channel><item><title>US trucking</title><link>https://www.supplychaindive.com/news/test-old/</link><pubDate>Mon, 05 Oct 2026 10:30:00 GMT</pubDate></item></channel></rss>'
+  self.assertEqual(parse_feed(stale,source,now=now),[])
  def test_visual_and_weather(self):
   page=(BASE/'site/index.html').read_text()
   for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — um produto da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)

@@ -46,6 +46,34 @@
       "enabled": true
     },
     {
+      "id": "supply-chain-dive",
+      "name": "Supply Chain Dive",
+      "url": "https://www.supplychaindive.com",
+      "category": "Fretes",
+      "feed_url": "https://www.supplychaindive.com/feeds/news/",
+      "original_lang": "en",
+      "access": "rss",
+      "publication": "review-required",
+      "enabled": true,
+      "region": "US",
+      "source_type": "publisher-feed",
+      "attribution": "Original publication and date must be verified; only US road-freight eligible headlines may surface"
+    },
+    {
+      "id": "automotive-fleet",
+      "name": "Automotive Fleet",
+      "url": "https://www.automotive-fleet.com",
+      "category": "Transporte",
+      "feed_url": "https://www.automotive-fleet.com/rss/",
+      "original_lang": "en",
+      "access": "rss",
+      "publication": "review-required",
+      "enabled": true,
+      "region": "US",
+      "source_type": "publisher-feed",
+      "attribution": "Fleet industry source; road-freight/US eligibility gate remains mandatory"
+    },
+    {
       "id": "overdrive",
       "name": "Overdrive",
       "url": "https://www.overdriveonline.com",
