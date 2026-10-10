@@ -14,10 +14,11 @@ class Element {
  get classList(){return {add(){},remove(){}};}
  scrollIntoView(){}
 }
-const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','highlights','highlights-title','highlights-note','highlightList','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','modalbrief','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-dialog','translation','shade','noticias','footer-publisher','footer-legal','story-preview','story-preview-image','story-preview-download','story-preview-close','story-preview-title','story-preview-hint'];
+const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','highlights','highlights-title','highlights-note','highlightList','newsroom-section-label','newsroom-section-desc','newsroom-cta-eyebrow','newsroom-cta-title','newsroom-cta-desc','newsroom-cta-driver','newsroom-cta-carrier','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','modalbrief','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-dialog','translation','shade','noticias','footer-publisher','footer-legal','story-preview','story-preview-image','story-preview-download','story-preview-close','story-preview-title','story-preview-hint'];
 for(const id of ids)elements[id]=new Element(id);
 for(const id of ['panorama .heading','noticias .heading','market-title','.demo'])selectors['#'+id]=new Element(id);
 selectors['.demo']=new Element('demo');
+selectors['.newsroom-nav']=new Element('newsroom-nav');
 selectors['.edition']=new Element('edition');selectors['.edition'].childNodes=[{textContent:'EDIÇÃO DIGITAL · '}];
 selectors['.weather-top h2']=[new Element('weather-head-1'),new Element('weather-head-2')];selectors['.weather-card']=[new Element('weather-card-1'),new Element('weather-card-2')];
 elements.age.value='all';elements.category.options=[new Element('all')];elements.category.options[0].value='Todas';elements.age.options=['all','2','7','30'].map(v=>({value:v,text:''}));
@@ -32,6 +33,8 @@ vm.runInNewContext(fs.readFileSync(path.join(root,'site/assets/app.js'),'utf8'),
 document.ready();
 assert(elements.features.innerHTML.includes('Como interpretar o preço do diesel'));
 assert(elements.list.innerHTML.includes('Como interpretar o preço do diesel'));
+assert(elements.highlightList.innerHTML.includes('highlight-photo'),'v34 newsroom brief photo elements are rendered');
+assert.strictEqual(elements['newsroom-cta-title'].textContent,'Oportunidades no transporte');
 assert(elements.market.innerHTML.includes('Dólar comercial'));
 assert(elements.market.innerHTML.includes('FDX'));
 assert(elements.market.innerHTML.includes('Class 8'));

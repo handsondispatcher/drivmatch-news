@@ -13,8 +13,8 @@ const {spawn}=require('node:child_process');
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v33','public page has v33 version');
-   assert.equal(await page.locator('#site-version').innerText(),'v33','public masthead identifies v33');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34','public page has v33 version');
+   assert.equal(await page.locator('#site-version').innerText(),'v34','public masthead identifies v34');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
@@ -35,6 +35,23 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#features > .hero-wrap h3').textContent(),originalHeadline);
    assert.ok(await page.locator('#highlightList li').count()>=1,'News briefing must reflect the real feed');
    assert.ok(await page.locator('#highlightList li').count()<=5,'Briefing must not fabricate stories');
+   // v34 newsroom must be editorial-forward: real licensed thumbnails and tiny
+   // commercial bridge; preserve tested compact mobile reading.
+   assert.equal(await page.locator('.newsroom-nav a[data-newsroom-cat]').count(),5);
+   assert.equal(await page.locator('#highlightList .highlight-photo').count(),await page.locator('#highlightList li').count(),'Highlights must carry real source-derived local images or honest illustrated fallback');
+   assert.equal(await page.locator('#newsroom-cta-driver').getAttribute('href').then(x=>x.includes('utm_source=drivmatch_news')),true);
+   assert.equal(await page.locator('#newsroom-cta-carrier').getAttribute('href').then(x=>x.includes('utm_content=carrier')),true);
+   assert.equal(await page.locator('#article-dialog').count(),1,'Never replace original v33 compact mobile reader');
+   const nav=page.locator('.newsroom-nav a[data-newsroom-cat="Fretes"]');
+   await nav.click();
+   assert.equal(await page.locator('#category').inputValue(),'Fretes','Newsroom nav uses existing category filter');
+   await page.locator('.newsroom-nav a[data-newsroom-label="home"]').click();
+   assert.equal(await page.locator('#category').inputValue(),'Todas','Front page resets existing filter');
+   if(width===1440) {
+     const hero=await page.locator('#features .hero-wrap article').evaluate(el=>({position:getComputedStyle(el).position,visible:el.getBoundingClientRect().width>0}));
+     assert.ok(hero.visible,'Newsroom has a visible hero headline');
+   }
+
 
    assert.equal(await page.locator('.language-shortcuts button[data-site-lang="pt"]').isVisible(),true);
    if(width===1440){
