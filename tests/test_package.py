@@ -10,7 +10,7 @@ sys.path.insert(0,str(BASE/'scripts'))
 import update as up
 from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
- def test_v34.1_release_contract(self):
+ def test_v34_1_release_contract(self):
   version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
   self.assertEqual(version['version'],'v34.1')
   self.assertEqual(version['previous_release_branch'],'backup/v34-initial-2026-10-09')
