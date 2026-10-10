@@ -294,7 +294,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
             approved+=twitch_verify(twitch_candidates,tid,token,now,api,result['warnings'])
         except (OSError,TimeoutError,ValueError,KeyError,TypeError):
             result['warnings'].append('twitch_authentication_failed')
-    if not fresh_cache:
+    if not fresh_cache and cache is None:
         store_cached_discovery(discovery)
     result['live_checked_at']=now.isoformat()
     # Live first, sorting recent starts; only one player's video is ever loaded.
