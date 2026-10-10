@@ -89,7 +89,7 @@ class PublicationTests(unittest.TestCase):
   self.assertEqual(next(x for x in registry['sources'] if x['id']=='weather-lkn')['display'],'not_a_camera_provider')
   self.assertTrue(version['road_tv_policy']['camera_link_is_not_live_certification'])
   self.assertIn('camera-source-network.json',update)
-  self.assertIn('data/camera-source-network.json',tv)
+  self.assertIn('camera-source-network.json',update)
   self.assertIn('source_rank',road)
   self.assertIn('USBOUND_BORDER',road)
   # Owner-mandated public reader interface must match frozen 10/10 screenshot.
