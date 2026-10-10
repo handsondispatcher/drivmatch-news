@@ -398,6 +398,33 @@ def build(offline=False):
     try:external_headlines=verified_external_source_links(offline)+external_headlines
     except (OSError,ValueError,TypeError,KeyError) as exc:errors.append('verified_external_links:'+type(exc).__name__)
     external_headlines=deduplicate_external(localize_source_headlines(external_headlines,errors,offline),articles)
+    # Independent newsroom health signal. Do not replace source publication dates
+    # with build timestamps, relax the editorial gate, or fake fresh headlines.
+    dated=[]
+    for headline in external_headlines:
+        try:
+            observed=datetime.fromisoformat(headline['published_at'].replace('Z','+00:00'))
+            if observed.tzinfo is None:observed=observed.replace(tzinfo=timezone.utc)
+            dated.append(observed)
+        except (KeyError,TypeError,ValueError,AttributeError):continue
+    freshest=max(dated) if dated else None
+    current=NOW()
+    age_minutes=round((current-freshest).total_seconds()/60) if freshest else None
+    freshness={
+        'schema_version':1,'checked_at':current.isoformat(timespec='seconds'),
+        'latest_original_published_at':freshest.isoformat() if freshest else None,
+        'latest_original_age_minutes':age_minutes,
+        'approved_external_headlines':len(external_headlines),
+        'published_last_60_minutes':sum(0<=(current-d).total_seconds()<=3600 for d in dated),
+        'published_last_180_minutes':sum(0<=(current-d).total_seconds()<=10800 for d in dated),
+        'status':('fresh' if age_minutes is not None and 0<=age_minutes<=180
+                  else 'stale_or_no_verified_headlines'),
+        'policy':'Report age of original verified headlines; never manufacture freshness or alter source timestamps.'
+    }
+    (ROOT/'build').mkdir(parents=True,exist_ok=True)
+    (ROOT/'build/newsroom-health.json').write_text(json.dumps(freshness,ensure_ascii=False,indent=2)+'\\n',encoding='utf-8')
+    if freshness['status']!='fresh':
+        errors.append('newsroom_freshness:stale_or_no_verified_headlines')
     unique={}
     for a in articles:
         if a['id'] in unique:continue
