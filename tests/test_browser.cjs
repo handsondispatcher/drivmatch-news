@@ -17,8 +17,8 @@ const {spawn}=require('node:child_process');
    await page.route('https://fl511.com/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>FL511 camera directory test stub</title>'}));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.5','public page has v34.5 version');
-   assert.equal(await page.locator('#site-version').innerText(),'v34.5','public masthead identifies v34.5');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.6','public page has v34.6 version');
+   assert.equal(await page.locator('#site-version').innerText(),'v34.6','public masthead identifies v34.6');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
    // Immutable editorial composition: search exclusively above institutional footer.
    const layout=await page.evaluate(()=>{
@@ -98,7 +98,7 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   // v34.5: no stale hardcoded player. No published video without verified catalog.
+   // v34.6: no stale hardcoded player. No published video without verified catalog.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
    assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
@@ -106,7 +106,19 @@ const {spawn}=require('node:child_process');
    const fl511=tvCard.locator('.roadtv-official-map');
    await fl511.waitFor({state:'attached',timeout:10000});
    assert.match(await fl511.getAttribute('src'),/^https:\/\/fl511\.com\/Map\/EmbeddedMap\?layers=Cameras/);
-   assert.equal(await tvCard.locator('a[href="https://fl511.com/"]').count(),1,'Official direct camera directory remains accessible');
+   // Sources are hyperlinks to their owners: NO unauthorized source iframe or fake LIVE banner.
+   const sources=tvCard.locator('.roadtv-source-links a');
+   await sources.nth(3).waitFor({state:'attached',timeout:9000});
+   assert.equal(await sources.count(),4,'Four rights-safe camera sources are available as outbound links');
+   const urls=await sources.evaluateAll(nodes=>nodes.map(el=>el.getAttribute('href')));
+   assert.deepEqual(urls,[
+      'https://fl511.com/region/Central',
+      'https://www.peacebridge.com/media-room/traffic-cameras/',
+      'https://www.nvroads.com/',
+      'https://milecheckapp.com/cameras/'
+   ],'Prioritized official I-4, Canada→USA, Nevada and link-only MileCheck');
+   assert.equal(await tvCard.locator('iframe').count(),1,'Only sanctioned official Florida map may be embedded');
+   assert.equal(await tvCard.locator('.roadtv-replay').count(),0,'Directory cannot masquerade as recorded or LIVE video');
    assert.equal(await page.locator('#mercados').isVisible(),width>990);
    assert.equal(await page.locator('#mobile-market').isVisible(),width<=990);
    assert.equal(await page.locator('#news-freshness').count(),1);
