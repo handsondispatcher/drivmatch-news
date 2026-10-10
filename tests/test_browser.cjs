@@ -15,8 +15,8 @@ const {spawn}=require('node:child_process');
    await page.route('https://www.youtube-nocookie.com/**',route=>route.fulfill({status:200,body:'<!doctype html><title>Official player test stub</title>'}));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.3','public page has v34.3 version');
-   assert.equal(await page.locator('#site-version').innerText(),'v34.3','public masthead identifies v34.3');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.4','public page has v34.4 version');
+   assert.equal(await page.locator('#site-version').innerText(),'v34.4','public masthead identifies v34.4');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
@@ -80,22 +80,23 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   // The viewer asked for exactly ROAD TV + one official player,
-   // without creator chips, text explaining the test, or dead status badges.
+   // v34.4: no stale hardcoded player. No published video without verified catalog.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').innerText(),'ROAD TV');
-   assert.equal(await tvCard.locator('.roadtv-screen iframe').count(),1);
-   assert.equal(await tvCard.locator('button').count(),0,'No public Road TV buttons');
-   assert.equal(await tvCard.locator('a').count(),0,'No public channel links');
+   assert.equal(await tvCard.locator('button,a,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
    assert.equal(await tvCard.locator('.roadtv-screen').count(),1);
-   assert.equal(await tvCard.locator('.roadtv-screen iframe').getAttribute('src').then(x=>x.startsWith('https://www.youtube-nocookie.com/embed/to8SHIQHyQo')),true);
-   assert.equal(await tvCard.locator('[data-roadtv-badge], .roadtv-channels, .roadtv-credit, .roadtv-toolbar, .roadtv-disclosure').count(),0);
-   assert.equal(await tvCard.locator('h2, .roadtv-screen').count(),2);
+   assert.equal(await tvCard.locator('.roadtv-screen iframe').count(),0,'Do not show hardcoded unavailable stream');
    assert.equal(await page.locator('#mercados').isVisible(),width>990);
    assert.equal(await page.locator('#mobile-market').isVisible(),width<=990);
-   if(width<=390) {
-     const dims=await tvCard.locator('iframe').evaluate(el=>({height:el.getBoundingClientRect().height,width:el.getBoundingClientRect().width}));
-     assert.ok(dims.width>=260&&dims.height>=195,'Road TV mobile player must be visible without long empty blocks');
+   assert.equal(await page.locator('#news-freshness').count(),1);
+   if(width<=390){
+     const dims=await tvCard.locator('.roadtv-screen').evaluate(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height}));
+     assert.ok(dims.width>=260&&dims.height>=195,'Road TV player space is usable on mobile');
+     const size=await page.evaluate(()=>{
+       const e=document.createElement('a');e.className='dm-crawler-link';document.body.appendChild(e);
+       const n=parseFloat(getComputedStyle(e).fontSize);e.remove();return n;
+     });
+     assert.ok(size>=16,'Crawler must be >=16px on mobile');
    }
    const card=width>990?'#clima-desktop':'#clima-mobile';
    assert.equal(await page.locator('#dm-crawler-track a[href*="thetrucker.com"]').count(),0,'Known geo-blocked publisher must not appear in ticker');
@@ -245,6 +246,41 @@ const {spawn}=require('node:child_process');
    await page.locator('[data-site-lang="en"]').click();
    assert.equal(await page.locator('#market-title').textContent(),'Market Focus');
    assert.deepEqual(errors,[]);
+   if(width===1440){
+     // Local fixture tests actual player error auto-rotation; no invented video ships.
+     const first='A1b2C3d4E5f',second='B1b2C3d4E5f';
+     const candidate=id=>({platform:'youtube',video_id:id,
+       video_url:'https://www.youtube.com/watch?v='+id,
+       channel_url:'https://www.youtube.com/channel/UCAAAAAAAAAAAAAAAAAAAAAA',
+       title:'USA semi truck forward windshield dashcam highway',
+       live:true,status:'live',geo_evidence:'publisher metadata',
+       camera_evidence:'publisher metadata',verification:'CI fixture'});
+     const fixture={schema_version:2,generated_at:new Date().toISOString(),
+       live_checked_at:new Date().toISOString(),candidates:[candidate(first),candidate(second)]};
+     await page.route('**/data/road-tv.json?ts=*',route=>route.fulfill({
+       status:200,contentType:'application/json',body:JSON.stringify(fixture)}));
+     await page.route('https://www.youtube.com/embed/**',route=>route.fulfill({status:200,body:'<!doctype html><title>Test only</title>'}));
+     await page.addInitScript(()=>{
+       window.YT={Player:class {
+         constructor(root,options){
+           this.options=options;window.__ytOptions=options;
+           this.iframe=document.createElement('iframe');
+           this.iframe.src='https://www.youtube.com/embed/'+options.videoId;
+           root.appendChild(this.iframe);
+           setTimeout(()=>options.events.onReady({target:this}),0);
+         }
+         mute(){}
+         playVideo(){this.options.events.onStateChange({data:1})}
+         destroy(){this.iframe.remove()}
+       }};
+     });
+     await page.reload({waitUntil:'networkidle'});
+     await page.locator('#roadtv-desktop iframe').first().waitFor({state:'attached',timeout:9000});
+     assert.ok((await page.locator('#roadtv-desktop iframe').getAttribute('src')).includes(first),'First validated stream plays');
+     await page.evaluate(()=>window.__ytOptions.events.onError({data:100}));
+     await page.waitForFunction(id=>(document.querySelector('#roadtv-desktop iframe')?.src||'').includes(id),second);
+     assert.ok((await page.locator('#roadtv-desktop iframe').getAttribute('src')).includes(second),'Player failure selects alternative');
+   }
    await page.screenshot({path:`test-results/${width}.png`,fullPage:true});await page.close();
    console.log(`PASS ${width}px: logo, no overflow, market, weather, article translation`);
   }
