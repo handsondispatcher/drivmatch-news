@@ -42,9 +42,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: build/roadtv-discovery.json
-          key: roadtv-discovery-v2-${{ env.ROADTV_CACHE_HOUR }}
+          key: roadtv-discovery-v3-${{ env.ROADTV_CACHE_HOUR }}
           restore-keys: |
-            roadtv-discovery-v2-
+            roadtv-discovery-v3-
       # Reuse only date-verified original publisher headlines after transient RSS outages.
       # Never change their published_at date or extend their 48-hour validity.
       - name: Restaurar histórico de manchetes originais
@@ -99,6 +99,11 @@ jobs:
               road=json.loads(road_path.read_text(encoding='utf-8'))
               lines.append(f"- road_tv_status: {road.get('live_status')}")
               lines.append(f"- verified_video_candidates: {len(road.get('candidates',[]))}")
+              safe_diagnostics=road.get('discovery_diagnostics') or {}
+              lines.append(f"- discovery_diagnostics: {safe_diagnostics}")
+              lines.append(f"- api_error_codes: {road.get('warnings') or []}")
+              print('ROAD TV DISCOVERY COUNTS:',safe_diagnostics)
+              print('ROAD TV API ERROR CODES:',road.get('warnings') or [])
               if not road.get('candidates'):
                   print('::warning title=Driver POV discovery blocked::No verified video candidate. Check YouTube/Twitch API credentials and provider permissions.')
           summary.open('a',encoding='utf-8').write('\n'.join(lines)+'\n')

@@ -147,8 +147,8 @@ class RoadTVTests(unittest.TestCase):
    raise AssertionError(url)
   c={"checked_at":"2026-10-08T00:00:00Z"}
   doc=make_road_tv(now=NOW,api_key="test",get_json=api,cache=c)
-  self.assertEqual(len(calls),3)
-  self.assertEqual(sum(x[0]==["live"] for x in calls),2)
+  self.assertEqual(len(calls),2)
+  self.assertEqual(sum(x[0]==["live"] for x in calls),1)
   self.assertEqual(sum(x[0]==["completed"] for x in calls),1)
   self.assertEqual(doc["live_status"],"none_verified")
 
@@ -187,23 +187,56 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(d['current_live']['video_id'],camera_id)
   self.assertEqual(d['featured_recording']['video_id'],replay_id)
 
- def test_named_creator_search_is_in_every_hourly_live_discovery(self):
+ def test_exact_channel_live_search_uses_resolved_youtube_id(self):
+  from road_tv import youtube_curated_channel_discover
   calls=[]
-  def api(url,**kwargs):
+  channels=[{'name':'Ride Along Gang','handle':'@Ridealonggang'},
+            {'name':'Trucking Duke','handle':'@TruckingDuke'}]
+  def api(url):
+   q=parse_qs(urlparse(url).query)
+   if '/channels?' in url:
+    return {'items':[{'id':CHANNEL,'contentDetails':{
+      'relatedPlaylists':{'uploads':'UUknown'}}}]}
+   if '/playlistItems?' in url:return {'items':[]}
    if '/search?' in url:
-    from urllib.parse import parse_qs,urlparse
-    q=parse_qs(urlparse(url).query)
-    calls.append((q['eventType'][0],q['q'][0]))
-    return {'items':[]}
+    calls.append(q)
+    return {'items':[{'id':{'videoId':ID}}]}
    raise AssertionError(url)
-  for hour in (0,1,2,3):
-   t=NOW.replace(hour=hour)
-   make_road_tv(now=t,api_key='test',get_json=api,
-                cache={'checked_at':(t-dt.timedelta(hours=2)).isoformat()})
-  live=[q for mode,q in calls if mode=='live']
-  self.assertEqual(len(live),8)
-  self.assertEqual(sum('Trucking Duke' in q or 'Ride Along Gang' in q for q in live),4)
+  diagnostic={'targeted_channel_checked':None,
+              'targeted_channel_unresolved':None,'targeted_live_hits':0}
+  ids=youtube_curated_channel_discover('test-key',channels,api,[],targeted_hour=0,
+                                      diagnostics=diagnostic)
+  self.assertEqual(ids,[ID])
+  self.assertEqual(len(calls),1)
+  self.assertEqual(calls[0]['channelId'],[CHANNEL])
+  self.assertEqual(calls[0]['eventType'],['live'])
+  self.assertEqual(calls[0]['videoEmbeddable'],['true'])
+  self.assertEqual(diagnostic['targeted_channel_checked'],'Ride Along Gang')
+  self.assertEqual(diagnostic['targeted_live_hits'],1)
 
+ def test_priority_channels_alternate_and_no_uploads_required(self):
+  from road_tv import youtube_curated_channel_discover
+  calls=[]
+  def api(url):
+   if '/channels?' in url:
+    return {'items':[{'id':CHANNEL,'contentDetails':{}}]}
+   if '/search?' in url:
+    q=parse_qs(urlparse(url).query)
+    calls.append(q['channelId'][0])
+    return {'items':[{'id':{'videoId':ID}}]}
+   raise AssertionError(url)
+  channels=[{'name':'Ride Along Gang','handle':'@Ridealonggang'},
+            {'name':'Trucking Duke','handle':'@TruckingDuke'}]
+  result=youtube_curated_channel_discover('test',channels,api,[],targeted_hour=1)
+  self.assertEqual(result,[ID])
+  self.assertEqual(calls,[CHANNEL])
+
+ def test_ride_along_live_pov_with_trucker_in_description_qualifies(self):
+  title='LIVE Driving POV- IRL- Denver CO to Schuyler NE | Relaxing Ride Along'
+  description='One trucker answers the call on the road. This is not just a delivery.'
+  self.assertEqual(source_profile(title,description)['view_type'],'cargo_cab')
+  self.assertIsNone(source_profile(title,'A passenger car driving POV'))
+ 
  def test_clock_alignment_require_real_recording_duration(self):
   t=dt.datetime(2026,10,8,20,10,tzinfo=dt.timezone.utc)
   self.assertEqual(video_length("PT1H30M"),5400)

@@ -132,7 +132,7 @@ def safe_cached_discovery(now):
     try:
         data = json.loads(CACHE_PATH.read_text(encoding='utf-8'))
         ts = when(data.get('checked_at'))
-        if ts and 0 <= (now-ts).total_seconds() < 3700:
+        if data.get('discovery_version')==3 and ts and 0 <= (now-ts).total_seconds() < 3700:
             return data
     except (OSError, ValueError, TypeError):
         pass
@@ -145,19 +145,22 @@ def store_cached_discovery(data):
                           encoding='utf-8')
 
 
+def api_error_tag(exc):
+    """Only safe status code, never URLs, key values, or exception messages."""
+    status=getattr(exc,'code',None)
+    return 'http_'+str(status) if isinstance(status,int) else 'unavailable'
+
+
 def youtube_discover(key, now, api, errors):
     candidates = {}
     # These searches discover beyond any initial 4 creators. Search "regionCode"
     # is ONLY relevance, never treated as verification of stream geography.
     # The discovery cache is hourly; two cycling LIVE searches plus one
     # completed-broadcast search = 72 YouTube search calls/day maximum.
-    # Search one general category and one named creator EVERY hour, rather
-    # than waiting several hours for creator queries to rotate into the pool.
-    # Two LIVE + one completed search per hour preserves the API quota budget.
+    # One broad live search here; the second is a targeted creator-channel
+    # LIVE search below. Together with replay: <= 3 search.list/hour.
     general_queries=QUERIES[:5]
-    creator_queries=QUERIES[5:]
-    selected_live=(general_queries[now.hour % len(general_queries)],
-                   creator_queries[now.hour % len(creator_queries)])
+    selected_live=(general_queries[now.hour % len(general_queries)],)
     for query in selected_live:
         try:
             params = dict(part='snippet', type='video', eventType='live',
@@ -168,8 +171,8 @@ def youtube_discover(key, now, api, errors):
                 ident = (item.get('id') or {}).get('videoId')
                 if VIDEO_ID.fullmatch(ident or ''):
                     candidates[ident] = item.get('snippet') or {}
-        except (OSError, TimeoutError, ValueError, KeyError, TypeError):
-            errors.append('youtube_discovery_unavailable')
+        except (OSError, TimeoutError, ValueError, KeyError, TypeError) as exc:
+            errors.append('youtube_discovery_'+api_error_tag(exc))
     # Fresh archived live-replays are not limited to the initial creators.
     for query in (QUERIES[(now.hour+2) % len(QUERIES)],):
         try:
@@ -182,12 +185,12 @@ def youtube_discover(key, now, api, errors):
                 ident=(item.get('id') or {}).get('videoId')
                 if VIDEO_ID.fullmatch(ident or ''):
                     candidates[ident]=item.get('snippet') or {}
-        except (OSError, TimeoutError, ValueError, KeyError, TypeError):
-            errors.append('youtube_replay_search_unavailable')
+        except (OSError, TimeoutError, ValueError, KeyError, TypeError) as exc:
+            errors.append('youtube_replay_search_'+api_error_tag(exc))
     return candidates
 
 
-def youtube_curated_channel_discover(key, channels, api, errors):
+def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hour=None, diagnostics=None):
     """Poll known creator handles using official low-quota YouTube API endpoints.
 
     channels.list + uploads playlistItems.list cost about two units per
@@ -196,7 +199,8 @@ def youtube_curated_channel_discover(key, channels, api, errors):
     Discovery does NOT mean live: videos.list still verifies status and embed.
     """
     found = []
-    for source in channels[:8]:
+    priority_index = targeted_hour % min(2,len(channels)) if targeted_hour is not None and channels else None
+    for index,source in enumerate(channels[:8]):
         handle = str(source.get('handle') or '')
         if not re.fullmatch(r'@[A-Za-z0-9_.-]{3,40}', handle):
             continue
@@ -205,6 +209,28 @@ def youtube_curated_channel_discover(key, channels, api, errors):
                 'part':'contentDetails', 'forHandle':handle, 'key':key})
             channel_data = api('https://www.googleapis.com/youtube/v3/channels?'+channel_params)
             channel = next(iter(channel_data.get('items') or []), {})
+            channel_id = str(channel.get('id') or '')
+            # Broadcasts can be LIVE on YouTube before appearing in uploads.
+            # Ask for active broadcasts from this resolved channelId, not only
+            # the latest uploaded items. Never trust a handle as a channel ID.
+            if priority_index == index:
+                if CHANNEL_ID.fullmatch(channel_id):
+                    if diagnostics is not None: diagnostics['targeted_channel_checked'] = source['name']
+                    try:
+                        params=urllib.parse.urlencode({
+                            'part':'snippet','type':'video','eventType':'live',
+                            'videoEmbeddable':'true','channelId':channel_id,
+                            'maxResults':'15','key':key})
+                        live_result=api('https://www.googleapis.com/youtube/v3/search?'+params)
+                        for row in live_result.get('items') or []:
+                            ident=(row.get('id') or {}).get('videoId')
+                            if VIDEO_ID.fullmatch(str(ident or '')):
+                                found.append(ident)
+                                if diagnostics is not None: diagnostics['targeted_live_hits']+=1
+                    except (OSError,TimeoutError,ValueError,KeyError,TypeError) as exc:
+                        errors.append('youtube_targeted_channel_live_'+api_error_tag(exc))
+                elif diagnostics is not None:
+                    diagnostics['targeted_channel_unresolved']=source['name']
             playlist = ((channel.get('contentDetails') or {})
                         .get('relatedPlaylists') or {}).get('uploads', '')
             if not playlist:
@@ -217,32 +243,37 @@ def youtube_curated_channel_discover(key, channels, api, errors):
                 video_id = (item.get('contentDetails') or {}).get('videoId')
                 if VIDEO_ID.fullmatch(str(video_id or '')):
                     found.append(video_id)
-        except (OSError, TimeoutError, ValueError, KeyError, TypeError):
-            errors.append('youtube_curated_channel_unavailable')
+        except (OSError, TimeoutError, ValueError, KeyError, TypeError) as exc:
+            errors.append('youtube_curated_channel_'+api_error_tag(exc))
     return list(dict.fromkeys(found))
 
 
-def verify_youtube(ids, key, now, api, errors):
+def verify_youtube(ids, key, now, api, errors, diagnostics=None):
     found=[]
     for offset in range(0,min(len(ids),MAX_CANDIDATES),50):
         try:
             params=dict(part='snippet,status,liveStreamingDetails,contentDetails',
                         id=','.join(ids[offset:offset+50]),key=key)
             result=api('https://www.googleapis.com/youtube/v3/videos?'+urllib.parse.urlencode(params))
-        except (OSError, TimeoutError, ValueError, KeyError, TypeError):
-            errors.append('youtube_video_validation_failed')
+        except (OSError, TimeoutError, ValueError, KeyError, TypeError) as exc:
+            errors.append('youtube_video_validation_'+api_error_tag(exc))
             continue
         for vid in result.get('items',[]):
+            if diagnostics is not None:diagnostics['videos_returned']+=1
             info=vid.get('snippet') or {}
             status=vid.get('status') or {}
             live=vid.get('liveStreamingDetails') or {}
             ident=vid.get('id','')
             if not VIDEO_ID.fullmatch(ident):continue
-            if status.get('privacyStatus')!='public' or status.get('embeddable') is not True:continue
+            if status.get('privacyStatus')!='public' or status.get('embeddable') is not True:
+                if diagnostics is not None:diagnostics['rejected_not_public_embeddable']+=1
+                continue
             title=str(info.get('title') or '')
             desc=str(info.get('description') or '')[:850]
             profile=source_profile(title,desc)
-            if not profile:continue
+            if not profile:
+                if diagnostics is not None:diagnostics['rejected_no_geo_cargo_pov']+=1
+                continue
             channel=str(info.get('channelTitle') or 'Criador independente')
             base={'platform':'youtube','video_id':ident,
                   'video_url':'https://www.youtube.com/watch?v='+ident,
@@ -254,6 +285,7 @@ def verify_youtube(ids, key, now, api, errors):
             if (info.get('liveBroadcastContent')=='live'
                 and when(live.get('actualStartTime')) and not live.get('actualEndTime')):
                 found.append({**base,'live':True,'status':'live','start_seconds':0})
+                if diagnostics is not None:diagnostics['accepted_live']+=1
                 continue
             ended=when(live.get('actualEndTime'))
             started=when(live.get('actualStartTime'))
@@ -348,7 +380,11 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     api=get_json or request_json
     cached=cache if cache is not None else safe_cached_discovery(now)
     fresh_cache=cached and when(cached.get('checked_at')) and (now-when(cached['checked_at'])).total_seconds()<3700
-    discovery={'checked_at':now.isoformat()}
+    discovery={'checked_at':now.isoformat(),'discovery_version':3}
+    diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
+                 'targeted_live_hits':0,'videos_returned':0,
+                 'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
+                 'accepted_live':0}
     approved=[]
     if key:
         if fresh_cache and isinstance(cached.get('youtube_ids'),list):
@@ -359,12 +395,18 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         # Independently poll the latest uploads of approved discovery leads on
         # EVERY run, not only once per hour. Official API; no HTML scraping.
         creator_ids=(youtube_curated_channel_discover(
-            key,cfg['channel_sources'],lambda u:api(u),result['warnings'])
-            if cache is None else [])  # Explicit injected discovery fixtures stay deterministic.
-        ids=list(dict.fromkeys(creator_ids+search_ids))[:MAX_CANDIDATES]
+            key,cfg['channel_sources'],lambda u:api(u),result['warnings'],
+            targeted_hour=(now.hour if not fresh_cache else None),
+            diagnostics=diagnostics)
+            if cache is None else [])  # Injected discovery fixtures remain deterministic.
+        cached_creator_ids=[i for i in ((cached or {}).get('curated_ids') or [])
+                            if VIDEO_ID.fullmatch(str(i))]
+        ids=list(dict.fromkeys(creator_ids+cached_creator_ids+search_ids))[:MAX_CANDIDATES]
         discovery['youtube_ids']=search_ids
+        discovery['curated_ids']=creator_ids
+        diagnostics['candidate_ids']=len(ids)
         result['creator_discovery_count']=len(creator_ids)
-        approved+=verify_youtube(ids,key,now,lambda u:api(u),result['warnings'])
+        approved+=verify_youtube(ids,key,now,lambda u:api(u),result['warnings'],diagnostics)
     if tid and secret:
         try:
             token=twitch_token(tid,secret,api)
@@ -379,6 +421,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     if not fresh_cache and cache is None:
         store_cached_discovery(discovery)
     result['live_checked_at']=now.isoformat()
+    result['discovery_diagnostics']=diagnostics
     # Live first, sorting recent starts; only one player's video is ever loaded.
     lives=[x for x in approved if x.get('live')]
     replays=[x for x in approved if not x.get('live')]
