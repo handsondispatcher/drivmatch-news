@@ -246,12 +246,12 @@
           'news-top':['Conecta tu empresa con el transporte de EE. UU.','Conductores, flotas y empresas en movimiento. Descubre el ecosistema DrivMatch.'],
           'market-sidebar':['El transporte mueve oportunidades','Una vitrina para empresas y profesionales de la logística.']}
     }[lang];
-    const previous=$('ad-slot');if(previous){previous.hidden=true;previous.replaceChildren();}
+    const previous=$('ad-slot');if(previous){previous.hidden=true;previous.innerHTML='';}
     for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner']]){
       const container=$(id);if(!container)continue;
       const ad=placements.find(x=>x.enabled===true&&x.relationship==='house'&&x.slot===slot
              &&/^https:\/\/drivmatch\.com\//i.test(x.url||''));
-      container.hidden=!ad;if(!ad){container.replaceChildren();continue;}
+      container.hidden=!ad;if(!ad){container.innerHTML='';continue;}
       const [title,description]=text[slot];
       container.innerHTML=`<div class="ad-copy"><span class="ad-kicker">${escapeHTML(text.kicker)}</span>
         <h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p></div>
