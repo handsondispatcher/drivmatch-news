@@ -1,135 +1,190 @@
-/* DrivMatch News Road TV v34.2
- * Official YouTube player, click-to-load; never restream or invent LIVE state.
- * Both renderers read one verified catalog; no third-party requests before click. */
+/* DrivMatch Road TV v34.2 | YouTube + Twitch official embeds only.
+ * No iframe before a viewer's click; no restreaming; no fabricated LIVE label.
+ * A 10-minute news build checks metadata. Browser refreshes the status every
+ * 2 minutes; switches on broadcaster STOP metadata or after 12 minutes if
+ * another eligible active stream is available (not a motion detector). */
 (()=>{
- 'use strict';
- const cards=[...document.querySelectorAll('[data-roadtv]')];
- if(!cards.length)return;
- const official='https://www.youtube.com/';
- const channels=[
-  {name:'Ride Along Gang',channel_url:official+'@Ridealonggang'},
-  {name:'51 Logistics',channel_url:official+'@51logistics'},
-  {name:'Freight Relocators Live',channel_url:official+'@freightrelocatorslive'},
-  {name:'Johnny Trucker USA',channel_url:official+'@JohnnyTruckerUSA'}
- ];
- const recorded={
-  video_id:'OyrSHX18bQk',channel_name:'Johnny Trucker USA',
-  channel_url:official+'@JohnnyTruckerUSA',
-  video_url:official+'watch?v=OyrSHX18bQk',
-  title:'Vermont to Upstate New York · POV truck ride (4K, recorded)',
-  live:false
- };
- const t={
-  pt:{sub:'NA ESTRADA · VIAGENS E TRANSMISSÕES',live:'AO VIVO',recorded:'GRAVADO',
-   title:'Vermont e Nova York · viagem de caminhão gravada',play:'▶ Abrir player do YouTube',
-   watch:'Ver vídeo original ↗',
-   intro:'Conteúdo de criadores independentes · YouTube',
-   infoLive:'Transmissão ao vivo confirmada pelo YouTube. O player é carregado somente após seu clique.',
-   infoRec:'Gravação identificada, não é transmissão ao vivo. O YouTube é carregado apenas após seu clique; disponibilidade depende do criador.',
-   channels:'Visitar outros canais de caminhoneiros no YouTube:'},
-  en:{sub:'ON THE ROAD · LIVE AND RECORDED',live:'LIVE',recorded:'RECORDED',
-   title:'Vermont to New York · recorded trucking ride',play:'▶ Open YouTube player',
-   watch:'Original on YouTube ↗',
-   intro:'Independent creators · YouTube',
-   infoLive:'Livestream verified by YouTube. The player loads only after you click.',
-   infoRec:'This is a recording, not a live broadcast. YouTube loads only after you click; embedding depends on the creator.',
-   channels:'Explore other trucking channels on YouTube:'},
-  es:{sub:'EN LA RUTA · DIRECTOS Y GRABACIONES',live:'EN VIVO',recorded:'GRABADO',
-   title:'Vermont a Nueva York · viaje grabado en camión',play:'▶ Abrir reproductor de YouTube',
-   watch:'Ver original en YouTube ↗',
-   intro:'Creadores independientes · YouTube',
-   infoLive:'Transmisión en vivo verificada por YouTube. El reproductor se carga al pulsar.',
-   infoRec:'Es una grabación, no una transmisión en vivo. YouTube se carga solo al pulsar; depende del creador.',
-   channels:'Otros canales de camioneros en YouTube:'}
- };
- const safeVideoId=id=>typeof id==='string'&&/^[A-Za-z0-9_-]{11}$/.test(id);
- function safeYouTubeURL(url){
-  try{const u=new URL(url);
-   return u.protocol==='https:'&&['www.youtube.com','youtube.com','m.youtube.com'].includes(u.hostname)?u.href:'';
-  }catch{return ''}
+'use strict';
+const cards=[...document.querySelectorAll('[data-roadtv]')];
+if(!cards.length)return;
+const VERIFIED_HOSTS=new Set(['drivmatch.com','www.drivmatch.com','handsondispatcher.github.io','localhost','127.0.0.1']);
+const aliases={
+ pt:{sub:'ESTRADA DOS EUA · SEMI / BOX / PICKUP / VAN',live:'AO VIVO',replay:'REPLAY',missing:'SEM LIVE',
+  awaiting:'Verificando transmissões…',none:'Nenhuma live ou gravação elegível confirmada agora.',
+  play:'▶ Assistir pelo player oficial',next:'Próximo canal ↻',source:'Abrir na plataforma ↗',
+  note:'Filmagem a partir da cabine e operação nos EUA: sinais declarados no título/descrição do criador, não verificados quadro a quadro.',
+  recorded:'Reprodução de transmissão encerrada hoje/ontem; horário aproximado da gravação alinhado ao horário atual. Não é ao vivo.',
+  online:'Transmissão ativa confirmada pela plataforma. Cena e movimento não podem ser certificados automaticamente.',
+  search:'Continue explorando os canais; nenhum conteúdo é reproduzido sem sua ação.',
+  wait:'Aguardando nova verificação.',channels:'Fontes indicadas para investigação (não necessariamente ao vivo).',
+  switch:'Troca automática quando outra transmissão validada estiver disponível.',
+  manual:'Escolha outro canal verificado'},
+ en:{sub:'U.S. ROADS · SEMI / BOX / PICKUP / VAN',live:'LIVE',replay:'REPLAY',missing:'NO LIVE',
+  awaiting:'Checking live feeds…',none:'No verified live stream or eligible recent replay right now.',
+  play:'▶ Watch in official player',next:'Next channel ↻',source:'Open on platform ↗',
+  note:'US location and forward-facing cab camera are declared by the creator, not verified frame by frame.',
+  recorded:'A completed broadcast from today/yesterday, roughly matched to the local time of day. Not live.',
+  online:'Live status verified by platform. Movement and camera view cannot be certified automatically.',
+  search:'Explore the channels; no third-party content plays until you click.',
+  wait:'Awaiting another verification.',channels:'Discovery leads (not necessarily live).',
+  switch:'Automatic channel rotation when another eligible broadcast exists.',
+  manual:'Select another verified channel'},
+ es:{sub:'CARRETERAS DE EE. UU. · CAMIONES Y FURGONETAS',live:'EN VIVO',replay:'REPETICIÓN',missing:'SIN DIRECTO',
+  awaiting:'Buscando transmisiones…',none:'No hay directos ni repeticiones recientes verificadas en este momento.',
+  play:'▶ Ver con reproductor oficial',next:'Siguiente canal ↻',source:'Abrir en la plataforma ↗',
+  note:'EE. UU. y cámara frontal declarados por el creador; no se verifican fotogramas.',
+  recorded:'Transmisión terminada hoy/ayer, seleccionada por hora aproximada. No es en vivo.',
+  online:'Directo confirmado por la plataforma. Movimiento y cámara no se certifican automáticamente.',
+  search:'Explore los canales; no se reproduce contenido sin pulsar.',
+  wait:'Esperando nueva verificación.',channels:'Canales para investigar (no necesariamente en vivo).',
+  switch:'Cambio automático cuando exista otro directo elegible.',
+  manual:'Seleccione otro canal verificado'}
+};
+const lang=()=>aliases[document.getElementById('language')?.value]?document.getElementById('language').value:'pt';
+const goodURL=u=>{try{const x=new URL(u);return x.protocol==='https:'&&
+  ['www.youtube.com','youtube.com','m.youtube.com','www.twitch.tv','twitch.tv'].includes(x.hostname)?x.href:null;}catch{return null}};
+const validVideo=v=>v&&(
+  v.platform==='youtube'&&/^[A-Za-z0-9_-]{11}$/.test(v.video_id||'') ||
+  v.platform==='twitch'&&/^[a-z0-9_]{3,25}$/.test(v.channel_login||'')
+)&&goodURL(v.video_url)&&goodURL(v.channel_url)
+  &&v.geo_evidence&&v.camera_evidence&&v.verification
+  &&(v.live===true&&v.status==='live'||v.live===false&&v.status==='replay');
+const id=v=>String(v.platform)+':'+String(v.video_id||v.channel_login||'');
+let data={schema_version:2,live_status:'unverified',candidates:[],channels:[]};
+let catalog=[],index=0,activeCard=null,activated=false,startedAt=0,activeId='';
+let waitingRefresh=false;
+function clearFrame(card){card.querySelector('[data-roadtv-screen] iframe')?.remove();card.querySelector('[data-roadtv-stage]').hidden=false}
+function stopFrames(){cards.forEach(clearFrame);activeCard=null;activeId=''}
+function safeCandidates(d){
+ const generated=Date.parse(d?.generated_at||'');
+ if(!Number.isFinite(generated)||Math.abs(Date.now()-generated)>25*60000)return [];
+ // Even when a cached catalog says LIVE, no player may claim that label after
+ // 20 minutes without an updated authorized API verification.
+ const checked=Date.parse(d?.live_checked_at||'');
+ const liveFresh=Number.isFinite(checked)&&Date.now()-checked>=-60000&&Date.now()-checked<20*60000;
+ const uniq=new Set();
+ return (Array.isArray(d?.candidates)?d.candidates:[]).filter(v=>{
+  if(!validVideo(v)||v.live===true&&!liveFresh)return false;
+  // Replays only from the trusted backend selection of today/yesterday;
+  // invalidated cached replay entries should not persist in client forever.
+  if(v.live===false){
+   const at=Date.parse(v.ended_at||'');
+   if(!Number.isFinite(at)||Date.now()-at>48*3600000||Date.now()<at)return false;
+  }
+  if(uniq.has(id(v)))return false;uniq.add(id(v));return true;
+ }).slice(0,12).sort((a,b)=>Number(b.live)-Number(a.live));
+}
+function current(){return catalog[index]||null}
+function link(u,label){
+ const a=document.createElement('a');a.textContent=label;a.href=goodURL(u)||'https://www.youtube.com/';
+ a.target='_blank';a.rel='noopener noreferrer';return a;
+}
+function updateCard(card){
+ const c=aliases[lang()],v=current(),live=!!v?.live;
+ const badge=card.querySelector('[data-roadtv-badge]');
+ badge.textContent=v?(live?c.live:c.replay):c.missing;
+ badge.classList.toggle('is-live',live);
+ badge.classList.toggle('is-pending',!v);
+ card.querySelector('[data-roadtv-subheading]').textContent=c.sub;
+ card.querySelector('[data-roadtv-stage-title]').textContent=v?String(v.title||v.channel_name).slice(0,155):c.none;
+ const play=card.querySelector('[data-roadtv-play]');play.hidden=!v;play.textContent=c.play;
+ card.querySelector('[data-roadtv-credit]').textContent=v?String(v.channel_name||'')+' · '+(v.platform==='youtube'?'YouTube':'Twitch'):'Road TV · YouTube / Twitch';
+ const original=card.querySelector('[data-roadtv-original]');original.hidden=!v;
+ if(v)original.href=goodURL(v.video_url);
+ original.textContent=c.source;
+ const next=card.querySelector('[data-roadtv-next]');next.textContent=c.next;next.disabled=catalog.length<=1;
+ const status=card.querySelector('[data-roadtv-status]');status.textContent=v?((index+1)+' / '+catalog.length+' · '+c.switch):c.wait;
+ const message=card.querySelector('[data-roadtv-disclosure]');
+ message.textContent=(v?(live?c.online:c.recorded):c.search)+' '+c.note;
+ const list=card.querySelector('[data-roadtv-channels]');list.replaceChildren();
+ list.setAttribute('aria-label',c.channels);
+ // Additional creators are discovered through authorized APIs. Catalog
+ // "channels" are suggestions to explore, never impersonated as LIVE.
+ for(const ch of (Array.isArray(data.channels)?data.channels:[])){
+  if(goodURL(ch.channel_url))list.appendChild(link(ch.channel_url,String(ch.name||'Criador')));
  }
- const lang=()=>['pt','en','es'].includes(document.getElementById('language')?.value)?document.getElementById('language').value:'pt';
- let catalog={current_live:null,live_checked_at:null,featured_recording:recorded,channels};
- let selected=null;
- function currentVideo(){
-  const live=catalog.current_live,at=Date.parse(catalog.live_checked_at||'');
-  const fresh=Number.isFinite(at)&&Date.now()-at>=-60000&&Date.now()-at<20*60*1000;
-  if(fresh&&live?.live===true&&safeVideoId(live.video_id)&&safeYouTubeURL(live.video_url)&&safeYouTubeURL(live.channel_url))return live;
-  const fallback=catalog.featured_recording;
-  if(fallback&&safeVideoId(fallback.video_id)&&safeYouTubeURL(fallback.video_url)&&safeYouTubeURL(fallback.channel_url))return {...fallback,live:false};
-  return recorded;
+ const stage=card.querySelector('[data-roadtv-stage]');
+ stage.hidden=!!card.querySelector('iframe');
+}
+function render(){cards.forEach(updateCard)}
+function choose(n,auto=false){
+ const v=catalog[n];
+ if(!v)return;
+ stopFrames();index=n;startedAt=Date.now();render();
+ if(auto&&activated&&activeCard){
+  // activeCard is cleared by stopFrames: retain it explicitly in callers
+  // (switch is a selection; visitor can choose playback for a new creator).
  }
- function newLink(url,label,className){
-  const a=document.createElement('a');a.href=safeYouTubeURL(url)||recorded.channel_url;
-  a.target='_blank';a.rel='noopener noreferrer';a.textContent=label;
-  if(className)a.className=className;
-  return a;
+}
+function embed(card){
+ const v=current();
+ if(!v||!VERIFIED_HOSTS.has(location.hostname))return;
+ stopFrames();
+ let src;
+ if(v.platform==='youtube'){
+  src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.video_id)+'?playsinline=1&rel=0';
+  if(!v.live&&Number.isInteger(v.start_seconds)&&v.start_seconds>0)
+   src+='&start='+Math.min(v.start_seconds,86400);
+ }else{
+  src='https://player.twitch.tv/?channel='+encodeURIComponent(v.channel_login)
+    +'&parent='+encodeURIComponent(location.hostname)+'&autoplay=false&muted=true';
  }
- function renderCard(card,video){
-  const copy=t[lang()];const isLive=video.live===true;
-  card.querySelector('[data-roadtv-subheading]').textContent=copy.sub;
-  const badge=card.querySelector('[data-roadtv-badge]');
-  badge.textContent=isLive?copy.live:copy.recorded;
-  badge.classList.toggle('is-live',isLive);
-  card.querySelector('[data-roadtv-credit]').textContent=copy.intro+' · '+String(video.channel_name||'');
-  const orig=card.querySelector('[data-roadtv-original]');
-  orig.href=safeYouTubeURL(video.video_url)||recorded.video_url;
-  orig.textContent=copy.watch;
-  const screen=card.querySelector('[data-roadtv-screen]');
-  const existing=screen.querySelector('iframe[data-roadtv-frame]');
-  if(existing&&existing.dataset.videoId!==video.video_id){existing.remove()}
-  const stage=card.querySelector('[data-roadtv-stage]');
-  stage.querySelector('[data-roadtv-stage-title]').textContent=isLive?String(video.title||video.channel_name||'YouTube'):copy.title;
-  const btn=stage.querySelector('[data-roadtv-play]');btn.textContent=copy.play;
-  stage.hidden=!!screen.querySelector('iframe');
-  card.querySelector('[data-roadtv-disclosure]').textContent=isLive?copy.infoLive:copy.infoRec;
-  const list=card.querySelector('[data-roadtv-channels]');list.replaceChildren();
-  list.setAttribute('aria-label',copy.channels);
-  (Array.isArray(catalog.channels)?catalog.channels:channels).forEach(ch=>{
-   const link=safeYouTubeURL(ch.channel_url);
-   if(link)list.appendChild(newLink(link,String(ch.name||'Canal')));
-  });
- }
- function render(){
-  selected=currentVideo();
-  cards.forEach(card=>renderCard(card,selected));
- }
- function loadVideo(card){
-  const video=selected||currentVideo();if(!safeVideoId(video.video_id))return;
-  // A hidden mobile/desktop duplicate must not continue playing.
-  cards.forEach(c=>{if(c!==card){
-   c.querySelectorAll('iframe[data-roadtv-frame]').forEach(el=>el.remove());
-   c.querySelector('[data-roadtv-stage]').hidden=false;
-  }});
-  const screen=card.querySelector('[data-roadtv-screen]');
-  if(screen.querySelector('iframe[data-roadtv-frame]'))return;
-  const iframe=document.createElement('iframe');
-  iframe.dataset.roadtvFrame='true';iframe.dataset.videoId=video.video_id;
-  iframe.title='YouTube — '+String(video.channel_name||'Trucking');
-  iframe.src='https://www.youtube-nocookie.com/embed/'+video.video_id+'?playsinline=1&rel=0';
-  iframe.referrerPolicy='strict-origin-when-cross-origin';
-  iframe.setAttribute('allow','encrypted-media; picture-in-picture; fullscreen; web-share');
-  iframe.setAttribute('allowfullscreen','');
-  iframe.loading='lazy';
-  screen.appendChild(iframe);
-  card.querySelector('[data-roadtv-stage]').hidden=true;
-  // No URL includes personal data; external video platform has its own tracking.
-  card.dispatchEvent(new CustomEvent('roadtv:player-opened',{bubbles:true,detail:{source:'youtube',status:video.live?'live':'recorded'}}));
- }
- cards.forEach(card=>card.addEventListener('click',e=>{
-  if(e.target.closest('[data-roadtv-play]'))loadVideo(card);
- }));
- document.getElementById('language')?.addEventListener('change',render);
- document.querySelectorAll('[data-site-lang]').forEach(el=>el.addEventListener('click',()=>setTimeout(render,0)));
+ const frame=document.createElement('iframe');
+ frame.title=(v.live?'AO VIVO':'REPLAY')+' · '+(v.channel_name||v.platform);
+ frame.src=src;frame.loading='lazy';
+ frame.referrerPolicy='strict-origin-when-cross-origin';
+ frame.setAttribute('allow','autoplay; encrypted-media; picture-in-picture; fullscreen');
+ frame.setAttribute('allowfullscreen','');
+ frame.setAttribute('data-roadtv-frame','true');
+ card.querySelector('[data-roadtv-screen]').appendChild(frame);
+ card.querySelector('[data-roadtv-stage]').hidden=true;
+ activeCard=card;activeId=id(v);activated=true;startedAt=Date.now();
+ card.dispatchEvent(new CustomEvent('roadtv:player-opened',
+  {bubbles:true,detail:{platform:v.platform,live:v.live,regionClaim:'USA'}}));
+}
+function reconcile(next){
+ const old=current(),previous=old&&id(old),playing=activeId;
+ data=next;catalog=safeCandidates(next);
+ const match=catalog.findIndex(c=>id(c)===previous);
+ index=match>=0?match:0;
+ const changed=playing&&!catalog.some(v=>id(v)===playing);
+ if(changed)stopFrames();
+ // Live always outranks a replay. Rotate if verified live appears after replay
+ // and no video is currently being actively watched.
+ if(!playing&&catalog.some(c=>c.live)&&catalog[index]&&!catalog[index].live)
+  index=catalog.findIndex(c=>c.live);
  render();
- if(location.protocol==='http:'||location.protocol==='https:'){
-  fetch('data/road-tv.json?ts='+Date.now(),{cache:'no-store'}).then(async res=>{
-   if(!res.ok)throw Error('Road TV catalog temporarily unavailable');
-   const data=await res.json();
-   if(data.schema_version!==1||!Array.isArray(data.channels))return;
-   // Creator links are explicitly allowlisted to YouTube; live is always
-   // checked against its timestamp and never inferred from a name/title.
-   catalog=data;render();
-  }).catch(()=>{/* Identified recorded video and owner links remain available. */});
- }
+}
+async function refresh(){
+ if(waitingRefresh)return;
+ waitingRefresh=true;
+ try{
+  const response=await fetch('data/road-tv.json?probe='+Date.now(),{cache:'no-store'});
+  if(!response.ok)throw Error('catalog_unavailable');
+  const obj=await response.json();
+  if(obj.schema_version!==2||!Array.isArray(obj.candidates))throw Error('invalid_schema');
+  reconcile(obj);
+ }catch{
+  // If verification stops, stale LIVE must not remain labeled as active.
+  if(data.generated_at&&Date.now()-Date.parse(data.generated_at)>25*60000)
+   reconcile({...data,generated_at:null,candidates:[]});
+ }finally{waitingRefresh=false}
+}
+cards.forEach(card=>{
+ card.addEventListener('click',e=>{
+  if(e.target.closest('[data-roadtv-play]'))embed(card);
+  if(e.target.closest('[data-roadtv-next]')&&catalog.length>1)
+   choose((index+1)%catalog.length);
+ });
+});
+document.getElementById('language')?.addEventListener('change',render);
+document.querySelectorAll('[data-site-lang]').forEach(x=>x.addEventListener('click',()=>setTimeout(render,0)));
+setInterval(refresh,120000);
+setInterval(()=>{
+ if(catalog.length<2||!activated||!activeId||Date.now()-startedAt<12*60000)return;
+ const next=catalog.findIndex((v,i)=>i!==index&&v.live);
+ if(next>=0){choose(next,true)}
+},60000);
+render();
+refresh();
 })();
