@@ -552,11 +552,15 @@ def build(offline=False):
     source_metrics={'total':len(statuses),'working':sum(x.get('status')=='ok' for x in statuses),
                     'failed':sum(x.get('status')=='failed' for x in statuses),
                     'manual':sum(x.get('status')=='manual-review' for x in statuses)}
-    latest=max((x.get('published_at','') for x in external_headlines),default='')
+    # Editorial freshness measures newspaper source publication dates only.
+    # Active government bulletins are operational information, not "new news".
+    publisher_headlines=[x for x in external_headlines
+                         if x.get('editorial_type')!='operational_bulletin']
+    latest=max((x.get('published_at','') for x in publisher_headlines),default='')
     now=NOW()
-    fresh_6h=sum(1 for x in external_headlines if x.get('published_at') and
+    fresh_6h=sum(1 for x in publisher_headlines if x.get('published_at') and
                  0<=(now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds()<=6*3600)
-    fresh_12h=sum(1 for x in external_headlines if x.get('published_at') and
+    fresh_12h=sum(1 for x in publisher_headlines if x.get('published_at') and
                   0<=(now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds()<=12*3600)
     newest_age_h=(now-datetime.fromisoformat(latest.replace('Z','+00:00'))).total_seconds()/3600 if latest else None
     if newest_age_h is None or newest_age_h>8:
@@ -579,12 +583,13 @@ def build(offline=False):
         'checked_at':now.isoformat(timespec='seconds'),
         'latest_original_published_at':latest or None,
         'latest_original_age_minutes':age_minutes,
-        'approved_external_headlines':len(external_headlines),
+        'approved_external_headlines':len(publisher_headlines),
+        'official_nws_bulletins':len(external_headlines)-len(publisher_headlines),
         'published_last_60_minutes':sum(
-            1 for x in external_headlines if x.get('published_at') and
+            1 for x in publisher_headlines if x.get('published_at') and
             0 <= (now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds() <= 3600),
         'published_last_180_minutes':sum(
-            1 for x in external_headlines if x.get('published_at') and
+            1 for x in publisher_headlines if x.get('published_at') and
             0 <= (now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds() <= 10800),
         'source_metrics':source_metrics,
         'source_candidate_rejections':rejection_counts,
