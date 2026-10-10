@@ -1,3 +1,12 @@
+# DrivMatch News — v34 (Newsroom Editorial, 09/10/2026)
+
+**Estado:** `development_prelaunch`, **não aprovado para divulgação pública**. V34 é uma revisão visual mais jornalística, com off-white/navy/azul, lead fotográfico, 3 notícias relacionadas, 5 destaques fotográficos, editorias e uma chamada comercial discreta separada do jornalismo. **Sem fotos, cotações ou afirmações de negócio demonstrativas publicadas como fatos**.
+
+**BACKUP ANTES DA REVISÃO:** v33 intacta na branch [`backup/v33-approved-2026-10-09`](https://github.com/handsondispatcher/drivmatch-news/tree/backup/v33-approved-2026-10-09), SHA `fea227dde034e101ace8299357579ddfe98fe256`. v32 continua preservada em `backup/v32-approved-2026-10-09` (SHA `659a146b8f48c342c2a62d86a1330d59760116d4`).
+
+**Leia primeiro:** [Governança e escopo da v34](docs/V34_RELEASE.md) • [Histórico canônico dos chats](docs/CONTINUIDADE_DRIVMATCH_NEWS.md) • [War Room de monetização](docs/WAR_ROOM_ESTRATEGIA_DRIVMATCH_NEWS_E_RECEITA_2026-10-09.md). Versões anteriores abaixo são históricas.
+
+---
 # DrivMatch News — v33 (Revisão editorial, 09/10/2026)
 
 **Estado:** Desenvolvimento / Pré-lançamento. **Não autorizado para divulgação como produto concluído.**
