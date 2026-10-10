@@ -1,4 +1,4 @@
-/* DrivMatch News v34.1 — newsroom, only verified market values; v34/v33 snapshots and mobile reader preserved. */
+/* DrivMatch News v34.2 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -195,11 +195,14 @@
     const empty=lang==='pt'?'Sem indicadores recentes e verificados nesta atualização. Não exibimos cotações fictícias.':
       lang==='es'?'No hay indicadores recientes y verificados. No mostramos cotizaciones ficticias.':
       'No recent verified market indicators are available. No invented quotes.';
-    $('market').innerHTML=body.length?body.join(''):`<p class="market-unavailable">${empty}</p>`;
+    const marketHTML=body.length?body.join(''):`<p class="market-unavailable">${empty}</p>`;
+    $('market').innerHTML=marketHTML;
+    $('market-mobile').innerHTML=marketHTML;
     const note=lang==='pt'?'Dados de referência, não cotações em tempo real.':
       lang==='es'?'Datos de referencia, no cotizaciones en tiempo real.':
       'Reference data, not real-time prices.';
     $('market-note').textContent=body.length?note:'';
+    $('market-note-mobile').textContent=body.length?note:'';
   }
   function renderAds(){let ad=(data.ads?.enabled && data.ads.placements||[]).find(x=>x.enabled && x.slot==='below_panorama' && safeUrl(x.url));
     $('ad-slot').hidden=!ad;if(!ad)return;
@@ -322,6 +325,7 @@
     $('story-preview-hint').textContent=next==='en'?'Review the card, then post it to Instagram, TikTok or WhatsApp Status.':next==='es'?'Revisa la imagen y luego publícala en Instagram, TikTok o el estado de WhatsApp.':'Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.';
     const trans=labels[next];document.querySelector('#panorama .heading').textContent=trans.panorama;document.querySelector('#noticias .heading').textContent=trans.news;
     document.querySelector('#market-title').textContent=trans.market;
+    $('market-title-mobile').textContent=trans.market;
     $('search').placeholder=trans.search;$('category').options[0].text=trans.filters;
     const ages=$('age').options;[trans.allDates,trans.d2,trans.d7,trans.d30].forEach((t,i)=>{if(ages[i])ages[i].text=t});
     $('prev').textContent=trans.prev;$('next').textContent=trans.next;
