@@ -352,6 +352,52 @@ def make_market(offline=False):
     return market
 
 
+def bootstrap_external_story_cards(headlines, first_party):
+    """Show vetted source-linked briefs immediately, before any client fetch.
+
+    These are NOT DrivMatch-written reports. Preserve original publisher URLs,
+    timestamps and attribution. Only the headline is reproduced or translated.
+    """
+    categories={'Transporte','Combustíveis','Acidentes','Clima','Rodovias',
+                'Fiscalização','Tecnologia','Fretes','Empregos','Caminhões',
+                'Mecânica','Caminhoneiros','Socorro','Negócios','Governo',
+                'Imigração','Segurança'}
+    existing={x.get('source_url') for x in first_party}
+    ids={x.get('id') for x in first_party}
+    result=[]
+    for item in headlines:
+        url=item.get('source_url','')
+        stamp=item.get('published_at')
+        titles=item.get('titles') or {}
+        if (not item.get('geo_scope_verified') or
+            item.get('origin_type')=='aggregator-discovery' or
+            not url.startswith('https://') or not stamp or
+            not item.get('source') or not item.get('title') or
+            url in existing or item.get('id') in ids):
+            continue
+        try:
+            published=datetime.fromisoformat(stamp.replace('Z','+00:00'))
+            if published.tzinfo is None or published>NOW():
+                continue
+        except (TypeError, ValueError):
+            continue
+        original=item.get('original_lang') if item.get('original_lang') in ('pt','en','es') else 'en'
+        result.append({
+            'id':item['id'], 'kind':'external_link', 'status':'external_source',
+            'demo':False,
+            'category':item.get('category') if item.get('category') in categories else 'Transporte',
+            'source':item['source'], 'source_url':url, 'published_at':stamp,
+            'original_lang':original, 'region':item.get('region','US'),
+            'translated_langs':[language for language in ('pt','en','es') if titles.get(language)],
+            'locales':{language:{'title':titles.get(language) or item['title'],
+                                 'summary':'','body':''}
+                       for language in ('pt','en','es')}
+        })
+        existing.add(url)
+        ids.add(item['id'])
+    return result
+
+
 def build(offline=False):
     errors=[]
     articles=read_json(ROOT/'content/editorial.json')
@@ -434,8 +480,15 @@ def build(offline=False):
     release=read_json(ROOT/'content/release.json')
     if release.get('version')!='v34.11' or release.get('public_launch_approved') is not False:
         raise ValueError('Invalid release contract: v34.11 must remain prelaunch')
+    # Source-linked headlines are part of the initial issue: an extra failed
+    # client fetch must not leave readers staring only at old approved stories.
+    # They remain external links, not fabricated DrivMatch original reporting.
+    initial_links=bootstrap_external_story_cards(external_headlines,unique.values())[:75]
+    latest_source=max((x.get('published_at','') for x in external_headlines),default='')
     data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
-          'articles':list(unique.values()),'market':market,'ads':ads}
+          'source_monitor':{'checked_at':NOW().isoformat(timespec='seconds'),
+                            'latest_original_published_at':latest_source},
+          'articles':list(unique.values())+initial_links,'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
     public_spot=os.getenv('USDBRL_PUBLIC_URL','')
     runtime={'spot_url':public_spot if public_spot.startswith('https://') else ''}
