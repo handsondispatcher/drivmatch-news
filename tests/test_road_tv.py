@@ -7,7 +7,7 @@ from urllib.parse import parse_qs, urlparse
 
 BASE=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(BASE/'scripts'))
-from road_tv import make_road_tv,clock_offset,evidence,video_length,source_profile
+from road_tv import make_road_tv,clock_offset,evidence,video_length,source_profile,youtube_curated_channel_discover
 
 NOW=dt.datetime(2026,10,9,20,30,tzinfo=dt.timezone.utc)
 ID="A1b2C3d4E5f"
@@ -102,6 +102,22 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(source_profile(TITLE)["source_rank"],0)
   self.assertEqual(source_profile("Florida I-4 interstate live traffic camera")["source_rank"],1)
   self.assertEqual(source_profile("Peace Bridge USA Entrance live traffic webcam")["source_rank"],2)
+
+ def test_curated_creator_channel_poll_uses_low_quota_official_endpoints(self):
+  calls=[]
+  def api(url):
+   calls.append(url)
+   if '/channels?' in url:
+    return {'items':[{'contentDetails':{'relatedPlaylists':{'uploads':'UUtestcreator'}}}]}
+   if '/playlistItems?' in url:
+    return {'items':[{'contentDetails':{'videoId':ID}}]}
+   raise AssertionError(url)
+  ids=youtube_curated_channel_discover('test-key',
+      [{'handle':'@Ridealonggang'}],api,[])
+  self.assertEqual(ids,[ID])
+  self.assertEqual(len(calls),2)
+  self.assertIn('forHandle=%40Ridealonggang',calls[0])
+  self.assertIn('playlistItems?',calls[1])
 
  def test_no_key_fail_closed_instead_of_stale_static_demo(self):
   doc=make_road_tv(now=NOW,api_key="",twitch_id="",twitch_secret="")
