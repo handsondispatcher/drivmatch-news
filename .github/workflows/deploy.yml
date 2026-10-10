@@ -105,12 +105,12 @@ jobs:
           test "$(wc -c < /tmp/drivmatch-social.jpg)" -gt 10000
           echo "PUBLIC SOCIAL PREVIEW PASS: Open Graph HTML and photo JPEG are accessible"
           INDEX="https://handsondispatcher.github.io/drivmatch-news/"
-          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$INDEX" -o /tmp/drivmatch-v34.5-index.html
-          grep -q 'name="drivmatch-news-version" content="v34.5"' /tmp/drivmatch-v34.5-index.html
-          grep -q 'data-site-version="v34.5"' /tmp/drivmatch-v34.5-index.html
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$INDEX" -o /tmp/drivmatch-v34.6-index.html
+          grep -q 'name="drivmatch-news-version" content="v34.6"' /tmp/drivmatch-v34.6-index.html
+          grep -q 'data-site-version="v34.6"' /tmp/drivmatch-v34.6-index.html
           RELEASE="https://handsondispatcher.github.io/drivmatch-news/data/release.json"
-          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v34.5-release.json
-          python -c 'import json; x=json.load(open("/tmp/drivmatch-v34.5-release.json")); assert x["version"]=="v34.5" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v34.5 PASS: prelaunch contract consistent")'
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v34.6-release.json
+          python -c 'import json; x=json.load(open("/tmp/drivmatch-v34.6-release.json")); assert x["version"]=="v34.6" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v34.6 PASS: prelaunch contract consistent")'
           PHOTOS="https://handsondispatcher.github.io/drivmatch-news/data/news-images.json"
           curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$PHOTOS" -o /tmp/drivmatch-news-images.json
           PHOTO=$(python -c 'import json; m=json.load(open("/tmp/drivmatch-news-images.json")); a=list(m["images"].values()); assert m["license_policy"]=="curated_commons" and len(a)>=16 and all(x["image"].startswith("assets/news-photos/") and x["image_credit"] and x["image_license"] for x in a); print(a[0]["image"])')
@@ -148,12 +148,12 @@ jobs:
           DOMAIN="https://drivmatch.com/news/"
           if curl --fail --location --silent --show-error --retry 2 --max-time 18 \
               -H "Cache-Control: no-cache" \
-              "${DOMAIN}?__release_probe=v34.5-${BUST}" -o /tmp/drivmatch-domain.html; then
-            if grep -q 'name="drivmatch-news-version" content="v34.5"' /tmp/drivmatch-domain.html \
-                && grep -q 'data-site-version="v34.5"' /tmp/drivmatch-domain.html; then
-              echo "CUSTOM DOMAIN V34.5 PASS: custom domain HTML identifies v34.5"
+              "${DOMAIN}?__release_probe=v34.6-${BUST}" -o /tmp/drivmatch-domain.html; then
+            if grep -q 'name="drivmatch-news-version" content="v34.6"' /tmp/drivmatch-domain.html \
+                && grep -q 'data-site-version="v34.6"' /tmp/drivmatch-domain.html; then
+              echo "CUSTOM DOMAIN V34.6 PASS: custom domain HTML identifies v34.6"
             else
-              echo "::warning::CUSTOM DOMAIN V34.5 MISMATCH: drivmatch.com/news/ does not serve v34.5 HTML; check Cloudflare route/proxy and caching. GitHub Pages is up-to-date."
+              echo "::warning::CUSTOM DOMAIN V34.6 MISMATCH: drivmatch.com/news/ does not serve v34.6 HTML; check Cloudflare route/proxy and caching. GitHub Pages is up-to-date."
               grep -oE 'name="drivmatch-news-version" content="[^"]+"' /tmp/drivmatch-domain.html || true
               grep -oE 'data-site-version="[^"]+"' /tmp/drivmatch-domain.html || true
               echo "CUSTOM DOMAIN HTML first line:"
@@ -164,7 +164,7 @@ jobs:
           fi
           if curl --fail --location --silent --show-error --retry 2 --max-time 18 \
               -H "Cache-Control: no-cache" \
-              "https://drivmatch.com/news/data/release.json?__release_probe=v34.5-${BUST}" \
+              "https://drivmatch.com/news/data/release.json?__release_probe=v34.6-${BUST}" \
               -o /tmp/drivmatch-domain-release.json; then
             python - <<'PY'
           import json
@@ -172,8 +172,8 @@ jobs:
               try: d=json.load(f)
               except (json.JSONDecodeError,UnicodeDecodeError): d={}
           print('CUSTOM DOMAIN RELEASE:',d.get('version','missing/invalid manifest'))
-          if d.get('version')!='v34.5':
-              print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v34.5. Cloudflare routing or cache differs from GitHub Pages.')
+          if d.get('version')!='v34.6':
+              print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v34.6. Cloudflare routing or cache differs from GitHub Pages.')
           PY
           else
             echo "::warning::CUSTOM DOMAIN MANIFEST UNAVAILABLE: /news/data/release.json not served at custom domain."
