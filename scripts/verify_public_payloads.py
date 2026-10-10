@@ -39,8 +39,16 @@ def check_pair(feed, pages, custom, now, max_age_minutes=45):
     if not isinstance(pages, dict) or not isinstance(custom, dict):
         raise ValueError(feed + ": expected JSON objects from both origins")
     for label, document in (("pages", pages), ("custom", custom)):
-        if document.get("schema_version") not in (1, 2):
+        # source-headlines.json is an existing unversioned monitor contract.
+        # Never invent a schema_version requirement for that published feed.
+        if feed == "content.json" and document.get("schema_version") != 1:
             raise ValueError(feed + ": invalid " + label + " schema")
+        if feed == "road-tv.json" and document.get("schema_version") != 2:
+            raise ValueError(feed + ": invalid " + label + " schema")
+        if feed == "source-headlines.json" and (
+                not isinstance(document.get("headlines"), list)
+                or "source_metrics" not in document):
+            raise ValueError(feed + ": invalid " + label + " headline contract")
         generated = parse_date(document.get("generated_at"))
         if generated is None:
             raise ValueError(feed + ": missing " + label + " generated_at")
