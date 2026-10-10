@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "policy": "Channel references are discovery candidates, NOT verified US-moving-front-cab channels. Never play stale recordings; prefer verified active US front-cab cargo livestreams. Replay only today/yesterday with verified original live start time and close wall-clock-hour.",
+  "policy": "Channel references are discovery candidates, NOT verified US-moving-front-cab channels. Never play stale recordings; prefer verified active US front-cab cargo livestreams. Replay only today/yesterday with verified original live start time and close wall-clock-hour. Owner screenshot is a lead, not API verification of embeddability or stream status.",
   "channel_sources": [
     {
       "name": "Ride Along Gang",
@@ -8,6 +8,14 @@
       "channel_url": "https://www.youtube.com/@Ridealonggang",
       "channel_id": null,
       "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
+    },
+    {
+      "name": "Trucking Duke",
+      "handle": "@TruckingDuke",
+      "channel_url": "https://www.youtube.com/@TruckingDuke",
+      "channel_id": null,
+      "source_note": "Owner-provided visual evidence of live truck forward POV on 2026-10-10. The exact channel handle is still a discovery lead and must be resolved by YouTube before use.",
       "status": "unverified_discovery_reference"
     },
     {
