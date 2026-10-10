@@ -114,7 +114,11 @@ def youtube_discover(key, now, api, errors):
     candidates = {}
     # These searches discover beyond any initial 4 creators. Search "regionCode"
     # is ONLY relevance, never treated as verification of stream geography.
-    for query in QUERIES:
+    # The discovery cache is hourly; two cycling LIVE searches plus one
+    # completed-broadcast search = 72 YouTube search calls/day maximum.
+    selected_live=(QUERIES[now.hour % len(QUERIES)],
+                   QUERIES[(now.hour+1) % len(QUERIES)])
+    for query in selected_live:
         try:
             params = dict(part='snippet', type='video', eventType='live',
                           videoEmbeddable='true', regionCode='US',
@@ -127,7 +131,7 @@ def youtube_discover(key, now, api, errors):
         except (OSError, TimeoutError, ValueError, KeyError, TypeError):
             errors.append('youtube_discovery_unavailable')
     # Fresh archived live-replays are not limited to the initial creators.
-    for query in QUERIES[:2]:
+    for query in (QUERIES[(now.hour+2) % len(QUERIES)],):
         try:
             params = dict(part='snippet',type='video',eventType='completed',
                           videoEmbeddable='true',order='date',
