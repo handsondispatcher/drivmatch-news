@@ -215,6 +215,22 @@ class PublicationTests(unittest.TestCase):
   d={'symbol':'USD/BRL','instrument':'spot','price_type':'commercial','session_status':'open','source':'test fixture','source_url':'https://vendor.example','value':5.1,'observed_at':datetime.now(timezone.utc).isoformat()}
   with patch.dict('os.environ',{'USDBRL_SPOT_URL':'https://vendor.example/feed','USDBRL_REDISTRIBUTION_AUTHORIZED':'true'}),patch.object(up,'fetch',return_value=json.dumps(d)):
    self.assertEqual(up.authorized_spot()['instrument'],'spot')
+ def test_curated_fresh_publisher_link_expires_without_relabeling_build_date(self):
+  link=json.loads((BASE/'content/verified-external-links.json').read_text(encoding='utf-8'))['verified_external_links'][0]
+  self.assertEqual(link['source'],'Transport Topics')
+  self.assertEqual(link['published_at'],'2026-10-10T11:00:00+00:00')
+  self.assertTrue(link['link_only'])
+  self.assertFalse(link['editorial_body_written'])
+  self.assertIn('ttnews.com/articles/',link['source_url'])
+  with patch.object(up,'NOW',return_value=datetime(2026,10,10,13,tzinfo=timezone.utc)):
+   data=up.verified_external_source_links()
+   self.assertEqual(len(data),1)
+   self.assertEqual(data[0]['origin_type'],'publisher-curated')
+   self.assertEqual(data[0]['titles']['en'],link['title'])
+  with patch.object(up,'NOW',return_value=datetime(2026,10,13,13,tzinfo=timezone.utc)):
+   self.assertEqual(up.verified_external_source_links(),[])
+  self.assertEqual(up.verified_external_source_links(offline=True),[])
+
  def test_09_oct_2026_commercial_close_is_correct_and_date_bounded(self):
   quote=json.loads((BASE/'content/usdbrl_last_close.json').read_text(encoding='utf-8'))
   self.assertEqual(quote['close_date'],'2026-10-09')
