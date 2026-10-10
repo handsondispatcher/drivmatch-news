@@ -77,15 +77,15 @@
       "id": "dat-freight-blog",
       "name": "DAT Freight & Analytics",
       "url": "https://dat.com/blog",
-      "feed_url": "https://dat.com/blog/feed",
-      "access": "rss",
+      "feed_url": null,
+      "access": "editorial-review",
       "category": "Fretes",
       "region": "US",
       "original_lang": "en",
       "publication": "review-required",
       "enabled": true,
       "source_type": "publisher-feed",
-      "attribution": "Original publisher URL and timestamp; editorial US road-freight relevance gate; external link only, no automatic article approval"
+      "attribution": "Publisher RSS endpoint returned non-RSS data in GitHub Actions on 2026-10-10; manual review only until a working official feed is confirmed."
     },
     {
       "id": "cdllife-primary",
