@@ -160,17 +160,20 @@ const {spawn}=require('node:child_process');
    }
    if(width>=944){
      const layout=await page.locator('.dm-util-inner').evaluate(el=>{
-       const grid=getComputedStyle(el).gridTemplateColumns.split(' ').length;
-       const rows=[...el.children].map(ch=>ch.getBoundingClientRect());
-       const horizontal=rows.every(r=>Math.abs(r.top-rows[0].top)<6);
-       const noOverlap=rows.every((r,i)=>i===0||r.left>=rows[i-1].right-1);
+       const columns=getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length;
+       const rects=[...el.children].map(ch=>ch.getBoundingClientRect());
        const container=el.getBoundingClientRect();
-       const contained=rows.every(r=>r.right<=container.right+2);
-       return {grid,horizontal,noOverlap,contained};
+       const overflow=rects.some(r=>r.left<container.left-2||r.right>container.right+2);
+       const collision=rects.some((r,i)=>rects.slice(i+1).some(q=>
+         r.left<q.right-1&&r.right>q.left+1&&r.top<q.bottom-1&&r.bottom>q.top+1));
+       const rowTops=[...new Set(rects.map(r=>Math.round(r.top/5)*5))];
+       return {columns,overflow,collision,rows:rowTops.length};
      });
-     assert.equal(layout.grid,6,'New owner request adds city selector as sixth market/weather cell');
-     assert.ok(layout.horizontal&&layout.noOverlap&&layout.contained,
-       'Six market/weather/city/risk modules must not overlap or spill out at '+width+'px');
+     assert.equal(layout.columns,width===944?3:6,
+       'City selector must use 3×2 responsive market strip at 944px and 6-wide on desktop');
+     assert.equal(layout.rows,width===944?2:1,'Market/forecast modules should use intentional row layout');
+     assert.equal(layout.overflow,false,'No weather/quote module should exceed its container');
+     assert.equal(layout.collision,false,'Market/forecast modules must never overlap');
    }
    if(width===1440){
      for(const c of await page.locator('.related-rail p.editorial-context').all()){
