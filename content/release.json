@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.3",
-  "baseline": "v34.2 preserved in backup/v34-2-2026-10-09; Road TV clean official railcam embed for interface validation",
+  "version": "v34.4",
+  "baseline": "v34.3 frozen at backup/v34-3-mobile-audit-2026-10-10; verified live failover, mobile ticker legibility, source recency audit",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -27,7 +27,12 @@
     "weather_road_tv_market_order",
     "single_embedded_railcam",
     "remove_roadtv_channel_buttons_and_public_fallback_text",
-    "no_false_live_badge"
+    "no_false_live_badge",
+    "youtube_player_api_error_end_failover",
+    "live_video_only_if_platform_verified",
+    "mobile_ticker_16px",
+    "news_last_source_check_vs_newest_story",
+    "news_freshness_metrics"
   ],
   "prior_backups": [
     {
@@ -36,8 +41,8 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "backup/v34-2-2026-10-09",
-  "previous_release_commit": "c5bcc13ea8ed61677a85f7ee8807ea34d48229c9",
+  "previous_release_branch": "backup/v34-3-mobile-audit-2026-10-10",
+  "previous_release_commit": "578a713ce3e3a3e90402d2026319756754dca911",
   "road_tv_policy": {
     "youtube_twitch_only": true,
     "live_claim_requires_authorized_api": true,
@@ -47,10 +52,13 @@
     "clock_aligned_actual_broadcast_metadata_only": true,
     "no_live_and_no_recent_verified_recording": "show_unavailable_state",
     "automatic_restreaming": false,
-    "player_test": "single_official_youtube_railcam_embed",
-    "roadtv_ui": "heading_plus_unmodified_youtube_player_only",
-    "roadtv_dynamic_discovery_currently_active": false,
+    "player_test": "removed_dead_static_train_video",
+    "roadtv_ui": "heading_and_official_verified_player_only",
+    "roadtv_dynamic_discovery_currently_active": true,
     "recording_or_current_live_status": "platform_controlled_not_claimed_by_drivmatch",
-    "retain_backend_for_future_review": true
+    "retain_backend_for_future_review": true,
+    "no_verified_video": "honest_player_unavailable_state",
+    "player_error_failover": true,
+    "no_video_guarantee_without_authorized_api": true
   }
 }
