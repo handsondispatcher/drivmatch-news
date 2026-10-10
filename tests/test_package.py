@@ -23,6 +23,22 @@ class PublicationTests(unittest.TestCase):
   player=(BASE/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
   self.assertIn('CAMERA_ROTATION_MS=5*60*1000',player)
 
+ def test_automated_newsroom_and_video_health_contract(self):
+  workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
+  update=(BASE/'scripts/update.py').read_text(encoding='utf-8')
+  player=(BASE/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
+  engine=(BASE/'scripts/road_tv.py').read_text(encoding='utf-8')
+  self.assertIn('War Room — verificar frescor editorial e descoberta de vídeos',workflow)
+  self.assertIn('newsroom-freshness-audit',workflow)
+  self.assertIn('build/newsroom-health.json',update)
+  self.assertIn('published_last_180_minutes',update)
+  self.assertIn('latest_original_published_at',update)
+  self.assertIn('const CAMERA_ROTATION_MS=5*60*1000',player)
+  self.assertIn("priority(a)-priority(b)",player)
+  self.assertIn("v.get('view_type')=='cargo_cab' and v.get('live')",engine)
+  self.assertIn('creator_queries=QUERIES[5:]',engine)
+  self.assertIn("cron: '7,17,27,37,47,57 * * * *'",workflow)
+
  def test_v34_11_release_contract(self):
   version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
   self.assertEqual(version['version'],'v34.11')
