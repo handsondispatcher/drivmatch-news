@@ -320,8 +320,8 @@ def build(offline=False):
     weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
     release=read_json(ROOT/'content/release.json')
-    if release.get('version')!='v34.1' or release.get('public_launch_approved') is not False:
-        raise ValueError('Invalid release contract: v34.1 must remain prelaunch')
+    if release.get('version')!='v34.2' or release.get('public_launch_approved') is not False:
+        raise ValueError('Invalid release contract: v34.2 must remain prelaunch')
     data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
@@ -353,11 +353,16 @@ def build(offline=False):
     (path/'live-feed.json').write_text(json.dumps(live,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'market.json').write_text(json.dumps(market,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'weather.json').write_text(json.dumps(weather,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    # Verified livestreams only; without authorized API key this publishes a
+    # clearly labeled, playable third-party recording, never a fictitious LIVE.
+    from road_tv import make_road_tv
+    road_tv=make_road_tv(offline=offline)
+    (path/'road-tv.json').write_text(json.dumps(road_tv,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
     # Content hashes prevent browsers mixing new HTML with cached runtime/data.
     page=ROOT/'site/index.html'
     markup=page.read_text(encoding='utf-8')
-    for asset in ('data/bootstrap.js','assets/app.js','assets/news-crawler.js','assets/clima-spot.js','assets/utility-strip.js'):
+    for asset in ('data/bootstrap.js','assets/app.js','assets/road-tv.js','assets/news-crawler.js','assets/clima-spot.js','assets/utility-strip.js'):
         version=hashlib.sha256((ROOT/'site'/asset).read_bytes()).hexdigest()[:16]
         markup=re.sub(r'(src="'+re.escape(asset)+r')(?:\?[^"]*)?"',lambda m:m.group(1)+'?v='+version+'"',markup)
     page.write_text(markup,encoding='utf-8')
