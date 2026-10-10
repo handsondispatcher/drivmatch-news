@@ -82,7 +82,10 @@
       "category": "Fretes",
       "region": "US",
       "original_lang": "en",
-      "publication": "review-required"
+      "publication": "review-required",
+      "enabled": true,
+      "source_type": "publisher-feed",
+      "attribution": "Original publisher URL and timestamp; editorial US road-freight relevance gate; external link only, no automatic article approval"
     },
     {
       "id": "cdllife-primary",
@@ -93,7 +96,10 @@
       "category": "Caminhoneiros",
       "region": "US",
       "original_lang": "en",
-      "publication": "review-required"
+      "publication": "review-required",
+      "enabled": true,
+      "source_type": "publisher-feed",
+      "attribution": "Original publisher URL and timestamp; editorial US road-freight relevance gate; external link only, no automatic article approval"
     },
     {
       "id": "overdrive",
