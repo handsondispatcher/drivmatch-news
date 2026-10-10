@@ -844,6 +844,12 @@ body{background:#f7f9fc;color:#14283c}
 .dm-util-risk{white-space:normal;text-align:center}
 @media (min-width:1121px) and (max-width:1280px){.dm-util-inner{padding-left:9px;padding-right:9px}.dm-util-city-select{padding-left:5px;padding-right:5px}.dm-util-quote{padding-left:4px;padding-right:4px}}
 @media (max-width:650px){.dm-util-city-controls input{font-size:12px;min-height:34px}.dm-util-city-controls button{min-height:34px}}
+
+/* City search controls: visible typed action; do not show rotation duration to readers. */
+.dm-util-city-controls #top-city-type{font-size:10px;min-width:46px;padding:0 5px}
+.dm-util-city-controls #top-city-query{min-width:60px}
+@media(min-width:851px) and (max-width:1120px){.dm-util-city-controls #top-city-query{min-width:80px}}
+@media(max-width:650px){.dm-util-city-controls{flex-wrap:wrap}.dm-util-city-controls input{min-width:100%;flex-basis:100%}.dm-util-city-controls button{flex:1 1 25%;max-width:90px}}
 </style>
 </head>
 <body>
@@ -875,10 +881,11 @@ body{background:#f7f9fc;color:#14283c}
    <span class="dm-util-temps" aria-label="Temperaturas previstas"><span id="top-range-f">Máx. —°F · Mín. —°F</span><span id="top-range-c">Máx. —°C · Mín. —°C</span></span></span>
   </div>
   <div class="dm-util-city-select">
-<label for="top-city-query" id="top-city-select-label">Cidade / Estado</label>
+<label for="top-city-query" id="top-city-select-label">Previsão do tempo</label>
 <div class="dm-util-city-controls">
-<input id="top-city-query" type="search" list="top-city-options" autocomplete="off" spellcheck="false" maxlength="80" placeholder="Cidade, UF" aria-describedby="top-city-feedback" aria-label="Digite cidade e sigla do estado, por exemplo Tampa, FL">
+<input id="top-city-query" type="search" list="top-city-options" autocomplete="off" spellcheck="false" maxlength="80" placeholder="Selecione ou digite sua cidade" aria-describedby="top-city-feedback" aria-label="Digite cidade e sigla do estado, por exemplo Tampa, FL">
 <datalist id="top-city-options"></datalist>
+<button id="top-city-type" type="button" aria-label="Digitar sua cidade">Digitar</button>
 <button id="top-city-apply" type="button" aria-label="Confirmar cidade">OK</button>
 <button id="top-city-auto" type="button" aria-label="Voltar à rotação de cidades a cada 10 segundos" title="Alternar cidades automaticamente">↻</button>
 </div>
