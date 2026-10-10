@@ -33,7 +33,7 @@ def parse_gazetteer(blob:bytes):
     rows=csv.DictReader(io.StringIO(text),delimiter="\t")
     required={"USPS","NAME","INTPTLAT","INTPTLONG"}
     if not rows.fieldnames or not required.issubset({n.strip() for n in rows.fieldnames}):
-        raise ValueError("Census National Places columns unexpected")
+        raise ValueError(f"Census National Places columns unexpected: {rows.fieldnames!r}")
     found={}
     for row in rows:
         state=(row.get("USPS") or "").strip().upper()
