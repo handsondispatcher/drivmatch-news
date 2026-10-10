@@ -10,7 +10,10 @@ from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-API_URL = "https://api.weather.gov/alerts/active?limit=150"
+API_URL = "https://api.weather.gov/alerts/active"
+# NOAA documents area=STATE for this endpoint; fallback only when nationwide
+# payload is unavailable. Cover two impact states first, without fake alerts.
+FALLBACK_AREAS = ("FL","AL","GA","MS")
 EVENT_NAMES = {
     "Hurricane Warning": ("Alerta de furacão", "Alerta de huracán"),
     "Hurricane Watch": ("Vigilância de furacão", "Vigilancia de huracán"),
@@ -86,8 +89,8 @@ def parse_alerts(document, now=None, limit=5):
     return results[:limit]
 
 
-def fetch_nws_json():
-    req=Request(API_URL,headers={
+def _request_nws(url):
+    req=Request(url,headers={
         "User-Agent":"DrivMatchNews/1.0 (https://drivmatch.com/news; official weather bulletins)",
         "Accept":"application/geo+json",
     })
@@ -95,7 +98,27 @@ def fetch_nws_json():
         payload=resp.read(6_000_001)
     if len(payload)>6_000_000:
         raise ValueError("NWS alert response too large")
-    return json.loads(payload)
+    data=json.loads(payload)
+    if not isinstance(data,dict) or not isinstance(data.get("features"),list):
+        raise ValueError("NWS alert response missing features")
+    return data
+
+
+def fetch_nws_json():
+    # National active-alerts endpoint is the preferred complete source.
+    # During outages/rate limits, ask state-filtered documented endpoints.
+    try:
+        return _request_nws(API_URL)
+    except (OSError,TimeoutError,ValueError,TypeError) as national_error:
+        combined=[]
+        for state in FALLBACK_AREAS:
+            try:
+                combined.extend(_request_nws(API_URL+"?area="+state)["features"])
+            except (OSError,TimeoutError,ValueError,TypeError):
+                pass
+        if combined:
+            return {"features":combined,"coverage":"partial_nws_state_fallback"}
+        raise national_error
 
 
 def collect_nws_alerts(now=None, fetcher=None):
