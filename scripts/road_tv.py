@@ -60,7 +60,7 @@ def when(value):
 def evidence(title, desc=''):
     """Explicit USA + forward-facing cargo vehicle descriptions required."""
     text = f'{title or ""} {desc or ""}'[:1400]
-    return bool((US.search(text) or US_ROUTE.search(text)) and CAB.search(text) and CARGO.search(text) and not STOP.search(text))
+    return bool((US.search(text) or US_ROUTE.search(text)) and CAB.search(text) and CARGO.search(text) and not STOP.search(title or ''))
 
 
 
@@ -76,7 +76,10 @@ MOTION_DECEPTION = re.compile(r'\b(?:recorded|archived|loop(?:ing)?|pre[- ]?reco
 def source_profile(title, desc=''):
     """Rank publisher metadata; actual LIVE and embeddability are checked separately."""
     raw=f'{title or ""} {desc or ""}'[:1400]
-    if STOP.search(raw):
+    # Generic creator descriptions mention parking, sleeping and showers even
+    # while an active stream visibly shows driving. Veto idle declarations in
+    # the specific VIDEO TITLE, never from reusable channel boilerplate.
+    if STOP.search(title or ''):
         return None
     if evidence(title,desc):
         return {'source_rank':0,'view_type':'cargo_cab',
@@ -285,7 +288,8 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
                     'cab_pov':bool(CAB.search(title+' '+desc)),
                     'cargo_vehicle':bool(CARGO.search(title+' '+desc)),
                     'us_road_or_route':bool(US.search(title+' '+desc) or US_ROUTE.search(title+' '+desc)),
-                    'stopped_keyword':bool(STOP.search(title+' '+desc)),
+                    'stopped_keyword':bool(STOP.search(title or '')),
+                    'generic_description_mentions_stop':bool(STOP.search(desc)),
                     'snippet_live':info.get('liveBroadcastContent')=='live',
                     'actual_start_present':bool(when(live.get('actualStartTime'))),
                     'actual_end_present':bool(live.get('actualEndTime'))}
