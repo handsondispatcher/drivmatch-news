@@ -10,11 +10,11 @@ sys.path.insert(0,str(BASE/'scripts'))
 import update as up
 from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
- def test_v34_8_release_contract(self):
+ def test_v34_9_release_contract(self):
   version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
-  self.assertEqual(version['version'],'v34.8')
-  self.assertEqual(version['previous_release_branch'],'snapshot/v34-7-before-20261010-reader-corrections')
-  self.assertEqual(version['previous_release_commit'],'7f9dd188727d37003ebb08eb6900b8dbd344ec52')
+  self.assertEqual(version['version'],'v34.9')
+  self.assertEqual(version['previous_release_branch'],'snapshot/v34-8-before-v34-9-six-requests-20261010')
+  self.assertEqual(version['previous_release_commit'],'ebe47c6ba961db5c19fa9a1b13537c8f8702a8b4')
   self.assertFalse(version['public_launch_approved'])
   self.assertEqual(version['backup_branch'],'backup/v33-approved-2026-10-09')
   self.assertEqual(version['backup_commit'],'fea227dde034e101ace8299357579ddfe98fe256')
@@ -27,7 +27,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('highlightList',app)
   self.assertIn('aria-current=',app)
   self.assertIn('featureDots',app)
-  self.assertIn('data-newsroom-cat=',page)
+  self.assertNotIn('data-newsroom-cat=',page)
   self.assertIn('newsroom-partner-cta',page)
   self.assertIn('highlight-photo',app)
   self.assertIn('verifiedMarketQuote',app)
@@ -38,10 +38,10 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('illustrated',app)
   self.assertIn('utm_source=drivmatch_news',page)
   self.assertNotIn('public_launch_approved": true',page)
-  self.assertIn('data-site-version="v34.8"',page)
-  self.assertIn('name="drivmatch-news-version" content="v34.8"',page)
-  self.assertIn('id="site-version" hidden>v34.8',page)
-  self.assertIn('DrivMatch News v34.8',app)
+  self.assertIn('data-site-version="v34.9"',page)
+  self.assertIn('name="drivmatch-news-version" content="v34.9"',page)
+  self.assertIn('id="site-version" hidden>v34.9',page)
+  self.assertIn('DrivMatch News v34.9',app)
   # Clean public player only; dynamic discovery engine retained separately.
   road=(BASE/'scripts/road_tv.py').read_text(encoding='utf-8')
   self.assertIn('YOUTUBE_DATA_API_KEY',road)
@@ -108,7 +108,7 @@ class PublicationTests(unittest.TestCase):
   self.assertFalse(version['road_tv_policy']['publisher_camera_is_certified_playing_live'])
   self.assertFalse(version['road_tv_policy']['fl511_map_used_as_primary'])
   # Visual and functional freeze from owner's five screenshot corrections.
-  self.assertIn('id="footer-version">· v34.8',page)
+  self.assertIn('id="footer-version">· v34.9',page)
   self.assertIn('id="footer-version',app)
   self.assertIn('.header .language-picker{border:0!important',page)
   self.assertIn('#panorama .carousel-controls{position:absolute',page)
@@ -122,6 +122,26 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(version['carousel_policy']['hero_only'])
   self.assertTrue(version['carousel_policy']['read_also_stable'])
   self.assertTrue(version['market_policy']['no_undated_or_invented_quote'])
+  # Six owner-directed visual and automatic-content invariants.
+  self.assertNotIn('<nav class="newsroom-nav"',page)
+  self.assertNotIn('id="chips"',page)
+  self.assertNotIn('id="highlights-note"',page)
+  self.assertIn('id="news-commercial-banner"',page)
+  self.assertIn('id="market-commercial-banner"',page)
+  self.assertIn('id="top-city-select"',page)
+  self.assertIn('id="top-city-select-label"',page)
+  self.assertIn("10*60000", (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
+  self.assertIn('drivmatch_weather_city_v1',(BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
+  self.assertIn('source-candidates-cache.json',update.replace('news-candidates-cache.json','source-candidates-cache.json'))
+  self.assertIn('original-language headlines remain readable'.lower(),app.lower())
+  self.assertNotIn("$('chips').innerHTML",app)
+  self.assertNotIn("document.querySelector('.newsroom-nav').addEventListener",app)
+  ads=json.loads((BASE/'content/ads.json').read_text(encoding='utf-8'))
+  self.assertTrue(ads['enabled'])
+  self.assertEqual({p['slot'] for p in ads['placements']},{'news-top','market-sidebar'})
+  self.assertTrue(all(p['relationship']=='house' and p['enabled'] for p in ads['placements']))
+  self.assertEqual(version['weather_policy']['rotation_minutes'],10)
+  self.assertEqual(version['editorial_policy']['cache_ttl_hours'],48)
   self.assertIn('news-freshness',page)
   self.assertIn('sourceCheckedAt',app)
   self.assertIn('fresh_6h',update)
@@ -140,11 +160,32 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('class="related-rail"',app)
   self.assertIn('shareDestinations',app)
   workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
-  self.assertIn('CUSTOM DOMAIN V34.8 PASS',workflow)
-  self.assertIn('CUSTOM DOMAIN V34.8 MISMATCH',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.9 PASS',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.9 MISMATCH',workflow)
   self.assertIn('drivmatch.com/news/data/release.json',workflow)
 
   self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
+ def test_48h_source_cache_keeps_original_dates_and_rejects_foreign_or_stale(self):
+  from collect_sources import merge_verified_candidate_history
+  from tempfile import TemporaryDirectory
+  source={'id':'primary','url':'https://freightwaves.com/','name':'FreightWaves',
+          'access':'rss','category':'Fretes','original_lang':'en'}
+  now=datetime(2026,10,10,12,tzinfo=timezone.utc)
+  good={'source_url':'https://freightwaves.com/news/trucking-today','title':'US trucking carriers',
+        'origin_type':'publisher-feed','status':'pending_review','source':'FreightWaves',
+        'published_at':'2026-10-09T20:00:00+00:00'}
+  bad={**good,'source_url':'https://evil.example/news'}
+  stale={**good,'source_url':'https://freightwaves.com/news/old',
+         'published_at':'2026-10-07T01:00:00+00:00'}
+  with TemporaryDirectory() as tmp:
+   p=Path(tmp)/'news-candidates-cache.json'
+   p.write_text(json.dumps([good,bad,stale]),encoding='utf-8')
+   current={}
+   saved=merge_verified_candidate_history(current,[source],now=now,path=p)
+  self.assertEqual(saved,1)
+  self.assertEqual(list(current),[good['source_url']])
+  self.assertEqual(current[good['source_url']]['published_at'],good['published_at'])
+
  def test_rss_transport_retries_only_transient_status_and_preserves_truth(self):
   from urllib.error import HTTPError
   from collect_sources import fetch_rss_with_retry, safe_feed_error
