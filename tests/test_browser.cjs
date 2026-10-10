@@ -158,13 +158,21 @@ const {spawn}=require('node:child_process');
    for(const id of ['top-usd-value','top-diesel-value','top-brent-value','top-weather-icon','top-risk']) {
      assert.equal(await page.locator('#'+id).count(),1,'Reference strip item '+id+' missing');
    }
-   if(width===944){
-     const grid=await page.locator('.dm-util-inner').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
-     assert.equal(grid,5,'Approved image 2 must remain five horizontal quote/weather cells at 944px');
+   if(width>=944){
+     const layout=await page.locator('.dm-util-inner').evaluate(el=>{
+       const grid=getComputedStyle(el).gridTemplateColumns.split(' ').length;
+       const rows=[...el.children].map(ch=>ch.getBoundingClientRect());
+       const horizontal=rows.every(r=>Math.abs(r.top-rows[0].top)<6);
+       const noOverlap=rows.every((r,i)=>i===0||r.left>=rows[i-1].right-1);
+       const container=el.getBoundingClientRect();
+       const contained=rows.every(r=>r.right<=container.right+2);
+       return {grid,horizontal,noOverlap,contained};
+     });
+     assert.equal(layout.grid,6,'New owner request adds city selector as sixth market/weather cell');
+     assert.ok(layout.horizontal&&layout.noOverlap&&layout.contained,
+       'Six market/weather/city/risk modules must not overlap or spill out at '+width+'px');
    }
    if(width===1440){
-     const grid=await page.locator('.dm-util-inner').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
-     assert.equal(grid,5,'Approved screenshot uses 5 horizontal cells');
      for(const c of await page.locator('.related-rail p.editorial-context').all()){
        const x=await c.evaluate(el=>({height:el.getBoundingClientRect().height,lineHeight:parseFloat(getComputedStyle(el).lineHeight),text:el.textContent}));
        assert.ok(x.height<=x.lineHeight+1.5,'CTA must fit in a single line: '+x.text);
