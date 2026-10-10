@@ -151,6 +151,15 @@ jobs:
       - name: Browser regression (bounded)
         timeout-minutes: 3
         run: npm run test:browser
+      - name: Auditoria real da Road TV e notícias no domínio público (sem mocks)
+        if: ${{ github.event_name == 'pull_request' }}
+        timeout-minutes: 5
+        run: node tests/audit_live_site.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-visitor-production-audit
+          path: test-results/live-site-visitor-audit/
       - uses: actions/upload-artifact@v4
         if: always()
         with:
