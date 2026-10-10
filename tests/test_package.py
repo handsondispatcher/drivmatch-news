@@ -91,8 +91,8 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('class="related-rail"',app)
   self.assertIn('shareDestinations',app)
   workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
-  self.assertIn('CUSTOM DOMAIN V34.4 PASS',workflow)
-  self.assertIn('CUSTOM DOMAIN V34.4 MISMATCH',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.5 PASS',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.5 MISMATCH',workflow)
   self.assertIn('drivmatch.com/news/data/release.json',workflow)
 
   self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
