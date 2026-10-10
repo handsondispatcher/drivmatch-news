@@ -260,8 +260,8 @@ def make_market(offline=False):
             if key=='usdbrl':
                 try:market['indicators'][key]=verified_previous_close()
                 except Exception as exc2:market['errors'].append('usdbrl_previous_close:'+type(exc2).__name__)
-    market['stocks']=finnhub_quotes(market['errors'])
-    market['indicators'].update(class8_quotes(market['errors']))
+    # V34.1: unproven securities/Class 8 feeds no longer requested or rendered.
+    # Retain authorized source adapters for future separately approved pilots.
     return market
 
 
@@ -320,8 +320,8 @@ def build(offline=False):
     weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
     release=read_json(ROOT/'content/release.json')
-    if release.get('version')!='v34' or release.get('public_launch_approved') is not False:
-        raise ValueError('Invalid release contract: v34 must remain prelaunch')
+    if release.get('version')!='v34.1' or release.get('public_launch_approved') is not False:
+        raise ValueError('Invalid release contract: v34.1 must remain prelaunch')
     data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)

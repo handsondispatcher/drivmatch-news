@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34",
-  "baseline": "v33 frozen at backup/v33-approved-2026-10-09; v34 restrained editorial redesign; v32 also preserved",
+  "version": "v34.1",
+  "baseline": "v34 published baseline frozen at backup/v34-initial-2026-10-09; v33/v32 preserved; v34.1 removes empty market tickers",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -15,7 +15,10 @@
     "photo_hero_and_related_news",
     "licensed_five_headline_visual_briefing",
     "mobile_accessibility",
-    "nonintrusive_platform_referrals_without_new_matching"
+    "nonintrusive_platform_referrals_without_new_matching",
+    "hide_dead_stocks_and_class8_ui",
+    "verified_market_values_only",
+    "remove_unnecessary_unavailable_market_queries"
   ],
   "prior_backups": [
     {
@@ -23,5 +26,7 @@
       "branch": "backup/v32-approved-2026-10-09",
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
-  ]
+  ],
+  "previous_release_branch": "backup/v34-initial-2026-10-09",
+  "previous_release_commit": "3ea738b87f1efd482d5dac95b536c241b9cae9de"
 }

@@ -13,8 +13,8 @@ const {spawn}=require('node:child_process');
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34','public page has v33 version');
-   assert.equal(await page.locator('#site-version').innerText(),'v34','public masthead identifies v34');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.1','public page has v34.1 version');
+   assert.equal(await page.locator('#site-version').innerText(),'v34.1','public masthead identifies v34.1');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
@@ -65,7 +65,11 @@ const {spawn}=require('node:child_process');
     assert.match(image.headers()['content-type'],/image\/jpeg/);
    }
    assert.equal(await page.locator('#market-title').textContent(),'Mercado em Foco');
-   assert.equal(await page.locator('#mercados').innerText().then(x=>x.includes('FDX')),true);
+   // No placeholders for prices unavailable to the authorized data pipeline.
+   assert.equal(await page.locator('#market .sidegroup').count(),0,'Remove empty transport-stock heading');
+   assert.equal(await page.locator('#market').innerText().then(x=>/Class 8|J.B. Hunt|Knight-Swift|FedEx|FDX/.test(x)),false,'Do not show dead tickers');
+   assert.ok(await page.locator('#market .market-live-row').count()<=3,'Only three verified indicator categories allowed');
+   assert.equal(await page.locator('#market .market-live-row').count()+(await page.locator('#market .market-unavailable').count())>0,true,'Either verified data or one explanation is visible');
    const card=width>990?'#clima-desktop':'#clima-mobile';
    assert.equal(await page.locator('#dm-crawler-track a[href*="thetrucker.com"]').count(),0,'Known geo-blocked publisher must not appear in ticker');
    // Approved layout: Ventusky is visible immediately, without a toggle.

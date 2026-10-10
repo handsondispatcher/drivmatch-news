@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR" data-site-version="v34">
+<html lang="pt-BR" data-site-version="v34.1">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="drivmatch-news-version" content="v34"/>
+<meta name="drivmatch-news-version" content="v34.1"/>
 <meta name="drivmatch-news-release-status" content="development-prelaunch"/>
 <title>DrivMatch News — Transporte e logística nos EUA</title>
 <style>
@@ -619,10 +619,19 @@ body{background:#f7f9fc;color:#14283c}
 }
 @media(prefers-reduced-motion:reduce){#highlightList{scroll-snap-type:none}}
 
+/* V34.1: empty ticker stacks are removed; keep a compact, transparent status. */
+#mercados .market-unavailable{color:#c7d8e7;font:13px/1.55 Arial,sans-serif;background:#1b394f;border-radius:6px;padding:13px 14px;margin:8px 0}
+#mercados .market-live-row{padding:12px 0;min-height:64px}
+#mercados #market-note{margin-top:10px;line-height:1.4;color:#a8bfd2}
+@media(max-width:600px){
+  #mercados.side{margin:0 0 16px;padding:13px 16px;box-shadow:none;border-radius:7px}
+  #mercados .market-live-row{min-height:0;padding:12px 0}
+}
+
 </style>
 </head>
 <body>
-<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition">EDIÇÃO DIGITAL · <span id="site-version" aria-label="Versão 34">v34</span> · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
+<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition">EDIÇÃO DIGITAL · <span id="site-version" aria-label="Versão 34.1">v34.1</span> · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
 <nav class="newsroom-nav" aria-label="Editorias DrivMatch News"><div class="newsroom-nav-inner">
   <a href="#panorama" data-newsroom-label="home" class="newsroom-nav-home">Capa</a>
   <a href="#noticias" data-newsroom-cat="Caminhoneiros" data-newsroom-label="drivers">Caminhoneiros</a>
@@ -699,7 +708,7 @@ body{background:#f7f9fc;color:#14283c}
 </div></article></div>
 <div class="story-preview-overlay" id="story-preview" hidden role="dialog" aria-modal="true" aria-labelledby="story-preview-title"><div class="story-preview-panel"><div class="story-preview-head"><strong id="story-preview-title">Prévia do Story</strong><button id="story-preview-close" type="button" aria-label="Fechar prévia">×</button></div><div class="story-preview-scroll"><img id="story-preview-image" alt="Prévia da imagem vertical da notícia para Stories"></div><div class="story-preview-actions"><a id="story-preview-download" download="drivmatch-news-story.png" href="#">Salvar imagem PNG</a><p id="story-preview-hint">Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.</p></div></div></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-newsroom-20261009" defer></script>
+<script src="assets/app.js?v=v34-1-market-verified-20261009" defer></script>
 <script src="assets/utility-strip.js" defer></script>
 <script src="assets/news-crawler.js?v=warroom-20261009-v2" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
