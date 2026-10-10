@@ -486,7 +486,7 @@ def build(offline=False):
     initial_links=bootstrap_external_story_cards(external_headlines,unique.values())[:75]
     latest_source=max((x.get('published_at','') for x in external_headlines),default='')
     data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
-          'source_monitor':{'checked_at':NOW().isoformat(timespec='seconds'),
+          'source_monitor':{'checked_at':(NOW().isoformat(timespec='seconds') if not offline else None),
                             'latest_original_published_at':latest_source},
           'articles':list(unique.values())+initial_links,'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
