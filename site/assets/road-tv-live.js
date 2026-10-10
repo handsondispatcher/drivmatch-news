@@ -26,6 +26,9 @@
  const visible=()=>cards.find(c=>c.getBoundingClientRect().width>0&&getComputedStyle(c).display!=='none'&&c.getClientRects().length)||cards[0];
  const playbackArea=card=>card.querySelector('.roadtv-screen');
  const key=v=>v?.platform==='youtube'?'y:'+v.video_id:'t:'+v?.channel_login;
+ // Owner's immutable programming hierarchy: driving POV LIVE > driving POV
+ // recorded with verified original broadcast clock > live highway camera.
+ const priority=v=>v.view_type==='cargo_cab'?(v.live?0:1):(v.live?2:3);
  const safeUri=u=>{try{const x=new URL(u);return x.protocol==='https:'&&['www.youtube.com','youtube.com','m.youtube.com','www.twitch.tv','twitch.tv'].includes(x.hostname);}catch{return false}};
  const valid=(v,checkedAt)=>{
   if(!v||typeof v!=='object'||!safeUri(v.video_url)||!safeUri(v.channel_url)||!v.geo_evidence||!v.camera_evidence||!v.verification)return false;
@@ -152,7 +155,7 @@
    return (Array.isArray(json.candidates)?json.candidates:[])
      .filter(v=>valid(v,checked))
      .filter(v=>{const id=key(v);if(unique.has(id))return false;unique.add(id);return true})
-     .sort((a,b)=>Number(b.live)-Number(a.live)||(Number(a.source_rank??99)-Number(b.source_rank??99))).slice(0,12);
+     .sort((a,b)=>priority(a)-priority(b)||(Number(a.source_rank??99)-Number(b.source_rank??99))).slice(0,12);
  }
  function markedBad(v){return failed.has(key(v))&&now()-failed.get(key(v))<15*60000}
  function nextVideo(exclude){
@@ -249,9 +252,9 @@
      else if(!old){
        const target=nextVideo('');
        if(target)start(target);else status(labels[lang()].empty);
-     }else if(!matched.live&&videos.some(x=>x.live)){
-       // A real LIVE takes priority over a replay.
-       const target=videos.find(x=>x.live&&!markedBad(x));if(target)start(target);
+     }else if(videos.some(x=>priority(x)<priority(matched)&&!markedBad(x))){
+       // Switch only to a higher-ranked verified source, not a generic camera.
+       const target=videos.find(x=>priority(x)<priority(matched)&&!markedBad(x));if(target)start(target);
      }
    }catch{
      if(!active)status(labels[lang()].empty);
