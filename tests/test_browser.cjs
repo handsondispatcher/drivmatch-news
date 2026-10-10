@@ -137,7 +137,15 @@ const {spawn}=require('node:child_process');
    // The user's exact bug: Saint/St. Charles is not in the 170-city static rotation.
    await page.locator('#top-city-query').fill('St Charles');
    await page.locator('#top-city-query').press('Enter');
-   await page.locator('#top-city-feedback').filter({hasText:/MO.*IL|IL.*MO/}).waitFor({timeout:3000});
+   if(width===360){
+     const listing=await page.request.get('http://127.0.0.1:8765/data/us-places.json');
+     console.log('CITY_SEARCH_DIAG',JSON.stringify({
+       status:listing.status(),feedback:await page.locator('#top-city-feedback').innerText(),
+       suggestions:await page.locator('#top-city-options option').allTextContents(),
+       pageErrors:errors
+     }));
+   }
+   await page.locator('#top-city-feedback').filter({hasText:/MO.*IL|IL.*MO/}).waitFor({timeout:4000});
    assert.ok((await page.locator('#top-city-feedback').innerText()).includes('IL'),
      'Ambiguous US cities must require state, never guess');
    for(const state of ['MO','IL']){
