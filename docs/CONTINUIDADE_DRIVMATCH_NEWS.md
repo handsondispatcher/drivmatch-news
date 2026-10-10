@@ -1,5 +1,9 @@
 # DrivMatch News — CONTINUIDADE CANÔNICA / LEIA PRIMEIRO
 
+## EVIDÊNCIA REAL / CORREÇÃO V34.1 — 09/10/2026
+
+O usuário enviou captura real no Android após a v34: no final do News a coluna Mercado em Foco estava preenchida com J.B. Hunt, Knight-Swift, Schneider, Werner, Old Dominion, XPO, Landstar, C.H. Robinson, FedEx e Class 8 sem preços/dados. Isso não é aceitável. **V34.1** remove tais títulos permanentemente da UI até haver fonte autorizada e valor para demonstrar; conserva apenas USD/BRL, diesel EIA/FRED e Brent com dados atuais/identificados e exibe explicação única quando faltam. Veja [V34_1_MARKET_FIX.md](V34_1_MARKET_FIX.md). Backup da v34 antes da correção `backup/v34-initial-2026-10-09` SHA `3ea738b87f1efd482d5dac95b536c241b9cae9de`; backup v33/v32 inalterados. O usuário também declarou que “não tem nada de novo” após atualizar: testar e mostrar **versão real no domínio** e explicar que novas mudanças de v34 são sobretudo na região de manchetes; não culpar cache sem comprovação. Manter issue #18 pré-lançamento aberta.
+
 ## ESTADO ATUAL — REVISÃO V34 COM v33 INTACTA (09/10/2026)
 
 A pedido explícito do usuário, **v33 foi preservada antes da v34** na branch `backup/v33-approved-2026-10-09`, commit `fea227dde034e101ace8299357579ddfe98fe256`. A v32 anterior continua preservada em `backup/v32-approved-2026-10-09`. **NUNCA apagar essas referências para desenvolver.**
