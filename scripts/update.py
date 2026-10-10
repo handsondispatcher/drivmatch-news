@@ -482,6 +482,29 @@ def build(offline=False):
              'editorial_status':'external_feed_links_not_editorially_approved',
              'headlines':external_headlines}
     (path/'source-headlines.json').write_text(json.dumps(monitor,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    # Independent private operations signal. A successful deployment is NOT
+    # proof of a fresh article, and the reader never sees this diagnostic.
+    age_minutes=round(newest_age_h*60) if newest_age_h is not None else None
+    freshness={
+        'schema_version':1,
+        'checked_at':now.isoformat(timespec='seconds'),
+        'latest_original_published_at':latest or None,
+        'latest_original_age_minutes':age_minutes,
+        'approved_external_headlines':len(external_headlines),
+        'published_last_60_minutes':sum(
+            1 for x in external_headlines if x.get('published_at') and
+            0 <= (now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds() <= 3600),
+        'published_last_180_minutes':sum(
+            1 for x in external_headlines if x.get('published_at') and
+            0 <= (now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds() <= 10800),
+        'source_metrics':source_metrics,
+        'status':'fresh' if age_minutes is not None and 0<=age_minutes<=180 else 'stale_or_no_verified_headlines',
+        'policy':'Preserve source dates and editorial gates. Never invent a story or label a build as a new publication.'
+    }
+    (ROOT/'build').mkdir(exist_ok=True)
+    (ROOT/'build/newsroom-health.json').write_text(json.dumps(freshness,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    if freshness['status']!='fresh':
+        print('::warning title=Editorial freshness::No verified source headline published in the past 3 hours; review sources and eligibility.')
     print('NEWS FRESHNESS:',len(external_headlines),'eligible', 'fresh_6h:',fresh_6h,
           'fresh_12h:',fresh_12h,'latest_age_h:',round(newest_age_h,1) if newest_age_h is not None else 'unknown')
     # A safe current-news endpoint for the separately deployed DrivMatch Live site.
