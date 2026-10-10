@@ -14,7 +14,7 @@ class PublicationTests(unittest.TestCase):
   version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
   self.assertEqual(version['version'],'v34')
   self.assertFalse(version['public_launch_approved'])
-  self.assertEqual(version['backup_branch'],'backup/v34-approved-2026-10-09')
+  self.assertEqual(version['backup_branch'],'backup/v33-approved-2026-10-09')
   self.assertEqual(version['backup_commit'],'fea227dde034e101ace8299357579ddfe98fe256')
   self.assertEqual(version['prior_backups'][0]['version'],'v32')
   self.assertEqual(version['prior_backups'][0]['commit'],'659a146b8f48c342c2a62d86a1330d59760116d4')
