@@ -1,4 +1,4 @@
-/* DrivMatch News v34.8 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
+/* DrivMatch News v34.9 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -82,7 +82,7 @@
     return !q||t.toLocaleLowerCase(lang).includes(q);
   }
   function articlesFiltered(){
-    const pool=pageStories().filter(a=>(a.kind!=='external_link'||(a.translated_langs?.includes(lang)&&a.locales?.[lang]?.title))&&matches(a));
+    const pool=pageStories().filter(a=>matches(a)); // Original-language headlines remain readable when optional translation is unavailable.
     // Editorial sequencing: keep recency while avoiding consecutive stories about the same event.
     const result=[],remaining=pool.slice();
     const topicKey=a=>{
@@ -121,7 +121,7 @@
   function storyCard(a,i,featured=false,showContext=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
     if(a.kind==='external_link'){
       const title=escapeHTML(cleanHeadline(txt?.title||'')), url=escapeHTML(safeUrl(a.source_url)||'#'), attribution=escapeHTML(a.source||'');
-      const translated=a.translated_langs?.includes(lang);const languageNotice=translated?'':(lang==='pt'?' · Título original sem tradução':lang==='es'?' · Titular original sin traducir':' · Original headline (not translated)');
+      const translated=a.translated_langs?.includes(lang);const languageNotice=translated?'':(lang==='pt'?' · Título original em '+(a.original_lang==='es'?'espanhol':'inglês'):lang==='es'?' · Titular original en '+(a.original_lang==='es'?'español':'inglés'):' · Original-language headline');
       const note=(lang==='pt'?'Leia o contexto no DrivMatch News':lang==='es'?'Lee el contexto en DrivMatch News':'Read the context on DrivMatch News');
       const translationNote=languageNotice?`<small class="editorial-context-translation">${escapeHTML(languageNotice.trim())}</small>`:'';
       const body=`<div class="kicker">${cat}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div>${showContext?`<p class="editorial-context">${escapeHTML(note)}</p>`:""}${translationNote}`;
@@ -173,7 +173,6 @@
     $('featureDots').innerHTML=Array.from({length:n},(_,i)=>`<button type="button" class="carousel-dot ${i===featurePage?'active':''}" data-slide="${i}" aria-label="${slideLabel} ${i+1} / ${n}" aria-pressed="${i===featurePage}" ${i===featurePage?'aria-current="page"':''}></button>`).join('');
     const shortlist=f.slice(0,5);
     $('highlights-title').textContent=lang==='pt'?'5 manchetes em foco':lang==='es'?'5 titulares destacados':'5 headlines in focus';
-    $('highlights-note').textContent=lang==='pt'?'Seleção por relevância e recência do feed; confira a fonte original.':lang==='es'?'Selección del feed; compruebe la fuente original.':'Selected from the news feed; verify the original source.';
     $('highlightList').innerHTML=shortlist.map(a=>{
       const i=indexSet.get(a.id),title=cleanHeadline(localeOf(a)?.title||'');
       return `<li><button type="button" data-story="${i}" aria-label="${escapeHTML(title)}">${imageHTML(a,'class="highlight-photo"')}<span class="highlight-category">${escapeHTML(localizedCategory(a.category))}</span><span class="highlight-headline">${escapeHTML(title)}</span><span class="highlight-source">${escapeHTML(a.source||'')}</span></button></li>`;
@@ -234,9 +233,30 @@
     $('market-note').textContent=body.length?note:'';
     $('market-note-mobile').textContent=body.length?note:'';
   }
-  function renderAds(){let ad=(data.ads?.enabled && data.ads.placements||[]).find(x=>x.enabled && x.slot==='below_panorama' && safeUrl(x.url));
-    $('ad-slot').hidden=!ad;if(!ad)return;
-    $('ad-slot').innerHTML=`<span class="ad-label">${labels[lang].ad}</span><a href="${escapeHTML(ad.url)}" target="_blank" rel="noopener noreferrer sponsored">${escapeHTML(ad.title||'')}</a><p>${escapeHTML(ad.text||'')}</p>`;
+  function renderAds(){
+    const placements=(data.ads?.enabled&&Array.isArray(data.ads.placements))?data.ads.placements:[];
+    const text={
+      pt:{kicker:'Publicidade · DrivMatch',action:'Conheça a plataforma ↗',
+          'news-top':['Conecte seu negócio ao transporte americano','Motoristas, frotas e empresas em movimento. Conheça o ecossistema DrivMatch.'],
+          'market-sidebar':['O transporte move oportunidades','Uma vitrine para empresas e profissionais que fazem a logística acontecer.']},
+      en:{kicker:'Advertisement · DrivMatch',action:'Explore the platform ↗',
+          'news-top':['Connect your business to American trucking','Drivers, fleets and businesses in motion. Explore the DrivMatch ecosystem.'],
+          'market-sidebar':['Trucking moves opportunities','Connecting carriers and professionals in American logistics.']},
+      es:{kicker:'Publicidad · DrivMatch',action:'Conoce la plataforma ↗',
+          'news-top':['Conecta tu empresa con el transporte de EE. UU.','Conductores, flotas y empresas en movimiento. Descubre el ecosistema DrivMatch.'],
+          'market-sidebar':['El transporte mueve oportunidades','Una vitrina para empresas y profesionales de la logística.']}
+    }[lang];
+    const previous=$('ad-slot');if(previous){previous.hidden=true;previous.replaceChildren();}
+    for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner']]){
+      const container=$(id);if(!container)continue;
+      const ad=placements.find(x=>x.enabled===true&&x.relationship==='house'&&x.slot===slot
+             &&/^https:\/\/drivmatch\.com\//i.test(x.url||''));
+      container.hidden=!ad;if(!ad){container.replaceChildren();continue;}
+      const [title,description]=text[slot];
+      container.innerHTML=`<div class="ad-copy"><span class="ad-kicker">${escapeHTML(text.kicker)}</span>
+        <h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p></div>
+        <a class="ad-link" href="${escapeHTML(ad.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(text.action)}</a>`;
+    }
   }
   // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.
   // Social platforms require our own crawlable Open Graph page, never an RSS redirect.
@@ -347,7 +367,7 @@
     $('newsroom-cta-driver').textContent=newsroomCopy.driver;
     $('newsroom-cta-carrier').textContent=newsroomCopy.carrier;
     $('footer-publisher').textContent='DrivMatch News — um produto da Hands On Dispatcher LLC';
-    $('footer-legal').innerHTML='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.8</span>';
+    $('footer-legal').innerHTML='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.9</span>';
     $('story-preview-title').textContent=next==='en'?'Story preview':next==='es'?'Vista previa de Story':'Prévia do Story';
     $('story-preview-download').textContent=next==='en'?'Save PNG image':next==='es'?'Guardar imagen PNG':'Salvar imagem PNG';
     $('story-preview-hint').textContent=next==='en'?'Review the card, then post it to Instagram, TikTok or WhatsApp Status.':next==='es'?'Revisa la imagen y luego publícala en Instagram, TikTok o el estado de WhatsApp.':'Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.';
@@ -360,7 +380,6 @@
     $('featurePrev').textContent='←';$('featureNext').textContent='→';
     $('featurePrev').setAttribute('aria-label',trans.prev.replace(/[←→]/g,'').trim());
     $('featureNext').setAttribute('aria-label',trans.next.replace(/[←→]/g,'').trim());
-    $('chips').innerHTML=['Todas',...CATS].map(c=>`<button class="chip ${selected===c?'active':''}" data-cat="${c}">${c==='Todas'?trans.all:escapeHTML(localizedCategory(c))}</button>`).join('');
     [...$('category').options].slice(1).forEach(o=>o.textContent=localizedCategory(o.value));
     if(rerender){renderStories();renderMarket();renderAds();if(opened)renderArticle();}
   }
@@ -404,26 +423,9 @@
     // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
     document.querySelectorAll('.language-shortcuts').forEach(el=>el.addEventListener('click',e=>{const b=e.target.closest('[data-site-lang]');if(b)languageSet(b.dataset.siteLang);}));
-    // Newsroom category bar uses the existing filter; never creates a duplicate directory.
-    document.querySelector('.newsroom-nav').addEventListener('click',e=>{
-      const link=e.target.closest('a[data-newsroom-cat],a[data-newsroom-label="home"],a[data-newsroom-label="weather"]');
-      if(!link)return;
-      if(link.dataset.newsroomLabel==='weather'){
-        link.hash=window.matchMedia('(max-width: 990px)').matches?'clima-mobile':'mercados';
-        return;
-      }
-      if(link.dataset.newsroomLabel==='home'){
-        selected='Todas';$('category').value='Todas';$('search').value='';$('age').value='all';
-      } else {
-        selected=link.dataset.newsroomCat;
-        $('category').value=selected;$('search').value='';$('age').value='all';
-      }
-      page=featurePage=0;languageSet(lang);
-    });
     $('search').addEventListener('input',()=>{page=featurePage=0;renderStories();});
     $('category').addEventListener('change',e=>{selected=e.target.value;page=featurePage=0;languageSet(lang);});
     $('age').addEventListener('change',()=>{page=featurePage=0;renderStories();});
-    $('chips').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(!b)return;selected=b.dataset.cat;$('category').value=selected;page=featurePage=0;languageSet(lang);});
     $('prev').addEventListener('click',()=>{page--;renderStories();$('noticias').scrollIntoView({behavior:'smooth'});});
     $('next').addEventListener('click',()=>{page++;renderStories();$('noticias').scrollIntoView({behavior:'smooth'});});
     $('featurePrev').addEventListener('click',()=>{featurePage--;renderStories();});
