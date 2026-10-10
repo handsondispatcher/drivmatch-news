@@ -299,13 +299,14 @@ class PublicationTests(unittest.TestCase):
    self.assertEqual(entry['feed_url'],feed)
    self.assertEqual(entry['access'],'rss')
    self.assertEqual(entry['publication'],'review-required')
-  for ident,feed in [('cdllife-primary','https://cdllife.com/feed'),
-                     ('dat-freight-blog','https://dat.com/blog/feed')]:
-   entry=next(x for x in sources if x['id']==ident)
-   self.assertEqual(entry['feed_url'],feed)
-   self.assertEqual(entry['access'],'rss')
-   self.assertEqual(entry['publication'],'review-required')
-   self.assertEqual(entry['region'],'US')
+  cdllife=next(x for x in sources if x['id']=='cdllife-primary')
+  self.assertEqual(cdllife['feed_url'],'https://cdllife.com/feed')
+  self.assertEqual(cdllife['access'],'rss')
+  self.assertEqual(cdllife['publication'],'review-required')
+  self.assertEqual(cdllife['region'],'US')
+  dat=next(x for x in sources if x['id']=='dat-freight-blog')
+  self.assertIsNone(dat['feed_url'],'Invalid publisher feed cannot be polled repeatedly')
+  self.assertEqual(dat['access'],'editorial-review')
   source=next(x for x in sources if x['id']=='supply-chain-dive')
   now=datetime(2026,10,10,11,0,tzinfo=timezone.utc)
   xml=b'<rss><channel><item><title>Texas truck carriers expand freight hauling</title><link>https://www.supplychaindive.com/news/test-truck-freight/</link><pubDate>Sat, 10 Oct 2026 10:30:00 GMT</pubDate></item></channel></rss>'
