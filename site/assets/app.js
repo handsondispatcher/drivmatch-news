@@ -1,4 +1,4 @@
-/* DrivMatch News v34.9 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
+/* DrivMatch News v34.10 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -153,7 +153,7 @@
   function renderStories(){const f=articlesFiltered();const pages=Math.max(1,Math.ceil(f.length/pageSize));page=Math.min(page,pages-1);
     const all=pageStories(); indexSet.clear();all.forEach((a,i)=>indexSet.set(a.id,i));
     $('list').innerHTML=f.length?f.slice(page*pageSize,(page+1)*pageSize).map(a=>storyCard(a,indexSet.get(a.id))).join(''):`<div class="empty">${labels[lang].noResults}</div>`;
-    $('count').textContent=`${f.length} ${labels[lang].showing}`;
+    $('count').textContent=''; // Editorial article counts are internal, not reader-facing.
     $('pagecount').textContent=`${page+1} / ${pages}`;
     $('prev').disabled=page===0; $('next').disabled=page===pages-1;
     // The arrow/dot carousel changes the hero image/headline only.
@@ -236,13 +236,13 @@
   function renderAds(){
     const placements=(data.ads?.enabled&&Array.isArray(data.ads.placements))?data.ads.placements:[];
     const text={
-      pt:{kicker:'Publicidade · DrivMatch',action:'Conheça a plataforma ↗',
+      pt:{action:'Conheça a plataforma ↗',
           'news-top':['Conecte seu negócio ao transporte americano','Motoristas, frotas e empresas em movimento. Conheça o ecossistema DrivMatch.'],
           'market-sidebar':['O transporte move oportunidades','Uma vitrine para empresas e profissionais que fazem a logística acontecer.']},
-      en:{kicker:'Advertisement · DrivMatch',action:'Explore the platform ↗',
+      en:{action:'Explore the platform ↗',
           'news-top':['Connect your business to American trucking','Drivers, fleets and businesses in motion. Explore the DrivMatch ecosystem.'],
           'market-sidebar':['Trucking moves opportunities','Connecting carriers and professionals in American logistics.']},
-      es:{kicker:'Publicidad · DrivMatch',action:'Conoce la plataforma ↗',
+      es:{action:'Conoce la plataforma ↗',
           'news-top':['Conecta tu empresa con el transporte de EE. UU.','Conductores, flotas y empresas en movimiento. Descubre el ecosistema DrivMatch.'],
           'market-sidebar':['El transporte mueve oportunidades','Una vitrina para empresas y profesionales de la logística.']}
     }[lang];
@@ -253,8 +253,7 @@
              &&/^https:\/\/drivmatch\.com\//i.test(x.url||''));
       container.hidden=!ad;if(!ad){container.innerHTML='';continue;}
       const [title,description]=text[slot];
-      container.innerHTML=`<div class="ad-copy"><span class="ad-kicker">${escapeHTML(text.kicker)}</span>
-        <h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p></div>
+      container.innerHTML=`<div class="ad-copy"><h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p></div>
         <a class="ad-link" href="${escapeHTML(ad.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(text.action)}</a>`;
     }
   }
@@ -343,6 +342,9 @@
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
     document.querySelectorAll('[data-site-lang]').forEach(b=>{b.classList.toggle('selected',b.dataset.siteLang===next);b.setAttribute('aria-pressed',String(b.dataset.siteLang===next));});
     $('language').value=next;$('languageFlag').src=flags[next];$('languageFlag').alt=next==='pt'?'Bandeira do Brasil':next==='en'?'US flag':'Bandera de España';
+    // Flag-button clicks do not fire change on the hidden select automatically.
+    // Tell independently initialized quote/weather/video modules to translate too.
+    if(typeof CustomEvent==='function')document.dispatchEvent(new CustomEvent('drivmatch:language',{detail:{language:next}}));
     $('share-label').textContent=next==='en'?'Share':next==='es'?'Compartir':'Compartilhar';
     $('share-section-title').textContent=next==='en'?'Share this story':next==='es'?'Comparte esta noticia':'Compartilhe esta notícia';
     $('share-copy').textContent=next==='en'?'Copy link':next==='es'?'Copiar enlace':'Copiar link';
@@ -367,7 +369,7 @@
     $('newsroom-cta-driver').textContent=newsroomCopy.driver;
     $('newsroom-cta-carrier').textContent=newsroomCopy.carrier;
     $('footer-publisher').textContent='DrivMatch News — um produto da Hands On Dispatcher LLC';
-    $('footer-legal').innerHTML='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.9</span>';
+    $('footer-legal').innerHTML='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.10</span>';
     $('story-preview-title').textContent=next==='en'?'Story preview':next==='es'?'Vista previa de Story':'Prévia do Story';
     $('story-preview-download').textContent=next==='en'?'Save PNG image':next==='es'?'Guardar imagen PNG':'Salvar imagem PNG';
     $('story-preview-hint').textContent=next==='en'?'Review the card, then post it to Instagram, TikTok or WhatsApp Status.':next==='es'?'Revisa la imagen y luego publícala en Instagram, TikTok o el estado de WhatsApp.':'Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.';

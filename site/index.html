@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR" data-site-version="v34.9">
+<html lang="pt-BR" data-site-version="v34.10">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="drivmatch-news-version" content="v34.9"/>
+<meta name="drivmatch-news-version" content="v34.10"/>
 <meta name="drivmatch-news-release-status" content="development-prelaunch"/>
 <title>DrivMatch News — Transporte e logística nos EUA</title>
 <style>
@@ -813,7 +813,7 @@ body{background:#f7f9fc;color:#14283c}
 @media(max-width:650px){.dm-util-inner{grid-template-columns:repeat(2,minmax(0,1fr))}.dm-util-quote:nth-child(3){grid-column:1/3}.dm-util-city{grid-column:1/3}.dm-util-city-select{grid-column:1/2;padding:7px}.dm-util-risk{grid-column:2/3;justify-self:end}.ad-placement-news{flex-direction:column;align-items:stretch;padding:15px 17px}.ad-placement-news .ad-link{align-self:flex-start}.ad-placement-side{min-height:230px}}
 
 /* v34.9 audit: middle desktop viewport cannot fit six media tiles on one line. */
-@media(min-width:851px) and (max-width:1120px){
+@media(min-width:851px) and (max-width:1280px){
  .dm-util-inner{grid-template-columns:repeat(3,minmax(0,1fr))!important;row-gap:8px;padding:8px 13px}
  .dm-util-quote{grid-column:auto;grid-row:1}
  .dm-util-quote:nth-child(3){border-right:0}
@@ -821,10 +821,39 @@ body{background:#f7f9fc;color:#14283c}
  .dm-util-city-select{grid-column:2;grid-row:2;padding:4px 10px;min-width:0}
  .dm-util-risk{grid-column:3;grid-row:2;justify-self:end;max-width:100%;margin:0 5px;white-space:normal;text-align:center}
 }
+
+/* v34.10 War Room: preserve the OFFICIAL blue gradient master logo on neutral-black;
+   a white-logo treatment requires explicit brand change approval. */
+.header{background:#020408!important;color:#fff!important}
+.header-inner{background:transparent!important}
+.header .brand img{filter:none!important}
+.newsroom-nav,.newsroom-nav-inner,.chips,#chips,#highlights-note{display:none!important}
+#count{display:none!important}
+.header .language-picker,.header .edition .language-picker,.header .language-shortcuts{border:0!important;box-shadow:none!important;background:transparent!important;padding:0!important}
+.header .language-shortcuts button{box-shadow:none!important}
+.ad-placement .ad-kicker{display:none!important}
+/* Reader-entered city and STATE within the verified NWS coverage map. */
+.dm-util-city-select{min-width:0;gap:3px}
+.dm-util-city-controls{display:flex;align-items:center;gap:3px;width:100%;min-width:0}
+.dm-util-city-controls input{flex:1 1 0;width:1px;min-width:0;padding:5px 5px;height:31px;border:1px solid #98b7cc;background:#fff;color:#183a56;border-radius:4px;font:600 10px/1.3 Arial,sans-serif;letter-spacing:0;text-overflow:ellipsis}
+.dm-util-city-controls button{flex:0 0 auto;min-width:25px;height:30px;border:1px solid #7baed1;border-radius:4px;padding:0 4px;background:#ecf7ff;color:#125184;font:700 11px Arial,sans-serif}
+.dm-util-city-controls button:hover{background:#cae7fc}
+.dm-util-city-controls :is(input,button):focus-visible{outline:2px solid #0676dc;outline-offset:2px}
+#top-city-feedback{display:block;font:9px/1.25 Arial,sans-serif;color:#aa3025;max-height:28px;overflow:hidden}
+#top-city-feedback:empty{display:none}
+.dm-util-risk{white-space:normal;text-align:center}
+@media (min-width:1121px) and (max-width:1280px){.dm-util-inner{padding-left:9px;padding-right:9px}.dm-util-city-select{padding-left:5px;padding-right:5px}.dm-util-quote{padding-left:4px;padding-right:4px}}
+@media (max-width:650px){.dm-util-city-controls input{font-size:12px;min-height:34px}.dm-util-city-controls button{min-height:34px}}
+
+/* City search controls: visible typed action; do not show rotation duration to readers. */
+.dm-util-city-controls #top-city-type{font-size:10px;min-width:46px;padding:0 5px}
+.dm-util-city-controls #top-city-query{min-width:60px}
+@media(min-width:851px) and (max-width:1280px){.dm-util-city-controls #top-city-query{min-width:80px}}
+@media(max-width:650px){.dm-util-city-controls{flex-wrap:wrap}.dm-util-city-controls input{min-width:100%;flex-basis:100%}.dm-util-city-controls button{flex:1 1 25%;max-width:90px}}
 </style>
 </head>
 <body>
-<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.9</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
+<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.10</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
 
 <section id="dm-utility" class="dm-utility" aria-label="Cotações e condições do tempo">
  <div class="dm-util-inner">
@@ -851,7 +880,17 @@ body{background:#f7f9fc;color:#14283c}
    <span class="dm-util-weather-copy"><strong id="top-city">Tempo nos EUA</strong><small id="top-condition"></small>
    <span class="dm-util-temps" aria-label="Temperaturas previstas"><span id="top-range-f">Máx. —°F · Mín. —°F</span><span id="top-range-c">Máx. —°C · Mín. —°C</span></span></span>
   </div>
-  <div class="dm-util-city-select"><label for="top-city-select" id="top-city-select-label">Cidade / Estado</label><select id="top-city-select" aria-label="Escolher cidade e estado para o clima"><option value="auto">Automático · 10 min</option></select></div>
+  <div class="dm-util-city-select">
+<label for="top-city-query" id="top-city-select-label">Previsão do tempo</label>
+<div class="dm-util-city-controls">
+<input id="top-city-query" type="search" list="top-city-options" autocomplete="off" spellcheck="false" maxlength="80" placeholder="Selecione ou digite sua cidade" aria-describedby="top-city-feedback" aria-label="Digite cidade e sigla do estado, por exemplo Tampa, FL">
+<datalist id="top-city-options"></datalist>
+<button id="top-city-type" type="button" aria-label="Digitar sua cidade">Digitar</button>
+<button id="top-city-apply" type="button" aria-label="Confirmar cidade">OK</button>
+<button id="top-city-auto" type="button" aria-label="Voltar à rotação de cidades a cada 10 segundos" title="Alternar cidades automaticamente">↻</button>
+</div>
+<span id="top-city-feedback" role="status" aria-live="polite"></span>
+</div>
   <div class="dm-util-risk" id="top-risk" hidden></div>
  </div>
 </section>
@@ -871,7 +910,7 @@ body{background:#f7f9fc;color:#14283c}
 <section class="highlights-panel" id="highlights" aria-label="Manchetes em destaque"><h2 class="highlights-title" id="highlights-title">5 manchetes em foco</h2><ol id="highlightList" class="highlights-list"></ol></section>
 <div id="ad-slot" aria-label="Publicidade" hidden></div>
 <section id="noticias" class="section">
-  <div class="topline"><h2 class="heading">Notícias</h2><span class="sub" id="count"></span></div>
+  <div class="topline"><h2 class="heading">Notícias</h2><span class="sub" id="count" hidden aria-hidden="true"></span></div>
   <p class="news-freshness" id="news-freshness" hidden aria-hidden="true"></p>
   <div id="news-commercial-banner" class="ad-placement ad-placement-news" aria-label="Publicidade"></div>
   <div id="list"></div>
@@ -896,7 +935,7 @@ body{background:#f7f9fc;color:#14283c}
   </div>
 </aside>
 <section class="search-footer" id="pesquisa-noticias" aria-label="Pesquisar notícias e arquivo"><div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div></section>
-<footer class="footer" aria-label="Informações institucionais"><div class="footer-publisher" id="footer-publisher">DrivMatch News — um produto da Hands On Dispatcher LLC</div><div class="footer-legal" id="footer-legal">© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.9</span></div></footer>
+<footer class="footer" aria-label="Informações institucionais"><div class="footer-publisher" id="footer-publisher">DrivMatch News — um produto da Hands On Dispatcher LLC</div><div class="footer-legal" id="footer-legal">© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.10</span></div></footer>
 <div class="modalshade" id="shade"><article class="modal" id="article-dialog" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody">
 <h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div>
 <section class="trans article-reading" id="article-reading" aria-label="Idioma de leitura">
@@ -926,9 +965,9 @@ body{background:#f7f9fc;color:#14283c}
 </div></article></div>
 <div class="story-preview-overlay" id="story-preview" hidden role="dialog" aria-modal="true" aria-labelledby="story-preview-title"><div class="story-preview-panel"><div class="story-preview-head"><strong id="story-preview-title">Prévia do Story</strong><button id="story-preview-close" type="button" aria-label="Fechar prévia">×</button></div><div class="story-preview-scroll"><img id="story-preview-image" alt="Prévia da imagem vertical da notícia para Stories"></div><div class="story-preview-actions"><a id="story-preview-download" download="drivmatch-news-story.png" href="#">Salvar imagem PNG</a><p id="story-preview-hint">Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.</p></div></div></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-7-approved-20261010" defer></script>
-<script src="assets/road-tv-live.js?v=v34-7-direct-player-20261010" defer></script>
-<script src="assets/utility-strip.js?v=v34-7-quote-strip-20261010" defer></script>
-<script src="assets/news-crawler.js?v=warroom-20261009-v2" defer></script>
+<script src="assets/app.js?v=v34-10-warroom-20261010" defer></script>
+<script src="assets/road-tv-live.js?v=v34-10-interstate-rotation-20261010" defer></script>
+<script src="assets/utility-strip.js?v=v34-10-city-search-20261010" defer></script>
+<script src="assets/news-crawler.js?v=v34-10-20261010" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>

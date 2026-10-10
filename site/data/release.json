@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.9",
-  "baseline": "v34.8 snapshot ebe47c6ba961db5c19fa9a1b13537c8f8702a8b4; owner six changes 2026-10-10",
+  "version": "v34.10",
+  "baseline": "v34.9 snapshot 16de69068cc97223df682a76709ff930f7e88435; owner five-image header/news/ads/weather refinements",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -64,7 +64,15 @@
     "no_empty_highlights_explanation",
     "standalone_language_buttons_no_outer_frame",
     "headline_original_language_fallback_but_label",
-    "48_hour_publisher_candidate_cache_strict_original_date"
+    "48_hour_publisher_candidate_cache_strict_original_date",
+    "official_gradient_blue_logo_neutral_black_masthead",
+    "no_duplicate_newsroom_navigation",
+    "no_reader_visible_article_count",
+    "remove_advertising_brand_eyebrow",
+    "weather_city_state_typed_input_supported_nws_cities",
+    "rotate_validated_cached_city_forecast_each_10_seconds_unless_pinned",
+    "version_specific_static_asset_urls_to_avoid_stale_scripts",
+    "no_city_forecast_invention"
   ],
   "prior_backups": [
     {
@@ -73,8 +81,8 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "snapshot/v34-8-before-v34-9-six-requests-20261010",
-  "previous_release_commit": "ebe47c6ba961db5c19fa9a1b13537c8f8702a8b4",
+  "previous_release_branch": "snapshot/v34-9-before-v34-10-warroom-2026-10-10",
+  "previous_release_commit": "16de69068cc97223df682a76709ff930f7e88435",
   "road_tv_policy": {
     "youtube_twitch_only": false,
     "live_claim_requires_authorized_api": true,
@@ -123,13 +131,19 @@
       "market-sidebar"
     ],
     "clearly_labeled": true,
-    "no_false_clients": true
+    "no_false_clients": true,
+    "visible_kicker_removed": true,
+    "house_promotional_creatives": true
   },
   "weather_policy": {
     "city_selection": "manual_pin_or_auto",
-    "rotation_minutes": 10,
     "verified_forecast_only": true,
-    "selection_local_device": true
+    "selection_local_device": true,
+    "rotation_seconds": 10,
+    "selection": "typed_city_state_from_verified_nws_coverage",
+    "unsupported_cities": "show_unavailable_no_fabricated_data",
+    "manual_selection_persist": true,
+    "forecast_refresh_minutes": 15
   },
   "editorial_policy": {
     "original_language_allowed_when_translation_missing": true,
@@ -139,5 +153,17 @@
     "build_cron_minutes": 10,
     "source_verification_required": true,
     "no_guaranteed_new_story_when_sources_do_not_publish": true
+  },
+  "brand_policy": {
+    "approved_logo": "unchanged_official_blue_gradient",
+    "header_bg": "#020408",
+    "white_logo_variant": "requires_owner_change_control",
+    "no_recreation_of_logo": true
+  },
+  "reader_ui": {
+    "no_top_news_category_nav": true,
+    "no_news_filter_chips": true,
+    "no_article_count": true,
+    "stable_brand_layout": true
   }
 }
