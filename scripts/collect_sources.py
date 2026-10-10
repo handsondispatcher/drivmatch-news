@@ -9,6 +9,8 @@ from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
+from time import sleep
 from editorial_text import clean_title
 ROOT=Path(__file__).resolve().parents[1]
 def parse_feed(raw, source, now=None):
@@ -43,19 +45,53 @@ def parse_feed(raw, source, now=None):
             'status':'pending_review','publication_blockers':['verify-event-and-original-date','write-owned-summary','complete-three-languages','approve-editorially']})
     return result
 
+TRANSIENT_HTTP = frozenset({408, 425, 429, 500, 502, 503, 504})
+MAX_RSS_BYTES = 2_000_000
+
+def fetch_rss_with_retry(feed_url, *, attempts=2):
+    """Bounded retries for transient feed transport failures, never 403/404 or malformed XML.
+    The feed's original date and strict publisher-host checks remain authoritative.
+    """
+    req = Request(feed_url, headers={
+        'User-Agent': 'DrivMatchNews/1.1 (+https://drivmatch.com/news)',
+        'Accept': 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9'
+    })
+    for attempt in range(attempts):
+        try:
+            with urlopen(req, timeout=9) as res:
+                raw = res.read(MAX_RSS_BYTES)
+            if len(raw) >= MAX_RSS_BYTES:
+                raise ValueError('Oversized feed')
+            return raw,attempt+1
+        except HTTPError as exc:
+            if exc.code not in TRANSIENT_HTTP or attempt == attempts-1:
+                raise
+        except (URLError, TimeoutError, ConnectionResetError):
+            if attempt == attempts-1:
+                raise
+        sleep(0.7 * (attempt+1))
+    raise RuntimeError('RSS retry exhausted')
+
+def safe_feed_error(exc):
+    """Log an error class/code only, never expose stack traces to public readers."""
+    if isinstance(exc, HTTPError):
+        return 'HTTP_'+str(exc.code)
+    if isinstance(exc, URLError):
+        return 'URLError'
+    return type(exc).__name__
+
 def collect():
     sources=json.loads((ROOT/'content/sources.json').read_text())['sources']
     def check(source):
         if not source.get('feed_url'):return [],dict(id=source['id'],status='manual-review',url=source['url'])
         try:
-            req=Request(source['feed_url'],headers={'User-Agent':'DrivMatchNews/1.0 (+https://drivmatch.com/news)'})
-            with urlopen(req,timeout=9) as res:raw=res.read(2_000_000)
-            if len(raw)>=2_000_000:raise ValueError('Oversized feed')
+            raw,attempts_used=fetch_rss_with_retry(source['feed_url'])
             rows=parse_feed(raw,source)
-            return rows,dict(id=source['id'],status='ok',candidates=len(rows),url=source['feed_url'])
-        except Exception as exc:return [],dict(id=source['id'],status='failed',error=type(exc).__name__,url=source['feed_url'])
+            return rows,dict(id=source['id'],status='ok',candidates=len(rows),attempts=attempts_used,url=source['feed_url'])
+        except Exception as exc:
+            return [],dict(id=source['id'],status='failed',error=safe_feed_error(exc),url=source['feed_url'])
     candidates={};health=[]
-    with ThreadPoolExecutor(max_workers=12) as pool:
+    with ThreadPoolExecutor(max_workers=8) as pool:
         for rows,status in pool.map(check,sources):
             health.append(status)
             for row in rows:
@@ -65,5 +101,12 @@ def collect():
     report={'checked_at':datetime.now(timezone.utc).isoformat(),'sources':health,'candidate_count':len(candidates)}
     (out/'source-health.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('Sources:',len(sources),'candidates:',len(candidates),'feed failures:',sum(x['status']=='failed' for x in health))
+    failing=[x for x in health if x['status']=='failed']
+    if failing:
+        print('SOURCE_FAILURE_DIAGNOSTICS:',', '.join(f"{x['id']}:{x['error']}" for x in failing))
+    print('RSS_RETRY_METRICS:', 'recovered_on_retry:',
+          sum(x['status']=='ok' and x.get('attempts',1)>1 for x in health),
+          'working:',sum(x['status']=='ok' for x in health),
+          'manual:',sum(x['status']=='manual-review' for x in health))
     return report
 if __name__=='__main__':collect()

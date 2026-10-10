@@ -130,6 +130,34 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('drivmatch.com/news/data/release.json',workflow)
 
   self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
+ def test_rss_transport_retries_only_transient_status_and_preserves_truth(self):
+  from urllib.error import HTTPError
+  from collect_sources import fetch_rss_with_retry, safe_feed_error
+  from io import BytesIO
+  class Response:
+   def __init__(self,data):self.data=data
+   def __enter__(self):return BytesIO(self.data)
+   def __exit__(self,*a):return False
+  calls=[]
+  def transient(req,timeout):
+   calls.append(1)
+   if len(calls)==1:raise HTTPError(req.full_url,503,'temporary',{},None)
+   return Response(b'<rss><channel/></rss>')
+  with patch('collect_sources.urlopen',side_effect=transient),patch('collect_sources.sleep',return_value=None) as wait:
+   data,attempts=fetch_rss_with_retry('https://www.ttnews.com/rss.xml')
+  self.assertEqual(data,b'<rss><channel/></rss>')
+  self.assertEqual(attempts,2)
+  self.assertEqual(wait.call_count,1)
+  forbidden=[]
+  def blocked(req,timeout):
+   forbidden.append(1)
+   raise HTTPError(req.full_url,403,'blocked',{},None)
+  with patch('collect_sources.urlopen',side_effect=blocked),patch('collect_sources.sleep',return_value=None) as wait:
+   with self.assertRaises(HTTPError) as e:fetch_rss_with_retry('https://example.com/feed')
+  self.assertEqual(len(forbidden),1)
+  self.assertEqual(wait.call_count,0)
+  self.assertEqual(safe_feed_error(e.exception),'HTTP_403')
+
  def test_fresh_primary_publisher_feeds_are_auditable_not_auto_editorials(self):
   from editorial_gate import eligible
   sources=json.loads((BASE/'content/sources.json').read_text(encoding='utf-8'))['sources']
