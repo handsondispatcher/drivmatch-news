@@ -68,6 +68,21 @@ class NwsBulletinTests(unittest.TestCase):
         self.assertTrue(eligible(valid))
         self.assertFalse(eligible({**valid,'title':'Celebrity sports betting news'}))
 
+    def test_fallback_uses_only_documented_state_alerts_on_national_failure(self):
+        from unittest.mock import patch
+        from official_alerts import fetch_nws_json,API_URL
+        calls=[]
+        def fake(url):
+            calls.append(url)
+            if url==API_URL:raise OSError('nationwide temporarily unavailable')
+            if url.endswith('?area=FL'):return {'features':[make_alert()]}
+            return {'features':[]}
+        with patch('official_alerts._request_nws',side_effect=fake):
+            doc=fetch_nws_json()
+        self.assertEqual(doc['coverage'],'partial_nws_state_fallback')
+        self.assertEqual(len(doc['features']),1)
+        self.assertIn(API_URL+'?area=FL',calls)
+
     def test_fetch_injection_is_not_network_required(self):
         self.assertEqual(len(collect_nws_alerts(NOW,lambda:{'features':[make_alert()]})),1)
 
