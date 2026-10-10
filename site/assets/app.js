@@ -37,23 +37,36 @@
   // Only licensed, credited, story-specific photography; no generic stock repetition.
   function storyGraphic(a){
     if(a.editorial_type==='operational_bulletin'){
-      // Never imply a random trucking photo depicts a tornado, flood or blizzard.
-      // This is a bulletin marker, not an NWS seal or event photograph.
-      // Region and identifying source text keep each graphic informative and
-      // unique without suggesting imagery from the actual weather event.
-      const alertTitle=cleanHeadline(localeOf(a)?.title||'Boletim meteorológico');
-      const region=(alertTitle.split('—').slice(1).join('—').trim()||alertTitle).slice(0,51);
-      const escapeSvg=t=>String(t||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
-      const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520">'+
-        '<desc>'+escapeSvg(String(a.id||'')+' '+alertTitle)+'</desc>'+
-        '<rect width="900" height="520" fill="#e8f3fb"/>'+
-        '<rect width="900" height="14" fill="#1475b4"/>'+
-        '<path d="M450 104L660 455H240Z" fill="none" stroke="#236c9d" stroke-width="24" stroke-linejoin="round"/>'+
-        '<rect x="437" y="218" width="26" height="120" rx="12" fill="#236c9d"/>'+
-        '<circle cx="450" cy="380" r="16" fill="#236c9d"/>'+
-        '<text x="42" y="75" font-size="27" font-weight="bold" font-family="Arial,sans-serif" fill="#125781">BOLETIM METEOROLÓGICO</text>'+
-        '<text x="42" y="151" font-size="28" font-family="Arial,sans-serif" fill="#17486a">'+escapeSvg(region)+'</text>'+
-        '<text x="42" y="491" font-size="25" font-family="Arial,sans-serif" fill="#17486a">NWS · FONTE OFICIAL · CONSULTE DOT/511</text></svg>';
+      // Visual identification, never a simulated event photo, official NWS logo,
+      // radar map, actual road closure or invented weather observation.
+      const enTitle=String(localeOf(a,'en')?.title||localeOf(a)?.title||'');
+      const title=cleanHeadline(localeOf(a)?.title||'');
+      const place=(title.split('—').slice(1).join('—').trim()||title).slice(0,39);
+      const category=/tornado/i.test(enTitle)?'TORNADO':
+        /blizzard|winter storm|ice storm|snow|snowstorm/i.test(enTitle)?'NEVE E GELO':
+        /flood|storm surge/i.test(enTitle)?'INUNDAÇÃO':
+        /wind|hurricane|tropical storm/i.test(enTitle)?'VENTOS FORTES':'CLIMA';
+      const xml=t=>String(t||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+      const cloud='<path d="M-91 28h173c28 0 50-22 50-49s-20-46-43-49c-10-41-46-70-89-70-45 0-83 34-91 76-27-3-51 18-51 46 0 26 22 46 51 46Z" fill="#f8fcff" stroke="#5088a9" stroke-width="13"/>';
+      const eventSymbol=category==='NEVE E GELO'
+        ?'<path d="M-50 69v70m-32-35h64m-54-23 44 46m0-46-44 46" stroke="#2784c0" stroke-width="9" stroke-linecap="round"/>'
+        :category==='TORNADO'
+        ?'<path d="M-69 69h130m-105 18h83m-58 18h37m-20 18h11" stroke="#2784c0" stroke-width="10" stroke-linecap="round"/>'
+        :'<path d="M-68 83l-19 42m91-42-19 42m92-42-19 42" stroke="#2784c0" stroke-width="11" stroke-linecap="round"/>';
+      const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img">'+
+        '<desc>'+xml(String(a.id||'')+' · '+title+' · ilustração editorial, não foto do evento')+'</desc>'+
+        '<rect width="960" height="540" rx="18" fill="#eaf5fb"/>'+
+        '<rect x="0" y="0" width="960" height="10" fill="#1174b2"/>'+
+        '<rect x="45" y="53" width="292" height="45" rx="9" fill="#d6eafb"/>'+
+        '<text x="61" y="83" font-size="22" font-weight="700" font-family="Arial,sans-serif" fill="#17628f">NWS  ·  BOLETIM OFICIAL</text>'+
+        '<text x="48" y="189" font-size="48" font-weight="700" font-family="Arial,sans-serif" fill="#113f62">'+xml(category)+'</text>'+
+        '<path d="M48 218h462" stroke="#9cc4da" stroke-width="3"/>'+
+        '<text x="48" y="289" font-size="35" font-family="Arial,sans-serif" fill="#174963">'+xml(place)+'</text>'+
+        '<text x="48" y="353" font-size="21" font-family="Arial,sans-serif" fill="#5c7a8d">Aviso meteorológico · fonte original NWS</text>'+
+        '<g transform="translate(749 250)">'+cloud+eventSymbol+'</g>'+
+        '<path d="M48 450H912" stroke="#bdd8e8" stroke-width="3"/>'+
+        '<text x="48" y="498" font-size="23" font-family="Arial,sans-serif" fill="#2c6285">CONDIÇÕES REAIS DA RODOVIA: VERIFIQUE DOT / 511</text>'+
+        '</svg>';
       return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
     }
     const title=cleanHeadline(localeOf(a)?.title||'NOTÍCIAS DO TRANSPORTE');
@@ -93,7 +106,7 @@
       ?(lang==='pt'?'Identificação gráfica de boletim meteorológico NWS; não é fotografia do fenômeno':lang==='es'?'Gráfico identificador de boletín meteorológico NWS; no es una foto del evento':'NWS bulletin identifier; not an event photograph')
       :graphic?(lang==='pt'?'Ilustração editorial desta manchete':'Editorial illustration'):
       illustrative?(lang==='pt'?'Fotografia de arquivo ilustrativa; não retrata necessariamente o acontecimento':lang==='es'?'Fotografía de archivo ilustrativa; no representa necesariamente el acontecimiento':'Illustrative archive photograph; not necessarily the reported event'):(a.image_alt||localeOf(a)?.title||'Imagem');
-    return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(a.editorial_type==='operational_bulletin'?'Identificador gráfico de boletim meteorológico':illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
+    return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(a.editorial_type==='operational_bulletin'?'Ilustração informativa de alerta meteorológico, não foto do evento':illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" '+(a.editorial_type==='operational_bulletin'?'data-bulletin="true" ':'')+'onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
   }
   function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
@@ -113,6 +126,11 @@
     // editorial category. But a cluster of government alerts must not swallow
     // the newspaper's lead stories merely by being issued minutes apart.
     const isBulletin=a=>a.editorial_type==='operational_bulletin';
+    // Weather notices remain in the ticker, list and related rail. The main
+    // newspaper feature opens with an independently sourced transport story
+    // when at least one is eligible for the current reader filters.
+    const firstJournalism=pool.findIndex(a=>!isBulletin(a));
+    if(firstJournalism>0)pool.unshift(pool.splice(firstJournalism,1)[0]);
     const result=[],remaining=pool.slice();
     while(remaining.length){
       const last=result[result.length-1];
