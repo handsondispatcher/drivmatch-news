@@ -61,7 +61,7 @@
    embed:'https://camstreamer.com/embed/7WIJom0FTmLGWRea1khwrohdqLpKwHOa2DU5Wjqq?rel=0',
    page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'}
  ];
- const CAMERA_ROTATION_MS=120*1000; // Different embedded live-road-camera source every 2min, NOT a freshness claim.
+ const CAMERA_ROTATION_MS=5*60*1000; // Rotate approved live road camera sources every five minutes; never label an unverified stream LIVE.
  let publisherIndex=0,publisherFrame=null,publisherFailures=new Set(),publisherSince=0;
 
  function publisherUnavailable(area){
