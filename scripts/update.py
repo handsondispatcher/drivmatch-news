@@ -384,6 +384,8 @@ def bootstrap_external_story_cards(headlines, first_party):
         original=item.get('original_lang') if item.get('original_lang') in ('pt','en','es') else 'en'
         result.append({
             'id':item['id'], 'kind':'external_link', 'status':'external_source',
+            'origin_type':item.get('origin_type','publisher-feed'),
+            'editorial_type':item.get('editorial_type','publisher_headline'),
             'demo':False,
             'category':item.get('category') if item.get('category') in categories else 'Transporte',
             'source':item['source'], 'source_url':url, 'published_at':stamp,
@@ -462,10 +464,21 @@ def build(offline=False):
                 if len(external_headlines)>=90:break
         except (OSError,ValueError,TypeError,KeyError) as exc:
             errors.append('external_headlines:'+type(exc).__name__)
-    # Verified fresh first-party links supplement RSS gaps, never get a new build timestamp.
+    # Official US weather bulletins are separate from journalistic reporting.
+    # Each bulletin keeps the NWS 'sent' timestamp and exact official source URL.
+    official_alerts=[]
+    if not offline:
+        try:
+            from official_alerts import collect_nws_alerts
+            official_alerts=collect_nws_alerts()
+        except (OSError,TimeoutError,ValueError,KeyError,TypeError) as exc:
+            errors.append('nws_official_alerts:'+type(exc).__name__)
+            print('NWS_OFFICIAL_ALERTS_UNAVAILABLE:',type(exc).__name__)
+    print('NWS_OFFICIAL_ALERTS:',len(official_alerts),'current high-impact official bulletins (not verified road closures)')
+    # Verified first-party links supplement RSS gaps, never get a new build timestamp.
     try:external_headlines=verified_external_source_links(offline)+external_headlines
     except (OSError,ValueError,TypeError,KeyError) as exc:errors.append('verified_external_links:'+type(exc).__name__)
-    external_headlines=deduplicate_external(localize_source_headlines(external_headlines,errors,offline),articles)
+    external_headlines=deduplicate_external(localize_source_headlines(official_alerts+external_headlines,errors,offline),articles)
     unique={}
     for a in articles:
         if a['id'] in unique:continue
@@ -555,6 +568,7 @@ def build(offline=False):
              'fresh_6h':fresh_6h,'fresh_12h':fresh_12h,
              'newest_headline_age_hours':round(newest_age_h,2) if newest_age_h is not None else None,
              'editorial_status':'external_feed_links_not_editorially_approved',
+             'official_nws_bulletins':sum(1 for x in external_headlines if x.get('editorial_type')=='operational_bulletin'),
              'headlines':external_headlines}
     (path/'source-headlines.json').write_text(json.dumps(monitor,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     # Independent private operations signal. A successful deployment is NOT
