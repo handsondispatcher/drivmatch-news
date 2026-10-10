@@ -42,13 +42,13 @@
       "name": "BuffaloWebcam — Peace Bridge USA Entrance",
       "priority": 25,
       "kind": "third_party_youtube_embedded_on_publisher",
-      "display": "external_link_only",
+      "display": "reference_only",
       "source_url": "https://buffalowebcam.com/live-webcams/peace-bridge-usa-entrance/",
       "label": "Buffalo",
       "geo": "Peace Bridge — USA entrance",
       "verified_playing_live": false,
       "rights": "Publisher embeds its own YouTube video; DrivMatch embed requires official YouTube API status and license/platform rules, not a harvested player URL.",
-      "note": "Search lead, not an approved live YouTube video ID; no auto-publishing without active & embeddable check."
+      "note": "Publisher YouTube landing page is a discovery reference only. Do not publish in the active 4-link directory without official platform live and embeddability evidence."
     },
     {
       "id": "nvroads-nevada",
