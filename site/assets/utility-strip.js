@@ -254,9 +254,11 @@ async function searchCity(){
  if(!choice){
    const l=lang();
    if(matched.length>1||hits.length>1){
-     const names=(matched.length?matched:hits).slice(0,4).map(p=>p[0]+', '+p[1]).join(' · ');
-     feedback('error', 'Especifique o estado: '+names,
-       'Specify the state: '+names,'Indica el estado: '+names);
+     // Large duplicate-city families (including 11 St. Charles locations)
+     // must expose ALL matching state abbreviations, not arbitrary top four.
+     const states=[...new Set((matched.length?matched:hits).map(p=>p[1]))].sort().join(', ');
+     feedback('error', 'Selecione o estado: '+states,
+       'Select the state: '+states,'Selecciona el estado: '+states);
    }else{
      feedback('error','Cidade não encontrada. Digite cidade e sigla do estado.',
        'City not found. Enter city and state.','Ciudad no encontrada. Escribe ciudad y estado.');
