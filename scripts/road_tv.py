@@ -358,8 +358,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
             search_ids=list(found)[:MAX_CANDIDATES]
         # Independently poll the latest uploads of approved discovery leads on
         # EVERY run, not only once per hour. Official API; no HTML scraping.
-        creator_ids=youtube_curated_channel_discover(
+        creator_ids=(youtube_curated_channel_discover(
             key,cfg['channel_sources'],lambda u:api(u),result['warnings'])
+            if cache is None else [])  # Explicit injected discovery fixtures stay deterministic.
         ids=list(dict.fromkeys(creator_ids+search_ids))[:MAX_CANDIDATES]
         discovery['youtube_ids']=search_ids
         result['creator_discovery_count']=len(creator_ids)
