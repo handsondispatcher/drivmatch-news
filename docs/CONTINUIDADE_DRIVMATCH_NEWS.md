@@ -1,5 +1,13 @@
 # DrivMatch News — CONTINUIDADE CANÔNICA / LEIA PRIMEIRO
 
+## ROAD TV v34.2 — NOVO COMANDO CANÔNICO (09/10/2026)
+
+O usuário determinou a implantação imediata **Ventusky → Road TV → dólar/diesel/petróleo**, com busca automática de **lives reais** nos EUA filmando para a frente da cabine de semi, box, pickup de carga/hotshot ou cargo van. Não limitar a quatro canais; permitir YouTube e Twitch. Se não houver live, buscar gravações de **hoje ou ontem** com *hora original* comprovada para replay próximo do horário real do dia, sempre marcado REPLAY. Trocar transmissões que terminem, sinalizem parada ou após 12 minutos preventivos quando houver alternativa validada. Não prometer identificação visual da cabine/estrada ou movimento apenas com APIs; dados de criador são declarações e precisam de verificação humana para certificação. **Sem chave de API, sem conteúdo artificial; estado indisponível.**
+
+**Artefato e passo a passo:** [V34_2_ROAD_TV.md](V34_2_ROAD_TV.md), scripts `scripts/road_tv.py`, `site/assets/road-tv.js`, `site/data/road-tv.json` schema 2, `tests/test_road_tv.py`. **Dependências:** GitHub Actions secrets `YOUTUBE_DATA_API_KEY`, `TWITCH_CLIENT_ID`, `TWITCH_CLIENT_SECRET`. Nunca inserir secrets em JS/browser. V34.1 salvaguardada ANTES da revisão em `backup/v34-1-approved-2026-10-09`, SHA `77b6d50fa159a0b18a9619a2fcf6db4b652646cd`. Todos os outros backups mantidos. Gate público #18 continua ABERTO.
+
+
+
 ## EVIDÊNCIA REAL / CORREÇÃO V34.1 — 09/10/2026
 
 O usuário enviou captura real no Android após a v34: no final do News a coluna Mercado em Foco estava preenchida com J.B. Hunt, Knight-Swift, Schneider, Werner, Old Dominion, XPO, Landstar, C.H. Robinson, FedEx e Class 8 sem preços/dados. Isso não é aceitável. **V34.1** remove tais títulos permanentemente da UI até haver fonte autorizada e valor para demonstrar; conserva apenas USD/BRL, diesel EIA/FRED e Brent com dados atuais/identificados e exibe explicação única quando faltam. Veja [V34_1_MARKET_FIX.md](V34_1_MARKET_FIX.md). Backup da v34 antes da correção `backup/v34-initial-2026-10-09` SHA `3ea738b87f1efd482d5dac95b536c241b9cae9de`; backup v33/v32 inalterados. O usuário também declarou que “não tem nada de novo” após atualizar: testar e mostrar **versão real no domínio** e explicar que novas mudanças de v34 são sobretudo na região de manchetes; não culpar cache sem comprovação. Manter issue #18 pré-lançamento aberta.
