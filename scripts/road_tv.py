@@ -22,6 +22,7 @@ UTC = dt.timezone.utc
 VIDEO_ID = re.compile(r'^[A-Za-z0-9_-]{11}$')
 CHANNEL_ID = re.compile(r'^UC[A-Za-z0-9_-]{22}$')
 US = re.compile(r'\b(?:usa|u\.s\.a\.?|united states|american highway|us interstate|interstate\s+\d{1,3}|i[-\s]?(?:5|10|15|20|25|35|40|44|55|64|65|70|75|76|77|80|81|84|85|90|94|95))\b', re.I)
+US_ROUTE = re.compile(r'\\b(?:ohio\\s+(?:to|[-–>])\\s+texas|denver\\s*,?\\s*(?:co|colorado)|colorado\\s+(?:to|[-–>])\\s+nebraska|schuyler\\s*,?\\s*(?:ne|nebraska))\\b',re.I)
 CAB = re.compile(r'\b(?:dashcam|dash[\s-]?cam|windshield|front[\s-]?facing|forward[\s-]?view|front[\s-]?camera|cab[\s-]?view|driver[\s-]?pov|trucker[\s-]?pov|road[\s-]?view|from[\s-]?the[\s-]?cab)\b', re.I)
 CARGO = re.compile(r'\b(?:semi[\s-]?truck|18[\s-]?wheeler|tractor[\s-]?trailer|truck[\s-]?driv(?:er|ing)|trucking|box[\s-]?truck|straight[\s-]?truck|cargo[\s-]?van|sprinter[\s-]?van|pickup[\s-]?truck|pick[\s-]?up[\s-]?truck|hotshot[\s-]?truck|expedit(?:e|er|ing)[\s-]?van)\b', re.I)
 STOP = re.compile(r'\b(?:parked|parking break|rest stop|sleeping|shower|truck stop break|off duty|not driving|stopped|lunch break|taking a break|end of stream)\b', re.I)
@@ -31,6 +32,8 @@ QUERIES = (
     'USA pickup truck hotshot trucking forward road live',
     'Florida I-4 interstate live traffic camera highway',
     'Peace Bridge Buffalo USA entrance live border traffic webcam trucks',
+    'Trucking Duke DriveCam POV Ohio Texas live',
+    'Ride Along Gang driving POV Denver Colorado live',
 )
 TWITCH_QUERIES = ('trucking', 'truckdriver', 'dashcam')
 CACHE_PATH = ROOT / 'build' / 'roadtv-discovery.json'
@@ -57,7 +60,7 @@ def when(value):
 def evidence(title, desc=''):
     """Explicit USA + forward-facing cargo vehicle descriptions required."""
     text = f'{title or ""} {desc or ""}'[:1400]
-    return bool(US.search(text) and CAB.search(text) and CARGO.search(text) and not STOP.search(text))
+    return bool((US.search(text) or US_ROUTE.search(text)) and CAB.search(text) and CARGO.search(text) and not STOP.search(text))
 
 
 
