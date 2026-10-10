@@ -771,11 +771,10 @@ body{background:#f7f9fc;color:#14283c}
    This geometry references the previously approved 1.65fr/1fr feature split. */
 #panorama .topline{position:relative;min-height:40px;padding-bottom:10px;overflow:visible}
 #panorama .carousel-controls{position:absolute;left:calc((100% - 14px)*.62265/2);top:0;right:auto;transform:translateX(-50%);margin:0;z-index:2;max-width:61%}
-#panorama .carousel-dots{max-width:220px}
-/* The absolutely-positioned navigation wrapper must never intercept hits
-   intended for its dot BUTTONS or for underlying headline controls. */
-#panorama .carousel-controls,#panorama .carousel-dots{pointer-events:none}
-#panorama .carousel-controls button:not(:disabled){pointer-events:auto}
+#panorama .carousel-dots{max-width:220px;overflow-x:visible;flex:0 1 auto;min-width:0}
+/* Keep the actual clickable dots within the control's 220px width even
+   with 11 editorial carousel pages. No overlay on adjacent hit targets. */
+#panorama .carousel-dot{flex-basis:19px;width:19px;min-width:19px}
 @media(max-width:850px){
  #panorama .topline{display:flex;align-items:center;flex-wrap:wrap;min-height:0;gap:6px}
  #panorama .carousel-controls{position:static;left:auto;top:auto;right:auto;transform:none;width:100%;max-width:100%;justify-content:center}
