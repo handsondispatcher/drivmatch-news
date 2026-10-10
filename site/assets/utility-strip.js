@@ -13,8 +13,8 @@ function number(v,d){return Number(v).toLocaleString(lang()==='pt'?'pt-BR':lang(
 function showMarket(){
  const l=lang();
  el('top-usd-label').textContent=l==='en'?'USD / BRL':l==='es'?'Dólar':'Dólar';
- el('top-diesel-label').textContent=l==='en'?'US Diesel':l==='es'?'Diésel EE. UU.':'Diesel EUA';
- el('top-brent-label').textContent=l==='en'?'Brent Oil':l==='es'?'Petróleo Brent':'Petróleo Brent';
+ el('top-diesel-label').textContent='US Diesel';
+ el('top-brent-label').textContent=l==='en'?'Brent Crude Oil':l==='es'?'Petróleo Brent':'Petróleo Brent';
  const usd=spot||market.usdbrl;
  el('top-usd-label').textContent=usd?.instrument==='ptax_reference'
      ?(l==='en'?'USD PTAX':l==='es'?'Dólar PTAX':'Dólar PTAX')
@@ -22,7 +22,7 @@ function showMarket(){
  const values=[
   {id:'usd',data:usd,decimals:4,prefix:'R$ ',suffix:''},
   {id:'diesel',data:market.diesel,decimals:3,prefix:'US$ ',suffix:'/gal'},
-  {id:'brent',data:market.brent,decimals:2,prefix:'US$ ',suffix:'/barril'}
+  {id:'brent',data:market.brent,decimals:2,prefix:'US$ ',suffix:l==='en'?'/barrel':'/barril'}
  ];
  for(const item of values){
    const v=item.data;
@@ -104,14 +104,29 @@ function populateWeatherChoices(){
  const query=el('top-city-query'),list=el('top-city-options');
  if(!query||!list)return;
  const l=lang(),lab=el('top-city-select-label');
- if(lab)lab.textContent=l==='en'?'City / State':l==='es'?'Ciudad / Estado':'Cidade / Estado';
- const placeholder=l==='en'?'City, ST':l==='es'?'Ciudad, EE':'Cidade, UF';
+ if(lab)lab.textContent=l==='en'?'Weather forecast':l==='es'?'Pronóstico del tiempo':'Previsão do tempo';
+ const placeholder=l==='en'?'Select or enter your city':l==='es'?'Elige o escribe tu ciudad':'Selecione ou digite sua cidade';
  query.placeholder=placeholder;
+ query.setAttribute('aria-label',l==='en'?'Enter city and state, for example Tampa, FL':
+   l==='es'?'Escribe ciudad y estado, por ejemplo Tampa, FL':
+   'Digite cidade e estado, por exemplo Tampa, FL');
+ const buttonType=el('top-city-type');
+ if(buttonType){
+   buttonType.textContent=l==='en'?'Type':l==='es'?'Escribir':'Digitar';
+   buttonType.setAttribute('aria-label',l==='en'?'Type your city':
+     l==='es'?'Escribe tu ciudad':'Digitar sua cidade');
+ }
+ const apply=el('top-city-apply');
+ if(apply)apply.setAttribute('aria-label',l==='en'?'Confirm location':l==='es'?'Confirmar ciudad':'Confirmar cidade');
  list.replaceChildren();
  for(const c of validCities())list.appendChild(new Option(c.city+', '+c.state,c.city+', '+c.state));
  if(document.activeElement!==query)query.value=weatherSelection==='auto'?'':chosenText(weatherSelection);
  const button=el('top-city-auto');
- if(button){button.disabled=weatherSelection==='auto';button.title=l==='en'?'Automatic: next city every 10 seconds':l==='es'?'Automático: cambia cada 10 segundos':'Automático: alterna a cada 10 segundos';}
+ if(button){
+   button.disabled=weatherSelection==='auto';
+   button.title=l==='en'?'Rotate weather cities automatically':l==='es'?'Alternar las ciudades automáticamente':'Alternar cidades automaticamente';
+   button.setAttribute('aria-label',button.title);
+ }
 }
 function applyCityQuery(){
  const query=el('top-city-query');if(!query)return;
@@ -164,6 +179,7 @@ function init(){
  showMarket();showCity();
  if(location.protocol.startsWith('http')){weather();quotes();live();setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);}
  setInterval(()=>{if(weatherSelection==='auto'&&validCities().length){weatherRotateIndex++;showCity()}},10*1000);
+ el('top-city-type')?.addEventListener('click',()=>{const e=el('top-city-query');e?.focus();e?.select();});
  el('top-city-apply')?.addEventListener('click',applyCityQuery);
  el('top-city-query')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyCityQuery();}});
  el('top-city-auto')?.addEventListener('click',resetCityAuto);
