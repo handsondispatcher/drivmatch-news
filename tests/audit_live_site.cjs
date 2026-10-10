@@ -54,6 +54,7 @@ async function audit(){
           article_cards:document.querySelectorAll('#list article').length,
           total_bootstrap:boot.articles?.length??null,
           bootstrap_external:boot.articles?.filter(x=>x.kind==='external_link').length??null,
+          bootstrap_official_bulletins:boot.articles?.filter(x=>x.editorial_type==='operational_bulletin').length??null,
           latest_bootstrap_story:boot.articles?.map(a=>a.published_at).filter(Boolean).sort().reverse()[0]||null,
           freshness_text:sel('#news-freshness')?.innerText||null,
           freshness_hidden:!!sel('#news-freshness')?.hidden,
@@ -75,10 +76,24 @@ async function audit(){
               latest:d.articles?.map(a=>a.published_at).filter(Boolean).sort().reverse()[0]}:
             name==='sources'?
             {http:response.status(),generation:d.generated_at,
-              headlines:d.headlines?.length,latest:d.latest_headline_at,fresh6h:d.fresh_6h}:
+              headlines:d.headlines?.length,latest:d.latest_headline_at,fresh6h:d.fresh_6h,
+              official_nws_bulletins:d.official_nws_bulletins}:
             {http:response.status(),generation:d.generated_at,status:d.live_status,
               live_checked_at:d.live_checked_at,candidates:d.candidates?.length,warnings:d.warnings};
         }catch(e){row.errors.push(endpoint+':'+String(e).slice(0,200))}
+      }
+      // Confirm reader can actually discover new official bulletins in the
+      // rendered news interface, not merely in an updated JSON file.
+      if(row.rendered.bootstrap_official_bulletins>0){
+        await page.locator('#search').fill('NWS');
+        await sleep(350);
+        const results=await page.locator('#list article').allTextContents();
+        row.rendered.nws_search_results=results.filter(x=>x.includes('NWS')).length;
+        row.rendered.nws_search_sample=results[0]?.trim().slice(0,170)||null;
+        if(row.rendered.nws_search_results===0){
+          row.errors.push('official_nws_bulletins_not_visible_in_news_search');
+        }
+        await page.locator('#search').fill('');
       }
       const filename=site.name+'-'+view.name+'.png';
       await page.screenshot({path:path.join(OUT,filename),fullPage:true,timeout:20000});
