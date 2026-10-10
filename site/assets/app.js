@@ -1,9 +1,10 @@
-/* DrivMatch News v34.3 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
+/* DrivMatch News v34.4 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
   let externalHeadlines = [], photoByStory = {}, data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
+  let sourceCheckedAt='', newestSourceAt='', currentSourceCount=0;
   const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
   const labels = {
@@ -129,6 +130,25 @@
     if(featured)return `<article class="story ${imageOf(a).startsWith('data:image/svg')?'illustrated':''}" tabindex="0" role="button" data-external="false" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><p class="feature-summary">${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
     return `<article class="item" tabindex="0" role="button" data-external="false" data-story="${i}"><div><span class="tag">${cat}</span> ${a.kind==='opportunity'?'<span class="origin-pill">DrivMatch</span>':''}<h3>${escapeHTML(txt.title)}</h3><p>${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div><div class="thumb">${imageHTML(a)}<span class="label">${cat}</span></div></article>`;
   }
+  // A new publication build is not proof of a newly published article.
+  // Display separate source-check time and actual newest story time.
+  function renderFreshness(){
+    const el=$('news-freshness');if(!el)return;
+    const checked=Date.parse(sourceCheckedAt||''),latest=Date.parse(newestSourceAt||'');
+    const checkedValid=Number.isFinite(checked)&&Date.now()-checked>=-60000&&Date.now()-checked<90*60000;
+    const newestValid=Number.isFinite(latest)&&Date.now()-latest>=-120000;
+    const freshnessAge=newestValid?(Date.now()-latest)/3600000:Infinity;
+    el.classList.toggle('is-stale',freshnessAge>8);
+    const format=timestamp=>new Date(timestamp).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{dateStyle:'short',timeStyle:'short'});
+    const check=checkedValid?format(checked):null,story=newestValid?format(latest):null;
+    const pt=check?`Fontes verificadas em ${check}. `:'Fontes aguardando atualização. ';
+    const en=check?`Sources checked ${check}. `:'Source check unavailable. ';
+    const es=check?`Fuentes consultadas ${check}. `:'Verificación de fuentes pendiente. ';
+    el.textContent=lang==='pt'
+      ?pt+(story?`Notícia mais recente identificada: ${story}.`:'Nenhuma manchete recente identificada.')
+      :lang==='en'?en+(story?`Newest identified story: ${story}.`:'No recent source headline identified.')
+      :es+(story?`Noticia más reciente identificada: ${story}.`:'No se identificaron titulares recientes.');
+  }
   function renderStories(){const f=articlesFiltered();const pages=Math.max(1,Math.ceil(f.length/pageSize));page=Math.min(page,pages-1);
     const all=pageStories(); indexSet.clear();all.forEach((a,i)=>indexSet.set(a.id,i));
     $('list').innerHTML=f.length?f.slice(page*pageSize,(page+1)*pageSize).map(a=>storyCard(a,indexSet.get(a.id))).join(''):`<div class="empty">${labels[lang].noResults}</div>`;
@@ -153,6 +173,7 @@
       return `<li><button type="button" data-story="${i}" aria-label="${escapeHTML(title)}">${imageHTML(a,'class="highlight-photo"')}<span class="highlight-category">${escapeHTML(localizedCategory(a.category))}</span><span class="highlight-headline">${escapeHTML(title)}</span><span class="highlight-source">${escapeHTML(a.source||'')}</span></button></li>`;
     }).join('');
     $('highlights').hidden=!shortlist.length;
+    renderFreshness();
   }
   function percentBadge(v){if(!Number.isFinite(v))return '';
     const cls=v>0?'market-up':v<0?'market-down':'market-flat';const arrow=v>0?'▲':v<0?'▼':'—';const n=(v>0?'+':'')+v.toLocaleString(lang==='pt'?'pt-BR':'en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -347,6 +368,9 @@
       if(external.ok){
         const next=await external.json();
         if(Array.isArray(next.headlines)){
+          sourceCheckedAt=next.generated_at||'';
+          newestSourceAt=next.latest_headline_at||'';
+          currentSourceCount=next.headlines.length;
           const approved=new Set((data.articles||[]).map(x=>x.source_url));
           const seen=new Set();
           externalHeadlines=next.headlines.filter(x=>x.geo_scope_verified===true&&x.title&&x.origin_type!=='aggregator-discovery'&&!/news\.google\.com/i.test(x.source_url||'')&&!/\b(tanzania|tanz[aâ]nia|vietnam|vietnamese|da nang|hanoi)\b/i.test(x.title+' '+Object.values(x.titles||{}).join(' '))&&!/^https:\/\/(?:[a-z0-9-]+\.)*thetrucker\.com(?:[\/:?#]|$)/i.test(x.source_url||'')&&safeUrl(x.source_url)&&!approved.has(x.source_url)&&!seen.has(x.source_url)&&seen.add(x.source_url)).filter((x,i,rows)=>!rows.slice(0,i).some(y=>duplicateEvent(x.titles?.pt||x.title,y.titles?.pt||y.title))&&!data.articles.some(y=>Object.values(y.locales||{}).some(loc=>duplicateEvent(x.titles?.pt||x.title,loc.title)))).slice(0,90).map(x=>({
