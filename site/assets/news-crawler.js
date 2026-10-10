@@ -24,12 +24,13 @@ function display(){
  const fingerprint=t=>cleanTitle(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
  for(const a of sourceHeadlines){
    if(!fresh(sourceCheckedAt,MAX_SNAPSHOT_AGE_MS)||!fresh(a.published_at,MAX_HEADLINE_AGE_MS))continue;
-   if(blockedPublisher(a.source_url)||a.geo_scope_verified!==true||a.origin_type==='aggregator-discovery'||/news\.google\.com/i.test(a.source_url||'')||!a.source_url?.startsWith('https://')||!a.title||!a.titles?.[l]||seen.has(a.source_url))continue;
-   if(l!==(a.original_lang||'en')&&clean(a.titles[l]).toLowerCase()===clean(a.title).toLowerCase())continue;
+   if(blockedPublisher(a.source_url)||a.geo_scope_verified!==true||a.origin_type==='aggregator-discovery'||/news\.google\.com/i.test(a.source_url||'')||!a.source_url?.startsWith('https://')||!a.title||seen.has(a.source_url))continue;
+   // A valid recent source headline is not discarded just because its translation is pending.
    const title=cleanTitle(a.titles?.[l]||a.title);
    if(seenTitles.has(fingerprint(title)))continue;
    seenTitles.add(fingerprint(title));seen.add(a.source_url);
-   const untranslated=!a.titles?.[l];
+   const untranslated=!a.titles?.[l] ||
+     (l!==(a.original_lang||'en') && clean(a.titles?.[l]).toLowerCase()===clean(a.title).toLowerCase());
    links.push({title,untranslated,source:a.source||'External source',url:a.source_url,external:true,region:a.region||'US',date:a.published_at||'',category:a.category||'Transporte'});
  }
  // Supplement with approved stories not already included in the source monitor.
@@ -42,7 +43,8 @@ function display(){
    const link=document.createElement('a');link.className='dm-crawler-link';link.href=a.url;link.target='_blank';link.rel='noopener noreferrer';
    const k=document.createElement('span');k.className='dm-crawler-label';const categories={Clima:['CLIMA','WEATHER','CLIMA'],Rodovias:['RODOVIAS','ROADS','CARRETERAS'],Acidentes:['ACIDENTE','ACCIDENT','ACCIDENTE'],Combustíveis:['DIESEL E COMBUSTÍVEIS','DIESEL AND FUEL','DIÉSEL Y COMBUSTIBLES'],Tecnologia:['TECNOLOGIA E TRANSPORTE','TRANSPORT TECHNOLOGY','TECNOLOGÍA Y TRANSPORTE'],Imigração:['IMIGRAÇÃO','IMMIGRATION','INMIGRACIÓN'],Segurança:['SEGURANÇA','SAFETY','SEGURIDAD'],Energia:['ENERGIA','ENERGY','ENERGÍA'],Transporte:['TRANSPORTE','TRANSPORT','TRANSPORTE'],Fretes:['FRETES','FREIGHT','FLETES'],Negócios:['NEGÓCIOS','BUSINESS','NEGOCIOS'],Fiscalização:['FISCALIZAÇÃO','ENFORCEMENT','FISCALIZACIÓN'],Caminhoneiros:['CAMINHONEIROS','TRUCK DRIVERS','CAMIONEROS']};
    const category=categories[a.category]||[clean(a.category||'TRANSPORTE')];
-   k.textContent=category[['pt','en','es'].indexOf(l)]||category[0];
+   k.textContent=(category[['pt','en','es'].indexOf(l)]||category[0])+
+     (a.untranslated?' · '+(l==='pt'?'ORIGINAL':l==='es'?'ORIGINAL':'ORIGINAL'):'');
    const t=document.createElement('span');t.textContent=headline(a.title);
    link.append(k,t);return link;
  });
