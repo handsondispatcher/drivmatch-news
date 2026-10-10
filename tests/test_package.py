@@ -40,7 +40,7 @@ class PublicationTests(unittest.TestCase):
   self.assertNotIn('public_launch_approved": true',page)
   self.assertIn('data-site-version="v34.5"',page)
   self.assertIn('name="drivmatch-news-version" content="v34.5"',page)
-  self.assertIn('id="site-version" aria-label="Versão 34.4">v34.5',page)
+  self.assertIn('id="site-version" aria-label="Versão 34.5">v34.5',page)
   self.assertIn('DrivMatch News v34.5',app)
   # Clean public player only; dynamic discovery engine retained separately.
   road=(BASE/'scripts/road_tv.py').read_text(encoding='utf-8')
