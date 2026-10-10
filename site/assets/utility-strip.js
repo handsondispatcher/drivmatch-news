@@ -2,19 +2,37 @@
 'use strict';
 const el=id=>document.getElementById(id);
 const fixed=[['Orlando','FL'],['Houston','TX'],['New York City','NY'],['Newark','NJ'],['San Francisco','CA'],['Atlanta','GA'],['El Paso','TX'],['Buffalo','NY'],['Salt Lake City','UT'],['Las Vegas','NV'],['Chattanooga','TN'],['Nashville','TN'],['Chicago','IL'],['Los Angeles','CA'],['Dallas','TX'],['Miami','FL'],['Tampa','FL'],['Jacksonville','FL'],['Memphis','TN'],['Indianapolis','IN'],['Columbus','OH'],['Cincinnati','OH'],['Louisville','KY'],['Kansas City','MO'],['St. Louis','MO'],['Denver','CO'],['Phoenix','AZ'],['Albuquerque','NM'],['Seattle','WA'],['Portland','OR'],['Detroit','MI'],['Laredo','TX'],['San Diego','CA'],['Charlotte','NC'],['Birmingham','AL'],['Oklahoma City','OK'],['Harrisburg','PA'],['Sacramento','CA'],['Cleveland','OH'],['Boston','MA'],['McAllen','TX'],['Ontario','CA'],['Savannah','GA'],['Reno','NV'],['Philadelphia','PA'],['Fresno','CA'],['Austin','TX'],['Washington','DC'],['Fort Lauderdale','FL'],['Kissimmee','FL'],['Boca Raton','FL'],['Pompano Beach','FL'],['Framingham','MA'],['Worcester','MA'],['Danbury','CT'],['Edison','NJ'],['San Antonio','TX'],['Norfolk','VA'],['Tacoma','WA'],['Bellingham','WA'],['Spokane','WA'],['Eugene','OR'],['Medford','OR'],['Redding','CA'],['Stockton','CA'],['Bakersfield','CA'],['San Bernardino','CA'],['Barstow','CA'],['Long Beach','CA'],['Oakland','CA'],['Tucson','AZ'],['Nogales','AZ'],['Flagstaff','AZ'],['Yuma','AZ'],['Kingman','AZ'],['Las Cruces','NM'],['Amarillo','TX'],['Waco','TX'],['Fort Worth','TX'],['Beaumont','TX'],['Lubbock','TX'],['Eagle Pass','TX'],['Brownsville','TX'],['Midland','TX'],['Corpus Christi','TX'],['Tulsa','OK'],['Wichita','KS'],['Topeka','KS'],['Salina','KS'],['Lincoln','NE'],['Omaha','NE'],['North Platte','NE'],['Cheyenne','WY'],['Rock Springs','WY'],['Ogden','UT'],['St. George','UT'],['Colorado Springs','CO'],['Grand Junction','CO'],['Des Moines','IA'],['Cedar Rapids','IA'],['Minneapolis','MN'],['Duluth','MN'],['Fargo','ND'],['Pembina','ND'],['Sioux Falls','SD'],['Little Rock','AR'],['Jackson','MS'],['Baton Rouge','LA'],['New Orleans','LA'],['Lafayette','LA'],['Shreveport','LA'],['Mobile','AL'],['Montgomery','AL'],['Huntsville','AL'],['Pensacola','FL'],['Tallahassee','FL'],['Ocala','FL'],['Gainesville','FL'],['Valdosta','GA'],['Macon','GA'],['Augusta','GA'],['Charleston','SC'],['Columbia','SC'],['Greenville','SC'],['Florence','SC'],['Fayetteville','NC'],['Greensboro','NC'],['Raleigh','NC'],['Asheville','NC'],['Richmond','VA'],['Fredericksburg','VA'],['Roanoke','VA'],['Winchester','VA'],['Lexington','KY'],['Bowling Green','KY'],['Knoxville','TN'],['Jackson','TN'],['Gary','IN'],['South Bend','IN'],['Toledo','OH'],['Dayton','OH'],['Youngstown','OH'],['Pittsburgh','PA'],['Carlisle','PA'],['Allentown','PA'],['Scranton','PA'],['Baltimore','MD'],['Hagerstown','MD'],['Wilmington','DE'],['Trenton','NJ'],['Elizabeth','NJ'],['New Haven','CT'],['Hartford','CT'],['Providence','RI'],['Portland','ME'],['Albany','NY'],['Syracuse','NY'],['Binghamton','NY'],['Rochester','NY'],['Niagara Falls','NY'],['Port Huron','MI'],['Grand Rapids','MI'],['Milwaukee','WI'],['Madison','WI'],['Green Bay','WI'],['Joliet','IL'],['Rockford','IL'],['Springfield','IL']];
-const shuffle = list => {const a=[...list];for(let j=a.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[a[j],a[k]]=[a[k],a[j]];}return a;};
-let order=shuffle(fixed.map(([city,state])=>city+'|'+state));
-let cities=fixed.map(([city,state])=>({city,state,status:'unavailable'})),i=0,market={},spot=null;
+// Approved layout requires stable location, never random city changes between visits.
+let cities=fixed.map(([city,state])=>({city,state,status:'unavailable'})),market={},spot=null;
 const lang=()=>el('language')?.value||'pt';
 function number(v,d){return Number(v).toLocaleString(lang()==='pt'?'pt-BR':lang()==='es'?'es-ES':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+// v34.7: identical reader-facing quote composition to the approved screenshot.
+ // Only represent real verified observations; no sample values or invented arrows.
 function showMarket(){
- el('top-usd-label').textContent=lang()==='en'?'USD/BRL':'Dólar';
- el('top-diesel-label').textContent=lang()==='en'?'US Diesel':lang()==='es'?'Diésel EE. UU.':'Diesel EUA';
- const usd=spot||market.usdbrl, diesel=market.diesel;
- el('top-usd-value').textContent=usd&&Number(usd.value)>0?'R$ '+number(usd.value,4):'—';
- el('top-usd-date').textContent=usd?.observed_at?(usd.source||'USD/BRL')+' · '+usd.observed_at:'Sem cotação';
- el('top-diesel-value').textContent=diesel&&Number(diesel.value)>0?'US$ '+number(diesel.value,3)+'/gal':'—';
- el('top-diesel-date').textContent=diesel?.observed_at?'EIA · '+diesel.observed_at:'EIA · semanal';
+ const l=lang();
+ el('top-usd-label').textContent=l==='en'?'USD / BRL':l==='es'?'Dólar':'Dólar';
+ el('top-diesel-label').textContent=l==='en'?'US Diesel':l==='es'?'Diésel EE. UU.':'Diesel EUA';
+ el('top-brent-label').textContent=l==='en'?'Brent Oil':l==='es'?'Petróleo Brent':'Petróleo Brent';
+ const values=[
+  {id:'usd',data:spot||market.usdbrl,decimals:4,prefix:'R$ ',suffix:''},
+  {id:'diesel',data:market.diesel,decimals:3,prefix:'US$ ',suffix:'/gal'},
+  {id:'brent',data:market.brent,decimals:2,prefix:'US$ ',suffix:'/barril'}
+ ];
+ for(const item of values){
+   const v=item.data;
+   const fresh=!!v&&Number.isFinite(Number(v.value))&&Number(v.value)>0
+      &&Number.isFinite(Date.parse(v.observed_at||''))
+      &&Date.now()-Date.parse(v.observed_at)>=-24*3600000
+      &&Date.now()-Date.parse(v.observed_at)<10*86400000;
+   const value=el('top-'+item.id+'-value'),chg=el('top-'+item.id+'-change'),meta=el('top-'+item.id+'-date');
+   value.textContent=fresh?item.prefix+number(v.value,item.decimals)+item.suffix:'—';
+   const pct=fresh&&Number.isFinite(Number(v.change_pct))&&v.change_pct!==null?Number(v.change_pct):null;
+   chg.hidden=pct===null;
+   chg.classList.toggle('negative',pct!==null&&pct<0);
+   chg.textContent=pct===null?'':(pct>0?'+':'')+number(pct,2)+'%';
+   const source=fresh?(v.source||'')+' · '+v.observed_at:'Cotação não verificada';
+   meta.textContent=source;value.title=source;
+ }
 }
 function icon(d){
  d=String(d||'').toLowerCase();
@@ -38,11 +56,9 @@ function showCity(){
  if(!good.length){panel.hidden=true;return;}
  panel.hidden=false;
  const avail=new Map(good.map(c=>[c.city+'|'+c.state,c]));
- let picked=null;
- for(let tries=0;tries<order.length;tries++){
-   if(i>=order.length){order=shuffle(order);i=0;}
-   const key=order[i++];if(avail.has(key)){picked=avail.get(key);break;}
- }
+ // Tampa is the fixed approved reference location when the feed is available.
+ // Otherwise use a predictable real city, never a random carousel.
+ const picked=avail.get('Tampa|FL')||good[0];
  if(!picked){panel.hidden=true;return;}
  el('top-city').textContent=picked.city+', '+picked.state;
  el('top-weather-icon').textContent=icon(picked.condition_en);
@@ -83,7 +99,7 @@ function init(){
  if(!el('top-city'))return;
  showMarket();showCity();
  if(location.protocol.startsWith('http')){weather();quotes();live();setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);}
- setInterval(showCity,10000);el('language')?.addEventListener('change',()=>{showMarket();i=Math.max(0,i-1);showCity()});
+ el('language')?.addEventListener('change',()=>{showMarket();showCity()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
