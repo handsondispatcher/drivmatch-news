@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR" data-site-version="v34.2">
+<html lang="pt-BR" data-site-version="v34.3">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="drivmatch-news-version" content="v34.2"/>
+<meta name="drivmatch-news-version" content="v34.3"/>
 <meta name="drivmatch-news-release-status" content="development-prelaunch"/>
 <title>DrivMatch News — Transporte e logística nos EUA</title>
 <style>
@@ -629,66 +629,36 @@ body{background:#f7f9fc;color:#14283c}
 }
 
 
-/* v34.2: Ventusky → Road TV → Dólar/Diesel/Brent; no changes to modal CSS.
-   Third-party YouTube players are loaded only after an explicit user click. */
-.roadtv-card{background:#102e45;border:1px solid #365b73;border-radius:7px;color:#f2f7fc;margin:0 0 18px;padding:12px;overflow:hidden}
-.roadtv-top{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;margin-bottom:9px}
-.roadtv-top h2{margin:0;color:#fff;font:700 18px/1.15 Georgia,serif;letter-spacing:.2px}
-.roadtv-top [data-roadtv-subheading]{display:block;font:700 9px/1.6 Arial,sans-serif;color:#afd2e7;letter-spacing:.8px;margin-top:3px}
-.roadtv-state{display:inline-block;flex:0 0 auto;border:1px solid #90acc1;border-radius:4px;padding:4px 7px;font:700 10px/1 Arial,sans-serif;color:#ecf4fa;background:#31506a}
-.roadtv-state.is-live{background:#a92f38;border-color:#d75960;color:#fff}
-.roadtv-screen{position:relative;min-height:200px;aspect-ratio:16/10;background:linear-gradient(150deg,#06121f 3%,#173e5c 55%,#092237 100%);border:1px solid #42667e;border-radius:5px;overflow:hidden}
-.roadtv-screen.is-twitch{min-height:305px;aspect-ratio:auto}
-.roadtv-screen.is-twitch iframe{min-height:305px}
-.roadtv-screen iframe{width:100%;height:100%;min-height:200px;border:0;display:block;background:#07131f}
-.roadtv-stage[hidden]{display:none!important}
-.roadtv-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px;padding:14px;text-align:center;color:#eaf4fa}
-.roadtv-stage-icon{display:grid;place-items:center;width:45px;height:45px;background:#0c689c;border:1px solid #74bedf;border-radius:50%;font-size:22px;line-height:1;padding-left:3px;color:#fff}
-.roadtv-stage strong{font:700 14px/1.34 Georgia,serif;max-width:260px;color:#fff}
-.roadtv-play{background:#1178bc;border:1px solid #5eaee0;color:#fff;font:700 12px/1.2 Arial,sans-serif;padding:10px 13px;min-height:40px;border-radius:5px;cursor:pointer}
-.roadtv-play:hover,.roadtv-play:focus-visible{background:#0a5b8f}
-.roadtv-credit{display:flex;justify-content:space-between;align-items:center;gap:7px;margin-top:9px;color:#d1e3ef;font:11px/1.45 Arial,sans-serif}
-.roadtv-credit span{min-width:0}
-.roadtv-credit a{flex:0 0 auto;color:#9bdcff;font-weight:700;text-decoration:underline;text-underline-offset:2px}
-.roadtv-channels{display:flex;gap:6px;flex-wrap:wrap;margin:11px 0 7px}
-.roadtv-channels a{font:700 10px/1.25 Arial,sans-serif;color:#c7e8fb;text-decoration:none;padding:7px 8px;border:1px solid #56758b;border-radius:4px;background:#203f58}
-.roadtv-channels a:hover,.roadtv-channels a:focus-visible{border-color:#7ec8f2;color:#fff;background:#285673}
-.roadtv-disclosure{margin:7px 0 0;color:#a9c4d7;font:10px/1.4 Arial,sans-serif}
+
+/* v34.3: one clean official player; retain Ventusky → ROAD TV → verified market order. */
+.roadtv-card{margin:0 0 18px;padding:12px;background:#102e45;border:1px solid #365b73;border-radius:7px;overflow:hidden;color:#f2f7fc}
+.roadtv-card h2{margin:0 0 10px;color:#fff;font:700 23px/1.3 Georgia,serif;letter-spacing:.3px}
+.roadtv-screen{position:relative;aspect-ratio:16/9;min-height:200px;border-radius:5px;overflow:hidden;background:#06121f}
+.roadtv-screen iframe{display:block;position:absolute;inset:0;width:100%;height:100%;border:0;background:#06121f}
 .mobile-market{display:none}
 #mercados .roadtv-card{margin-top:1px}
 @media(max-width:990px){
-  /* On mobile, the existing dual-weather construction needs one matching video
-     card and market renderer right below the *visible* Ventusky, not below news. */
-  #mercados.side{display:none}
-  .mobile-market{display:block;margin:0 0 18px;padding:13px 15px;border-radius:7px;background:#0c2337;color:#fff}
-  .mobile-market h2{font:700 16px/1.4 Georgia,serif;border-bottom:1px solid #41627a;padding-bottom:8px;margin:0 0 6px}
-  .mobile-market .sideitem{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #30516a;padding:9px 0}
-  .mobile-market .sideitem strong{font-size:13px;color:#e8f3fc}
-  .mobile-market .sideitem small{display:block;font-size:10px;color:#b2c9d8;margin-top:3px}
-  .mobile-market .value{text-align:right;font:13px/1.4 Arial,sans-serif;max-width:57%}
-  .mobile-market .value b{font-size:14px}
-  .mobile-market .value .market-asof{display:block;font-size:10px;max-width:none;color:#a9c6d8}
-  .mobile-market .micro{font-size:10px;color:#a9c6d8}
-  .mobile-market .market-unavailable{color:#c7d8e7;font:12px/1.4 Arial,sans-serif;margin:9px 0}
-  #roadtv-mobile{margin:0 0 12px}
+ #mercados.side{display:none}
+ .mobile-market{display:block;margin:0 0 18px;padding:13px 15px;border-radius:7px;background:#0c2337;color:#fff}
+ .mobile-market h2{font:700 16px/1.4 Georgia,serif;border-bottom:1px solid #41627a;padding-bottom:8px;margin:0 0 6px}
+ .mobile-market .sideitem{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #30516a;padding:9px 0}
+ .mobile-market .sideitem strong{font-size:13px;color:#e8f3fc}
+ .mobile-market .sideitem small{display:block;font-size:10px;color:#b2c9d8;margin-top:3px}
+ .mobile-market .value{text-align:right;font:13px/1.4 Arial,sans-serif;max-width:57%}
+ .mobile-market .value b{font-size:14px}
+ .mobile-market .value .market-asof{display:block;font-size:10px;max-width:none;color:#a9c6d8}
+ .mobile-market .micro{font-size:10px;color:#a9c6d8}
+ .mobile-market .market-unavailable{color:#c7d8e7;font:12px/1.4 Arial,sans-serif;margin:9px 0}
+ #roadtv-mobile{margin:0 0 12px}
 }
 @media(max-width:600px){
-  #roadtv-mobile .roadtv-screen{min-height:204px}
-  #roadtv-mobile .roadtv-card{padding:10px}
-  .roadtv-channels{gap:5px}
-  .roadtv-channels a{font-size:10px}
+ #roadtv-mobile .roadtv-screen{min-height:200px}
+ #roadtv-mobile{padding:11px}
 }
-
-.roadtv-play[hidden]{display:none!important}
-.roadtv-toolbar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:space-between;margin:9px 0 4px}
-.roadtv-toolbar button{border:1px solid #87afc9;background:#183c57;color:#e8f5fd;border-radius:5px;padding:8px 9px;font:700 11px/1.1 Arial,sans-serif;cursor:pointer}
-.roadtv-toolbar button:disabled{opacity:.45;cursor:not-allowed}
-.roadtv-toolbar [data-roadtv-status]{color:#b5cddd;font:10px/1.4 Arial,sans-serif;max-width:185px}
-.roadtv-state.is-pending{color:#cddfec;background:#173950}
 </style>
 </head>
 <body>
-<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition">EDIÇÃO DIGITAL · <span id="site-version" aria-label="Versão 34.2">v34.2</span> · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
+<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition">EDIÇÃO DIGITAL · <span id="site-version" aria-label="Versão 34.3">v34.3</span> · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
 <nav class="newsroom-nav" aria-label="Editorias DrivMatch News"><div class="newsroom-nav-inner">
   <a href="#panorama" data-newsroom-label="home" class="newsroom-nav-home">Capa</a>
   <a href="#noticias" data-newsroom-cat="Caminhoneiros" data-newsroom-label="drivers">Caminhoneiros</a>
@@ -704,12 +674,11 @@ body{background:#f7f9fc;color:#14283c}
 <div class="main">
 <main>
 <div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div>
-<div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section><section class="roadtv-card" id="roadtv-mobile" data-roadtv aria-label="Road TV — vídeos de viagem dos caminhoneiros no YouTube">
- <div class="roadtv-top"><div><h2 data-roadtv-heading>ROAD TV</h2><span data-roadtv-subheading>NA ESTRADA · TRANSMISSÕES E VIAGENS</span></div><span class="roadtv-state" data-roadtv-badge>VERIFICANDO</span></div>
- <div class="roadtv-screen" data-roadtv-screen><div class="roadtv-stage" data-roadtv-stage><span aria-hidden="true" class="roadtv-stage-icon">▶</span><strong data-roadtv-stage-title>Buscando câmera frontal em estrada nos EUA</strong><button class="roadtv-play" type="button" data-roadtv-play hidden>▶ Assistir</button></div></div>
- <div class="roadtv-credit"><span data-roadtv-credit>Conteúdo de criadores independentes · YouTube</span><a data-roadtv-original href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">Ver canal ↗</a></div>
- <div class="roadtv-toolbar"><button type="button" data-roadtv-next disabled>Próxima transmissão ↻</button><span data-roadtv-status role="status">Aguardando verificação do catálogo.</span></div><div class="roadtv-channels" data-roadtv-channels aria-label="Explorar canais no YouTube e Twitch"></div>
- <p class="roadtv-disclosure" data-roadtv-disclosure>Reprodução pelo player oficial do YouTube ou Twitch, apenas após seu clique. “Ao vivo” exige confirmação atual.</p>
+<div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section><section class="roadtv-card" id="roadtv-mobile" aria-label="ROAD TV">
+  <h2>ROAD TV</h2>
+  <div class="roadtv-screen">
+    <iframe title="ROAD TV — câmera ferroviária Oklahoma City, EUA" src="https://www.youtube-nocookie.com/embed/to8SHIQHyQo?autoplay=1&amp;mute=1&amp;playsinline=1&amp;rel=0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+  </div>
 </section><section class="mobile-market" id="mobile-market" aria-labelledby="market-title-mobile"><h2 id="market-title-mobile">Mercado em Foco</h2><div id="market-mobile"></div><p class="micro" id="market-note-mobile"></p></section></div>
 <section id="panorama">
   <div class="newsroom-topline" aria-label="Informação editorial">
@@ -729,12 +698,11 @@ body{background:#f7f9fc;color:#14283c}
 </section>
 
 </main>
-<aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div><section class="roadtv-card" id="roadtv-desktop" data-roadtv aria-label="Road TV — vídeos de viagem dos caminhoneiros no YouTube">
- <div class="roadtv-top"><div><h2 data-roadtv-heading>ROAD TV</h2><span data-roadtv-subheading>NA ESTRADA · TRANSMISSÕES E VIAGENS</span></div><span class="roadtv-state" data-roadtv-badge>VERIFICANDO</span></div>
- <div class="roadtv-screen" data-roadtv-screen><div class="roadtv-stage" data-roadtv-stage><span aria-hidden="true" class="roadtv-stage-icon">▶</span><strong data-roadtv-stage-title>Buscando câmera frontal em estrada nos EUA</strong><button class="roadtv-play" type="button" data-roadtv-play hidden>▶ Assistir</button></div></div>
- <div class="roadtv-credit"><span data-roadtv-credit>Conteúdo de criadores independentes · YouTube</span><a data-roadtv-original href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">Ver canal ↗</a></div>
- <div class="roadtv-toolbar"><button type="button" data-roadtv-next disabled>Próxima transmissão ↻</button><span data-roadtv-status role="status">Aguardando verificação do catálogo.</span></div><div class="roadtv-channels" data-roadtv-channels aria-label="Explorar canais no YouTube e Twitch"></div>
- <p class="roadtv-disclosure" data-roadtv-disclosure>Reprodução pelo player oficial do YouTube ou Twitch, apenas após seu clique. “Ao vivo” exige confirmação atual.</p>
+<aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div><section class="roadtv-card" id="roadtv-desktop" aria-label="ROAD TV">
+  <h2>ROAD TV</h2>
+  <div class="roadtv-screen">
+    <iframe title="ROAD TV — câmera ferroviária Oklahoma City, EUA" src="https://www.youtube-nocookie.com/embed/to8SHIQHyQo?autoplay=1&amp;mute=1&amp;playsinline=1&amp;rel=0" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
+  </div>
 </section><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
@@ -777,8 +745,7 @@ body{background:#f7f9fc;color:#14283c}
 </div></article></div>
 <div class="story-preview-overlay" id="story-preview" hidden role="dialog" aria-modal="true" aria-labelledby="story-preview-title"><div class="story-preview-panel"><div class="story-preview-head"><strong id="story-preview-title">Prévia do Story</strong><button id="story-preview-close" type="button" aria-label="Fechar prévia">×</button></div><div class="story-preview-scroll"><img id="story-preview-image" alt="Prévia da imagem vertical da notícia para Stories"></div><div class="story-preview-actions"><a id="story-preview-download" download="drivmatch-news-story.png" href="#">Salvar imagem PNG</a><p id="story-preview-hint">Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.</p></div></div></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-2-roadtv-20261009" defer></script>
-<script src="assets/road-tv.js?v=v34-2-roadtv-20261009" defer></script>
+<script src="assets/app.js?v=v34-3-railcam-20261009" defer></script>
 <script src="assets/utility-strip.js" defer></script>
 <script src="assets/news-crawler.js?v=warroom-20261009-v2" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
