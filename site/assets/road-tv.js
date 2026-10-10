@@ -108,26 +108,25 @@ function updateCard(card){
 }
 function render(){cards.forEach(updateCard)}
 function choose(n,auto=false){
- const v=catalog[n];
- if(!v)return;
+ const v=catalog[n];if(!v)return;
+ const previousCard=activeCard;
  stopFrames();index=n;startedAt=Date.now();render();
- if(auto&&activated&&activeCard){
-  // activeCard is cleared by stopFrames: retain it explicitly in callers
-  // (switch is a selection; visitor can choose playback for a new creator).
- }
+ // Autoplay may be blocked by the browser. A user click was already required
+ // for the first play. On auto rotation, muted playback is attempted safely.
+ if(auto&&activated&&previousCard)embed(previousCard,true);
 }
-function embed(card){
+function embed(card,auto=false){
  const v=current();
  if(!v||!VERIFIED_HOSTS.has(location.hostname))return;
  stopFrames();
  let src;
  if(v.platform==='youtube'){
-  src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.video_id)+'?playsinline=1&rel=0';
+  src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.video_id)+'?playsinline=1&rel=0'+(auto?'&autoplay=1&mute=1':'');
   if(!v.live&&Number.isInteger(v.start_seconds)&&v.start_seconds>0)
    src+='&start='+Math.min(v.start_seconds,86400);
  }else{
   src='https://player.twitch.tv/?channel='+encodeURIComponent(v.channel_login)
-    +'&parent='+encodeURIComponent(location.hostname)+'&autoplay=false&muted=true';
+    +'&parent='+encodeURIComponent(location.hostname)+'&autoplay='+(auto?'true':'false')+'&muted=true';
  }
  const frame=document.createElement('iframe');
  frame.title=(v.live?'AO VIVO':'REPLAY')+' · '+(v.channel_name||v.platform);
@@ -136,6 +135,7 @@ function embed(card){
  frame.setAttribute('allow','autoplay; encrypted-media; picture-in-picture; fullscreen');
  frame.setAttribute('allowfullscreen','');
  frame.setAttribute('data-roadtv-frame','true');
+ card.querySelector('[data-roadtv-screen]').classList.toggle('is-twitch',v.platform==='twitch');
  card.querySelector('[data-roadtv-screen]').appendChild(frame);
  card.querySelector('[data-roadtv-stage]').hidden=true;
  activeCard=card;activeId=id(v);activated=true;startedAt=Date.now();
@@ -148,9 +148,15 @@ function reconcile(next){
  const match=catalog.findIndex(c=>id(c)===previous);
  index=match>=0?match:0;
  const changed=playing&&!catalog.some(v=>id(v)===playing);
- if(changed)stopFrames();
- // Live always outranks a replay. Rotate if verified live appears after replay
- // and no video is currently being actively watched.
+ const newLive=!!(playing&&catalog[index]&&!catalog[index].live&&catalog.some(v=>v.live));
+ if(changed||newLive){
+   const previousCard=activeCard;
+   stopFrames();
+   if(newLive)index=catalog.findIndex(c=>c.live);
+   render();
+   if(previousCard&&catalog.length&&activated)embed(previousCard,true);
+   return;
+ }
  if(!playing&&catalog.some(c=>c.live)&&catalog[index]&&!catalog[index].live)
   index=catalog.findIndex(c=>c.live);
  render();
@@ -183,7 +189,7 @@ setInterval(refresh,120000);
 setInterval(()=>{
  if(catalog.length<2||!activated||!activeId||Date.now()-startedAt<12*60000)return;
  const next=catalog.findIndex((v,i)=>i!==index&&v.live);
- if(next>=0){choose(next,true)}
+ if(next>=0)choose(next,true);
 },60000);
 render();
 refresh();
