@@ -1,4 +1,4 @@
-/* DrivMatch News v33 — polimento editorial sobre v32; baseline v31 e modal compacto preservados. */
+/* DrivMatch News v34 — newsroom editorial on verified v33; v33 snapshot and mobile reader preserved. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -123,10 +123,10 @@
       const translated=a.translated_langs?.includes(lang);const languageNotice=translated?'':(lang==='pt'?' · Título original sem tradução':lang==='es'?' · Titular original sin traducir':' · Original headline (not translated)');
       const note=(lang==='pt'?'Leia o contexto no DrivMatch News':lang==='es'?'Lee el contexto en DrivMatch News':'Read the context on DrivMatch News')+languageNotice;
       const body=`<div class="kicker">${cat}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div><p>${note}</p>`;
-      return featured?`<article class="story" tabindex="0" role="button" data-external="true" data-story="${i}">${imageHTML(a)}<div class="info">${body}</div></article>`:`<article class="item" tabindex="0" role="button" data-external="true" data-story="${i}"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></article>`;
+      return featured?`<article class="story ${imageOf(a).startsWith('data:image/svg')?'illustrated':''}" tabindex="0" role="button" data-external="true" data-story="${i}">${imageHTML(a)}<div class="info">${body}</div></article>`:`<article class="item" tabindex="0" role="button" data-external="true" data-story="${i}"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></article>`;
     }
     const kicker= a.kind==='opportunity' ? `${cat} · ${lang==='en'?'Opportunity':lang==='es'?'Oportunidad':'Oportunidade'}`:cat;
-    if(featured)return `<article class="story" tabindex="0" role="button" data-external="false" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><p class="feature-summary">${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
+    if(featured)return `<article class="story ${imageOf(a).startsWith('data:image/svg')?'illustrated':''}" tabindex="0" role="button" data-external="false" data-story="${i}">${imageHTML(a)}<div class="info"><div class="kicker">${kicker}</div><h3>${escapeHTML(txt.title)}</h3><p class="feature-summary">${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div></article>`;
     return `<article class="item" tabindex="0" role="button" data-external="false" data-story="${i}"><div><span class="tag">${cat}</span> ${a.kind==='opportunity'?'<span class="origin-pill">DrivMatch</span>':''}<h3>${escapeHTML(txt.title)}</h3><p>${escapeHTML(txt.summary||'')}</p><div class="byline">${daysLabel(a)} · ${escapeHTML(a.source||'')}</div></div><div class="thumb">${imageHTML(a)}<span class="label">${cat}</span></div></article>`;
   }
   function renderStories(){const f=articlesFiltered();const pages=Math.max(1,Math.ceil(f.length/pageSize));page=Math.min(page,pages-1);
@@ -150,7 +150,7 @@
     $('highlights-note').textContent=lang==='pt'?'Seleção por relevância e recência do feed; confira a fonte original.':lang==='es'?'Selección del feed; compruebe la fuente original.':'Selected from the news feed; verify the original source.';
     $('highlightList').innerHTML=shortlist.map(a=>{
       const i=indexSet.get(a.id),title=cleanHeadline(localeOf(a)?.title||'');
-      return `<li><button type="button" data-story="${i}" aria-label="${escapeHTML(title)}"><span class="highlight-headline">${escapeHTML(title)}</span><span class="highlight-source">${escapeHTML(a.source||'')}</span></button></li>`;
+      return `<li><button type="button" data-story="${i}" aria-label="${escapeHTML(title)}">${imageHTML(a,'class="highlight-photo"')}<span class="highlight-category">${escapeHTML(localizedCategory(a.category))}</span><span class="highlight-headline">${escapeHTML(title)}</span><span class="highlight-source">${escapeHTML(a.source||'')}</span></button></li>`;
     }).join('');
     $('highlights').hidden=!shortlist.length;
   }
@@ -276,6 +276,20 @@
     document.querySelectorAll('.weather-card').forEach(el=>el.setAttribute('aria-label',next==='en'?'Weather':next==='es'?'Clima':'Clima'));
     document.querySelector('.edition').childNodes[0].textContent=(next==='en'?'DIGITAL EDITION':next==='es'?'EDICIÓN DIGITAL':'EDIÇÃO DIGITAL')+' · ';
     $('edition-date').textContent=new Date().toLocaleDateString(next==='en'?'en-US':next==='es'?'es-MX':'pt-BR');
+    // Edition navigation and commercial bridge: newspaper first, service links second.
+    const newsroomCopy={
+      pt:{section:'NOTÍCIAS DO TRANSPORTE AMERICANO',sub:'Informação, mercado e contexto para quem vive o transporte nos EUA.',home:'Capa',drivers:'Caminhoneiros',freight:'Fretes',regulation:'Regulamentação',safety:'Segurança',technology:'Tecnologia',weather:'Clima & Mercado',eye:'SERVIÇOS DRIVMATCH · ACESSO EXTERNO AO JORNAL',title:'Oportunidades no transporte',desc:'A DrivMatch conecta profissionais e empresas. O cadastro e os matches acontecem na plataforma principal.',driver:'Sou motorista ↗',carrier:'Sou transportadora ↗'},
+      en:{section:'AMERICAN TRUCKING NEWS',sub:'News, markets and context for US transport professionals.',home:'Front page',drivers:'Truck drivers',freight:'Freight',regulation:'Regulation',safety:'Safety',technology:'Technology',weather:'Weather & Markets',eye:'DRIVMATCH SERVICES · OUTSIDE THE NEWSROOM',title:'Opportunities in transportation',desc:'DrivMatch connects professionals and companies. Registration and matching take place on the main platform.',driver:'I am a driver ↗',carrier:'I am a carrier ↗'},
+      es:{section:'NOTICIAS DEL TRANSPORTE EN EE. UU.',sub:'Información y mercados para profesionales del transporte en Estados Unidos.',home:'Portada',drivers:'Camioneros',freight:'Fletes',regulation:'Regulación',safety:'Seguridad',technology:'Tecnología',weather:'Clima y mercados',eye:'SERVICIOS DRIVMATCH · FUERA DE LAS NOTICIAS',title:'Oportunidades en el transporte',desc:'DrivMatch conecta profesionales y empresas. El registro y matching están en la plataforma principal.',driver:'Soy conductor ↗',carrier:'Soy transportista ↗'}
+    }[next];
+    $('newsroom-section-label').textContent=newsroomCopy.section;
+    $('newsroom-section-desc').textContent=newsroomCopy.sub;
+    document.querySelectorAll('[data-newsroom-label]').forEach(a=>{a.textContent=newsroomCopy[a.dataset.newsroomLabel]||a.textContent});
+    $('newsroom-cta-eyebrow').textContent=newsroomCopy.eye;
+    $('newsroom-cta-title').textContent=newsroomCopy.title;
+    $('newsroom-cta-desc').textContent=newsroomCopy.desc;
+    $('newsroom-cta-driver').textContent=newsroomCopy.driver;
+    $('newsroom-cta-carrier').textContent=newsroomCopy.carrier;
     $('footer-publisher').textContent='DrivMatch News — um produto da Hands On Dispatcher LLC';
     $('footer-legal').textContent='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.';
     $('story-preview-title').textContent=next==='en'?'Story preview':next==='es'?'Vista previa de Story':'Prévia do Story';
@@ -330,6 +344,22 @@
     // No public-facing development banner; sources remain in editorial metadata.
     $('language').addEventListener('change',e=>languageSet(e.target.value));
     document.querySelectorAll('.language-shortcuts').forEach(el=>el.addEventListener('click',e=>{const b=e.target.closest('[data-site-lang]');if(b)languageSet(b.dataset.siteLang);}));
+    // Newsroom category bar uses the existing filter; never creates a duplicate directory.
+    document.querySelector('.newsroom-nav').addEventListener('click',e=>{
+      const link=e.target.closest('a[data-newsroom-cat],a[data-newsroom-label="home"],a[data-newsroom-label="weather"]');
+      if(!link)return;
+      if(link.dataset.newsroomLabel==='weather'){
+        link.hash=window.matchMedia('(max-width: 990px)').matches?'clima-mobile':'mercados';
+        return;
+      }
+      if(link.dataset.newsroomLabel==='home'){
+        selected='Todas';$('category').value='Todas';$('search').value='';$('age').value='all';
+      } else {
+        selected=link.dataset.newsroomCat;
+        $('category').value=selected;$('search').value='';$('age').value='all';
+      }
+      page=featurePage=0;languageSet(lang);
+    });
     $('search').addEventListener('input',()=>{page=featurePage=0;renderStories();});
     $('category').addEventListener('change',e=>{selected=e.target.value;page=featurePage=0;languageSet(lang);});
     $('age').addEventListener('change',()=>{page=featurePage=0;renderStories();});
