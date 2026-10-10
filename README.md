@@ -1,3 +1,11 @@
+# DrivMatch News v34.3 — ROAD TV, player limpo
+
+**Edição aplicada mediante screenshot do usuário:** apenas “ROAD TV” + player oficial de câmera ferroviária Virtual Railfan (Oklahoma City, EUA), temporariamente, sem botões, listas, status ou textos públicos extras. Mesmo posicionamento depois do Ventusky e antes de Mercado em Foco. **A fonte identificava o stream como LIVE, mas disponibilidade e liberação de embed são controladas pelo YouTube/criador e devem ser verificadas manualmente.** A pesquisa YouTube/Twitch automática v34.2 foi preservada no repositório, não está ligada ao player temporário. [Especificação e gate](docs/V34_3_ROAD_TV_CLEAN.md).
+
+**Rollback v34.2:** `backup/v34-2-2026-10-09` SHA `c5bcc13ea8ed61677a85f7ee8807ea34d48229c9`, além de v34.1/v34/v33/v32. `public_launch_approved=false`.
+
+---
+
 # DrivMatch News v34.2 — Road TV (US cargo ride-along)
 
 **Alteração em desenvolvimento:** abaixo do Ventusky entrou **Road TV**, depois dólar, diesel e petróleo verificados, em desktop e celular. A descoberta automática usa API oficial YouTube/Twitch; sem credenciais configuradas ou transmissão elegível, mostra aviso honesto em vez de live inventada. **Replay só de transmissão encerrada hoje/ontem com horário de gravação verificável e próximo ao horário do dia; sempre rotulado REPLAY.** Nenhuma retransmissão por servidores DrivMatch. O modal compactado aprovado, o jornal e a identidade oficial permanecem intactos.
