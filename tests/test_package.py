@@ -10,11 +10,11 @@ sys.path.insert(0,str(BASE/'scripts'))
 import update as up
 from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
- def test_v34_5_release_contract(self):
+ def test_v34_6_release_contract(self):
   version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
-  self.assertEqual(version['version'],'v34.5')
-  self.assertEqual(version['previous_release_branch'],'snapshot/v34-4-pre-war-room-2026-10-10')
-  self.assertEqual(version['previous_release_commit'],'829169282718c3bf546fdb74d5ae692ff0943bb6')
+  self.assertEqual(version['version'],'v34.6')
+  self.assertEqual(version['previous_release_branch'],'snapshot/v34-5-pre-camera-network-2026-10-10')
+  self.assertEqual(version['previous_release_commit'],'946aaf215dcfe1e73c1fcabdbd5916f05e88e18d')
   self.assertFalse(version['public_launch_approved'])
   self.assertEqual(version['backup_branch'],'backup/v33-approved-2026-10-09')
   self.assertEqual(version['backup_commit'],'fea227dde034e101ace8299357579ddfe98fe256')
@@ -38,10 +38,10 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('illustrated',app)
   self.assertIn('utm_source=drivmatch_news',page)
   self.assertNotIn('public_launch_approved": true',page)
-  self.assertIn('data-site-version="v34.5"',page)
-  self.assertIn('name="drivmatch-news-version" content="v34.5"',page)
-  self.assertIn('id="site-version" aria-label="Versão 34.5">v34.5',page)
-  self.assertIn('DrivMatch News v34.5',app)
+  self.assertIn('data-site-version="v34.6"',page)
+  self.assertIn('name="drivmatch-news-version" content="v34.6"',page)
+  self.assertIn('id="site-version" aria-label="Versão 34.5">v34.6',page)
+  self.assertIn('DrivMatch News v34.6',app)
   # Clean public player only; dynamic discovery engine retained separately.
   road=(BASE/'scripts/road_tv.py').read_text(encoding='utf-8')
   self.assertIn('YOUTUBE_DATA_API_KEY',road)
@@ -73,6 +73,20 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('fl511.com/Map/EmbeddedMap?layers=Cameras',tv)
   self.assertTrue(version['road_tv_policy']['official_fl511_camera_embed_fallback'])
   self.assertFalse(version['road_tv_policy']['official_camera_map_is_verified_autoplay_stream'])
+  # Rights-governed video-source directory; camera site is NOT a guaranteed playing livestream.
+  registry=json.loads((BASE/'content/camera-source-network.json').read_text(encoding='utf-8'))
+  self.assertEqual(registry['schema_version'],1)
+  self.assertEqual(registry['primary_display'],'fl511-i4')
+  self.assertEqual(len({c['id'] for c in registry['sources']}),len(registry['sources']))
+  self.assertTrue(all(c['verified_playing_live'] is False for c in registry['sources']))
+  self.assertEqual(next(x for x in registry['sources'] if x['id']=='milecheck-cameras')['display'],
+                   'external_link_only_license_required')
+  self.assertEqual(next(x for x in registry['sources'] if x['id']=='weather-lkn')['display'],'not_a_camera_provider')
+  self.assertTrue(version['road_tv_policy']['camera_link_is_not_live_certification'])
+  self.assertIn('camera-source-network.json',update)
+  self.assertIn('data/camera-source-network.json',tv)
+  self.assertIn('source_rank',road)
+  self.assertIn('USBOUND_BORDER',road)
   self.assertIn('news-freshness',page)
   self.assertIn('sourceCheckedAt',app)
   self.assertIn('fresh_6h',update)
@@ -91,8 +105,8 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('class="related-rail"',app)
   self.assertIn('shareDestinations',app)
   workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
-  self.assertIn('CUSTOM DOMAIN V34.5 PASS',workflow)
-  self.assertIn('CUSTOM DOMAIN V34.5 MISMATCH',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.6 PASS',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.6 MISMATCH',workflow)
   self.assertIn('drivmatch.com/news/data/release.json',workflow)
 
   self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
