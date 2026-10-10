@@ -327,6 +327,41 @@ def build(offline=False):
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
     public_spot=os.getenv('USDBRL_PUBLIC_URL','')
     runtime={'spot_url':public_spot if public_spot.startswith('https://') else ''}
+    # Curated live-camera discovery directory: sources are not automatically video streams.
+    # Publish only explicitly allowed outbound references and the official FL511 map embed.
+    camera_network=read_json(ROOT/'content/camera-source-network.json')
+    allowed_display={'approved_official_embed','external_link_only','external_link_only_license_required'}
+    if camera_network.get('schema_version')!=1 or not isinstance(camera_network.get('sources'),list):
+        raise ValueError('Invalid camera network schema')
+    public_sources=[];camera_ids=set()
+    for camera in camera_network['sources']:
+        ident=camera.get('id')
+        if not isinstance(ident,str) or ident in camera_ids or not ident:
+            raise ValueError('Duplicate or invalid camera source identifier')
+        camera_ids.add(ident)
+        if camera.get('verified_playing_live') is not False:
+            raise ValueError('Camera directory must not certify verified live playback')
+        source_url=camera.get('source_url','')
+        if not isinstance(source_url,str) or not source_url.startswith('https://'):
+            raise ValueError('Camera source must use HTTPS')
+        if camera.get('display') not in allowed_display:
+            continue
+        public={'id':ident,'name':camera['name'],'label':camera['label'],
+                'source_url':source_url,'display':camera['display'],
+                'verified_playing_live':False,'priority':camera['priority']}
+        if camera['display']=='approved_official_embed':
+            embedded=camera.get('embed_url','')
+            if ident!='fl511-i4' or not embedded.startswith('https://fl511.com/Map/EmbeddedMap?'):
+                raise ValueError('Only explicitly sanctioned FL511 map embedding is allowed')
+            public['embed_url']=embedded
+        elif camera.get('embed_url'):
+            raise ValueError('Unlicensed camera provider may not have embed URL')
+        public_sources.append(public)
+    public_sources.sort(key=lambda c:c['priority'])
+    (path/'camera-source-network.json').write_text(
+        json.dumps({'schema_version':1,'sources':public_sources,
+                    'all_camera_streams_verified':False},ensure_ascii=False,indent=2)+'\n',
+        encoding='utf-8')
     (path/'release.json').write_text(json.dumps(release,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'runtime.json').write_text(json.dumps(runtime)+'\n',encoding='utf-8')
     (path/'content.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
