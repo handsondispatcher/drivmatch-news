@@ -260,8 +260,8 @@ def make_market(offline=False):
             if key=='usdbrl':
                 try:market['indicators'][key]=verified_previous_close()
                 except Exception as exc2:market['errors'].append('usdbrl_previous_close:'+type(exc2).__name__)
-    market['stocks']=finnhub_quotes(market['errors'])
-    market['indicators'].update(class8_quotes(market['errors']))
+    # V34.1: unproven securities/Class 8 feeds no longer requested or rendered.
+    # Retain authorized source adapters for future separately approved pilots.
     return market
 
 
