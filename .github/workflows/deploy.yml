@@ -69,6 +69,40 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
         run: python scripts/update.py
+      - name: War Room — verificar frescor editorial e descoberta de vídeos
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          summary=Path(os.environ['GITHUB_STEP_SUMMARY'])
+          report_path=Path('build/newsroom-health.json')
+          road_path=Path('site/data/road-tv.json')
+          lines=['### DrivMatch News — editorial and video operational health']
+          if report_path.exists():
+              report=json.loads(report_path.read_text(encoding='utf-8'))
+              for key in ('status','latest_original_published_at','latest_original_age_minutes',
+                          'approved_external_headlines','published_last_60_minutes',
+                          'published_last_180_minutes','source_metrics'):
+                  lines.append(f'- {key}: {report.get(key)}')
+              if report.get('status')!='fresh':
+                  print('::warning title=Newsroom stale::No verified headline published within three hours; deployment is not new editorial content.')
+          else:
+              lines.append('- newsroom_health: missing (build may have failed)')
+              print('::error title=Newsroom audit missing::Build did not produce the expected editorial health artifact.')
+          if road_path.exists():
+              road=json.loads(road_path.read_text(encoding='utf-8'))
+              lines.append(f"- road_tv_status: {road.get('live_status')}")
+              lines.append(f"- verified_video_candidates: {len(road.get('candidates',[]))}")
+              if not road.get('candidates'):
+                  print('::warning title=Driver POV discovery blocked::No verified video candidate. Check YouTube/Twitch API credentials and provider permissions.')
+          summary.open('a',encoding='utf-8').write('\n'.join(lines)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newsroom-freshness-audit
+          path: build/newsroom-health.json
       - name: Preservar histórico verificado por até 48 horas
         uses: actions/cache/save@v4
         with:
