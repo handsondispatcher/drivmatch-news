@@ -189,6 +189,9 @@ function init(){
  });
  el('top-city-auto')?.addEventListener('click',resetCityAuto);
  el('language')?.addEventListener('change',()=>{showMarket();populateWeatherChoices();showCity()});
+ document.addEventListener('drivmatch:language',()=>{
+   showMarket();populateWeatherChoices();showCity();
+ });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
