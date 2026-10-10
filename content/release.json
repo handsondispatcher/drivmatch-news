@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.10",
-  "baseline": "v34.9 snapshot 16de69068cc97223df682a76709ff930f7e88435; owner five-image header/news/ads/weather refinements",
+  "version": "v34.11",
+  "baseline": "v34.10 snapshot bfee2a7f0ab404abd22d737d6ab5210a37113c31; owner urgent nationwide city forecast search repair 2026-10-10",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -72,7 +72,15 @@
     "weather_city_state_typed_input_supported_nws_cities",
     "rotate_validated_cached_city_forecast_each_10_seconds_unless_pinned",
     "version_specific_static_asset_urls_to_avoid_stale_scripts",
-    "no_city_forecast_invention"
+    "no_city_forecast_invention",
+    "nationwide_us_census_city_state_gazetteer",
+    "st_charles_mo_il_disambiguation",
+    "single_city_search_field_magnifier",
+    "nws_forecast_per_selected_city",
+    "persist_reader_selected_city",
+    "missing_forecast_show_truthful_error",
+    "retain_10_second_automatic_forecast_display_rotation",
+    "no_third_party_geocoder_tracking"
   ],
   "prior_backups": [
     {
@@ -81,8 +89,8 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "snapshot/v34-9-before-v34-10-warroom-2026-10-10",
-  "previous_release_commit": "16de69068cc97223df682a76709ff930f7e88435",
+  "previous_release_branch": "snapshot/v34-10-before-v34-11-city-search-20261010",
+  "previous_release_commit": "bfee2a7f0ab404abd22d737d6ab5210a37113c31",
   "road_tv_policy": {
     "youtube_twitch_only": false,
     "live_claim_requires_authorized_api": true,
@@ -143,7 +151,14 @@
     "selection": "typed_city_state_from_verified_nws_coverage",
     "unsupported_cities": "show_unavailable_no_fabricated_data",
     "manual_selection_persist": true,
-    "forecast_refresh_minutes": 15
+    "forecast_refresh_minutes": 15,
+    "location_index": "U.S. Census Bureau 2025 National Places",
+    "forecast": "National Weather Service API by selected Census coordinates",
+    "city_search": "one_field_one_search_action",
+    "weather_cache_minutes": 15,
+    "geocoder_used": false,
+    "city_collisions": "state_disambiguation_required",
+    "unavailable_forecast": "explicit_source_unavailable_with_official_link"
   },
   "editorial_policy": {
     "original_language_allowed_when_translation_missing": true,
