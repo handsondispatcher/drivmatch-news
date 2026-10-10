@@ -1,49 +1,49 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "generated_at": null,
   "live_checked_at": null,
   "live_status": "unverified",
   "current_live": null,
-  "featured_recording": {
-    "video_id": "OyrSHX18bQk",
-    "channel_name": "Johnny Trucker USA",
-    "channel_url": "https://www.youtube.com/@JohnnyTruckerUSA",
-    "video_url": "https://www.youtube.com/watch?v=OyrSHX18bQk",
-    "title": "Vermont to Upstate New York · POV truck ride (4K, recorded)",
-    "published_at": "2025-08-07",
-    "live": false,
-    "verification": "public YouTube watch page; embed availability subject to owner settings"
-  },
+  "candidates": [],
+  "featured_recording": null,
   "channels": [
     {
       "name": "Ride Along Gang",
       "handle": "@Ridealonggang",
       "channel_url": "https://www.youtube.com/@Ridealonggang",
       "channel_id": null,
-      "source_note": "Creator channel referenced in public profiles; ID pending verification"
+      "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
     },
     {
       "name": "51 Logistics",
       "handle": "@51logistics",
       "channel_url": "https://www.youtube.com/@51logistics",
-      "channel_id": "UCD-HjSJVaH8-SKm6eNtylOg",
-      "source_note": "Channel ID corroborated by external channel profiles"
+      "channel_id": null,
+      "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
     },
     {
       "name": "Freight Relocators Live",
       "handle": "@freightrelocatorslive",
       "channel_url": "https://www.youtube.com/@freightrelocatorslive",
-      "channel_id": "UCk6eDzbrH8Z3PU7-7pf7QUg",
-      "source_note": "Channel ID corroborated by creator channel profiles"
+      "channel_id": null,
+      "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
     },
     {
       "name": "Johnny Trucker USA",
       "handle": "@JohnnyTruckerUSA",
       "channel_url": "https://www.youtube.com/@JohnnyTruckerUSA",
       "channel_id": null,
-      "source_note": "Published official channel link in Johnny's video"
+      "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
     }
   ],
-  "attribution": "Third-party creators / YouTube. Press play to load YouTube; not a DrivMatch transmission.",
-  "policy": "No live stream claimed without current API verification. Recorded video remains clearly labeled."
+  "autoselect_policy": "live_first_today_or_yesterday_replay_with_clock_alignment",
+  "idle_policy": "metadata stop indicators + status refresh; true motion verification unavailable",
+  "attribution": "Third-party creators via the official YouTube or Twitch player. Not retransmitted by DrivMatch.",
+  "warnings": [
+    "api_credentials_not_yet_configured"
+  ]
 }
