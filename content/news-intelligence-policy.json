@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-10",
+  "status": "SOURCE_DISCOVERY_CONFIG_NOT_LIVE_COVERAGE_CERTIFICATION",
+  "scope": {
+    "countries": [
+      "US",
+      "CA-US-cross-border",
+      "MX-US-cross-border"
+    ],
+    "us_states": 50,
+    "includes_dc": true,
+    "jurisdiction_layers": [
+      "federal",
+      "state",
+      "county",
+      "city",
+      "neighborhood",
+      "tribal",
+      "border crossing"
+    ],
+    "county_and_city_enumeration": "REQUIRES OFFICIAL DIRECTORY / IDENTITY VERIFICATION; inventory NOT complete"
+  },
+  "architecture": [
+    "first-responder-discovery",
+    "hyperlocal-search",
+    "official-road-weather",
+    "x-facebook-source-identity",
+    "synthetic-media-signals",
+    "primary-claim-verification",
+    "incident-lifecycle",
+    "corrections-ledger"
+  ],
+  "source_layers": {
+    "primaries": [
+      "police",
+      "sheriff",
+      "state patrol",
+      "fire/EMS",
+      "DOT/511",
+      "ICE/CBP/DHS",
+      "courts",
+      "NWS/NOAA",
+      "FEMA/IPAWS",
+      "Federal Register",
+      "EIA",
+      "FAA",
+      "FMCSA",
+      "NHTSA"
+    ],
+    "social": [
+      "X",
+      "Facebook",
+      "Instagram",
+      "YouTube",
+      "Threads",
+      "Bluesky"
+    ],
+    "publishers": [
+      "national",
+      "business/financial",
+      "TV/radio",
+      "state",
+      "county",
+      "city",
+      "neighborhood",
+      "specialized"
+    ],
+    "corporate": [
+      "energy/refining",
+      "carriers/brokers",
+      "warehouse/cold storage",
+      "freight-tech",
+      "autonomous vehicles",
+      "drones",
+      "agri/livestock",
+      "specialized trailer equipment"
+    ]
+  },
+  "topics": [
+    "crash",
+    "wrong-way driving",
+    "rescue",
+    "rollover",
+    "hazmat",
+    "road closed/reopened",
+    "weather warning",
+    "CDL/English proficiency",
+    "ICE enforcement",
+    "detention or arrest",
+    "truck parking",
+    "HOS/ELD/logbook",
+    "cargo theft",
+    "trailer theft",
+    "freight fraud",
+    "autonomous trucks",
+    "drone delivery",
+    "fuel prices",
+    "warehouse expansion",
+    "mergers and acquisitions",
+    "dry van",
+    "reefer/frozen",
+    "container/drayage",
+    "car hauler",
+    "step deck",
+    "flatbed",
+    "double/triple",
+    "live animal/bees/cattle",
+    "grain and agriculture",
+    "tankers",
+    "oversize/heavy haul"
+  ],
+  "publication_policy": {
+    "social_is_confirmation": false,
+    "blue_check_is_verification_of_fact": false,
+    "ai_detection_alone_decides": false,
+    "c2pa_missing_is_evidence_of_fake": false,
+    "aggregator_auto_publication": false,
+    "secondary_citation_without_primary_is_insufficient_for_sensitive_accusation": true,
+    "rights_and_attribution_required": true,
+    "emergency_status_requires_recheck": true,
+    "immutable_original_publication_timestamp": true,
+    "correction_log_required": true,
+    "criminal_arrest_is_not_conviction": true
+  },
+  "verification_states": [
+    "DISCOVERED",
+    "ORIGIN_PENDING",
+    "VERIFIED_SOURCE_IDENTITY",
+    "PRIMARY_FACT_CONFIRMED",
+    "CORROBORATED",
+    "DISPUTED",
+    "REJECTED_FALSE",
+    "OUTDATED",
+    "CORRECTED",
+    "RETRACTED",
+    "PENDING_SPECIALIST_REVIEW"
+  ],
+  "connectors": {
+    "x": "NOT_CONNECTED_DISCOVERY_AND_MANUAL_REVIEW_ONLY",
+    "facebook": "NOT_CONNECTED_DISCOVERY_AND_MANUAL_REVIEW_ONLY",
+    "official_county_sites": "DISCOVERY_AND_VERIFICATION_REQUIRED",
+    "nws": "DOCUMENTED_API; NO_NEW_API_ADAPTER_IN_THIS_CHANGE",
+    "fema_ipaws_live": "MOA_AND_AUTHORIZED_ACCESS_REQUIRED",
+    "private_social": "PROHIBITED"
+  },
+  "primary_doc": "docs/NEWS_INTELLIGENCE_ENGINE_V1.md"
+}
