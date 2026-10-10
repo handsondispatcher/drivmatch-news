@@ -8,7 +8,7 @@ const {spawn}=require('node:child_process');
  try {
   await new Promise((resolve,reject)=>{server.stdout.on('data',resolve);server.stderr.on('data',resolve);server.on('error',reject);setTimeout(resolve,1000)});
   browser=await chromium.launch({headless:true});
-  for(const width of [360,390,768,944,1440]) {
+  for(const width of [360,390,768,944,1280,1440]) {
    const page=await browser.newPage({viewport:{width,height:width<=390?680:900}});const errors=[];
    page.on('pageerror',e=>errors.push(e.message));
    // YouTube content is owned by the creator; do not depend on its network in CI.
@@ -192,9 +192,9 @@ const {spawn}=require('node:child_process');
          Math.min(...rects.slice(3).map(r=>r.top))>=Math.max(...rects.slice(0,3).map(r=>r.bottom))-2;
        return {columns,overflow,collision,separated};
      });
-     assert.equal(layout.columns,width===944?3:6,
+     assert.equal(layout.columns,width<=1280?3:6,
        'City selector must use 3×2 responsive market strip at 944px and 6-wide on desktop');
-     if(width===944)assert.equal(layout.separated,true,
+     if(width<=1280)assert.equal(layout.separated,true,
        'Below 1120px weather, city picker, and risk must sit beneath all three quotes');
      assert.equal(layout.overflow,false,'No weather/quote module should exceed its container');
      assert.equal(layout.collision,false,'Market/forecast modules must never overlap');
