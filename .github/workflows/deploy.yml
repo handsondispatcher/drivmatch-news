@@ -42,9 +42,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: build/roadtv-discovery.json
-          key: roadtv-discovery-v3-${{ env.ROADTV_CACHE_HOUR }}
+          key: roadtv-discovery-v4-${{ env.ROADTV_CACHE_HOUR }}
           restore-keys: |
-            roadtv-discovery-v3-
+            roadtv-discovery-v4-
       # Reuse only date-verified original publisher headlines after transient RSS outages.
       # Never change their published_at date or extend their 48-hour validity.
       - name: Restaurar histórico de manchetes originais
