@@ -1,5 +1,9 @@
 # DrivMatch News — CONTINUIDADE CANÔNICA / LEIA PRIMEIRO
 
+## ATUALIZAÇÃO v34.3 — ROAD TV SÓ COM VÍDEO (09/10/2026)
+
+Usuário enviou screenshot da v34.2 e ordenou explicitamente **apenas ROAD TV + player**, sem a linha “Road TV · YouTube / Twitch”, nenhum botão de próximo, nenhum chip ou lista dos quatro streamers, nenhuma nota pública de regra/teste. Deve-se implementar e publicar normalmente a v34.3 com **um feed ferroviário anunciado como live** para validar o player (Virtual Railfan, Oklahoma City `to8SHIQHyQo` via player YouTube oficial), **sem usar selo AO VIVO próprio não verificado**. Manter clima → player → USD/BRL, diesel e petróleo. A descoberta original YouTube/Twitch fica tecnicamente congelada no script anterior e no backend, mas NÃO ativa na janela desta revisão. Detalhes: [V34_3_ROAD_TV_CLEAN.md](V34_3_ROAD_TV_CLEAN.md). Backup v34.2 antes de alterar `backup/v34-2-2026-10-09` SHA `c5bcc13ea8ed61677a85f7ee8807ea34d48229c9`, junto aos demais. Nunca ressuscitar textos do painel anterior sem pedido do usuário.
+
 ## ROAD TV v34.2 — NOVO COMANDO CANÔNICO (09/10/2026)
 
 O usuário determinou a implantação imediata **Ventusky → Road TV → dólar/diesel/petróleo**, com busca automática de **lives reais** nos EUA filmando para a frente da cabine de semi, box, pickup de carga/hotshot ou cargo van. Não limitar a quatro canais; permitir YouTube e Twitch. Se não houver live, buscar gravações de **hoje ou ontem** com *hora original* comprovada para replay próximo do horário real do dia, sempre marcado REPLAY. Trocar transmissões que terminem, sinalizem parada ou após 12 minutos preventivos quando houver alternativa validada. Não prometer identificação visual da cabine/estrada ou movimento apenas com APIs; dados de criador são declarações e precisam de verificação humana para certificação. **Sem chave de API, sem conteúdo artificial; estado indisponível.**
