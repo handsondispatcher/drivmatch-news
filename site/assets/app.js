@@ -1,4 +1,4 @@
-/* DrivMatch News v34.7 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
+/* DrivMatch News v34.8 — Road TV after Ventusky; mobile market follows TV; earlier baselines preserved. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -118,13 +118,13 @@
     const overlap=[...one].filter(t=>two.has(t)).length;
     return overlap/Math.max(1,one.size+two.size-overlap)>=.84;
   }
-  function storyCard(a,i,featured=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
+  function storyCard(a,i,featured=false,showContext=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
     if(a.kind==='external_link'){
       const title=escapeHTML(cleanHeadline(txt?.title||'')), url=escapeHTML(safeUrl(a.source_url)||'#'), attribution=escapeHTML(a.source||'');
       const translated=a.translated_langs?.includes(lang);const languageNotice=translated?'':(lang==='pt'?' · Título original sem tradução':lang==='es'?' · Titular original sin traducir':' · Original headline (not translated)');
       const note=(lang==='pt'?'Leia o contexto no DrivMatch News':lang==='es'?'Lee el contexto en DrivMatch News':'Read the context on DrivMatch News');
       const translationNote=languageNotice?`<small class="editorial-context-translation">${escapeHTML(languageNotice.trim())}</small>`:'';
-      const body=`<div class="kicker">${cat}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div><p class="editorial-context">${escapeHTML(note)}</p>${translationNote}`;
+      const body=`<div class="kicker">${cat}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div>${showContext?`<p class="editorial-context">${escapeHTML(note)}</p>`:""}${translationNote}`;
       return featured?`<article class="story ${imageOf(a).startsWith('data:image/svg')?'illustrated':''}" tabindex="0" role="button" data-external="true" data-story="${i}">${imageHTML(a)}<div class="info">${body}</div></article>`:`<article class="item" tabindex="0" role="button" data-external="true" data-story="${i}"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></article>`;
     }
     const kicker= a.kind==='opportunity' ? `${cat} · ${lang==='en'?'Opportunity':lang==='es'?'Oportunidad':'Oportunidade'}`:cat;
@@ -156,11 +156,16 @@
     $('count').textContent=`${f.length} ${labels[lang].showing}`;
     $('pagecount').textContent=`${page+1} / ${pages}`;
     $('prev').disabled=page===0; $('next').disabled=page===pages-1;
-    const n=Math.max(1,Math.ceil(f.length/featureSize));featurePage=Math.min(featurePage,n-1);const pane=f.slice(featurePage*featureSize,(featurePage+1)*featureSize);
+    // The arrow/dot carousel changes the hero image/headline only.
+    // The three "Leia Também" stories remain fixed across hero navigation.
+    const n=Math.max(1,Math.ceil(f.length/featureSize));
+    featurePage=Math.min(featurePage,n-1);
+    const hero=f[featurePage*featureSize]||f[0];
+    const related=f.slice(1,4);
     const relatedTitle=lang==='pt'?'Leia também':lang==='es'?'Lea también':'Read also';
-    $('features').innerHTML=pane.length
-      ? `<div class="hero-wrap">${storyCard(pane[0],indexSet.get(pane[0].id),true)}</div>${pane.length>1
-        ? `<div class="related-rail" aria-label="${relatedTitle}"><div class="related-head">${relatedTitle}</div>${pane.slice(1).map(a=>storyCard(a,indexSet.get(a.id),true)).join('')}</div>` : ''}`
+    $('features').innerHTML=hero
+      ? `<div class="hero-wrap">${storyCard(hero,indexSet.get(hero.id),true,false)}</div>${related.length
+        ? `<div class="related-rail" aria-label="${relatedTitle}"><div class="related-head">${relatedTitle}</div>${related.map(a=>storyCard(a,indexSet.get(a.id),true,true)).join('')}</div>` : ''}`
       :`<div class="empty">${labels[lang].noResults}</div>`;
     $('featureCount').textContent=`${featurePage+1} / ${n}`;
     $('featurePrev').disabled=featurePage===0; $('featureNext').disabled=featurePage===n-1;
@@ -192,7 +197,9 @@
   }
   function marketValue(v,key){
     const status=key==='usdbrl'
-      ? (lang==='pt'?'Última cotação verificada':lang==='es'?'Última cotización verificada':'Last verified quote')
+      ?(v.instrument==='ptax_reference'
+         ?(lang==='pt'?'Última PTAX oficial de venda':lang==='es'?'Última PTAX oficial de venta':'Last official BCB PTAX sell reference')
+         :(lang==='pt'?'Último fechamento comercial verificado':lang==='es'?'Último cierre comercial verificado':'Last verified commercial close'))
       : (v.quote_status||({pt:'Último dado disponível',es:'Último dato disponible',en:'Last available observation'}[lang]));
     const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
     const unit=key==='usdbrl'?'R$': 'US$';
@@ -207,7 +214,8 @@
   function renderMarket(){
     const market=data.market||{},inds=market.indicators||{};
     const body=[
-      mrow(lang==='pt'?'Dólar comercial':lang==='es'?'Dólar comercial':'USD / BRL','USD/BRL',inds.usdbrl,'usdbrl'),
+      mrow(inds.usdbrl?.instrument==='ptax_reference'?(lang==='en'?'USD PTAX (BCB)':lang==='es'?'Dólar PTAX (BCB)':'Dólar PTAX (BCB)'):
+        (lang==='pt'?'Dólar comercial':lang==='es'?'Dólar comercial':'USD / BRL'),'USD/BRL',inds.usdbrl,'usdbrl'),
       mrow(lang==='en'?'US Diesel':lang==='es'?'Diésel en EE. UU.':'Diesel nos EUA','EIA · US$/gal',inds.diesel,'diesel'),
       mrow(lang==='en'?'Brent crude':lang==='es'?'Petróleo Brent':'Petróleo Brent','BRENT · US$/bbl',inds.brent,'brent')
     ].filter(Boolean);
@@ -339,7 +347,7 @@
     $('newsroom-cta-driver').textContent=newsroomCopy.driver;
     $('newsroom-cta-carrier').textContent=newsroomCopy.carrier;
     $('footer-publisher').textContent='DrivMatch News — um produto da Hands On Dispatcher LLC';
-    $('footer-legal').textContent='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.';
+    $('footer-legal').innerHTML='© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.8</span>';
     $('story-preview-title').textContent=next==='en'?'Story preview':next==='es'?'Vista previa de Story':'Prévia do Story';
     $('story-preview-download').textContent=next==='en'?'Save PNG image':next==='es'?'Guardar imagen PNG':'Salvar imagem PNG';
     $('story-preview-hint').textContent=next==='en'?'Review the card, then post it to Instagram, TikTok or WhatsApp Status.':next==='es'?'Revisa la imagen y luego publícala en Instagram, TikTok o el estado de WhatsApp.':'Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.';

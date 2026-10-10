@@ -17,7 +17,7 @@ const {spawn}=require('node:child_process');
    await page.route('https://camstreamer.com/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>CamStreamer native embed test stub</title>'}));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.7','public page has v34.7 version');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.8','public page has v34.8 version');
    assert.equal(await page.locator('#site-version').isVisible(),false,'Internal release must not appear in public masthead');
    assert.equal(await page.locator('#edition-date').isVisible(),false,'Internal edition date is not visible');
    assert.equal((await page.locator('.header').innerText()).includes('EDIÇÃO DIGITAL'),false,'No technical edition text on masthead');
@@ -37,6 +37,15 @@ const {spawn}=require('node:child_process');
    assert.ok(layout.searchBeforeFooter&&layout.ctaBeforeSearch&&layout.searchCount===1,'Search must be only above footer');
    assert.equal(layout.inventedTitle,false,'Unapproved editorial heading must never return');
    assert.ok(Math.max(...layout.flagRows)-Math.min(...layout.flagRows)<=3,'Language buttons must remain on one horizontal row');
+   const languageFrame=await page.locator('.header .language-picker').evaluate(el=>{
+     const css=getComputedStyle(el);
+     return {border:css.borderTopWidth,background:css.backgroundColor,shadow:css.boxShadow};
+   });
+   assert.equal(languageFrame.border,'0px','No second surrounding language border');
+   assert.equal(languageFrame.shadow,'none','No second surrounding language shadow');
+   assert.equal(await page.locator('.header .language-shortcuts button').count(),3);
+   const shadow=await page.locator('.header .language-shortcuts button.selected').evaluate(el=>getComputedStyle(el).boxShadow);
+   assert.equal(shadow,'none','Selected language has its own border but no overlaid shadow');
    assert.equal(await page.locator('#search').isVisible(),true);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
@@ -45,13 +54,27 @@ const {spawn}=require('node:child_process');
    // v33 polish: arrows are compact, every dot can navigate directly.
    const dots=page.locator('#featureDots button[data-slide]');
    assert.ok(await dots.count()>=2,'Multiple Panorama pages must expose direct navigation dots');
+   if(width>=944){
+     const ctr=await page.locator('#panorama .carousel-controls').evaluate(el=>el.getBoundingClientRect());
+     const hero=await page.locator('#features > .hero-wrap').evaluate(el=>el.getBoundingClientRect());
+     assert.ok(ctr.left>=hero.left-1 && ctr.right<=hero.right+2,
+       'Arrows must sit within horizontal footprint of hero, never over Leia Também');
+     assert.ok(ctr.bottom<=hero.top+1,'Arrows should sit immediately above hero image');
+   }
    assert.equal(await page.locator('#featurePrev').innerText(),'←');
    assert.equal(await page.locator('#featureNext').innerText(),'→');
    assert.equal(await page.locator('#featureDots button[aria-current="page"]').count(),1);
    assert.ok(await page.locator('#featurePrev').evaluate(e=>e.getBoundingClientRect().height)<=38,'Carousel arrows must be compact');
    const originalHeadline=await page.locator('#features > .hero-wrap h3').textContent();
+   const relatedBefore=await page.locator('#features > .related-rail article h3').allTextContents();
+   const contextBefore=await page.locator('#features > .related-rail p.editorial-context').count();
+   assert.equal(contextBefore,3,'Three green-context related cards only');
+   assert.equal(await page.locator('#features > .hero-wrap p.editorial-context').count(),0,'No context CTA in lead hero');
+   assert.equal(await page.locator('#noticias p.editorial-context').count(),0,'No context CTA in news list');
    await dots.nth(1).click();
    assert.notEqual(await page.locator('#features > .hero-wrap h3').textContent(),originalHeadline,'Dot jumps to selected carousel page');
+   assert.deepEqual(await page.locator('#features > .related-rail article h3').allTextContents(),relatedBefore,
+     'Leia Também cards must remain unchanged as hero carousel rotates');
    assert.ok((await page.locator('#featureCount').textContent()).trim().startsWith('2 /'));
    await page.locator('#featurePrev').click();
    assert.equal(await page.locator('#features > .hero-wrap h3').textContent(),originalHeadline);
@@ -100,7 +123,7 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   // v34.7: show one direct camera video embed, never a tiny map or links-only tile.
+   // v34.8: show one direct camera video embed, never a tiny map or links-only tile.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
    assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
@@ -212,8 +235,12 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('[data-site-lang="en"]').getAttribute('aria-pressed'),'true');
    assert.equal(await page.locator('#clima-desktop .weather-top h2').textContent(),'Weather');
    assert.equal(await page.locator('#footer-publisher').innerText(),'DrivMatch News — um produto da Hands On Dispatcher LLC');
-   assert.equal(await page.locator('#footer-legal').innerText(),'© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.');
+   assert.equal(await page.locator('#footer-legal').innerText(),
+     '© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. · v34.8');
+   assert.equal(await page.locator('#footer-version').innerText(),'· v34.8');
    await page.locator('[data-site-lang="pt"]').click();
+   assert.equal(await page.locator('#footer-version').textContent(),'· v34.8',
+     'Release footer must persist when changing language');
    assert.equal(await page.locator('[data-site-lang="pt"]').getAttribute('aria-pressed'),'true');
    assert.match(await page.locator('#footer-publisher').innerText(),/um produto da Hands On Dispatcher LLC/);
    await openEditorial();

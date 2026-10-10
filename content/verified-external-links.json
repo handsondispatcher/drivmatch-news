@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "purpose": "Owner-requested fresh, source-attributed external headlines not yet visible from primary publisher RSS. This file only links to first-party articles, never republishes their full text. Time-expiring and no invented publication time.",
+  "verified_external_links": [
+    {
+      "id": "tt-ai-summit-fleet-opportunities-20261010",
+      "title": "The AI Summit introduces fleets to AI's potential and pitfalls",
+      "titles": {
+        "pt": "Cúpula de IA apresenta oportunidades e riscos para frotas comerciais",
+        "en": "The AI Summit introduces fleets to AI's potential and pitfalls",
+        "es": "Cumbre de IA presenta oportunidades y riesgos para flotas comerciales"
+      },
+      "source": "Transport Topics",
+      "source_url": "https://www.ttnews.com/articles/ai-summit-potential-pitfalls",
+      "original_lang": "en",
+      "region": "US",
+      "category": "Tecnologia",
+      "published_at": "2026-10-10T11:00:00+00:00",
+      "original_publication_time": "October 10, 2026, 7:00 AM EDT",
+      "event_evidence": "Commercial vehicle operations, Technology & Maintenance Council AI Summit, fleet data quality and operational risk; U.S. Transport Topics source.",
+      "geo_scope_verified": true,
+      "link_only": true,
+      "editorial_body_written": false,
+      "usage_rights": "first_party_link_only",
+      "verification_note": "Publisher's original headline/date/location appeared in directly attributed external source listing. Not a DrivMatch-authored investigation.",
+      "status": "verified_external_link"
+    }
+  ]
+}

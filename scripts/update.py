@@ -63,12 +63,54 @@ def translate_source_headline(title, source_lang, target_lang):
     return translated
 
 
+def verified_external_source_links(offline=False):
+    """Short-lived original-source link supplements when an RSS publisher misses a story.
+
+    Never a DrivMatch-authored article; no undated or fabricated update.
+    """
+    if offline:return []
+    from urllib.parse import urlparse
+    data=read_json(ROOT/'content/verified-external-links.json')
+    if data.get('schema_version')!=1:raise ValueError('Invalid curated source link schema')
+    result=[]
+    seen=set()
+    for item in data.get('verified_external_links',[]):
+        if item.get('status')!='verified_external_link' or item.get('link_only') is not True or item.get('editorial_body_written') is not False:
+            continue
+        url=item.get('source_url','')
+        parsed=urlparse(url)
+        if parsed.scheme!='https' or parsed.hostname not in {'www.ttnews.com'}:
+            continue
+        if url in seen:continue
+        seen.add(url)
+        try:dt=datetime.fromisoformat(item['published_at'].replace('Z','+00:00'))
+        except (ValueError,TypeError,KeyError):continue
+        age=NOW()-dt
+        if dt.tzinfo is None or age<timedelta(minutes=-5) or age>timedelta(hours=48):
+            continue
+        titles=item.get('titles') or {}
+        if not all(isinstance(titles.get(lang),str) and titles[lang].strip() for lang in ('pt','en','es')):
+            continue
+        if item.get('region')!='US' or not item.get('geo_scope_verified') or not item.get('verification_note'):
+            continue
+        result.append({'id':'verified-link-'+hashlib.sha256(url.encode()).hexdigest()[:20],
+                       'title':item['title'],'titles':titles,'source':item['source'],
+                       'source_url':url,'published_at':dt.isoformat(),'category':item['category'],
+                       'region':'US','origin_type':'publisher-curated','original_lang':'en',
+                       'geo_scope_verified':True,'curated_verified_headline':True})
+    return result
+
+
 def localize_source_headlines(headlines, errors, offline):
     """Only the source headline is translated; never fabricate a translated article."""
     if offline:return headlines
     from concurrent.futures import ThreadPoolExecutor, as_completed
     def process(item):
         item=dict(item)
+        # Curated external first-party link has independently checked human-readable
+        # headline translations; don't overwrite them or fabricate a full article.
+        if item.get('curated_verified_headline') is True and all((item.get('titles') or {}).get(l) for l in ('pt','en','es')):
+            return item
         source_lang=item.get('original_lang') or ('es' if item.get('region')=='MX' else 'en')
         if source_lang not in ('pt','en','es'):source_lang='en'
         titles={source_lang:item['title']}
@@ -192,8 +234,45 @@ def authorized_spot():
 
 
 def verified_previous_close():
-    """Dated, attributed close for fallback; never presented as a live quote."""
-    return normalize_spot_quote(read_json(ROOT/'content/usdbrl_last_close.json'))
+    """Last *commercial spot* close, accepted only for the immediate nontrading window."""
+    q=normalize_spot_quote(read_json(ROOT/'content/usdbrl_last_close.json'))
+    close_date=datetime.strptime(q['close_date'],'%Y-%m-%d').date()
+    age=(NOW().date()-close_date).days
+    if age < 0 or age > 4:
+        raise ValueError('Commercial close fallback expired; do not display frozen rates')
+    return q
+
+
+def official_bcb_usdbrl():
+    """BCB SGS 1: official PTAX USD/BRL sell reference, distinct from commercial spot.
+
+    Public, dated daily reference; never label as real-time or commercial execution.
+    Official series is updated on Brazilian banking days (not weekends).
+    """
+    url='https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/5?formato=json'
+    rows=json.loads(fetch(url,timeout=12))
+    if not isinstance(rows,list):raise ValueError('Invalid BCB series shape')
+    observations=[]
+    for row in rows:
+        if not isinstance(row,dict):continue
+        try:
+            day=datetime.strptime(str(row['data']),'%d/%m/%Y').date()
+            value=float(str(row['valor']).replace(',','.'))
+            if not 0 < value < 50 or day>NOW().date():continue
+            observations.append((day,value))
+        except (KeyError,TypeError,ValueError):continue
+    observations=sorted(set(observations))
+    if not observations:raise ValueError('No BCB USD/BRL observations')
+    day,value=observations[-1]
+    if (NOW().date()-day).days>5:
+        raise ValueError('BCB reference date too old for public market strip')
+    previous=next((v for d,v in reversed(observations[:-1]) if d<day),None)
+    change=(value/previous-1)*100 if previous else None
+    quote=dated_quote(value,'Banco Central do Brasil — SGS 1 (PTAX venda)',day.isoformat(),
+                      change,'https://www.bcb.gov.br/estabilidadefinanceira/historicocotacoes')
+    quote.update(symbol='USD/BRL',instrument='ptax_reference',price_type='ptax_venda',
+                 session_status='closed',quote_status='official_bcb_ptax_last')
+    return quote
 
 
 def fred_latest(series, source):
@@ -258,8 +337,16 @@ def make_market(offline=False):
         except Exception as exc:
             market['errors'].append(f'{key}:{type(exc).__name__}')
             if key=='usdbrl':
-                try:market['indicators'][key]=verified_previous_close()
+                # Commercial close and BCB PTAX are not interchangeable instruments.
+                # Prefer the newest observation, commercial if dates coincide.
+                fallback=[]
+                try:fallback.append(verified_previous_close())
                 except Exception as exc2:market['errors'].append('usdbrl_previous_close:'+type(exc2).__name__)
+                try:fallback.append(official_bcb_usdbrl())
+                except Exception as exc3:market['errors'].append('usdbrl_bcb_ptax:'+type(exc3).__name__)
+                if fallback:
+                    fallback.sort(key=lambda q:(q['observed_at'][:10],q.get('instrument')=='spot'),reverse=True)
+                    market['indicators'][key]=fallback[0]
     # V34.1: unproven securities/Class 8 feeds no longer requested or rendered.
     # Retain authorized source adapters for future separately approved pilots.
     return market
@@ -307,6 +394,9 @@ def build(offline=False):
                 if len(external_headlines)>=90:break
         except (OSError,ValueError,TypeError,KeyError) as exc:
             errors.append('external_headlines:'+type(exc).__name__)
+    # Verified fresh first-party links supplement RSS gaps, never get a new build timestamp.
+    try:external_headlines=verified_external_source_links(offline)+external_headlines
+    except (OSError,ValueError,TypeError,KeyError) as exc:errors.append('verified_external_links:'+type(exc).__name__)
     external_headlines=deduplicate_external(localize_source_headlines(external_headlines,errors,offline),articles)
     unique={}
     for a in articles:
@@ -320,8 +410,8 @@ def build(offline=False):
     weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
     release=read_json(ROOT/'content/release.json')
-    if release.get('version')!='v34.7' or release.get('public_launch_approved') is not False:
-        raise ValueError('Invalid release contract: v34.7 must remain prelaunch')
+    if release.get('version')!='v34.8' or release.get('public_launch_approved') is not False:
+        raise ValueError('Invalid release contract: v34.8 must remain prelaunch')
     data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'articles':list(unique.values()),'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
