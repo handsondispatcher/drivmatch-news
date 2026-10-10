@@ -7,7 +7,7 @@ from urllib.parse import parse_qs, urlparse
 
 BASE=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(BASE/'scripts'))
-from road_tv import make_road_tv,clock_offset,evidence,video_length
+from road_tv import make_road_tv,clock_offset,evidence,video_length,source_profile
 
 NOW=dt.datetime(2026,10,9,20,30,tzinfo=dt.timezone.utc)
 ID="A1b2C3d4E5f"
@@ -78,6 +78,30 @@ class RoadTVTests(unittest.TestCase):
    with self.subTest(title=title):
     x={**LIVE,"snippet":{**SNIPPET,"title":title,"description":" "}}
     self.assertEqual(self.result(x)["candidates"],[])
+
+ def test_us_highway_live_camera_requires_platform_live_and_embed(self):
+  camera={**LIVE,"snippet":{"title":"Florida I-4 interstate live traffic camera Orlando",
+          "description":"Official USA interstate webcam with real road traffic",
+          "channelId":CHANNEL,"channelTitle":"Road Traffic","liveBroadcastContent":"live"}}
+  doc=self.result(camera)
+  self.assertEqual(doc["live_status"],"verified_live")
+  self.assertEqual(doc["current_live"]["view_type"],"us_highway_traffic")
+  self.assertEqual(doc["current_live"]["source_rank"],1)
+  self.assertNotIn("truck presence verified",doc["current_live"]["camera_evidence"].lower())
+  self.assertEqual(self.result({**camera,"status":{"privacyStatus":"public","embeddable":False}})["candidates"],[])
+
+ def test_us_bound_canada_border_requires_direction(self):
+  title="Peace Bridge USA Entrance Buffalo US bound live border traffic webcam trucks"
+  p=source_profile(title,"Fort Erie Ontario to Buffalo USA border crossing")
+  self.assertEqual(p["view_type"],"usbound_border_traffic")
+  self.assertEqual(p["source_rank"],2)
+  self.assertIsNone(source_profile("Peace Bridge Canada Entrance traffic webcam trucks","Ontario Canada-bound traffic"))
+  self.assertIsNone(source_profile("old Peace Bridge USA Entrance replay traffic webcam",""))
+
+ def test_trucker_live_rank_precedes_road_and_border(self):
+  self.assertEqual(source_profile(TITLE)["source_rank"],0)
+  self.assertEqual(source_profile("Florida I-4 interstate live traffic camera")["source_rank"],1)
+  self.assertEqual(source_profile("Peace Bridge USA Entrance live traffic webcam")["source_rank"],2)
 
  def test_no_key_fail_closed_instead_of_stale_static_demo(self):
   doc=make_road_tv(now=NOW,api_key="",twitch_id="",twitch_secret="")
