@@ -122,9 +122,15 @@
     if(a.kind==='external_link'){
       const title=escapeHTML(cleanHeadline(txt?.title||'')), url=escapeHTML(safeUrl(a.source_url)||'#'), attribution=escapeHTML(a.source||'');
       const translated=a.translated_langs?.includes(lang);const languageNotice=translated?'':(lang==='pt'?' · Título original em '+(a.original_lang==='es'?'espanhol':'inglês'):lang==='es'?' · Titular original en '+(a.original_lang==='es'?'español':'inglés'):' · Original-language headline');
-      const note=(lang==='pt'?'Leia o contexto no DrivMatch News':lang==='es'?'Lee el contexto en DrivMatch News':'Read the context on DrivMatch News');
+      const official=a.editorial_type==='operational_bulletin';
+      const officialMark=official?(lang==='pt'?' · BOLETIM OFICIAL':lang==='es'?' · BOLETÍN OFICIAL':' · OFFICIAL BULLETIN'):'';
+      const note=official
+        ?(lang==='pt'?'Alerta meteorológico do NWS; verifique restrições de estrada no DOT/511.':
+          lang==='es'?'Alerta meteorológica del NWS; verifique restricciones viales en DOT/511.':
+          'NWS weather bulletin; verify actual road restrictions with DOT/511.')
+        :(lang==='pt'?'Leia o contexto no DrivMatch News':lang==='es'?'Lee el contexto en DrivMatch News':'Read the context on DrivMatch News');
       const translationNote=languageNotice?`<small class="editorial-context-translation">${escapeHTML(languageNotice.trim())}</small>`:'';
-      const body=`<div class="kicker">${cat}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div>${showContext?`<p class="editorial-context">${escapeHTML(note)}</p>`:""}${translationNote}`;
+      const body=`<div class="kicker">${cat}${officialMark}</div><h3>${title}</h3><div class="byline">${daysLabel(a)} · ${attribution}</div>${showContext?`<p class="editorial-context">${escapeHTML(note)}</p>`:""}${translationNote}`;
       return featured?`<article class="story ${imageOf(a).startsWith('data:image/svg')?'illustrated':''}" tabindex="0" role="button" data-external="true" data-story="${i}">${imageHTML(a)}<div class="info">${body}</div></article>`:`<article class="item" tabindex="0" role="button" data-external="true" data-story="${i}"><div>${body}</div><div class="thumb">${imageHTML(a)}</div></article>`;
     }
     const kicker= a.kind==='opportunity' ? `${cat} · ${lang==='en'?'Opportunity':lang==='es'?'Oportunidad':'Oportunidade'}`:cat;
@@ -170,7 +176,13 @@
     $('featureCount').textContent=`${featurePage+1} / ${n}`;
     $('featurePrev').disabled=featurePage===0; $('featureNext').disabled=featurePage===n-1;
     const slideLabel=lang==='pt'?'Ir para página':lang==='es'?'Ir a la página':'Go to page';
-    $('featureDots').innerHTML=Array.from({length:n},(_,i)=>`<button type="button" class="carousel-dot ${i===featurePage?'active':''}" data-slide="${i}" aria-label="${slideLabel} ${i+1} / ${n}" aria-pressed="${i===featurePage}" ${i===featurePage?'aria-current="page"':''}></button>`).join('');
+    // A bounded window keeps the control clickable with 11+ story pages.
+    const visibleDots=Math.min(n,7);
+    const firstDot=Math.max(0,Math.min(featurePage-Math.floor(visibleDots/2),n-visibleDots));
+    $('featureDots').innerHTML=Array.from({length:visibleDots},(_,i)=>{
+      const target=firstDot+i;
+      return `<button type="button" class="carousel-dot ${target===featurePage?'active':''}" data-slide="${target}" aria-label="${slideLabel} ${target+1} / ${n}" aria-pressed="${target===featurePage}" ${target===featurePage?'aria-current="page"':''}></button>`;
+    }).join('');
     const shortlist=f.slice(0,5);
     $('highlights-title').textContent=lang==='pt'?'5 manchetes em foco':lang==='es'?'5 titulares destacados':'5 headlines in focus';
     $('highlightList').innerHTML=shortlist.map(a=>{
