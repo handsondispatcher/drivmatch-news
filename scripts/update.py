@@ -63,12 +63,54 @@ def translate_source_headline(title, source_lang, target_lang):
     return translated
 
 
+def verified_external_source_links(offline=False):
+    """Short-lived original-source link supplements when an RSS publisher misses a story.
+
+    Never a DrivMatch-authored article; no undated or fabricated update.
+    """
+    if offline:return []
+    from urllib.parse import urlparse
+    data=read_json(ROOT/'content/verified-external-links.json')
+    if data.get('schema_version')!=1:raise ValueError('Invalid curated source link schema')
+    result=[]
+    seen=set()
+    for item in data.get('verified_external_links',[]):
+        if item.get('status')!='verified_external_link' or item.get('link_only') is not True or item.get('editorial_body_written') is not False:
+            continue
+        url=item.get('source_url','')
+        parsed=urlparse(url)
+        if parsed.scheme!='https' or parsed.hostname not in {'www.ttnews.com'}:
+            continue
+        if url in seen:continue
+        seen.add(url)
+        try:dt=datetime.fromisoformat(item['published_at'].replace('Z','+00:00'))
+        except (ValueError,TypeError,KeyError):continue
+        age=NOW()-dt
+        if dt.tzinfo is None or age<timedelta(minutes=-5) or age>timedelta(hours=48):
+            continue
+        titles=item.get('titles') or {}
+        if not all(isinstance(titles.get(lang),str) and titles[lang].strip() for lang in ('pt','en','es')):
+            continue
+        if item.get('region')!='US' or not item.get('geo_scope_verified') or not item.get('verification_note'):
+            continue
+        result.append({'id':'verified-link-'+hashlib.sha256(url.encode()).hexdigest()[:20],
+                       'title':item['title'],'titles':titles,'source':item['source'],
+                       'source_url':url,'published_at':dt.isoformat(),'category':item['category'],
+                       'region':'US','origin_type':'publisher-curated','original_lang':'en',
+                       'geo_scope_verified':True,'curated_verified_headline':True})
+    return result
+
+
 def localize_source_headlines(headlines, errors, offline):
     """Only the source headline is translated; never fabricate a translated article."""
     if offline:return headlines
     from concurrent.futures import ThreadPoolExecutor, as_completed
     def process(item):
         item=dict(item)
+        # Curated external first-party link has independently checked human-readable
+        # headline translations; don't overwrite them or fabricate a full article.
+        if item.get('curated_verified_headline') is True and all((item.get('titles') or {}).get(l) for l in ('pt','en','es')):
+            return item
         source_lang=item.get('original_lang') or ('es' if item.get('region')=='MX' else 'en')
         if source_lang not in ('pt','en','es'):source_lang='en'
         titles={source_lang:item['title']}
@@ -352,6 +394,9 @@ def build(offline=False):
                 if len(external_headlines)>=90:break
         except (OSError,ValueError,TypeError,KeyError) as exc:
             errors.append('external_headlines:'+type(exc).__name__)
+    # Verified fresh first-party links supplement RSS gaps, never get a new build timestamp.
+    try:external_headlines=verified_external_source_links(offline)+external_headlines
+    except (OSError,ValueError,TypeError,KeyError) as exc:errors.append('verified_external_links:'+type(exc).__name__)
     external_headlines=deduplicate_external(localize_source_headlines(external_headlines,errors,offline),articles)
     unique={}
     for a in articles:
