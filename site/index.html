@@ -676,6 +676,13 @@ body{background:#f7f9fc;color:#14283c}
   .roadtv-channels{gap:5px}
   .roadtv-channels a{font-size:10px}
 }
+
+.roadtv-play[hidden]{display:none!important}
+.roadtv-toolbar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:space-between;margin:9px 0 4px}
+.roadtv-toolbar button{border:1px solid #87afc9;background:#183c57;color:#e8f5fd;border-radius:5px;padding:8px 9px;font:700 11px/1.1 Arial,sans-serif;cursor:pointer}
+.roadtv-toolbar button:disabled{opacity:.45;cursor:not-allowed}
+.roadtv-toolbar [data-roadtv-status]{color:#b5cddd;font:10px/1.4 Arial,sans-serif;max-width:185px}
+.roadtv-state.is-pending{color:#cddfec;background:#173950}
 </style>
 </head>
 <body>
@@ -696,11 +703,11 @@ body{background:#f7f9fc;color:#14283c}
 <main>
 <div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div>
 <div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section><section class="roadtv-card" id="roadtv-mobile" data-roadtv aria-label="Road TV — vídeos de viagem dos caminhoneiros no YouTube">
- <div class="roadtv-top"><div><h2 data-roadtv-heading>ROAD TV</h2><span data-roadtv-subheading>NA ESTRADA · TRANSMISSÕES E VIAGENS</span></div><span class="roadtv-state" data-roadtv-badge>GRAVADO</span></div>
- <div class="roadtv-screen" data-roadtv-screen><div class="roadtv-stage" data-roadtv-stage><span aria-hidden="true" class="roadtv-stage-icon">▶</span><strong data-roadtv-stage-title>Viagens de caminhoneiros nos EUA</strong><button class="roadtv-play" type="button" data-roadtv-play>▶ Assistir no YouTube</button></div></div>
- <div class="roadtv-credit"><span data-roadtv-credit>Conteúdo de criadores independentes · YouTube</span><a data-roadtv-original href="https://www.youtube.com/@JohnnyTruckerUSA" target="_blank" rel="noopener noreferrer">Ver canal ↗</a></div>
- <div class="roadtv-channels" data-roadtv-channels aria-label="Canais de caminhoneiros participantes"></div>
- <p class="roadtv-disclosure" data-roadtv-disclosure>Player oficial do YouTube. Vídeo gravado, não transmissão ao vivo. O vídeo só é carregado após seu clique.</p>
+ <div class="roadtv-top"><div><h2 data-roadtv-heading>ROAD TV</h2><span data-roadtv-subheading>NA ESTRADA · TRANSMISSÕES E VIAGENS</span></div><span class="roadtv-state" data-roadtv-badge>VERIFICANDO</span></div>
+ <div class="roadtv-screen" data-roadtv-screen><div class="roadtv-stage" data-roadtv-stage><span aria-hidden="true" class="roadtv-stage-icon">▶</span><strong data-roadtv-stage-title>Buscando câmera frontal em estrada nos EUA</strong><button class="roadtv-play" type="button" data-roadtv-play hidden>▶ Assistir</button></div></div>
+ <div class="roadtv-credit"><span data-roadtv-credit>Conteúdo de criadores independentes · YouTube</span><a data-roadtv-original href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">Ver canal ↗</a></div>
+ <div class="roadtv-toolbar"><button type="button" data-roadtv-next disabled>Próxima transmissão ↻</button><span data-roadtv-status role="status">Aguardando verificação do catálogo.</span></div><div class="roadtv-channels" data-roadtv-channels aria-label="Explorar canais no YouTube e Twitch"></div>
+ <p class="roadtv-disclosure" data-roadtv-disclosure>Reprodução pelo player oficial do YouTube ou Twitch, apenas após seu clique. “Ao vivo” exige confirmação atual.</p>
 </section><section class="mobile-market" id="mobile-market" aria-labelledby="market-title-mobile"><h2 id="market-title-mobile">Mercado em Foco</h2><div id="market-mobile"></div><p class="micro" id="market-note-mobile"></p></section></div>
 <section id="panorama">
   <div class="newsroom-topline" aria-label="Informação editorial">
@@ -721,11 +728,11 @@ body{background:#f7f9fc;color:#14283c}
 
 </main>
 <aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div><section class="roadtv-card" id="roadtv-desktop" data-roadtv aria-label="Road TV — vídeos de viagem dos caminhoneiros no YouTube">
- <div class="roadtv-top"><div><h2 data-roadtv-heading>ROAD TV</h2><span data-roadtv-subheading>NA ESTRADA · TRANSMISSÕES E VIAGENS</span></div><span class="roadtv-state" data-roadtv-badge>GRAVADO</span></div>
- <div class="roadtv-screen" data-roadtv-screen><div class="roadtv-stage" data-roadtv-stage><span aria-hidden="true" class="roadtv-stage-icon">▶</span><strong data-roadtv-stage-title>Viagens de caminhoneiros nos EUA</strong><button class="roadtv-play" type="button" data-roadtv-play>▶ Assistir no YouTube</button></div></div>
- <div class="roadtv-credit"><span data-roadtv-credit>Conteúdo de criadores independentes · YouTube</span><a data-roadtv-original href="https://www.youtube.com/@JohnnyTruckerUSA" target="_blank" rel="noopener noreferrer">Ver canal ↗</a></div>
- <div class="roadtv-channels" data-roadtv-channels aria-label="Canais de caminhoneiros participantes"></div>
- <p class="roadtv-disclosure" data-roadtv-disclosure>Player oficial do YouTube. Vídeo gravado, não transmissão ao vivo. O vídeo só é carregado após seu clique.</p>
+ <div class="roadtv-top"><div><h2 data-roadtv-heading>ROAD TV</h2><span data-roadtv-subheading>NA ESTRADA · TRANSMISSÕES E VIAGENS</span></div><span class="roadtv-state" data-roadtv-badge>VERIFICANDO</span></div>
+ <div class="roadtv-screen" data-roadtv-screen><div class="roadtv-stage" data-roadtv-stage><span aria-hidden="true" class="roadtv-stage-icon">▶</span><strong data-roadtv-stage-title>Buscando câmera frontal em estrada nos EUA</strong><button class="roadtv-play" type="button" data-roadtv-play hidden>▶ Assistir</button></div></div>
+ <div class="roadtv-credit"><span data-roadtv-credit>Conteúdo de criadores independentes · YouTube</span><a data-roadtv-original href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">Ver canal ↗</a></div>
+ <div class="roadtv-toolbar"><button type="button" data-roadtv-next disabled>Próxima transmissão ↻</button><span data-roadtv-status role="status">Aguardando verificação do catálogo.</span></div><div class="roadtv-channels" data-roadtv-channels aria-label="Explorar canais no YouTube e Twitch"></div>
+ <p class="roadtv-disclosure" data-roadtv-disclosure>Reprodução pelo player oficial do YouTube ou Twitch, apenas após seu clique. “Ao vivo” exige confirmação atual.</p>
 </section><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
