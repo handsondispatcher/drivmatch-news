@@ -132,7 +132,7 @@ def safe_cached_discovery(now):
     try:
         data = json.loads(CACHE_PATH.read_text(encoding='utf-8'))
         ts = when(data.get('checked_at'))
-        if ts and 0 <= (now-ts).total_seconds() < 3700:
+        if data.get('discovery_version')==3 and ts and 0 <= (now-ts).total_seconds() < 3700:
             return data
     except (OSError, ValueError, TypeError):
         pass
@@ -380,7 +380,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     api=get_json or request_json
     cached=cache if cache is not None else safe_cached_discovery(now)
     fresh_cache=cached and when(cached.get('checked_at')) and (now-when(cached['checked_at'])).total_seconds()<3700
-    discovery={'checked_at':now.isoformat()}
+    discovery={'checked_at':now.isoformat(),'discovery_version':3}
     diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
                  'targeted_live_hits':0,'videos_returned':0,
                  'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
