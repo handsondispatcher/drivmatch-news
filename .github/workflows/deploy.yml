@@ -11,6 +11,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  issues: write
 concurrency:
   group: drivmatch-news-pages-recovery-v2
   cancel-in-progress: false
@@ -83,7 +84,9 @@ jobs:
               report=json.loads(report_path.read_text(encoding='utf-8'))
               for key in ('status','latest_original_published_at','latest_original_age_minutes',
                           'approved_external_headlines','published_last_60_minutes',
-                          'published_last_180_minutes','source_metrics'):
+                          'published_last_180_minutes','publisher_candidates_last_180_minutes',
+                          'eligible_publisher_candidates_last_180_minutes',
+                          'source_candidate_rejections','source_metrics'):
                   lines.append(f'- {key}: {report.get(key)}')
               if report.get('status')!='fresh':
                   print('::warning title=Newsroom stale::No verified headline published within three hours; deployment is not new editorial content.')
@@ -98,11 +101,18 @@ jobs:
                   print('::warning title=Driver POV discovery blocked::No verified video candidate. Check YouTube/Twitch API credentials and provider permissions.')
           summary.open('a',encoding='utf-8').write('\n'.join(lines)+'\n')
           PY
+      - name: Operações — incidentes persistentes no GitHub sem duplicação
+        if: ${{ always() && github.ref == 'refs/heads/main' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/ops_watch.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: newsroom-freshness-audit
-          path: build/newsroom-health.json
+          path: |
+            build/newsroom-health.json
+            build/source-health.json
       - name: Preservar histórico verificado por até 48 horas
         uses: actions/cache/save@v4
         with:

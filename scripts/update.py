@@ -372,6 +372,12 @@ def build(offline=False):
     from editorial_text import deduplicate_external
 
     external_headlines=[]
+    # Private diagnostics separate actual source freshness from relevance decisions.
+    # No successful build is ever presented as a new article.
+    rejection_counts={'aggregator_discovery':0,'off_topic_or_wrong_corridor':0,
+                      'duplicate_or_invalid':0,'eligible_source_links':0}
+    recent_candidates_3h=0
+    recent_eligible_3h=0
     if not offline:
         from collect_sources import collect
         collect()
@@ -380,16 +386,29 @@ def build(offline=False):
             rows=read_json(candidates_path)
             seen={a.get('source_url') for a in articles}
             for item in sorted(rows,key=lambda a:a.get('published_at',''),reverse=True):
-                if item.get('source_url') in seen or not item.get('title') or not item.get('source_url','').startswith('https://'):continue
+                if item.get('source_url') in seen or not item.get('title') or not item.get('source_url','').startswith('https://'):
+                    rejection_counts['duplicate_or_invalid']+=1
+                    continue
                 # Discovery feeds are broad. Exclude entertainment/streaming false positives
                 # rather than labeling them as operational weather alerts.
-                if item.get('origin_type')=='aggregator-discovery' or 'news.google.com' in item.get('source_url',''):continue
-                if not editorial_eligible(item):continue
+                if item.get('origin_type')=='aggregator-discovery' or 'news.google.com' in item.get('source_url',''):
+                    rejection_counts['aggregator_discovery']+=1
+                    continue
+                try:
+                    recent=0<=(NOW()-datetime.fromisoformat(item['published_at'].replace('Z','+00:00'))).total_seconds()<=10800
+                except (KeyError,ValueError,TypeError,AttributeError):
+                    recent=False
+                if recent:recent_candidates_3h+=1
+                if not editorial_eligible(item):
+                    rejection_counts['off_topic_or_wrong_corridor']+=1
+                    continue
+                if recent:recent_eligible_3h+=1
                 headline=item['title'].casefold()
                 if item.get('category')=='Clima' and any(term in headline for term in
                     ('season 2','season 3','how to watch','streaming','episode','trailer','rocky mountain wreckers')):
                     continue
                 external_headlines.append({**{k:item[k] for k in ('title','source','source_url','published_at','category','region','origin_type')},'id':'source-'+hashlib.sha256(item['source_url'].encode()).hexdigest()[:20],'original_lang':item.get('original_lang','en'),'geo_scope_verified':True})
+                rejection_counts['eligible_source_links']+=1
                 seen.add(item['source_url'])
                 if len(external_headlines)>=90:break
         except (OSError,ValueError,TypeError,KeyError) as exc:
@@ -498,6 +517,9 @@ def build(offline=False):
             1 for x in external_headlines if x.get('published_at') and
             0 <= (now-datetime.fromisoformat(x['published_at'].replace('Z','+00:00'))).total_seconds() <= 10800),
         'source_metrics':source_metrics,
+        'source_candidate_rejections':rejection_counts,
+        'publisher_candidates_last_180_minutes':recent_candidates_3h,
+        'eligible_publisher_candidates_last_180_minutes':recent_eligible_3h,
         'status':'fresh' if age_minutes is not None and 0<=age_minutes<=180 else 'stale_or_no_verified_headlines',
         'policy':'Preserve source dates and editorial gates. Never invent a story or label a build as a new publication.'
     }

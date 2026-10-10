@@ -74,6 +74,34 @@
       "attribution": "Fleet industry source; road-freight/US eligibility gate remains mandatory"
     },
     {
+      "id": "dat-freight-blog",
+      "name": "DAT Freight & Analytics",
+      "url": "https://dat.com/blog",
+      "feed_url": null,
+      "access": "editorial-review",
+      "category": "Fretes",
+      "region": "US",
+      "original_lang": "en",
+      "publication": "review-required",
+      "enabled": true,
+      "source_type": "publisher-feed",
+      "attribution": "Publisher RSS endpoint returned non-RSS data in GitHub Actions on 2026-10-10; manual review only until a working official feed is confirmed."
+    },
+    {
+      "id": "cdllife-primary",
+      "name": "CDLLife",
+      "url": "https://cdllife.com/trucking",
+      "feed_url": "https://cdllife.com/feed",
+      "access": "rss",
+      "category": "Caminhoneiros",
+      "region": "US",
+      "original_lang": "en",
+      "publication": "review-required",
+      "enabled": true,
+      "source_type": "publisher-feed",
+      "attribution": "Original publisher URL and timestamp; editorial US road-freight relevance gate; external link only, no automatic article approval"
+    },
+    {
       "id": "overdrive",
       "name": "Overdrive",
       "url": "https://www.overdriveonline.com",

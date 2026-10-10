@@ -22,6 +22,8 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(any('Ride Along Gang' in q for q in QUERIES))
   player=(BASE/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
   self.assertIn('CAMERA_ROTATION_MS=5*60*1000',player)
+  self.assertIn("priority(v)===priority(active)",player)
+  self.assertIn("active.view_type==='cargo_cab'?12*60000:CAMERA_ROTATION_MS",player)
 
  def test_automated_newsroom_and_video_health_contract(self):
   workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
@@ -297,6 +299,14 @@ class PublicationTests(unittest.TestCase):
    self.assertEqual(entry['feed_url'],feed)
    self.assertEqual(entry['access'],'rss')
    self.assertEqual(entry['publication'],'review-required')
+  cdllife=next(x for x in sources if x['id']=='cdllife-primary')
+  self.assertEqual(cdllife['feed_url'],'https://cdllife.com/feed')
+  self.assertEqual(cdllife['access'],'rss')
+  self.assertEqual(cdllife['publication'],'review-required')
+  self.assertEqual(cdllife['region'],'US')
+  dat=next(x for x in sources if x['id']=='dat-freight-blog')
+  self.assertIsNone(dat['feed_url'],'Invalid publisher feed cannot be polled repeatedly')
+  self.assertEqual(dat['access'],'editorial-review')
   source=next(x for x in sources if x['id']=='supply-chain-dive')
   now=datetime(2026,10,10,11,0,tzinfo=timezone.utc)
   xml=b'<rss><channel><item><title>Texas truck carriers expand freight hauling</title><link>https://www.supplychaindive.com/news/test-truck-freight/</link><pubDate>Sat, 10 Oct 2026 10:30:00 GMT</pubDate></item></channel></rss>'
@@ -309,6 +319,12 @@ class PublicationTests(unittest.TestCase):
   self.assertFalse(eligible(parse_feed(foreign,source,now=now)[0]))
   stale=b'<rss><channel><item><title>US trucking</title><link>https://www.supplychaindive.com/news/test-old/</link><pubDate>Mon, 05 Oct 2026 10:30:00 GMT</pubDate></item></channel></rss>'
   self.assertEqual(parse_feed(stale,source,now=now),[])
+  cdllife=next(x for x in sources if x['id']=='cdllife-primary')
+  xml=b'<rss><channel><item><title>Truck driver safety inspections in Texas</title><link>https://cdllife.com/2026/truck-driver-safety-texas/</link><pubDate>Sat, 10 Oct 2026 10:30:00 GMT</pubDate></item></channel></rss>'
+  parsed=parse_feed(xml,cdllife,now=now)
+  self.assertEqual(len(parsed),1)
+  self.assertTrue(eligible(parsed[0]))
+  self.assertEqual(parsed[0]['status'],'pending_review')
  def test_visual_and_weather(self):
   page=(BASE/'site/index.html').read_text()
   for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — um produto da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
