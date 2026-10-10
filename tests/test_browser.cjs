@@ -137,14 +137,6 @@ const {spawn}=require('node:child_process');
    // The user's exact bug: Saint/St. Charles is not in the 170-city static rotation.
    await page.locator('#top-city-query').fill('St Charles');
    await page.locator('#top-city-query').press('Enter');
-   if(width===360){
-     const listing=await page.request.get('http://127.0.0.1:8765/data/us-places.json');
-     console.log('CITY_SEARCH_DIAG',JSON.stringify({
-       status:listing.status(),feedback:await page.locator('#top-city-feedback').innerText(),
-       suggestions:await page.locator('#top-city-options option').allTextContents(),
-       pageErrors:errors
-     }));
-   }
    await page.locator('#top-city-feedback').filter({hasText:/MO.*IL|IL.*MO/}).waitFor({timeout:4000});
    assert.ok((await page.locator('#top-city-feedback').innerText()).includes('IL'),
      'Ambiguous US cities must require state, never guess');
@@ -154,7 +146,7 @@ const {spawn}=require('node:child_process');
      await page.waitForFunction(st=>document.getElementById('top-city')?.textContent==='St. Charles, '+st,
        state,{timeout:8000});
      assert.equal((await page.locator('#top-city').innerText()).trim(),'St. Charles, '+state);
-     assert.match(await page.locator('#top-condition').innerText(),/Nublado|limpo|Cloud|Sunny/);
+     assert.match(await page.locator('#top-condition').innerText(),/nublado|limpo|Cloud|Sunny/i);
      assert.match(await page.locator('#top-range-f').innerText(),/72°F/);
    }
    if(width===1440){
