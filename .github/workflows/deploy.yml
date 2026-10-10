@@ -294,3 +294,8 @@ jobs:
           else
             echo "::warning::CUSTOM DOMAIN MANIFEST UNAVAILABLE: /news/data/release.json not served at custom domain."
           fi
+
+      - name: Checkout para prova de conteúdo publicado
+        uses: actions/checkout@v4
+      - name: Prova de produção — manchetes e Road TV no domínio público
+        run: python scripts/verify_public_payloads.py
