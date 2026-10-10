@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.4",
-  "baseline": "v34.3 frozen at backup/v34-3-mobile-audit-2026-10-10; verified live failover, mobile ticker legibility, source recency audit",
+  "version": "v34.5",
+  "baseline": "v34.4 snapshot 829169282718c3bf546fdb74d5ae692ff0943bb6; user-approved layout locks and honest FL511 camera fallback",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -32,7 +32,13 @@
     "live_video_only_if_platform_verified",
     "mobile_ticker_16px",
     "news_last_source_check_vs_newest_story",
-    "news_freshness_metrics"
+    "news_freshness_metrics",
+    "user_approved_search_above_footer",
+    "remove_unapproved_newsroom_heading",
+    "compact_horizontal_language_selector",
+    "remove_public_road_tv_heading",
+    "official_fl511_traffic_camera_fallback",
+    "immutable_ui_regression_contract"
   ],
   "prior_backups": [
     {
@@ -41,10 +47,10 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "backup/v34-3-mobile-audit-2026-10-10",
-  "previous_release_commit": "578a713ce3e3a3e90402d2026319756754dca911",
+  "previous_release_branch": "snapshot/v34-4-pre-war-room-2026-10-10",
+  "previous_release_commit": "829169282718c3bf546fdb74d5ae692ff0943bb6",
   "road_tv_policy": {
-    "youtube_twitch_only": true,
+    "youtube_twitch_only": false,
     "live_claim_requires_authorized_api": true,
     "video_location_and_forward_camera_metadata_only": true,
     "motion_verified": false,
@@ -53,12 +59,14 @@
     "no_live_and_no_recent_verified_recording": "show_unavailable_state",
     "automatic_restreaming": false,
     "player_test": "removed_dead_static_train_video",
-    "roadtv_ui": "heading_and_official_verified_player_only",
+    "roadtv_ui": "official_verified_player_or_official_camera_map_no_heading",
     "roadtv_dynamic_discovery_currently_active": true,
     "recording_or_current_live_status": "platform_controlled_not_claimed_by_drivmatch",
     "retain_backend_for_future_review": true,
-    "no_verified_video": "honest_player_unavailable_state",
+    "no_verified_video": "show_official_fl511_cameras_without_live_claim",
     "player_error_failover": true,
-    "no_video_guarantee_without_authorized_api": true
+    "no_video_guarantee_without_authorized_api": true,
+    "official_fl511_camera_embed_fallback": true,
+    "official_camera_map_is_verified_autoplay_stream": false
   }
 }
