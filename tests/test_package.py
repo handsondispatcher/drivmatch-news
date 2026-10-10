@@ -81,6 +81,8 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(all(c['verified_playing_live'] is False for c in registry['sources']))
   self.assertEqual(next(x for x in registry['sources'] if x['id']=='milecheck-cameras')['display'],
                    'external_link_only_license_required')
+  self.assertEqual(next(x for x in registry['sources'] if x['id']=='buffalo-usaentrance')['display'],
+                   'reference_only')
   self.assertEqual(next(x for x in registry['sources'] if x['id']=='weather-lkn')['display'],'not_a_camera_provider')
   self.assertTrue(version['road_tv_policy']['camera_link_is_not_live_certification'])
   self.assertIn('camera-source-network.json',update)
