@@ -29,6 +29,16 @@ jobs:
         run: |
           python -m unittest discover -s tests
           node tests/test_client.js
+      # Road TV discovery queries are cached by UTC hour across 10-minute
+      # publication runs (3 rotating YouTube searches/hour max).
+      - name: Janela de descoberta Road TV
+        run: echo "ROADTV_CACHE_HOUR=$(date -u +%Y%m%d%H)" >> "$GITHUB_ENV"
+      - uses: actions/cache@v4
+        with:
+          path: build/roadtv-discovery.json
+          key: roadtv-discovery-v2-${{ env.ROADTV_CACHE_HOUR }}
+          restore-keys: |
+            roadtv-discovery-v2-
       - name: Atualizar conteúdo público e indicadores
         env:
           GOOGLE_TRANSLATE_API_KEY: ${{ secrets.GOOGLE_TRANSLATE_API_KEY }}
@@ -44,6 +54,8 @@ jobs:
           CLASS8_REDISTRIBUTION_AUTHORIZED: ${{ vars.CLASS8_REDISTRIBUTION_AUTHORIZED }}
           USDBRL_SPOT_TOKEN: ${{ secrets.USDBRL_SPOT_TOKEN }}
           YOUTUBE_DATA_API_KEY: ${{ secrets.YOUTUBE_DATA_API_KEY }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
         run: python scripts/update.py
       - name: Verificar, baixar e servir fotos editoriais licenciadas
         run: python scripts/build_news_photos.py --ci
