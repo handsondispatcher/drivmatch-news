@@ -100,6 +100,7 @@
     return !q||t.toLocaleLowerCase(lang).includes(q);
   }
   function articlesFiltered(){
+    // Original-language headlines remain readable when translations are unavailable.
     const pool=pageStories().filter(a=>matches(a));
     // The original publication time remains intact and is used within each
     // editorial category. But a cluster of government alerts must not swallow
