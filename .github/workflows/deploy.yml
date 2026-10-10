@@ -71,6 +71,16 @@ jobs:
         with:
           path: build/news-candidates-cache.json
           key: newsroom-original-headlines-v1-${{ github.run_id }}-${{ github.run_attempt }}
+      # National Census city/state index is built once from an official 2025 source,
+      # cached across runs, and served as a static local suggestion database.
+      # Reader queries stay in the browser; only selected NWS coordinates go to NOAA.
+      - name: Cache do cadastro nacional de cidades dos EUA
+        uses: actions/cache@v4
+        with:
+          path: build/us-places-cache.json
+          key: census-places-2025-v1
+      - name: Validar cidades do Censo e gerar índice público
+        run: python scripts/build_us_places.py
       - name: Verificar, baixar e servir fotos editoriais licenciadas
         run: python scripts/build_news_photos.py --ci
       - name: Gerar links exclusivos e prévias para compartilhamento
@@ -119,12 +129,12 @@ jobs:
           test "$(wc -c < /tmp/drivmatch-social.jpg)" -gt 10000
           echo "PUBLIC SOCIAL PREVIEW PASS: Open Graph HTML and photo JPEG are accessible"
           INDEX="https://handsondispatcher.github.io/drivmatch-news/"
-          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$INDEX" -o /tmp/drivmatch-v34.10-index.html
-          grep -q 'name="drivmatch-news-version" content="v34.10"' /tmp/drivmatch-v34.10-index.html
-          grep -q 'data-site-version="v34.10"' /tmp/drivmatch-v34.10-index.html
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$INDEX" -o /tmp/drivmatch-v34.11-index.html
+          grep -q 'name="drivmatch-news-version" content="v34.11"' /tmp/drivmatch-v34.11-index.html
+          grep -q 'data-site-version="v34.11"' /tmp/drivmatch-v34.11-index.html
           RELEASE="https://handsondispatcher.github.io/drivmatch-news/data/release.json"
-          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v34.10-release.json
-          python -c 'import json; x=json.load(open("/tmp/drivmatch-v34.10-release.json")); assert x["version"]=="v34.10" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v34.10 PASS: prelaunch contract consistent")'
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v34.11-release.json
+          python -c 'import json; x=json.load(open("/tmp/drivmatch-v34.11-release.json")); assert x["version"]=="v34.11" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v34.11 PASS: prelaunch contract consistent")'
           # Separate truth gate: actual market payload deployed to the public origin.
           # A successful build is not proof of a current rate or correct instrument.
           MARKET_JSON="https://handsondispatcher.github.io/drivmatch-news/data/market.json"
@@ -207,12 +217,12 @@ jobs:
           DOMAIN="https://drivmatch.com/news/"
           if curl --fail --location --silent --show-error --retry 2 --max-time 18 \
               -H "Cache-Control: no-cache" \
-              "${DOMAIN}?__release_probe=v34.10-${BUST}" -o /tmp/drivmatch-domain.html; then
-            if grep -q 'name="drivmatch-news-version" content="v34.10"' /tmp/drivmatch-domain.html \
-                && grep -q 'data-site-version="v34.10"' /tmp/drivmatch-domain.html; then
-              echo "CUSTOM DOMAIN V34.10 PASS: custom domain HTML identifies v34.10"
+              "${DOMAIN}?__release_probe=v34.11-${BUST}" -o /tmp/drivmatch-domain.html; then
+            if grep -q 'name="drivmatch-news-version" content="v34.11"' /tmp/drivmatch-domain.html \
+                && grep -q 'data-site-version="v34.11"' /tmp/drivmatch-domain.html; then
+              echo "CUSTOM DOMAIN V34.11 PASS: custom domain HTML identifies v34.11"
             else
-              echo "::warning::CUSTOM DOMAIN V34.10 MISMATCH: drivmatch.com/news/ does not serve v34.10 HTML; check Cloudflare route/proxy and caching. GitHub Pages is up-to-date."
+              echo "::warning::CUSTOM DOMAIN V34.11 MISMATCH: drivmatch.com/news/ does not serve v34.11 HTML; check Cloudflare route/proxy and caching. GitHub Pages is up-to-date."
               grep -oE 'name="drivmatch-news-version" content="[^"]+"' /tmp/drivmatch-domain.html || true
               grep -oE 'data-site-version="[^"]+"' /tmp/drivmatch-domain.html || true
               echo "CUSTOM DOMAIN HTML first line:"
@@ -223,7 +233,7 @@ jobs:
           fi
           if curl --fail --location --silent --show-error --retry 2 --max-time 18 \
               -H "Cache-Control: no-cache" \
-              "https://drivmatch.com/news/data/release.json?__release_probe=v34.10-${BUST}" \
+              "https://drivmatch.com/news/data/release.json?__release_probe=v34.11-${BUST}" \
               -o /tmp/drivmatch-domain-release.json; then
             python - <<'PY'
           import json
@@ -231,8 +241,8 @@ jobs:
               try: d=json.load(f)
               except (json.JSONDecodeError,UnicodeDecodeError): d={}
           print('CUSTOM DOMAIN RELEASE:',d.get('version','missing/invalid manifest'))
-          if d.get('version')!='v34.10':
-              print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v34.10. Cloudflare routing or cache differs from GitHub Pages.')
+          if d.get('version')!='v34.11':
+              print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v34.11. Cloudflare routing or cache differs from GitHub Pages.')
           PY
           else
             echo "::warning::CUSTOM DOMAIN MANIFEST UNAVAILABLE: /news/data/release.json not served at custom domain."
