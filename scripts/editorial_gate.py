@@ -28,7 +28,8 @@ FOREIGN = re.compile(r'\b(?:tanzania|tanzanian|dar es salaam|kenya|kenyan|uganda
     r'iran|iraq|israel|gaza|brazil|argentina|colombia|peru|europe|africa|asia)\b',re.I)
 US_TRUCK_PUBLISHERS = (
     'freightwaves.com','ttnews.com','landline.media','thetrucker.com','overdriveonline.com',
-    'fleetowner.com','ccjdigital.com','truckersnews.com','cdllife.com','truckstop.com','dat.com'
+    'fleetowner.com','ccjdigital.com','truckersnews.com','cdllife.com','truckstop.com','dat.com',
+    'truckdrivernews.com'
 )
 CROSS = re.compile(r'\b(?:border|cross.border|crossing|customs|cbp|usmca|nafta|'
     r'port of entry|laredo|el paso|nogales|tijuana|ciudad juarez|nuevo laredo|'
