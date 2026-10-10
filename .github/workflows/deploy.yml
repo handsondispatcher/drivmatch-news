@@ -13,8 +13,10 @@ permissions:
   id-token: write
   issues: write
 concurrency:
-  group: drivmatch-news-pages-recovery-v2
-  cancel-in-progress: false
+  # PR browser tests must not be evicted by the ten-minute production schedule.
+  # Main production workflows still serialize to avoid Pages deployment races.
+  group: ${{ github.event_name == 'pull_request' && format('drivmatch-news-pr-{0}', github.event.pull_request.number) || 'drivmatch-news-pages-recovery-v2' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   build:
     timeout-minutes: 12
