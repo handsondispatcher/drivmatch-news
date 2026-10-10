@@ -36,6 +36,19 @@
   // Exhausted/unavailable images get a UNIQUE story-specific illustrated card.
   // Only licensed, credited, story-specific photography; no generic stock repetition.
   function storyGraphic(a){
+    if(a.editorial_type==='operational_bulletin'){
+      // Never imply a random trucking photo depicts a tornado, flood or blizzard.
+      // This is a generic bulletin marker, not an NWS seal or event photograph.
+      const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520">'+
+        '<rect width="900" height="520" fill="#e8f3fb"/>'+
+        '<rect width="900" height="14" fill="#1475b4"/>'+
+        '<path d="M450 104L660 455H240Z" fill="none" stroke="#236c9d" stroke-width="24" stroke-linejoin="round"/>'+
+        '<rect x="437" y="218" width="26" height="120" rx="12" fill="#236c9d"/>'+
+        '<circle cx="450" cy="380" r="16" fill="#236c9d"/>'+
+        '<text x="42" y="75" font-size="27" font-weight="bold" font-family="Arial,sans-serif" fill="#125781">BOLETIM METEOROLÓGICO</text>'+
+        '<text x="42" y="491" font-size="25" font-family="Arial,sans-serif" fill="#17486a">NWS · FONTE OFICIAL · CONSULTE DOT/511</text></svg>';
+      return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
+    }
     const title=cleanHeadline(localeOf(a)?.title||'NOTÍCIAS DO TRANSPORTE');
     const seed=[...String(a.id||a.source_url||title)].reduce((v,c)=>(v*33+c.charCodeAt(0))>>>0,5381);
     const hue=195+(seed%27);
@@ -62,11 +75,16 @@
     }
     visualCacheKey=key;visualCache=map;return map;
   }
-  function imageOf(a){return storyVisuals().get(a.id)||storyGraphic(a);}
+  function imageOf(a){
+    if(a.editorial_type==='operational_bulletin')return storyGraphic(a);
+    return storyVisuals().get(a.id)||storyGraphic(a);
+  }
   function imageHTML(a,suffix=''){
     const url=imageOf(a),fallback=storyGraphic(a),graphic=url.startsWith('data:image/svg');
     const photo=licensedPhotoOf(a),illustrative=Boolean(photo)||graphic||a.image_context==='illustrative_archive';
-    const alt=graphic?(lang==='pt'?'Ilustração editorial desta manchete':'Editorial illustration'):
+    const alt=a.editorial_type==='operational_bulletin'
+      ?(lang==='pt'?'Identificação gráfica de boletim meteorológico NWS; não é fotografia do fenômeno':lang==='es'?'Gráfico identificador de boletín meteorológico NWS; no es una foto del evento':'NWS bulletin identifier; not an event photograph')
+      :graphic?(lang==='pt'?'Ilustração editorial desta manchete':'Editorial illustration'):
       illustrative?(lang==='pt'?'Fotografia de arquivo ilustrativa; não retrata necessariamente o acontecimento':lang==='es'?'Fotografía de archivo ilustrativa; no representa necesariamente el acontecimiento':'Illustrative archive photograph; not necessarily the reported event'):(a.image_alt||localeOf(a)?.title||'Imagem');
     return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
   }
@@ -82,18 +100,24 @@
     return !q||t.toLocaleLowerCase(lang).includes(q);
   }
   function articlesFiltered(){
-    const pool=pageStories().filter(a=>matches(a)); // Original-language headlines remain readable when optional translation is unavailable.
-    // Editorial sequencing: keep recency while avoiding consecutive stories about the same event.
+    const pool=pageStories().filter(a=>matches(a));
+    // The original publication time remains intact and is used within each
+    // editorial category. But a cluster of government alerts must not swallow
+    // the newspaper's lead stories merely by being issued minutes apart.
+    const isBulletin=a=>a.editorial_type==='operational_bulletin';
     const result=[],remaining=pool.slice();
-    const topicKey=a=>{
-      const t=(a.locales?.en?.title||a.locales?.pt?.title||'').toLowerCase();
-      if(/isaias|hurricane|furac[aã]o/.test(t))return 'isaias';
-      if(/iran|diesel price|pre[cç]o.*diesel/.test(t))return 'diesel-prices';
-      return a.category+':'+t.split(/\\W+/).filter(w=>w.length>4).slice(0,3).join('-');
-    };
     while(remaining.length){
-      const previous=result.slice(-2).map(topicKey);
-      const idx=remaining.findIndex(a=>!previous.includes(topicKey(a)));
+      const last=result[result.length-1];
+      const previousTwo=result.slice(-2);
+      const mustSeparateBulletins=previousTwo.some(isBulletin)&&remaining.some(a=>!isBulletin(a));
+      let idx=remaining.findIndex(a=>
+        (!mustSeparateBulletins||!isBulletin(a)) &&
+        (!last||a.category!==last.category) &&
+        (!last||a.source!==last.source));
+      if(idx<0)idx=remaining.findIndex(a=>
+        (!mustSeparateBulletins||!isBulletin(a))&&
+        (!last||a.category!==last.category));
+      if(idx<0)idx=remaining.findIndex(a=>!mustSeparateBulletins||!isBulletin(a));
       result.push(remaining.splice(idx<0?0:idx,1)[0]);
     }
     return result;
@@ -415,6 +439,8 @@
           const seen=new Set();
           externalHeadlines=next.headlines.filter(x=>x.geo_scope_verified===true&&x.title&&x.origin_type!=='aggregator-discovery'&&!/news\.google\.com/i.test(x.source_url||'')&&!/\b(tanzania|tanz[aâ]nia|vietnam|vietnamese|da nang|hanoi)\b/i.test(x.title+' '+Object.values(x.titles||{}).join(' '))&&!/^https:\/\/(?:[a-z0-9-]+\.)*thetrucker\.com(?:[\/:?#]|$)/i.test(x.source_url||'')&&safeUrl(x.source_url)&&!approved.has(x.source_url)&&!seen.has(x.source_url)&&seen.add(x.source_url)).filter((x,i,rows)=>!rows.slice(0,i).some(y=>duplicateEvent(x.titles?.pt||x.title,y.titles?.pt||y.title))&&!data.articles.some(y=>Object.values(y.locales||{}).some(loc=>duplicateEvent(x.titles?.pt||x.title,loc.title)))).slice(0,90).map(x=>({
             id:x.id,kind:'external_link',status:'external_source',demo:false,
+            editorial_type:x.editorial_type||'publisher_headline',
+            origin_type:x.origin_type||'publisher-feed',
             category:CATS.includes(x.category)?x.category:'Transporte',region:x.region||'US',source:x.source,
             source_url:x.source_url,published_at:x.published_at,original_lang:x.original_lang|| (x.region==='MX'?'es':'en'),image:x.image||'',
             locales:Object.fromEntries(langs.map(l=>[l,{title:cleanHeadline(x.titles?.[l]||x.title),summary:'',body:''}])),translated_langs:Object.keys(x.titles||{})
