@@ -208,6 +208,24 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('census-places-2025-v1',workflow)
   self.assertIn('data/us-places.json',(BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
 
+ def test_roadtv_owner_automatic_video_priority_and_five_minute_camera_rotation(self):
+  player=(BASE/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
+  engine=(BASE/'scripts/road_tv.py').read_text(encoding='utf-8')
+  workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
+  self.assertIn('const CAMERA_ROTATION_MS=5*60*1000',player)
+  self.assertIn("v.view_type==='cargo_cab'?(v.live?0:1):(v.live?2:3)",player)
+  self.assertIn('priority(a)-priority(b)',player)
+  self.assertIn('priority(x)<priority(matched)',player)
+  self.assertIn("v.get('view_type')=='cargo_cab' and v.get('live')",engine)
+  self.assertIn('Trucking Duke DriveCam POV',engine)
+  self.assertIn("YOUTUBE_DATA_API_KEY: ${{ secrets.YOUTUBE_DATA_API_KEY }}",workflow)
+  self.assertIn("TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}",workflow)
+  self.assertIn("cron: '7,17,27,37,47,57 * * * *'",workflow)
+  self.assertIn('setInterval(refresh,120000)',player)
+  self.assertIn("if(!active){showPublisherCamera();return;}",player)
+  self.assertIn('onStateChange',player)
+  self.assertIn('onError:()=>playbackError',player)
+
  def test_48h_source_cache_keeps_original_dates_and_rejects_foreign_or_stale(self):
   from collect_sources import merge_verified_candidate_history
   from tempfile import TemporaryDirectory
