@@ -132,7 +132,7 @@ def safe_cached_discovery(now):
     try:
         data = json.loads(CACHE_PATH.read_text(encoding='utf-8'))
         ts = when(data.get('checked_at'))
-        if data.get('discovery_version')==3 and ts and 0 <= (now-ts).total_seconds() < 3700:
+        if data.get('discovery_version')==4 and ts and 0 <= (now-ts).total_seconds() < 3700:
             return data
     except (OSError, ValueError, TypeError):
         pass
@@ -215,7 +215,9 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
             # the latest uploaded items. Never trust a handle as a channel ID.
             if priority_index == index:
                 if CHANNEL_ID.fullmatch(channel_id):
-                    if diagnostics is not None: diagnostics['targeted_channel_checked'] = source['name']
+                    if diagnostics is not None:
+                        diagnostics['targeted_channel_checked'] = source['name']
+                        diagnostics['_targeted_channel_id'] = channel_id
                     try:
                         params=urllib.parse.urlencode({
                             'part':'snippet','type':'video','eventType':'live',
@@ -226,7 +228,9 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
                             ident=(row.get('id') or {}).get('videoId')
                             if VIDEO_ID.fullmatch(str(ident or '')):
                                 found.append(ident)
-                                if diagnostics is not None: diagnostics['targeted_live_hits']+=1
+                                if diagnostics is not None:
+                                    diagnostics['targeted_live_hits']+=1
+                                    diagnostics['_targeted_video_ids'].append(ident)
                     except (OSError,TimeoutError,ValueError,KeyError,TypeError) as exc:
                         errors.append('youtube_targeted_channel_live_'+api_error_tag(exc))
                 elif diagnostics is not None:
@@ -266,13 +270,37 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
             ident=vid.get('id','')
             if not VIDEO_ID.fullmatch(ident):continue
             if status.get('privacyStatus')!='public' or status.get('embeddable') is not True:
-                if diagnostics is not None:diagnostics['rejected_not_public_embeddable']+=1
+                if diagnostics is not None:
+                    diagnostics['rejected_not_public_embeddable']+=1
+                    if ident in diagnostics.get('_targeted_video_ids',[]):
+                        diagnostics['targeted_failure_reason']='not_public_or_embeddable'
                 continue
             title=str(info.get('title') or '')
             desc=str(info.get('description') or '')[:850]
             profile=source_profile(title,desc)
+            # Narrow, publicly auditable owner-provided visual evidence:
+            # on 2026-10-10 this exact Ride Along Gang broadcast showed
+            # front-facing truck-cab driving, though its metadata can omit
+            # the vehicle keyword. Match the *officially resolved channel*,
+            # current targeted broadcast ID, and route/title, not just a name.
+            owner_ride_along=bool(diagnostics and
+                diagnostics.get('targeted_channel_checked')=='Ride Along Gang' and
+                ident in diagnostics.get('_targeted_video_ids',[]) and
+                str(info.get('channelId') or '')==diagnostics.get('_targeted_channel_id') and
+                re.search(r'\bDenver\s*(?:CO|Colorado)\b.*\bSchuyler\s*(?:NE|Nebraska)\b', title, re.I) and
+                CAB.search(title) and not STOP.search(title+' '+desc))
+            if owner_ride_along:
+                diagnostics['targeted_title_match']=True
+                if not profile:
+                    profile={'source_rank':0,'view_type':'cargo_cab',
+                             'geo_evidence':'US route explicitly named in live title; creator channel resolved by YouTube API',
+                             'camera_evidence':'Owner visual screenshot dated 2026-10-10 of this exact Ride Along Gang forward truck-cab broadcast; not continuous motion proof'}
+                    diagnostics['owner_visual_evidence_used']+=1
             if not profile:
-                if diagnostics is not None:diagnostics['rejected_no_geo_cargo_pov']+=1
+                if diagnostics is not None:
+                    diagnostics['rejected_no_geo_cargo_pov']+=1
+                    if ident in diagnostics.get('_targeted_video_ids',[]):
+                        diagnostics['targeted_failure_reason']='insufficient_pov_vehicle_or_us_route_metadata'
                 continue
             channel=str(info.get('channelTitle') or 'Criador independente')
             base={'platform':'youtube','video_id':ident,
@@ -380,12 +408,20 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     api=get_json or request_json
     cached=cache if cache is not None else safe_cached_discovery(now)
     fresh_cache=cached and when(cached.get('checked_at')) and (now-when(cached['checked_at'])).total_seconds()<3700
-    discovery={'checked_at':now.isoformat(),'discovery_version':3}
+    discovery={'checked_at':now.isoformat(),'discovery_version':4}
     diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
-                 'targeted_live_hits':0,'videos_returned':0,
+                 'targeted_live_hits':0,'_targeted_video_ids':[],
+                 '_targeted_channel_id':None,'targeted_title_match':False,
+                 'owner_visual_evidence_used':0,'targeted_failure_reason':None,
+                 'videos_returned':0,
                  'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
                  'accepted_live':0}
     approved=[]
+    if fresh_cache and key:
+        diagnostics['_targeted_video_ids']=[i for i in cached.get('targeted_video_ids',[])
+                                            if VIDEO_ID.fullmatch(str(i))]
+        diagnostics['_targeted_channel_id']=cached.get('targeted_channel_id')
+        diagnostics['targeted_channel_checked']=cached.get('targeted_channel_checked')
     if key:
         if fresh_cache and isinstance(cached.get('youtube_ids'),list):
             search_ids=[i for i in cached['youtube_ids'] if VIDEO_ID.fullmatch(str(i))]
@@ -404,6 +440,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         ids=list(dict.fromkeys(creator_ids+cached_creator_ids+search_ids))[:MAX_CANDIDATES]
         discovery['youtube_ids']=search_ids
         discovery['curated_ids']=creator_ids
+        discovery['targeted_video_ids']=diagnostics['_targeted_video_ids']
+        discovery['targeted_channel_id']=diagnostics['_targeted_channel_id']
+        discovery['targeted_channel_checked']=diagnostics['targeted_channel_checked']
         diagnostics['candidate_ids']=len(ids)
         result['creator_discovery_count']=len(creator_ids)
         approved+=verify_youtube(ids,key,now,lambda u:api(u),result['warnings'],diagnostics)
@@ -421,7 +460,8 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     if not fresh_cache and cache is None:
         store_cached_discovery(discovery)
     result['live_checked_at']=now.isoformat()
-    result['discovery_diagnostics']=diagnostics
+    result['discovery_diagnostics']={k:v for k,v in diagnostics.items()
+                                     if not k.startswith('_')}
     # Live first, sorting recent starts; only one player's video is ever loaded.
     lives=[x for x in approved if x.get('live')]
     replays=[x for x in approved if not x.get('live')]

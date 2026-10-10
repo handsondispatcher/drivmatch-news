@@ -237,6 +237,53 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(source_profile(title,description)['view_type'],'cargo_cab')
   self.assertIsNone(source_profile(title,'A passenger car driving POV'))
  
+ def test_owner_screenshot_exact_channel_and_live_title_passes_without_cargo_keyword(self):
+  from road_tv import verify_youtube
+  t=dt.datetime(2026,10,10,20,0,tzinfo=dt.timezone.utc)
+  vid={**LIVE,'snippet':{
+    'title':'LIVE Driving POV- IRL- Denver CO → Schuyler NE | Relaxing Ride Along',
+    'description':'An endless road awaits. Relaxing and scenic.',
+    'channelId':CHANNEL,'channelTitle':'Ride Along Gang',
+    'liveBroadcastContent':'live'},
+    'liveStreamingDetails':{'actualStartTime':'2026-10-10T19:00:00Z'}}
+  d={'targeted_channel_checked':'Ride Along Gang','_targeted_channel_id':CHANNEL,
+     '_targeted_video_ids':[ID],'targeted_title_match':False,
+     'owner_visual_evidence_used':0,'videos_returned':0,
+     'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
+     'accepted_live':0,'targeted_failure_reason':None}
+  api=lambda _: {'items':[vid]}
+  result=verify_youtube([ID],'test',t,api,[],d)
+  self.assertEqual(len(result),1)
+  self.assertTrue(result[0]['live'])
+  self.assertEqual(result[0]['view_type'],'cargo_cab')
+  self.assertIn('Owner visual screenshot',result[0]['camera_evidence'])
+  self.assertEqual(d['owner_visual_evidence_used'],1)
+  self.assertTrue(d['targeted_title_match'])
+
+ def test_screenshot_cannot_override_different_channel_or_different_route(self):
+  from road_tv import verify_youtube
+  t=dt.datetime(2026,10,10,20,0,tzinfo=dt.timezone.utc)
+  metadata={**LIVE,'snippet':{
+    'title':'LIVE Driving POV- IRL- Denver CO → Schuyler NE | Relaxing Ride Along',
+    'description':'Scenic peaceful trip.',
+    'channelId':CHANNEL,'channelTitle':'Ride Along Gang',
+    'liveBroadcastContent':'live'},
+    'liveStreamingDetails':{'actualStartTime':'2026-10-10T19:00:00Z'}}
+  for wrong in ('video','channel','route'):
+   with self.subTest(wrong=wrong):
+    v={**metadata,'snippet':dict(metadata['snippet'])}
+    d={'targeted_channel_checked':'Ride Along Gang',
+       '_targeted_channel_id':CHANNEL,'_targeted_video_ids':[ID],
+       'owner_visual_evidence_used':0,'videos_returned':0,
+       'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
+       'accepted_live':0,'targeted_failure_reason':None}
+    if wrong=='video':d['_targeted_video_ids']=[]
+    if wrong=='channel':v['snippet']['channelId']='UC'+'B'*22
+    if wrong=='route':v['snippet']['title']='LIVE Driving POV New Zealand Road Trip'
+    result=verify_youtube([ID],'test',t,lambda _: {'items':[v]},[],d)
+    self.assertEqual(result,[])
+    self.assertEqual(d['owner_visual_evidence_used'],0)
+
  def test_clock_alignment_require_real_recording_duration(self):
   t=dt.datetime(2026,10,8,20,10,tzinfo=dt.timezone.utc)
   self.assertEqual(video_length("PT1H30M"),5400)
