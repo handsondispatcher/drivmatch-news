@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR" data-site-version="v34.6">
+<html lang="pt-BR" data-site-version="v34.7">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="drivmatch-news-version" content="v34.6"/>
+<meta name="drivmatch-news-version" content="v34.7"/>
 <meta name="drivmatch-news-release-status" content="development-prelaunch"/>
 <title>DrivMatch News — Transporte e logística nos EUA</title>
 <style>
@@ -720,10 +720,51 @@ body{background:#f7f9fc;color:#14283c}
  .search-footer .form input,.search-footer .form select{font-size:13px;min-height:44px}
  .roadtv-screen .roadtv-map-help{font-size:10px}
 }
+
+/* v34.7 — User-approved stable quote strip. Reference image 2; quotes must remain sourced, never simulated. */
+.dm-utility{background:#fff;border-bottom:1px solid #dce5ee;min-width:0}
+.dm-util-inner{max-width:1390px;min-height:66px;margin:auto;padding:8px 26px;display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,1.14fr) minmax(0,1.1fr) minmax(0,1.45fr) minmax(125px,.8fr);gap:0;align-items:center}
+.dm-util-quote{display:grid;grid-template-columns:27px minmax(0,1fr);grid-template-rows:16px 23px;align-content:center;gap:0 8px;padding:3px 13px;margin:0;min-width:0;border-right:1px solid #afc0d2}
+.dm-util-quote .dm-util-icon{font-size:21px;line-height:1;grid-row:1/3;grid-column:1;align-self:center}
+.dm-util-quote .dm-util-label{grid-column:2;grid-row:1;font-size:11px;line-height:15px;color:#1b3657;font-weight:700;white-space:nowrap}
+.dm-util-money{grid-column:2;grid-row:2;display:flex;align-items:baseline;gap:7px;white-space:nowrap;min-width:0}
+.dm-util-quote .dm-util-money strong{font:700 clamp(12px,1vw,16px)/1.3 Arial,sans-serif;color:#143422;white-space:nowrap}
+.dm-util-quote .dm-util-money em{font:700 10px Arial,sans-serif;color:#11963b;font-style:normal}
+.dm-util-quote .dm-util-money em.negative{color:#cf2739}
+.dm-util-provenance{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important}
+.dm-util-city{display:flex!important;align-items:center;gap:10px;min-width:0;margin:0;padding:0 16px;border-right:1px solid #afc0d2;flex:0 1 auto}
+.dm-util-city[hidden]{display:none!important}
+.dm-util-city #top-weather-icon{font-size:30px;line-height:1.1;flex-shrink:0}
+.dm-util-city .dm-util-weather-copy{display:flex;flex-direction:column;gap:1px;min-width:0}
+.dm-util-city #top-city{font-size:12px;line-height:1.2;font-weight:700;white-space:nowrap}
+.dm-util-city #top-condition{font-size:11px;line-height:1.1;color:#36536f;white-space:nowrap}
+.dm-util-city .dm-util-temps{display:flex;flex-direction:column;gap:0;align-items:flex-start;white-space:nowrap;margin:0;font:11px/1.2 Arial,sans-serif;color:#213f63}
+.dm-util-city .dm-util-temps #top-range-c{display:none}
+.dm-util-risk{justify-self:end;max-width:100%;margin-left:8px;padding:9px 12px;border-radius:50px;border:1px solid #f5d4cb;background:#ffebeb;color:#a42116;font:700 10px/1.25 Arial,sans-serif;white-space:nowrap}
+.dm-util-risk[hidden]{display:none!important}
+.news-freshness[hidden]{display:none!important}
+/* The story context CTA must be a single line, not an orphaned 'News'. */
+.related-rail .story .info p.editorial-context{white-space:nowrap!important;font:600 clamp(9px,.72vw,11px)/1.3 Arial,sans-serif;letter-spacing:-.25px;margin:4px 0 0}
+.related-rail .story{padding:9px 0}
+.related-rail .story h3{margin:3px 0}
+.related-rail .story .byline{font-size:9px}
+/* Keep public language controls compact; technical release details stay in the machine manifest. */
+.header .edition{display:flex;align-items:center;justify-content:flex-end}
+.header .language-shortcuts{margin-top:0}
+@media(max-width:1100px){.dm-util-inner{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 0;min-height:58px}.dm-util-city{grid-column:1/3;border-right:0;padding:7px 10px}.dm-util-risk{grid-column:3;justify-self:end}.dm-util-money strong{font-size:14px}}
+@media(max-width:650px){.dm-util-inner{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 0;padding:10px 9px}.dm-util-quote{padding:3px 7px}.dm-util-quote:nth-child(2){border-right:0}.dm-util-quote:nth-child(3){grid-column:1/3;border-right:0;border-bottom:1px solid #dce5ee;padding-bottom:8px}.dm-util-city{grid-column:1/3;padding:4px 7px}.dm-util-risk{grid-column:1/3;justify-self:start;margin-left:7px}.related-rail .story .info p.editorial-context{font-size:10px}}
+
+/* v34.7 Direct publisher camera: the dominant surface is VIDEO, not a map or directory. */
+.roadtv-screen .roadtv-publisher-camera{display:block;position:absolute;inset:0;width:100%;height:100%;border:0;background:#051626;z-index:1}
+.roadtv-screen .roadtv-camera-credit{position:absolute;z-index:3;inset:auto 0 0 0;padding:6px 8px;display:flex;align-items:center;justify-content:space-between;gap:7px;background:linear-gradient(0deg,rgba(0,12,23,.92),rgba(0,12,23,.60));color:#fff;font:600 10px/1.2 Arial,sans-serif;pointer-events:none}
+.roadtv-screen .roadtv-camera-credit span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.roadtv-screen .roadtv-camera-credit a{flex-shrink:0;pointer-events:auto;color:#a6e0ff;white-space:nowrap;font-weight:700}
+.roadtv-screen .roadtv-camera-unavailable{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;padding:20px;background:#0a2237;color:#e6f3ff;text-align:center;font:600 13px/1.4 Arial,sans-serif}
+.roadtv-screen .roadtv-camera-unavailable a{color:#8ad3ff;text-decoration:underline}
 </style>
 </head>
 <body>
-<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition">EDIÇÃO DIGITAL · <span id="site-version" aria-label="Versão 34.6">v34.6</span> · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
+<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.7</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
 <nav class="newsroom-nav" aria-label="Editorias DrivMatch News"><div class="newsroom-nav-inner">
   <a href="#panorama" data-newsroom-label="home" class="newsroom-nav-home">Capa</a>
   <a href="#noticias" data-newsroom-cat="Caminhoneiros" data-newsroom-label="drivers">Caminhoneiros</a>
@@ -733,7 +774,34 @@ body{background:#f7f9fc;color:#14283c}
   <a href="#noticias" data-newsroom-cat="Tecnologia" data-newsroom-label="technology">Tecnologia</a>
   <a href="#clima-desktop" data-newsroom-label="weather" class="newsroom-nav-weather">Clima &amp; Mercado</a>
 </div></nav>
-<section id="dm-utility" class="dm-utility" aria-label="Mercado e tempo"><div class="dm-util-inner"><div class="dm-util-quote"><span id="top-usd-label">Dólar</span> <strong id="top-usd-value">—</strong><small id="top-usd-date" title="Última cotação verificada">Sem cotação</small></div><div class="dm-util-quote"><span id="top-diesel-label">Diesel EUA</span> <strong id="top-diesel-value">—</strong><small id="top-diesel-date" title="Referência média semanal">EIA · semanal</small></div><div class="dm-util-city" aria-live="off" hidden><span id="top-weather-icon" aria-hidden="true">🌤️</span><span><strong id="top-city">Tempo nos EUA</strong><small id="top-condition"></small><small id="top-risk" class="dm-weather-risk" hidden></small></span><div class="dm-util-temps" aria-label="Temperaturas previstas"><div class="dm-util-temp-row" id="top-range-f">Máx. —°F · Mín. —°F</div><div class="dm-util-temp-row secondary" id="top-range-c">Máx. —°C · Mín. —°C</div></div></div></div></section>
+<section id="dm-utility" class="dm-utility" aria-label="Cotações e condições do tempo">
+ <div class="dm-util-inner">
+  <div class="dm-util-quote">
+   <span class="dm-util-icon" aria-hidden="true">📈</span>
+   <span id="top-usd-label" class="dm-util-label">Dólar</span>
+   <div class="dm-util-money"><strong id="top-usd-value">—</strong><em id="top-usd-change" hidden></em></div>
+   <small id="top-usd-date" class="dm-util-provenance" title="Fonte e data da cotação">Sem cotação</small>
+  </div>
+  <div class="dm-util-quote">
+   <span class="dm-util-icon" aria-hidden="true">⛽</span>
+   <span id="top-diesel-label" class="dm-util-label">Diesel EUA</span>
+   <div class="dm-util-money"><strong id="top-diesel-value">—</strong><em id="top-diesel-change" hidden></em></div>
+   <small id="top-diesel-date" class="dm-util-provenance" title="Fonte e data da cotação">EIA · semanal</small>
+  </div>
+  <div class="dm-util-quote">
+   <span class="dm-util-icon" aria-hidden="true">💧</span>
+   <span id="top-brent-label" class="dm-util-label">Petróleo Brent</span>
+   <div class="dm-util-money"><strong id="top-brent-value">—</strong><em id="top-brent-change" hidden></em></div>
+   <small id="top-brent-date" class="dm-util-provenance" title="Fonte e data da cotação">Sem cotação</small>
+  </div>
+  <div class="dm-util-city" aria-live="off" hidden>
+   <span id="top-weather-icon" aria-hidden="true">🌤️</span>
+   <span class="dm-util-weather-copy"><strong id="top-city">Tempo nos EUA</strong><small id="top-condition"></small>
+   <span class="dm-util-temps" aria-label="Temperaturas previstas"><span id="top-range-f">Máx. —°F · Mín. —°F</span><span id="top-range-c">Máx. —°C · Mín. —°C</span></span></span>
+  </div>
+  <div class="dm-util-risk" id="top-risk" hidden></div>
+ </div>
+</section>
 <section id="dm-news-crawler" class="dm-news-crawler" aria-label="Monitor de manchetes de fontes externas — títulos originais, ainda não revisados pela editoria DrivMatch News" hidden><div class="dm-crawler-viewport" id="dm-crawler-viewport"><div class="dm-crawler-track" id="dm-crawler-track"></div></div></section>
 
 <div class="main">
@@ -741,7 +809,7 @@ body{background:#f7f9fc;color:#14283c}
 <div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section><section class="roadtv-card" id="roadtv-mobile" aria-label="ROAD TV">
 
   <div class="roadtv-screen" aria-label="Transmissão em vídeo" aria-live="off"></div>
-</section><section class="mobile-market" id="mobile-market" aria-labelledby="market-title-mobile"><h2 id="market-title-mobile">Mercado em Foco</h2><div id="market-mobile"></div><p class="micro" id="market-note-mobile"></p></section></div>
+</section><section class="mobile-market" id="mobile-market" aria-labelledby="market-title-mobile"><h2 id="market-title-mobile">Cotações e Mercado</h2><div id="market-mobile"></div><p class="micro" id="market-note-mobile"></p></section></div>
 <section id="panorama">
 
   <div class="topline"><h2 class="heading">Panorama do Transporte</h2><div class="carousel-controls" role="group" aria-label="Navegação do panorama"><button class="btn secondary" id="featurePrev" type="button" aria-label="Página anterior" title="Anterior">←</button><div class="carousel-dots" id="featureDots" role="group" aria-label="Ir para página do panorama"></div><button class="btn" id="featureNext" type="button" aria-label="Próxima página" title="Próximas">→</button><span class="sub" id="featureCount" aria-live="polite"></span></div></div>
@@ -751,7 +819,7 @@ body{background:#f7f9fc;color:#14283c}
 <div id="ad-slot" aria-label="Publicidade" hidden></div>
 <section id="noticias" class="section">
   <div class="topline"><h2 class="heading">Notícias</h2><span class="sub" id="count"></span></div>
-  <p class="news-freshness" id="news-freshness" role="status" aria-live="polite"></p>
+  <p class="news-freshness" id="news-freshness" hidden aria-hidden="true"></p>
   <div class="chips" id="chips"></div>
   <div id="list"></div>
   <div class="pagination"><button class="btn secondary" id="prev">← Anterior</button><span class="sub" id="pagecount"></span><button class="btn" id="next">Próximas →</button></div>
@@ -761,7 +829,7 @@ body{background:#f7f9fc;color:#14283c}
 <aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div><section class="roadtv-card" id="roadtv-desktop" aria-label="ROAD TV">
 
   <div class="roadtv-screen" aria-label="Transmissão em vídeo" aria-live="off"></div>
-</section><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
+</section><h2 id="market-title">Cotações e Mercado</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p></aside>
 </div>
 <aside class="newsroom-partner-cta" aria-label="Acesso às oportunidades da DrivMatch">
@@ -804,9 +872,9 @@ body{background:#f7f9fc;color:#14283c}
 </div></article></div>
 <div class="story-preview-overlay" id="story-preview" hidden role="dialog" aria-modal="true" aria-labelledby="story-preview-title"><div class="story-preview-panel"><div class="story-preview-head"><strong id="story-preview-title">Prévia do Story</strong><button id="story-preview-close" type="button" aria-label="Fechar prévia">×</button></div><div class="story-preview-scroll"><img id="story-preview-image" alt="Prévia da imagem vertical da notícia para Stories"></div><div class="story-preview-actions"><a id="story-preview-download" download="drivmatch-news-story.png" href="#">Salvar imagem PNG</a><p id="story-preview-hint">Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.</p></div></div></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-6-camera-network-20261010" defer></script>
-<script src="assets/road-tv-live.js?v=v34-6-source-network-20261010" defer></script>
-<script src="assets/utility-strip.js" defer></script>
+<script src="assets/app.js?v=v34-7-approved-20261010" defer></script>
+<script src="assets/road-tv-live.js?v=v34-7-direct-player-20261010" defer></script>
+<script src="assets/utility-strip.js?v=v34-7-quote-strip-20261010" defer></script>
 <script src="assets/news-crawler.js?v=warroom-20261009-v2" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>

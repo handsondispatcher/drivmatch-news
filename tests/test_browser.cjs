@@ -13,12 +13,14 @@ const {spawn}=require('node:child_process');
    page.on('pageerror',e=>errors.push(e.message));
    // YouTube content is owned by the creator; do not depend on its network in CI.
    await page.route('https://www.youtube-nocookie.com/**',route=>route.fulfill({status:200,body:'<!doctype html><title>Official player test stub</title>'}));
-   // Official third-party FL511 is stubbed in CI; actual provider availability is a separate gate.
-   await page.route('https://fl511.com/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>FL511 camera directory test stub</title>'}));
+   // Stub CamStreamer only inside CI; iframe insertion does not certify real-world playback.
+   await page.route('https://camstreamer.com/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>CamStreamer native embed test stub</title>'}));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.6','public page has v34.6 version');
-   assert.equal(await page.locator('#site-version').innerText(),'v34.6','public masthead identifies v34.6');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.7','public page has v34.7 version');
+   assert.equal(await page.locator('#site-version').isVisible(),false,'Internal release must not appear in public masthead');
+   assert.equal(await page.locator('#edition-date').isVisible(),false,'Internal edition date is not visible');
+   assert.equal((await page.locator('.header').innerText()).includes('EDIÇÃO DIGITAL'),false,'No technical edition text on masthead');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
    // Immutable editorial composition: search exclusively above institutional footer.
    const layout=await page.evaluate(()=>{
@@ -84,7 +86,7 @@ const {spawn}=require('node:child_process');
     assert.equal(image.status(),200,'OG photo must be served');
     assert.match(image.headers()['content-type'],/image\/jpeg/);
    }
-   assert.equal(await page.locator('#market-title').textContent(),'Mercado em Foco');
+   assert.equal(await page.locator('#market-title').textContent(),'Cotações e Mercado');
    // No placeholders for prices unavailable to the authorized data pipeline.
    assert.equal(await page.locator('#market .sidegroup').count(),0,'Remove empty transport-stock heading');
    assert.equal(await page.locator('#market').innerText().then(x=>/Class 8|J.B. Hunt|Knight-Swift|FedEx|FDX/.test(x)),false,'Do not show dead tickers');
@@ -98,30 +100,32 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   // v34.6: no stale hardcoded player. No published video without verified catalog.
+   // v34.7: show one direct camera video embed, never a tiny map or links-only tile.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
    assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
    assert.equal(await tvCard.locator('.roadtv-screen').count(),1);
-   const fl511=tvCard.locator('.roadtv-official-map');
-   await fl511.waitFor({state:'attached',timeout:10000});
-   assert.match(await fl511.getAttribute('src'),/^https:\/\/fl511\.com\/Map\/EmbeddedMap\?layers=Cameras/);
-   // Sources are hyperlinks to their owners: NO unauthorized source iframe or fake LIVE banner.
-   const sources=tvCard.locator('.roadtv-source-links a');
-   await sources.nth(3).waitFor({state:'attached',timeout:9000});
-   assert.equal(await sources.count(),4,'Four rights-safe camera sources are available as outbound links');
-   const urls=await sources.evaluateAll(nodes=>nodes.map(el=>el.getAttribute('href')));
-   assert.deepEqual(urls,[
-      'https://fl511.com/region/Central',
-      'https://www.peacebridge.com/media-room/traffic-cameras/',
-      'https://www.nvroads.com/',
-      'https://milecheckapp.com/cameras/'
-   ],'Prioritized official I-4, Canada→USA, Nevada and link-only MileCheck');
-   assert.equal(await tvCard.locator('iframe').count(),1,'Only sanctioned official Florida map may be embedded');
-   assert.equal(await tvCard.locator('.roadtv-replay').count(),0,'Directory cannot masquerade as recorded or LIVE video');
+   const camera=tvCard.locator('iframe.roadtv-publisher-camera');
+   await camera.waitFor({state:'attached',timeout:11000});
+   assert.match(await camera.getAttribute('src'),/^https:\/\/camstreamer\.com\/embed\//,'Player must open an actual camera embed');
+   assert.equal(await tvCard.locator('.roadtv-official-map').count(),0,'No embedded map in video area');
+   assert.equal(await tvCard.locator('.roadtv-camera-credit a[href^="https://camstreamer.com/live/stream/"]').count(),1,'Publisher credit visible');
+   assert.equal(await tvCard.locator('.roadtv-replay').count(),0,'Do not mark an independent live camera as recorded video');
    assert.equal(await page.locator('#mercados').isVisible(),width>990);
    assert.equal(await page.locator('#mobile-market').isVisible(),width<=990);
    assert.equal(await page.locator('#news-freshness').count(),1);
+   assert.equal(await page.locator('#news-freshness').isVisible(),false,'Frescor editorial fica na auditoria, nunca no texto público');
+   for(const id of ['top-usd-value','top-diesel-value','top-brent-value','top-weather-icon','top-risk']) {
+     assert.equal(await page.locator('#'+id).count(),1,'Reference strip item '+id+' missing');
+   }
+   if(width===1440){
+     const grid=await page.locator('.dm-util-inner').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
+     assert.equal(grid,5,'Approved screenshot uses 5 horizontal cells');
+     for(const c of await page.locator('.related-rail p.editorial-context').all()){
+       const x=await c.evaluate(el=>({height:el.getBoundingClientRect().height,lineHeight:parseFloat(getComputedStyle(el).lineHeight),text:el.textContent}));
+       assert.ok(x.height<=x.lineHeight+1.5,'CTA must fit in a single line: '+x.text);
+     }
+   }
    if(width<=390){
      const dims=await tvCard.locator('.roadtv-screen').evaluate(e=>({width:e.getBoundingClientRect().width,height:e.getBoundingClientRect().height}));
      assert.ok(dims.width>=260&&dims.height>=195,'Road TV player space is usable on mobile');
@@ -277,7 +281,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#article-dialog').evaluate(e=>e.scrollTop),0);
    await page.keyboard.press('Escape');
    await page.locator('[data-site-lang="en"]').click();
-   assert.equal(await page.locator('#market-title').textContent(),'Market Focus');
+   assert.equal(await page.locator('#market-title').textContent(),'Quotes & Markets');
    assert.deepEqual(errors,[]);
    if(width===1440){
      // Local fixture tests actual player error auto-rotation; no invented video ships.

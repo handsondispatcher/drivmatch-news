@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.6",
-  "baseline": "v34.5 snapshot 946aaf215dcfe1e73c1fcabdbd5916f05e88e18d; rights-gated multi-source road-camera discovery, Canada-to-US priority, no invented autoplay",
+  "version": "v34.7",
+  "baseline": "v34.6 snapshot 33e75e0c46767a6c37b118d2bfbf7831f48c541b; owner approved 2026-10-10 direct pre-opened road-camera embed, stable 5-part market strip and internal-only editorial freshness",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -44,7 +44,13 @@
     "milecheck_outbound_link_only_until_licensed",
     "nevada_511_official_outbound_source",
     "source_directory_schema_and_rights_gates",
-    "no_false_live_from_directory_or_snapshot"
+    "no_false_live_from_directory_or_snapshot",
+    "rename_market_to_quotes_and_markets",
+    "restore_approved_five_item_market_weather_strip",
+    "internalize_public_edition_and_freshness",
+    "single_line_related_story_context",
+    "direct_publisher_road_camera_embed_no_map",
+    "camera_publisher_failover_without_false_live_badge"
   ],
   "prior_backups": [
     {
@@ -53,8 +59,8 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "snapshot/v34-5-pre-camera-network-2026-10-10",
-  "previous_release_commit": "946aaf215dcfe1e73c1fcabdbd5916f05e88e18d",
+  "previous_release_branch": "snapshot/v34-6-before-v34-7-2026-10-10",
+  "previous_release_commit": "33e75e0c46767a6c37b118d2bfbf7831f48c541b",
   "road_tv_policy": {
     "youtube_twitch_only": false,
     "live_claim_requires_authorized_api": true,
@@ -65,7 +71,7 @@
     "no_live_and_no_recent_verified_recording": "show_unavailable_state",
     "automatic_restreaming": false,
     "player_test": "removed_dead_static_train_video",
-    "roadtv_ui": "official_verified_player_or_official_camera_map_no_heading",
+    "roadtv_ui": "verified_platform_livestream_or_specific_preopened_publisher_camera_no_map",
     "roadtv_dynamic_discovery_currently_active": true,
     "recording_or_current_live_status": "platform_controlled_not_claimed_by_drivmatch",
     "retain_backend_for_future_review": true,
@@ -78,6 +84,10 @@
     "border_usbound_priority_after_highway": true,
     "milecheck_requires_commercial_license": true,
     "source_registry_published": true,
-    "camera_link_is_not_live_certification": true
+    "camera_link_is_not_live_certification": true,
+    "publisher_direct_camera_embed": true,
+    "publisher_camera_is_certified_playing_live": false,
+    "fl511_map_used_as_primary": false,
+    "publisher_embed_source": "CamStreamer provides direct video iframe embed code on stream detail pages; live playback is not certified by CI"
   }
 }

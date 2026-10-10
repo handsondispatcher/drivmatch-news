@@ -1,4 +1,4 @@
-/* DrivMatch News v34.6: Road TV integrity monitor.
+/* DrivMatch News v34.7: Road TV integrity monitor.
  * Official YouTube/Twitch player only. Never publish a hard-coded dead stream.
  * Live first, source-verified; recorded fallback allowed only when labeled.
  * Swap on playback errors, ended streams, verified-source expiry and rotation.
@@ -10,8 +10,7 @@
  if(!cards.length)return;
  const safeHost=new Set(['drivmatch.com','www.drivmatch.com','handsondispatcher.github.io','localhost','127.0.0.1']);
  const liveSource='data/road-tv.json';
- const cameraSourceRegistry='data/camera-source-network.json';
- let externalCameraLinks=[];
+ // Camera source registry remains governed in the backend; publisher embed is distinct.
  const videoId=/^[A-Za-z0-9_-]{11}$/;
  const twitchLogin=/^[a-z0-9_]{3,25}$/;
  const labels={
@@ -43,77 +42,82 @@
  };
  // Official FL511 permits embedding its traffic-camera map (including streaming-video cameras).
  // It is a usable road-camera directory, NOT a certified autoplaying live broadcast.
- const floridaCameras='https://fl511.com/Map/EmbeddedMap?layers=Cameras&region=ALL&size=0';
- const fallbackLinks=[{id:'fl511-i4',label:'I-4 / FL511',source_url:'https://fl511.com/region/Central'}];
- const approvedHosts={'fl511-i4':'fl511.com','peacebridge-usbound':'www.peacebridge.com',
-                      'nvroads-nevada':'www.nvroads.com','milecheck-cameras':'milecheckapp.com'};
- function safeOfficialLink(source){
-   if(!source||typeof source!=='object'||!approvedHosts[source.id])return false;
-   try{
-     const url=new URL(source.source_url);
-     return url.protocol==='https:'&&url.hostname===approvedHosts[source.id]
-       &&['approved_official_embed','external_link_only','external_link_only_license_required'].includes(source.display)
-       &&source.verified_playing_live===false;
-   }catch{return false}
+ // Direct source-player embeds offered explicitly by the publishers.
+ // These are actual camera-player iframes, not miniature maps or still photos.
+ // CamStreamer publishes the embed code; playback is still subject to provider uptime.
+ const directCameras=[
+  {id:'fl-bridge-lions',name:'Bridge of Lions · St. Augustine, FL',
+   embed:'https://camstreamer.com/embed/oEfmCvt05RxNKi3KsM8QLw5molD3ifp3ppWj6fJu?rel=0',
+   page:'https://camstreamer.com/live/stream/110525310'},
+  {id:'fl-midbay',name:'Mid-Bay Bridge · Destin, FL',
+   embed:'https://camstreamer.com/embed/cYFp9erEDuUm7JuD57twuOPmeT1rdBbh79nyUBx2?rel=0',
+   page:'https://camstreamer.com/live/stream/101125169'},
+  {id:'peace-canada',name:'Peace Bridge · direção Canadá',
+   embed:'https://camstreamer.com/embed/7WIJom0FTmLGWRea1khwrohdqLpKwHOa2DU5Wjqq?rel=0',
+   page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'}
+ ];
+ let publisherIndex=0,publisherFrame=null,publisherFailures=new Set();
+ function publisherUnavailable(area){
+   area.replaceChildren();
+   const notice=document.createElement('div');notice.className='roadtv-camera-unavailable';
+   notice.textContent=lang()==='en'?'Camera temporarily unavailable. Open the official source.':
+     lang()==='es'?'Cámara temporalmente no disponible. Abra la fuente.':
+     'Câmera temporariamente indisponível. Abra a fonte.';
+   const link=document.createElement('a');
+   link.href='https://fl511.com/region/Central';link.target='_blank';
+   link.rel='noopener noreferrer';link.textContent='FL511 ↗';
+   notice.appendChild(link);area.appendChild(notice);
  }
- function directoryLinks(){return externalCameraLinks.length?externalCameraLinks:fallbackLinks;}
- function renderCameraHelp(area){
-   area.querySelector('.roadtv-map-help')?.remove();
-   const helper=document.createElement('div');helper.className='roadtv-map-help';
-   const label=document.createElement('span');label.className='roadtv-help-label';
-   label.textContent=lang()==='en'?'Official road cameras — select to view':lang()==='es'?'Cámaras de carretera — seleccione':'Câmeras rodoviárias — escolha a fonte';
-   const links=document.createElement('span');links.className='roadtv-source-links';
-   for(const source of directoryLinks()){
-     const anchor=document.createElement('a');
-     anchor.href=source.source_url;anchor.target='_blank';anchor.rel='noopener noreferrer';
-     anchor.textContent=source.label;anchor.title=source.name||source.label;
-     anchor.dataset.cameraSourceId=source.id;
-     links.appendChild(anchor);
+ function showPublisherCamera(force=false){
+   if(active)return;
+   const card=visible(),area=playbackArea(card);if(!area)return;
+   if(!force&&area.querySelector('.roadtv-publisher-camera'))return;
+   cards.forEach(c=>{if(c!==card)playbackArea(c)?.replaceChildren();});
+   area.replaceChildren();publisherFrame=null;
+   const source=directCameras[publisherIndex];
+   if(!source||publisherFailures.size>=directCameras.length){publisherUnavailable(area);return;}
+   const frame=document.createElement('iframe');
+   frame.className='roadtv-publisher-camera';
+   frame.title=source.name+' — câmera rodoviária da fonte';
+   frame.loading='eager';
+   frame.referrerPolicy='strict-origin-when-cross-origin';
+   frame.allow='autoplay; fullscreen; picture-in-picture';
+   frame.setAttribute('allowfullscreen','');
+   frame.src=source.embed;
+   let loaded=false;
+   const guard=setTimeout(()=>{
+     if(!loaded&&publisherFrame===frame)failPublisher(source.id);
+   },16000);
+   frame.onload=()=>{loaded=true;clearTimeout(guard)};
+   frame.onerror=()=>{clearTimeout(guard);failPublisher(source.id)};
+   area.appendChild(frame);publisherFrame=frame;lastVisible=card;
+   const caption=document.createElement('div');caption.className='roadtv-camera-credit';
+   const name=document.createElement('span');name.textContent=source.name;
+   const link=document.createElement('a');link.href=source.page;link.target='_blank';
+   link.rel='noopener noreferrer';
+   link.textContent=lang()==='en'?'Source ↗':lang()==='es'?'Fuente ↗':'Fonte ↗';
+   caption.append(name,link);area.appendChild(caption);
+ }
+ function failPublisher(id){
+   const card=visible(),area=playbackArea(card);
+   publisherFailures.add(id);
+   if(publisherFailures.size>=directCameras.length){if(area)publisherUnavailable(area);return;}
+   for(let n=0;n<directCameras.length;n++){
+     publisherIndex=(publisherIndex+1)%directCameras.length;
+     if(!publisherFailures.has(directCameras[publisherIndex].id))break;
    }
-   helper.append(label,links);area.appendChild(helper);
- }
- async function loadCameraDirectory(){
-   if(!location.protocol.startsWith('http'))return;
-   try{
-     const response=await fetch(cameraSourceRegistry+'?ts='+now(),{cache:'no-store'});
-     if(!response.ok)throw Error('camera_sources_unavailable');
-     const data=await response.json();
-     if(data.schema_version!==1||!Array.isArray(data.sources)||data.all_camera_streams_verified!==false)
-       throw Error('camera_sources_not_safe');
-     externalCameraLinks=data.sources.filter(safeOfficialLink).slice(0,4);
-   }catch{externalCameraLinks=[]}
-   cards.forEach(card=>{
-     const area=playbackArea(card);
-     if(area?.querySelector('.roadtv-official-map'))renderCameraHelp(area);
-   });
+   showPublisherCamera(true);
  }
  function status(message){
-   const fallback=message===labels[lang()].empty||message===labels[lang()].error;
-   for(const card of cards){
-     const area=playbackArea(card);if(!area)return;
-     if(area.querySelector('.roadtv-official-map')){if(fallback)renderCameraHelp(area);continue}
-     if(area.querySelector('iframe'))continue;
-     area.replaceChildren();
-     if(fallback){
-       const iframe=document.createElement('iframe');
-       iframe.className='roadtv-official-map';
-       iframe.title='FL511: câmeras oficiais de rodovias da Flórida; selecione a I-4 e uma câmera de vídeo';
-       iframe.loading='lazy';
-       iframe.referrerPolicy='strict-origin-when-cross-origin';
-       iframe.src=floridaCameras;
-       area.appendChild(iframe);
-       renderCameraHelp(area);
-     }else{
-       const p=document.createElement('span');
-       p.className='roadtv-status';p.setAttribute('role','status');p.textContent=message;
-       area.appendChild(p);
-     }
-   }
+   // Only a platform-verified driver/road/border livestream supersedes this
+   // independent publisher camera. A map is never used as a substitute for video.
+   if(!active){showPublisherCamera();return;}
  }
  function clear(){
    epoch+=1;
    if(player?.destroy)try{player.destroy()}catch{}
    player=null;playing=false;active=null;activeCard=null;started=0;attemptingAt=0;
+   publisherFrame=null;
    cards.forEach(card=>{const area=playbackArea(card);area?.replaceChildren();area?.classList.remove('is-twitch')});
  }
  function candidates(json){
@@ -238,15 +242,18 @@
  // Only a verified live or qualifying same-day replay may be used.
  // No hard-coded video ID, no dead Virtual Railfan train camera.
  cards.forEach(c=>playbackArea(c)?.replaceChildren());
- status(labels[lang()].waiting);
- loadCameraDirectory();
+ // Show a specific camera immediately; never require reader to navigate a map.
+ showPublisherCamera();
  document.getElementById('language')?.addEventListener('change',()=>{
-   if(!active)status(labels[lang()].empty);
-   else if(!active.live)cards.forEach(c=>{const b=c.querySelector('.roadtv-replay');if(b)b.textContent=labels[lang()].replay});
+   if(!active){
+     const label=visible().querySelector('.roadtv-camera-credit a');
+     if(label)label.textContent=lang()==='en'?'Source ↗':lang()==='es'?'Fuente ↗':'Fonte ↗';
+   }else if(!active.live)cards.forEach(c=>{const b=c.querySelector('.roadtv-replay');if(b)b.textContent=labels[lang()].replay});
  });
  window.addEventListener('resize',()=>{
    const selected=visible();
    if(active&&selected!==lastVisible)start(active); // avoids off-screen video/duplicate audio
+   else if(!active&&selected!==lastVisible)showPublisherCamera(true);
  });
  setInterval(()=>{
    if(active&&active.platform==='youtube'&&!playing&&attemptingAt&&now()-attemptingAt>35000){
