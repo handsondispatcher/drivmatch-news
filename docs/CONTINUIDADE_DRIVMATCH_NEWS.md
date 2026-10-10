@@ -1,5 +1,17 @@
 # DrivMatch News — CONTINUIDADE CANÔNICA / LEIA PRIMEIRO
 
+## ESTADO ATUAL — REVISÃO V34 COM v33 INTACTA (09/10/2026)
+
+A pedido explícito do usuário, **v33 foi preservada antes da v34** na branch `backup/v33-approved-2026-10-09`, commit `fea227dde034e101ace8299357579ddfe98fe256`. A v32 anterior continua preservada em `backup/v32-approved-2026-10-09`. **NUNCA apagar essas referências para desenvolver.**
+
+**V34:** revisão visual em linguagem de jornal profissional: branco/navy/azul original, foto de destaque com título e 3 relacionadas, 5 destaques ilustrados com imagens atribuídas, editorias na barra, Ventusky, mercado e crawler preservados, ONE discreto bloco serviços DrivMatch fora de matérias. Nenhum marketplace/cadastro/matching duplicado. **O mockup HD é apenas inspiração**, não autorização para fabricar notícias, imagens ou cotações. O site v33 e o modal compacto móvel aprovado são invariantes; teste em 360/390/768/1440. Decisões econômicas e valuation não são alterados por layout.
+
+**Documento-mãe e gates:** [V34_RELEASE.md](V34_RELEASE.md). Estratégia de aquisição e receitas anterior continua em [WAR_ROOM_ESTRATEGIA_DRIVMATCH_NEWS_E_RECEITA_2026-10-09.md](WAR_ROOM_ESTRATEGIA_DRIVMATCH_NEWS_E_RECEITA_2026-10-09.md). Lançamento permanece BLOQUEADO pela issue #18. Não afirmar que conselheiros reais participaram: War Room é estrutura de pareceres simulados.
+
+**Quando retomar em outro chat:** conferir main/PRs/Actions, release.json e esta seção primeiro; não pedir ao usuário que reexplique a v34 nem devolver patches manuais. Apenas promover com teste completo verde, manter backup intacto e esclarecer estado de publicação.
+
+
+
 ## NOVA ATA PRESERVADA — WAR ROOM ESTRATÉGICO/COMERCIAL 09/10/2026
 
 **A pedido do usuário (“Salvar”)**, a reunião com Tônio, Vinny Jr., Sra. Deloitte, Paulo Guedes, Chico e agentes de War Room foi preservada integralmente em [WAR_ROOM_ESTRATEGIA_DRIVMATCH_NEWS_E_RECEITA_2026-10-09.md](WAR_ROOM_ESTRATEGIA_DRIVMATCH_NEWS_E_RECEITA_2026-10-09.md), com rastreio na [issue #26](https://github.com/handsondispatcher/drivmatch-news/issues/26). **Reaproveitar este plano nos próximos chats sem solicitar nova explicação**. Conteúdo: posicionamento DrivMatch vs News, brasileiros → hispanos → americanos, layout da homepage, notícias como motor de aquisição, serviços B2B, pilotos de US$1.200 por contratação, consultoria, patrocínios, parceiros, métricas e plano de 90 dias. **São propostas de preço e modelos para teste; nenhuma receita, valuation, cobrança ou aprovação de lançamento foi criada por esta ata**. `main` atual v33 permanece pré-lançamento, e backup v32 intocado.
