@@ -473,7 +473,9 @@ def build(offline=False):
             official_alerts=collect_nws_alerts()
         except (OSError,TimeoutError,ValueError,KeyError,TypeError) as exc:
             errors.append('nws_official_alerts:'+type(exc).__name__)
-            print('NWS_OFFICIAL_ALERTS_UNAVAILABLE:',type(exc).__name__)
+            safe_http_code=getattr(exc,'code',None)
+            print('NWS_OFFICIAL_ALERTS_UNAVAILABLE:',type(exc).__name__,
+                  'HTTP_'+str(safe_http_code) if isinstance(safe_http_code,int) else '')
     print('NWS_OFFICIAL_ALERTS:',len(official_alerts),'current high-impact official bulletins (not verified road closures)')
     # Verified first-party links supplement RSS gaps, never get a new build timestamp.
     try:external_headlines=verified_external_source_links(offline)+external_headlines
