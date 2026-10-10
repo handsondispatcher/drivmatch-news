@@ -62,4 +62,38 @@ elements.articleLanguageButtons.dispatch('click',{target:{closest:key=>({dataset
 assert(elements.modaltitle.textContent.includes('diésel'));
 assert.strictEqual(elements.language.value,'pt');
 assert(elements.modalbodytext.textContent.includes('Los precios del diésel'));
+// Production-like collision: five freshly issued NWS alerts and other
+// documented transportation stories must not produce five alerts in a row.
+const makeSource=(id,title,category,source,published,type)=>({
+  id,kind:'external_link',status:'external_source',demo:false,
+  category,source,source_url:'https://example.com/'+id,published_at:published,
+  original_lang:'en',editorial_type:type,
+  locales:Object.fromEntries(['pt','en','es'].map(l=>[l,{title,summary:'',body:''}]))
+});
+const nw=Array.from({length:5},(_,i)=>makeSource('weather-'+i,
+  'NWS Weather Alert '+i,'Clima','National Weather Service (NWS)',
+  new Date(Date.UTC(2026,9,10,22,10-i)).toISOString(),'operational_bulletin'));
+const other=[
+  ['Driver rule update','Fiscalização','FMCSA'],
+  ['Trucking load prices','Fretes','FreightWaves'],
+  ['Truck stop infrastructure','Rodovias','Transport Topics'],
+  ['CDL driver hiring','Caminhoneiros','CDLLife'],
+  ['Semi trucking technology','Tecnologia','FleetOwner'],
+  ['US trucking carriers','Transporte','Transport Topics'],
+  ['Freight broker security','Segurança','Land Line']
+].map(([title,cat,origin],i)=>makeSource('publisher-'+i,title,cat,origin,
+  new Date(Date.UTC(2026,9,10,12-i)).toISOString(),'publisher_headline'));
+data.articles=[...nw,...other];
+elements.language.value='pt';
+elements.language.dispatch('change',{target:{value:'pt'}});
+const orderedTitles=[...elements.list.innerHTML.matchAll(/<h3>([^<]*)<\/h3>/g)].map(m=>m[1]);
+assert.equal(orderedTitles.length,6);
+assert.equal(orderedTitles.slice(0,3).filter(s=>s.includes('NWS Weather Alert')).length,1,
+  'Only one NWS bulletin in the first three news cards');
+assert.ok(orderedTitles.some(x=>x.includes('Freight')||x.includes('Driver')||x.includes('Truck')),
+  'Operational bulletins must be interleaved with independently sourced journalism');
+assert.ok(elements.list.innerHTML.includes('não é fotografia do fenômeno'),
+  'NWS cards must use an explicit non-photographic bulletin marker');
+assert.ok(elements.list.innerHTML.includes('data:image/svg'), 'NWS card should use safe graphic marker');
+console.log('EDITORIAL MIX PASS: no five consecutive NWS alerts; semantic NWS graphic; transport headlines interleaved');
 console.log('CLIENT SMOKE PASS: panorama/list/mirrored mobile market/modal/Spanish full text; global language unchanged');

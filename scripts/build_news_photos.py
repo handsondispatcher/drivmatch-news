@@ -114,6 +114,11 @@ def choose_photos(stories: list, available: list):
         sid = story.get("id")
         if not sid or sid in assigned:
             continue
+        # Government severe-weather alerts must never receive a generic truck
+        # archive picture. The client shows a neutral official-bulletin graphic.
+        if (story.get('editorial_type')=='operational_bulletin' or
+                story.get('origin_type')=='official-operational-alert'):
+            continue
         headline = _headline(story)
         preferred_url = story.get("image_source_url", "")
         ranked = []
