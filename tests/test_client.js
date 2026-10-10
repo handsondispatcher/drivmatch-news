@@ -14,7 +14,7 @@ class Element {
  get classList(){return {add(){},remove(){}};}
  scrollIntoView(){}
 }
-const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','highlights','highlights-title','highlights-note','highlightList','newsroom-section-label','newsroom-section-desc','newsroom-cta-eyebrow','newsroom-cta-title','newsroom-cta-desc','newsroom-cta-driver','newsroom-cta-carrier','market','market-note','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','modalbrief','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-dialog','translation','shade','noticias','footer-publisher','footer-legal','story-preview','story-preview-image','story-preview-download','story-preview-close','story-preview-title','story-preview-hint'];
+const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','highlights','highlights-title','highlights-note','highlightList','newsroom-section-label','newsroom-section-desc','newsroom-cta-eyebrow','newsroom-cta-title','newsroom-cta-desc','newsroom-cta-driver','newsroom-cta-carrier','market','market-note','market-mobile','market-note-mobile','market-title-mobile','ad-slot','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','modalbrief','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-dialog','translation','shade','noticias','footer-publisher','footer-legal','story-preview','story-preview-image','story-preview-download','story-preview-close','story-preview-title','story-preview-hint'];
 for(const id of ids)elements[id]=new Element(id);
 for(const id of ['panorama .heading','noticias .heading','market-title','.demo'])selectors['#'+id]=new Element(id);
 selectors['.demo']=new Element('demo');
@@ -40,12 +40,14 @@ assert(!elements.market.innerHTML.includes('Class 8'),'Do not render unavailable
 assert(!elements.market.innerHTML.includes('SIMULAÇÃO'));
 assert(elements.market.innerHTML.includes('Sem indicadores recentes e verificados'),'Empty market should have one honest message instead of blank rows');
 assert.strictEqual(elements['market-note'].textContent,'');
+assert.strictEqual(elements['market-mobile'].innerHTML,elements.market.innerHTML,'Mobile market must mirror same valid quotes below Road TV');
 data.market.indicators.diesel={value:3.72,observed_at:new Date().toISOString(),source:'EIA / FRED (semanal)',quote_status:'última observação disponível',change_pct:null};
 // Market data is consumed from the bootstrapped object: assert the renderer's
 // real-data branch through language render, which re-renders Market Focus.
 elements.language.value='en';elements.language.dispatch('change',{target:{value:'en'}});
 assert(elements.market.innerHTML.includes('3.72'),'Dated verified fuel value should be displayed');
 assert(!elements.market.innerHTML.includes('FDX'));
+assert.strictEqual(elements['market-mobile'].innerHTML,elements.market.innerHTML);
 elements.language.value='pt';elements.language.dispatch('change',{target:{value:'pt'}});
 const sample=0;
 elements.list.dispatch('click',{target:{closest:key=>({dataset:{story:String(sample)}})}});
@@ -60,4 +62,4 @@ elements.articleLanguageButtons.dispatch('click',{target:{closest:key=>({dataset
 assert(elements.modaltitle.textContent.includes('diésel'));
 assert.strictEqual(elements.language.value,'pt');
 assert(elements.modalbodytext.textContent.includes('Los precios del diésel'));
-console.log('CLIENT SMOKE PASS: panorama/list/market/modal/Spanish full text; global language unchanged');
+console.log('CLIENT SMOKE PASS: panorama/list/mirrored mobile market/modal/Spanish full text; global language unchanged');

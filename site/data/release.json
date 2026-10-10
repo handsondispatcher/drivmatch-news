@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.1",
-  "baseline": "v34 published baseline frozen at backup/v34-initial-2026-10-09; v33/v32 preserved; v34.1 removes empty market tickers",
+  "version": "v34.2",
+  "baseline": "v34.1 frozen at backup/v34-1-approved-2026-10-09; Road TV embedded below Ventusky before verified USD/BRL, diesel and Brent",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -18,7 +18,13 @@
     "nonintrusive_platform_referrals_without_new_matching",
     "hide_dead_stocks_and_class8_ui",
     "verified_market_values_only",
-    "remove_unnecessary_unavailable_market_queries"
+    "remove_unnecessary_unavailable_market_queries",
+    "road_tv_click_to_load",
+    "youtube_twitch_automatic_live_discovery",
+    "usa_cargo_forward_cab_metadata_gate",
+    "recent_48h_replay_clock_alignment",
+    "road_tv_channel_rotation",
+    "weather_road_tv_market_order"
   ],
   "prior_backups": [
     {
@@ -27,6 +33,16 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "backup/v34-initial-2026-10-09",
-  "previous_release_commit": "3ea738b87f1efd482d5dac95b536c241b9cae9de"
+  "previous_release_branch": "backup/v34-1-approved-2026-10-09",
+  "previous_release_commit": "77b6d50fa159a0b18a9619a2fcf6db4b652646cd",
+  "road_tv_policy": {
+    "youtube_twitch_only": true,
+    "live_claim_requires_authorized_api": true,
+    "video_location_and_forward_camera_metadata_only": true,
+    "motion_verified": false,
+    "recorded_today_or_yesterday_only": true,
+    "clock_aligned_actual_broadcast_metadata_only": true,
+    "no_live_and_no_recent_verified_recording": "show_unavailable_state",
+    "automatic_restreaming": false
+  }
 }

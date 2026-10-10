@@ -1,0 +1,141 @@
+"""Road TV source governance tests; no network, no simulated feeds shipped to site."""
+import datetime as dt
+import sys
+import unittest
+from pathlib import Path
+from urllib.parse import parse_qs, urlparse
+
+BASE=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(BASE/'scripts'))
+from road_tv import make_road_tv,clock_offset,evidence,video_length
+
+NOW=dt.datetime(2026,10,9,20,30,tzinfo=dt.timezone.utc)
+ID="A1b2C3d4E5f"
+CHANNEL="UC"+"A"*22
+TITLE="USA semi truck driver POV windshield on I-40 trucking"
+SNIPPET={"title":TITLE,"description":"LIVE forward cab view crossing USA interstate",
+         "channelId":CHANNEL,"channelTitle":"Road POV Driver","liveBroadcastContent":"live"}
+STATUS={"privacyStatus":"public","embeddable":True}
+LIVE={"id":ID,"snippet":SNIPPET,"status":STATUS,
+      "liveStreamingDetails":{"actualStartTime":"2026-10-09T20:00:00Z"}}
+REPLAY={"id":ID,"snippet":{**SNIPPET,"liveBroadcastContent":"none"},
+        "status":STATUS,"liveStreamingDetails":{
+          "actualStartTime":"2026-10-08T20:10:00Z",
+          "actualEndTime":"2026-10-08T21:30:00Z"},
+        "contentDetails":{"duration":"PT1H20M"}}
+
+
+class RoadTVTests(unittest.TestCase):
+ def cache(self,video_ids=None):
+  return {"checked_at":NOW.isoformat(),"youtube_ids":video_ids or [ID],
+          "twitch_channels":[]}
+
+ def result(self,video):
+  def api(url,**kwargs):
+   if "/videos?" in url:
+    return {"items":[video]}
+   raise AssertionError("Unexpected request: "+url)
+  return make_road_tv(now=NOW,api_key="test-key",get_json=api,cache=self.cache())
+
+ def test_verified_public_live_with_explicit_usa_cab_cargo(self):
+  doc=self.result(LIVE)
+  self.assertEqual(doc["schema_version"],2)
+  self.assertEqual(doc["live_status"],"verified_live")
+  self.assertEqual(doc["current_live"]["video_id"],ID)
+  self.assertEqual(doc["current_live"]["platform"],"youtube")
+  self.assertEqual(doc["current_live"]["status"],"live")
+  self.assertTrue(doc["current_live"]["live"])
+  self.assertIn("publisher metadata",doc["current_live"]["verification"].replace("Stream metadata, not frame/motion analysis","publisher metadata") if False else doc["current_live"]["geo_evidence"])
+  self.assertIsNone(doc["featured_recording"])
+
+ def test_yesterday_completed_original_broadcast_matches_us_clock(self):
+  doc=self.result(REPLAY)
+  self.assertEqual(doc["live_status"],"verified_replay")
+  self.assertIsNone(doc["current_live"])
+  v=doc["featured_recording"]
+  self.assertFalse(v["live"])
+  self.assertEqual(v["status"],"replay")
+  self.assertGreater(v["start_seconds"],0)
+  self.assertIn("Actual start/end",v["replay_time_evidence"])
+
+ def test_yesterday_upload_without_original_capture_time_rejected(self):
+  missing={**REPLAY,"liveStreamingDetails":{}}
+  self.assertEqual(self.result(missing)["candidates"],[])
+
+ def test_six_days_old_replay_rejected(self):
+  stale={**REPLAY,"liveStreamingDetails":{
+      "actualStartTime":"2026-10-01T20:10:00Z",
+      "actualEndTime":"2026-10-01T21:30:00Z"}}
+  self.assertEqual(self.result(stale)["live_status"],"none_verified")
+
+ def test_stopped_bathing_parked_is_excluded(self):
+  idle={**LIVE,"snippet":{**SNIPPET,"title":TITLE+" — parked for a shower"}}
+  self.assertEqual(self.result(idle)["candidates"],[])
+
+ def test_unverified_country_camera_or_vehicle_are_excluded(self):
+  for title in ("USA trip highway driver 4K","box truck dashcam Europe",
+                "USA passenger car windshield road view"):
+   with self.subTest(title=title):
+    x={**LIVE,"snippet":{**SNIPPET,"title":title,"description":" "}}
+    self.assertEqual(self.result(x)["candidates"],[])
+
+ def test_no_key_fail_closed_instead_of_stale_static_demo(self):
+  doc=make_road_tv(now=NOW,api_key="",twitch_id="",twitch_secret="")
+  self.assertEqual(doc["live_status"],"unverified")
+  self.assertEqual(doc["candidates"],[])
+  self.assertIsNone(doc["featured_recording"])
+  self.assertIn("credentials_not_configured",doc["warnings"][0])
+
+ def test_video_unembeddable_or_private_excluded(self):
+  for status in ({"privacyStatus":"public","embeddable":False},
+                 {"privacyStatus":"private","embeddable":True}):
+   self.assertEqual(self.result({**LIVE,"status":status})["candidates"],[])
+
+ def test_same_day_replay_far_outside_clock_window_rejected(self):
+  # Recording started 7 hours before local current time, ended 6 hours ago.
+  morning={**REPLAY,"liveStreamingDetails":{
+      "actualStartTime":"2026-10-09T12:00:00Z",
+      "actualEndTime":"2026-10-09T13:00:00Z"}}
+  self.assertEqual(self.result(morning)["candidates"],[])
+
+ def test_discovery_rotates_categories_under_daily_search_cap(self):
+  calls=[]
+  def api(url,**kwargs):
+   q=parse_qs(urlparse(url).query)
+   if '/search?' in url:
+    calls.append((q.get("eventType"),q.get("q")));return {"items":[]}
+   raise AssertionError(url)
+  c={"checked_at":"2026-10-08T00:00:00Z"}
+  doc=make_road_tv(now=NOW,api_key="test",get_json=api,cache=c)
+  self.assertEqual(len(calls),3)
+  self.assertEqual(sum(x[0]==["live"] for x in calls),2)
+  self.assertEqual(sum(x[0]==["completed"] for x in calls),1)
+  self.assertEqual(doc["live_status"],"none_verified")
+
+ def test_twitch_discovery_live_but_not_stationary(self):
+  def api(url,**kwargs):
+   if "oauth2/token" in url:return {"access_token":"testtoken"}
+   if "/search/channels?" in url:
+    return {"data":[{"id":"12345","broadcaster_login":"truckroad",
+      "display_name":"US Truck Road","title":TITLE,"tags":["windshield"]}]}
+   if "/streams?" in url:
+    return {"data":[{"user_login":"truckroad","type":"live","title":TITLE,
+      "started_at":"2026-10-09T19:30:00Z","tags":["trucking"]}]}
+   raise AssertionError(url)
+  doc=make_road_tv(now=NOW,api_key="",twitch_id="testid",
+     twitch_secret="testsecret",get_json=api,cache={"checked_at":"2026-10-08T00:00:00Z"})
+  self.assertEqual(doc["live_status"],"verified_live")
+  self.assertEqual(doc["current_live"]["platform"],"twitch")
+  self.assertEqual(doc["current_live"]["channel_login"],"truckroad")
+
+ def test_clock_alignment_require_real_recording_duration(self):
+  t=dt.datetime(2026,10,8,20,10,tzinfo=dt.timezone.utc)
+  self.assertEqual(video_length("PT1H30M"),5400)
+  self.assertIsNotNone(clock_offset(NOW,t,5400))
+  self.assertIsNone(clock_offset(NOW,None,5400))
+  self.assertIsNone(clock_offset(NOW,t,0))
+  self.assertTrue(evidence(TITLE))
+  self.assertFalse(evidence(TITLE+" parked sleeping"))
+
+if __name__=="__main__":
+ unittest.main()

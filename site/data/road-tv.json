@@ -1,0 +1,49 @@
+{
+  "schema_version": 2,
+  "generated_at": null,
+  "live_checked_at": null,
+  "live_status": "unverified",
+  "current_live": null,
+  "candidates": [],
+  "featured_recording": null,
+  "channels": [
+    {
+      "name": "Ride Along Gang",
+      "handle": "@Ridealonggang",
+      "channel_url": "https://www.youtube.com/@Ridealonggang",
+      "channel_id": null,
+      "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
+    },
+    {
+      "name": "51 Logistics",
+      "handle": "@51logistics",
+      "channel_url": "https://www.youtube.com/@51logistics",
+      "channel_id": null,
+      "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
+    },
+    {
+      "name": "Freight Relocators Live",
+      "handle": "@freightrelocatorslive",
+      "channel_url": "https://www.youtube.com/@freightrelocatorslive",
+      "channel_id": null,
+      "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
+    },
+    {
+      "name": "Johnny Trucker USA",
+      "handle": "@JohnnyTruckerUSA",
+      "channel_url": "https://www.youtube.com/@JohnnyTruckerUSA",
+      "channel_id": null,
+      "source_note": "Provided as possible discovery lead by the user; exact identity/eligibility pending check.",
+      "status": "unverified_discovery_reference"
+    }
+  ],
+  "autoselect_policy": "live_first_today_or_yesterday_replay_with_clock_alignment",
+  "idle_policy": "metadata stop indicators + status refresh; true motion verification unavailable",
+  "attribution": "Third-party creators via the official YouTube or Twitch player. Not retransmitted by DrivMatch.",
+  "warnings": [
+    "api_credentials_not_yet_configured"
+  ]
+}

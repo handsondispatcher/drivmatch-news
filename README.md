@@ -1,3 +1,11 @@
+# DrivMatch News v34.2 — Road TV (US cargo ride-along)
+
+**Alteração em desenvolvimento:** abaixo do Ventusky entrou **Road TV**, depois dólar, diesel e petróleo verificados, em desktop e celular. A descoberta automática usa API oficial YouTube/Twitch; sem credenciais configuradas ou transmissão elegível, mostra aviso honesto em vez de live inventada. **Replay só de transmissão encerrada hoje/ontem com horário de gravação verificável e próximo ao horário do dia; sempre rotulado REPLAY.** Nenhuma retransmissão por servidores DrivMatch. O modal compactado aprovado, o jornal e a identidade oficial permanecem intactos.
+
+**[Documento e regras da Road TV](docs/V34_2_ROAD_TV.md)** · **Backup congelado v34.1:** `backup/v34-1-approved-2026-10-09` (`77b6d50fa159a0b18a9619a2fcf6db4b652646cd`). v34/v33/v32 preservadas. `public_launch_approved=false`.
+
+---
+
 # DrivMatch News v34.1 — Indicadores reais sem espaços vazios
 
 **ATUAL:** a v34.1 corrige a coluna Mercado em Foco — remove tickets de ações e Class 8 sem dados, exibindo apenas dólar, diesel e Brent efetivamente verificados, ou uma mensagem honesta. **Backup v34**: `backup/v34-initial-2026-10-09`, SHA `3ea738b87f1efd482d5dac95b536c241b9cae9de`. **Detalhes e gate:** [V34_1_MARKET_FIX.md](docs/V34_1_MARKET_FIX.md). Mantém v33/v32 intactas e `public_launch_approved=false`.
