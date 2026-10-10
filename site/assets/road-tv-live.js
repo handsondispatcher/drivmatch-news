@@ -1,4 +1,4 @@
-/* DrivMatch News v34.7: Road TV integrity monitor.
+/* DrivMatch News v34.10: Video integrity and direct traffic camera rotation.
  * Official YouTube/Twitch player only. Never publish a hard-coded dead stream.
  * Live first, source-verified; recorded fallback allowed only when labeled.
  * Swap on playback errors, ended streams, verified-source expiry and rotation.
@@ -46,6 +46,11 @@
  // These are actual camera-player iframes, not miniature maps or still photos.
  // CamStreamer publishes the embed code; playback is still subject to provider uptime.
  const directCameras=[
+  // Provider-published native iframe for a US interstate bridge — vehicles on a trucking route.
+  // An iframe alone still cannot certify actual continuous motion.
+  {id:'us-i74-bridge',name:'I-74 · Bettendorf, IA — tráfego interestadual',
+   embed:'https://camstreamer.com/embed/oAXcPbxV4EmwG1z4IErIYVFUeJmjrQAyda99F4LS?rel=0',
+   page:'https://camstreamer.com/live/stream/145163831'},
   {id:'fl-bridge-lions',name:'Bridge of Lions · St. Augustine, FL',
    embed:'https://camstreamer.com/embed/oEfmCvt05RxNKi3KsM8QLw5molD3ifp3ppWj6fJu?rel=0',
    page:'https://camstreamer.com/live/stream/110525310'},
@@ -56,7 +61,9 @@
    embed:'https://camstreamer.com/embed/7WIJom0FTmLGWRea1khwrohdqLpKwHOa2DU5Wjqq?rel=0',
    page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'}
  ];
- let publisherIndex=0,publisherFrame=null,publisherFailures=new Set();
+ const CAMERA_ROTATION_MS=120*1000; // Different embedded live-road-camera source every 2min, NOT a freshness claim.
+ let publisherIndex=0,publisherFrame=null,publisherFailures=new Set(),publisherSince=0;
+
  function publisherUnavailable(area){
    area.replaceChildren();
    const notice=document.createElement('div');notice.className='roadtv-camera-unavailable';
@@ -90,7 +97,7 @@
    },16000);
    frame.onload=()=>{loaded=true;clearTimeout(guard)};
    frame.onerror=()=>{clearTimeout(guard);failPublisher(source.id)};
-   area.appendChild(frame);publisherFrame=frame;lastVisible=card;
+   area.appendChild(frame);publisherFrame=frame;lastVisible=card;publisherSince=now();
    const caption=document.createElement('div');caption.className='roadtv-camera-credit';
    const name=document.createElement('span');name.textContent=source.name;
    const link=document.createElement('a');link.href=source.page;link.target='_blank';
@@ -108,6 +115,23 @@
    }
    showPublisherCamera(true);
  }
+ function rotatePublisherCamera(){
+   // A stalled cross-origin iframe can't be inspected for motion. Rotate among
+   // distinct SOURCE PROVIDED camera players; don't repeat one all afternoon.
+   if(active||document.visibilityState!=='visible'||!publisherSince||
+      now()-publisherSince<CAMERA_ROTATION_MS)return;
+   // Failures are transient; allow retries on another cycle rather than pinning a
+   // broken camera forever, but never mark a loaded iframe as certified live.
+   if(publisherFailures.size>=directCameras.length){publisherFailures.clear();}
+   const original=publisherIndex;
+   for(let i=1;i<=directCameras.length;i++){
+     const idx=(original+i)%directCameras.length;
+     if(!publisherFailures.has(directCameras[idx].id)){
+       publisherIndex=idx;break;
+     }
+   }
+   if(publisherIndex!==original)showPublisherCamera(true);
+ }
  function status(message){
    // Only a platform-verified driver/road/border livestream supersedes this
    // independent publisher camera. A map is never used as a substitute for video.
@@ -117,7 +141,7 @@
    epoch+=1;
    if(player?.destroy)try{player.destroy()}catch{}
    player=null;playing=false;active=null;activeCard=null;started=0;attemptingAt=0;
-   publisherFrame=null;
+   publisherFrame=null;publisherSince=0;
    cards.forEach(card=>{const area=playbackArea(card);area?.replaceChildren();area?.classList.remove('is-twitch')});
  }
  function candidates(json){
@@ -261,7 +285,10 @@
    }
    if(active&&now()-started>12*60000&&videos.length>1)rotate();
  },15000);
+ setInterval(rotatePublisherCamera,10000);
  setInterval(refresh,120000);
  if(document.visibilityState==='visible')refresh();
- document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
+ document.addEventListener('visibilitychange',()=>{
+   if(document.visibilityState==='visible'){rotatePublisherCamera();refresh();}
+ });
 })();
