@@ -192,8 +192,45 @@ def authorized_spot():
 
 
 def verified_previous_close():
-    """Dated, attributed close for fallback; never presented as a live quote."""
-    return normalize_spot_quote(read_json(ROOT/'content/usdbrl_last_close.json'))
+    """Last *commercial spot* close, accepted only for the immediate nontrading window."""
+    q=normalize_spot_quote(read_json(ROOT/'content/usdbrl_last_close.json'))
+    close_date=datetime.strptime(q['close_date'],'%Y-%m-%d').date()
+    age=(NOW().date()-close_date).days
+    if age < 0 or age > 4:
+        raise ValueError('Commercial close fallback expired; do not display frozen rates')
+    return q
+
+
+def official_bcb_usdbrl():
+    """BCB SGS 1: official PTAX USD/BRL sell reference, distinct from commercial spot.
+
+    Public, dated daily reference; never label as real-time or commercial execution.
+    Official series is updated on Brazilian banking days (not weekends).
+    """
+    url='https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/5?formato=json'
+    rows=json.loads(fetch(url,timeout=12))
+    if not isinstance(rows,list):raise ValueError('Invalid BCB series shape')
+    observations=[]
+    for row in rows:
+        if not isinstance(row,dict):continue
+        try:
+            day=datetime.strptime(str(row['data']),'%d/%m/%Y').date()
+            value=float(str(row['valor']).replace(',','.'))
+            if not 0 < value < 50 or day>NOW().date():continue
+            observations.append((day,value))
+        except (KeyError,TypeError,ValueError):continue
+    observations=sorted(set(observations))
+    if not observations:raise ValueError('No BCB USD/BRL observations')
+    day,value=observations[-1]
+    if (NOW().date()-day).days>5:
+        raise ValueError('BCB reference date too old for public market strip')
+    previous=next((v for d,v in reversed(observations[:-1]) if d<day),None)
+    change=(value/previous-1)*100 if previous else None
+    quote=dated_quote(value,'Banco Central do Brasil — SGS 1 (PTAX venda)',day.isoformat(),
+                      change,'https://www.bcb.gov.br/estabilidadefinanceira/historicocotacoes')
+    quote.update(symbol='USD/BRL',instrument='ptax_reference',price_type='ptax_venda',
+                 session_status='closed',quote_status='official_bcb_ptax_last')
+    return quote
 
 
 def fred_latest(series, source):
@@ -258,8 +295,16 @@ def make_market(offline=False):
         except Exception as exc:
             market['errors'].append(f'{key}:{type(exc).__name__}')
             if key=='usdbrl':
-                try:market['indicators'][key]=verified_previous_close()
+                # Commercial close and BCB PTAX are not interchangeable instruments.
+                # Prefer the newest observation, commercial if dates coincide.
+                fallback=[]
+                try:fallback.append(verified_previous_close())
                 except Exception as exc2:market['errors'].append('usdbrl_previous_close:'+type(exc2).__name__)
+                try:fallback.append(official_bcb_usdbrl())
+                except Exception as exc3:market['errors'].append('usdbrl_bcb_ptax:'+type(exc3).__name__)
+                if fallback:
+                    fallback.sort(key=lambda q:(q['observed_at'][:10],q.get('instrument')=='spot'),reverse=True)
+                    market['indicators'][key]=fallback[0]
     # V34.1: unproven securities/Class 8 feeds no longer requested or rendered.
     # Retain authorized source adapters for future separately approved pilots.
     return market
