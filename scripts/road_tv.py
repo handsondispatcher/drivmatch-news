@@ -132,7 +132,7 @@ def safe_cached_discovery(now):
     try:
         data = json.loads(CACHE_PATH.read_text(encoding='utf-8'))
         ts = when(data.get('checked_at'))
-        if data.get('discovery_version')==3 and ts and 0 <= (now-ts).total_seconds() < 3700:
+        if data.get('discovery_version')==4 and ts and 0 <= (now-ts).total_seconds() < 3700:
             return data
     except (OSError, ValueError, TypeError):
         pass
@@ -408,7 +408,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     api=get_json or request_json
     cached=cache if cache is not None else safe_cached_discovery(now)
     fresh_cache=cached and when(cached.get('checked_at')) and (now-when(cached['checked_at'])).total_seconds()<3700
-    discovery={'checked_at':now.isoformat(),'discovery_version':3}
+    discovery={'checked_at':now.isoformat(),'discovery_version':4}
     diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
                  'targeted_live_hits':0,'_targeted_video_ids':[],
                  '_targeted_channel_id':None,'targeted_title_match':False,
@@ -417,6 +417,11 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
                  'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
                  'accepted_live':0}
     approved=[]
+    if fresh_cache and key:
+        diagnostics['_targeted_video_ids']=[i for i in cached.get('targeted_video_ids',[])
+                                            if VIDEO_ID.fullmatch(str(i))]
+        diagnostics['_targeted_channel_id']=cached.get('targeted_channel_id')
+        diagnostics['targeted_channel_checked']=cached.get('targeted_channel_checked')
     if key:
         if fresh_cache and isinstance(cached.get('youtube_ids'),list):
             search_ids=[i for i in cached['youtube_ids'] if VIDEO_ID.fullmatch(str(i))]
@@ -435,6 +440,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         ids=list(dict.fromkeys(creator_ids+cached_creator_ids+search_ids))[:MAX_CANDIDATES]
         discovery['youtube_ids']=search_ids
         discovery['curated_ids']=creator_ids
+        discovery['targeted_video_ids']=diagnostics['_targeted_video_ids']
+        discovery['targeted_channel_id']=diagnostics['_targeted_channel_id']
+        discovery['targeted_channel_checked']=diagnostics['targeted_channel_checked']
         diagnostics['candidate_ids']=len(ids)
         result['creator_discovery_count']=len(creator_ids)
         approved+=verify_youtube(ids,key,now,lambda u:api(u),result['warnings'],diagnostics)
