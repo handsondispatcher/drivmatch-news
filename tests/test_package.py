@@ -144,7 +144,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('id="count" hidden aria-hidden="true"',page)
   self.assertNotIn('Publicidade · DrivMatch',app)
   self.assertIn('assets/app.js?v=v34-10-',page)
-  self.assertIn('assets/utility-strip.js?v=v34-10-',page)
+  self.assertIn('assets/utility-strip.js?v=v34-11-',page)
   self.assertIn('function searchCity()', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
   self.assertIn('function officialForecast(', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
   self.assertIn('data/us-places.json', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
