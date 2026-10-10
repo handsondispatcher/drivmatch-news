@@ -342,6 +342,9 @@
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
     document.querySelectorAll('[data-site-lang]').forEach(b=>{b.classList.toggle('selected',b.dataset.siteLang===next);b.setAttribute('aria-pressed',String(b.dataset.siteLang===next));});
     $('language').value=next;$('languageFlag').src=flags[next];$('languageFlag').alt=next==='pt'?'Bandeira do Brasil':next==='en'?'US flag':'Bandera de España';
+    // Flag-button clicks do not fire change on the hidden select automatically.
+    // Tell independently initialized quote/weather/video modules to translate too.
+    document.dispatchEvent(new CustomEvent('drivmatch:language',{detail:{language:next}}));
     $('share-label').textContent=next==='en'?'Share':next==='es'?'Compartir':'Compartilhar';
     $('share-section-title').textContent=next==='en'?'Share this story':next==='es'?'Comparte esta noticia':'Compartilhe esta notícia';
     $('share-copy').textContent=next==='en'?'Copy link':next==='es'?'Copiar enlace':'Copiar link';
