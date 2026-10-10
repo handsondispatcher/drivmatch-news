@@ -1,4 +1,4 @@
-/* DrivMatch News v34.4: Road TV integrity monitor.
+/* DrivMatch News v34.6: Road TV integrity monitor.
  * Official YouTube/Twitch player only. Never publish a hard-coded dead stream.
  * Live first, source-verified; recorded fallback allowed only when labeled.
  * Swap on playback errors, ended streams, verified-source expiry and rotation.
@@ -10,6 +10,8 @@
  if(!cards.length)return;
  const safeHost=new Set(['drivmatch.com','www.drivmatch.com','handsondispatcher.github.io','localhost','127.0.0.1']);
  const liveSource='data/road-tv.json';
+ const cameraSourceRegistry='data/camera-source-network.json';
+ let externalCameraLinks=[];
  const videoId=/^[A-Za-z0-9_-]{11}$/;
  const twitchLogin=/^[a-z0-9_]{3,25}$/;
  const labels={
@@ -42,11 +44,54 @@
  // Official FL511 permits embedding its traffic-camera map (including streaming-video cameras).
  // It is a usable road-camera directory, NOT a certified autoplaying live broadcast.
  const floridaCameras='https://fl511.com/Map/EmbeddedMap?layers=Cameras&region=ALL&size=0';
- const floridaPortal='https://fl511.com/';
+ const fallbackLinks=[{id:'fl511-i4',label:'I-4 / FL511',source_url:'https://fl511.com/region/Central'}];
+ const approvedHosts={'fl511-i4':'fl511.com','peacebridge-usbound':'www.peacebridge.com',
+                      'nvroads-nevada':'www.nvroads.com','milecheck-cameras':'milecheckapp.com'};
+ function safeOfficialLink(source){
+   if(!source||typeof source!=='object'||!approvedHosts[source.id])return false;
+   try{
+     const url=new URL(source.source_url);
+     return url.protocol==='https:'&&url.hostname===approvedHosts[source.id]
+       &&['approved_official_embed','external_link_only','external_link_only_license_required'].includes(source.display)
+       &&source.verified_playing_live===false;
+   }catch{return false}
+ }
+ function directoryLinks(){return externalCameraLinks.length?externalCameraLinks:fallbackLinks;}
+ function renderCameraHelp(area){
+   area.querySelector('.roadtv-map-help')?.remove();
+   const helper=document.createElement('div');helper.className='roadtv-map-help';
+   const label=document.createElement('span');label.className='roadtv-help-label';
+   label.textContent=lang()==='en'?'Official road cameras — select to view':lang()==='es'?'Cámaras de carretera — seleccione':'Câmeras rodoviárias — escolha a fonte';
+   const links=document.createElement('span');links.className='roadtv-source-links';
+   for(const source of directoryLinks()){
+     const anchor=document.createElement('a');
+     anchor.href=source.source_url;anchor.target='_blank';anchor.rel='noopener noreferrer';
+     anchor.textContent=source.label;anchor.title=source.name||source.label;
+     anchor.dataset.cameraSourceId=source.id;
+     links.appendChild(anchor);
+   }
+   helper.append(label,links);area.appendChild(helper);
+ }
+ async function loadCameraDirectory(){
+   if(!location.protocol.startsWith('http'))return;
+   try{
+     const response=await fetch(cameraSourceRegistry+'?ts='+now(),{cache:'no-store'});
+     if(!response.ok)throw Error('camera_sources_unavailable');
+     const data=await response.json();
+     if(data.schema_version!==1||!Array.isArray(data.sources)||data.all_camera_streams_verified!==false)
+       throw Error('camera_sources_not_safe');
+     externalCameraLinks=data.sources.filter(safeOfficialLink).slice(0,4);
+   }catch{externalCameraLinks=[]}
+   cards.forEach(card=>{
+     const area=playbackArea(card);
+     if(area?.querySelector('.roadtv-official-map'))renderCameraHelp(area);
+   });
+ }
  function status(message){
    const fallback=message===labels[lang()].empty||message===labels[lang()].error;
    for(const card of cards){
      const area=playbackArea(card);if(!area)return;
+     if(area.querySelector('.roadtv-official-map')){if(fallback)renderCameraHelp(area);continue}
      if(area.querySelector('iframe'))continue;
      area.replaceChildren();
      if(fallback){
@@ -57,13 +102,7 @@
        iframe.referrerPolicy='strict-origin-when-cross-origin';
        iframe.src=floridaCameras;
        area.appendChild(iframe);
-       const helper=document.createElement('div');helper.className='roadtv-map-help';
-       const label=document.createElement('span');
-       label.textContent=lang()==='en'?'Florida highway cameras — choose a camera':lang()==='es'?'Cámaras de carretera — elija una cámara':'Câmeras de rodovias — selecione uma câmera';
-       const link=document.createElement('a');
-       link.href=floridaPortal;link.target='_blank';link.rel='noopener noreferrer';
-       link.textContent='FL511 ↗';
-       helper.append(label,link);area.appendChild(helper);
+       renderCameraHelp(area);
      }else{
        const p=document.createElement('span');
        p.className='roadtv-status';p.setAttribute('role','status');p.textContent=message;
@@ -85,7 +124,7 @@
    return (Array.isArray(json.candidates)?json.candidates:[])
      .filter(v=>valid(v,checked))
      .filter(v=>{const id=key(v);if(unique.has(id))return false;unique.add(id);return true})
-     .sort((a,b)=>Number(b.live)-Number(a.live)).slice(0,12);
+     .sort((a,b)=>Number(b.live)-Number(a.live)||(Number(a.source_rank??99)-Number(b.source_rank??99))).slice(0,12);
  }
  function markedBad(v){return failed.has(key(v))&&now()-failed.get(key(v))<15*60000}
  function nextVideo(exclude){
@@ -200,6 +239,7 @@
  // No hard-coded video ID, no dead Virtual Railfan train camera.
  cards.forEach(c=>playbackArea(c)?.replaceChildren());
  status(labels[lang()].waiting);
+ loadCameraDirectory();
  document.getElementById('language')?.addEventListener('change',()=>{
    if(!active)status(labels[lang()].empty);
    else if(!active.live)cards.forEach(c=>{const b=c.querySelector('.roadtv-replay');if(b)b.textContent=labels[lang()].replay});
