@@ -146,6 +146,15 @@ jobs:
       - name: Browser regression (bounded)
         timeout-minutes: 3
         run: npm run test:browser
+      - name: Audit production as real visitor (no stream mocks)
+        if: ${{ github.event_name == 'pull_request' }}
+        timeout-minutes: 5
+        run: node tests/audit_live_site.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-visitor-production-audit
+          path: test-results/live-site-visitor-audit/
       - uses: actions/upload-artifact@v4
         if: always()
         with:
