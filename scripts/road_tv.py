@@ -248,27 +248,32 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
     return list(dict.fromkeys(found))
 
 
-def verify_youtube(ids, key, now, api, errors):
+def verify_youtube(ids, key, now, api, errors, diagnostics=None):
     found=[]
     for offset in range(0,min(len(ids),MAX_CANDIDATES),50):
         try:
             params=dict(part='snippet,status,liveStreamingDetails,contentDetails',
                         id=','.join(ids[offset:offset+50]),key=key)
             result=api('https://www.googleapis.com/youtube/v3/videos?'+urllib.parse.urlencode(params))
-        except (OSError, TimeoutError, ValueError, KeyError, TypeError):
-            errors.append('youtube_video_validation_failed')
+        except (OSError, TimeoutError, ValueError, KeyError, TypeError) as exc:
+            errors.append('youtube_video_validation_'+api_error_tag(exc))
             continue
         for vid in result.get('items',[]):
+            if diagnostics is not None:diagnostics['videos_returned']+=1
             info=vid.get('snippet') or {}
             status=vid.get('status') or {}
             live=vid.get('liveStreamingDetails') or {}
             ident=vid.get('id','')
             if not VIDEO_ID.fullmatch(ident):continue
-            if status.get('privacyStatus')!='public' or status.get('embeddable') is not True:continue
+            if status.get('privacyStatus')!='public' or status.get('embeddable') is not True:
+                if diagnostics is not None:diagnostics['rejected_not_public_embeddable']+=1
+                continue
             title=str(info.get('title') or '')
             desc=str(info.get('description') or '')[:850]
             profile=source_profile(title,desc)
-            if not profile:continue
+            if not profile:
+                if diagnostics is not None:diagnostics['rejected_no_geo_cargo_pov']+=1
+                continue
             channel=str(info.get('channelTitle') or 'Criador independente')
             base={'platform':'youtube','video_id':ident,
                   'video_url':'https://www.youtube.com/watch?v='+ident,
@@ -280,6 +285,7 @@ def verify_youtube(ids, key, now, api, errors):
             if (info.get('liveBroadcastContent')=='live'
                 and when(live.get('actualStartTime')) and not live.get('actualEndTime')):
                 found.append({**base,'live':True,'status':'live','start_seconds':0})
+                if diagnostics is not None:diagnostics['accepted_live']+=1
                 continue
             ended=when(live.get('actualEndTime'))
             started=when(live.get('actualStartTime'))
@@ -376,7 +382,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     fresh_cache=cached and when(cached.get('checked_at')) and (now-when(cached['checked_at'])).total_seconds()<3700
     discovery={'checked_at':now.isoformat()}
     diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
-                 'targeted_live_hits':0}
+                 'targeted_live_hits':0,'videos_returned':0,
+                 'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
+                 'accepted_live':0}
     approved=[]
     if key:
         if fresh_cache and isinstance(cached.get('youtube_ids'),list):
@@ -398,7 +406,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         discovery['curated_ids']=creator_ids
         diagnostics['candidate_ids']=len(ids)
         result['creator_discovery_count']=len(creator_ids)
-        approved+=verify_youtube(ids,key,now,lambda u:api(u),result['warnings'])
+        approved+=verify_youtube(ids,key,now,lambda u:api(u),result['warnings'],diagnostics)
     if tid and secret:
         try:
             token=twitch_token(tid,secret,api)
