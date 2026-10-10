@@ -1,3 +1,9 @@
+# DrivMatch News v34.4 — auditoria Android/operacional
+
+**Revisão motivada por três screenshots reais de 10/10/2026:** railcam fixa indisponível, ticker 12px ilegível no celular e fontes consultadas sem matérias novas na capa. Na v34.4 a Road TV lê **somente candidatos oficialmente verificados** do backend, troca stream quando o player informa erro/encerramento, não fabrica status de live se faltar API; no celular manchetes do ticker têm ≥16px, com métricas independentes de consulta às fontes e recência da notícia. **[Relatório completo](docs/V34_4_AUDIT.md)**. v34.3 preservada em `backup/v34-3-mobile-audit-2026-10-10`, commit `578a713ce3e3a3e90402d2026319756754dca911`. O jornal continua `public_launch_approved=false`.
+
+---
+
 # DrivMatch News v34.3 — ROAD TV, player limpo
 
 **Edição aplicada mediante screenshot do usuário:** apenas “ROAD TV” + player oficial de câmera ferroviária Virtual Railfan (Oklahoma City, EUA), temporariamente, sem botões, listas, status ou textos públicos extras. Mesmo posicionamento depois do Ventusky e antes de Mercado em Foco. **A fonte identificava o stream como LIVE, mas disponibilidade e liberação de embed são controladas pelo YouTube/criador e devem ser verificadas manualmente.** A pesquisa YouTube/Twitch automática v34.2 foi preservada no repositório, não está ligada ao player temporário. [Especificação e gate](docs/V34_3_ROAD_TV_CLEAN.md).
