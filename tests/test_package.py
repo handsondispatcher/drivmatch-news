@@ -10,11 +10,11 @@ sys.path.insert(0,str(BASE/'scripts'))
 import update as up
 from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
- def test_v34_10_release_contract(self):
+ def test_v34_11_release_contract(self):
   version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
-  self.assertEqual(version['version'],'v34.10')
-  self.assertEqual(version['previous_release_branch'],'snapshot/v34-9-before-v34-10-warroom-2026-10-10')
-  self.assertEqual(version['previous_release_commit'],'16de69068cc97223df682a76709ff930f7e88435')
+  self.assertEqual(version['version'],'v34.11')
+  self.assertEqual(version['previous_release_branch'],'snapshot/v34-10-before-v34-11-city-search-20261010')
+  self.assertEqual(version['previous_release_commit'],'bfee2a7f0ab404abd22d737d6ab5210a37113c31')
   self.assertFalse(version['public_launch_approved'])
   self.assertEqual(version['backup_branch'],'backup/v33-approved-2026-10-09')
   self.assertEqual(version['backup_commit'],'fea227dde034e101ace8299357579ddfe98fe256')
@@ -38,10 +38,10 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('illustrated',app)
   self.assertIn('utm_source=drivmatch_news',page)
   self.assertNotIn('public_launch_approved": true',page)
-  self.assertIn('data-site-version="v34.10"',page)
-  self.assertIn('name="drivmatch-news-version" content="v34.10"',page)
-  self.assertIn('id="site-version" hidden>v34.10',page)
-  self.assertIn('DrivMatch News v34.10',app)
+  self.assertIn('data-site-version="v34.11"',page)
+  self.assertIn('name="drivmatch-news-version" content="v34.11"',page)
+  self.assertIn('id="site-version" hidden>v34.11',page)
+  self.assertIn('DrivMatch News v34.11',app)
   # Clean public player only; dynamic discovery engine retained separately.
   road=(BASE/'scripts/road_tv.py').read_text(encoding='utf-8')
   self.assertIn('YOUTUBE_DATA_API_KEY',road)
@@ -108,7 +108,7 @@ class PublicationTests(unittest.TestCase):
   self.assertFalse(version['road_tv_policy']['publisher_camera_is_certified_playing_live'])
   self.assertFalse(version['road_tv_policy']['fl511_map_used_as_primary'])
   # Visual and functional freeze from owner's five screenshot corrections.
-  self.assertIn('id="footer-version">· v34.10',page)
+  self.assertIn('id="footer-version">· v34.11',page)
   self.assertIn('id="footer-version',app)
   self.assertIn('.header .language-picker{border:0!important',page)
   self.assertIn('#panorama .carousel-controls{position:absolute',page)
@@ -130,8 +130,11 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('id="market-commercial-banner"',page)
   self.assertIn('id="top-city-query"',page)
   self.assertIn('id="top-city-options"',page)
-  self.assertIn('id="top-city-auto"',page)
-  self.assertIn('id="top-city-apply"',page)
+  self.assertIn('id="top-city-search-form"',page)
+  self.assertIn('id="top-city-search"',page)
+  self.assertNotIn('id="top-city-auto"',page)
+  self.assertNotIn('id="top-city-apply"',page)
+  self.assertNotIn('id="top-city-type"',page)
   self.assertIn('id="top-city-select-label"',page)
   self.assertIn("10*1000", (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
   self.assertIn('drivmatch_weather_city_v1',(BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
@@ -142,7 +145,11 @@ class PublicationTests(unittest.TestCase):
   self.assertNotIn('Publicidade · DrivMatch',app)
   self.assertIn('assets/app.js?v=v34-10-',page)
   self.assertIn('assets/utility-strip.js?v=v34-10-',page)
-  self.assertIn('function applyCityQuery()', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
+  self.assertIn('function searchCity()', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
+  self.assertIn('function officialForecast(', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
+  self.assertIn('data/us-places.json', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
+  self.assertEqual(version['weather_policy']['city_search'],'one_field_one_search_action')
+  self.assertEqual(version['weather_policy']['location_index'],'U.S. Census Bureau 2025 National Places')
   self.assertIn('news-candidates-cache.json',(BASE/'scripts/collect_sources.py').read_text(encoding='utf-8'))
   self.assertIn('original-language headlines remain readable'.lower(),app.lower())
   self.assertNotIn("$('chips').innerHTML",app)
@@ -171,11 +178,36 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('class="related-rail"',app)
   self.assertIn('shareDestinations',app)
   workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
-  self.assertIn('CUSTOM DOMAIN V34.10 PASS',workflow)
-  self.assertIn('CUSTOM DOMAIN V34.10 MISMATCH',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.11 PASS',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.11 MISMATCH',workflow)
   self.assertIn('drivmatch.com/news/data/release.json',workflow)
 
   self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
+ def test_census_national_city_index_and_duplicate_city_disambiguation(self):
+  import io,zipfile
+  from build_us_places import parse_gazetteer,validate_cache,SOURCE_URL
+  rows=['USPS\\tNAME\\tINTPTLAT\\tINTPTLONG']
+  rows.extend(['MO\\tSt. Charles city\\t38.78400\\t-90.48100',
+               'IL\\tSt. Charles city\\t41.91400\\t-88.30800'])
+  rows.extend(f'TX\\tDemoTown{i:05d} city\\t31.00000\\t-97.00000' for i in range(20000))
+  b=io.BytesIO()
+  with zipfile.ZipFile(b,'w',compression=zipfile.ZIP_DEFLATED) as z:
+   z.writestr('2025_Gaz_place_national.txt','\\n'.join(rows))
+  places=parse_gazetteer(b.getvalue())
+  self.assertEqual(len(places),20002)
+  self.assertEqual({p[1] for p in places if p[0]=='St. Charles'},{'MO','IL'})
+  self.assertEqual(len({(p[0].casefold(),p[1]) for p in places}),len(places))
+  doc={'schema_version':1,'source_url':SOURCE_URL,'places':places}
+  self.assertIs(validate_cache(doc),doc)
+  with self.assertRaises(ValueError):
+   validate_cache({**doc,'places':places[:100]})
+
+ def test_census_index_build_is_wired_to_publication_workflow(self):
+  workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
+  self.assertIn('python scripts/build_us_places.py',workflow)
+  self.assertIn('census-places-2025-v1',workflow)
+  self.assertIn('data/us-places.json',(BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
+
  def test_48h_source_cache_keeps_original_dates_and_rejects_foreign_or_stale(self):
   from collect_sources import merge_verified_candidate_history
   from tempfile import TemporaryDirectory
