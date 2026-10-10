@@ -22,6 +22,8 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(any('Ride Along Gang' in q for q in QUERIES))
   player=(BASE/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
   self.assertIn('CAMERA_ROTATION_MS=5*60*1000',player)
+  self.assertIn("priority(v)===priority(active)",player)
+  self.assertIn("active.view_type==='cargo_cab'?12*60000:CAMERA_ROTATION_MS",player)
 
  def test_automated_newsroom_and_video_health_contract(self):
   workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
