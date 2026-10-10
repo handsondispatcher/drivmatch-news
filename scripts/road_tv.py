@@ -65,7 +65,7 @@ def evidence(title, desc=''):
 # These never bypass YouTube's public/embeddable/active livestream checks.
 ROAD_US = re.compile(r'\b(?:florida|i[- ]?4|i[- ]?80|interstate\s+\d{1,3}|us\s+highway|united\s+states|nevada|usa)\b',re.I)
 ROAD_CAM = re.compile(r'\b(?:traffic\s+cam(?:era)?s?|highway\s+cam(?:era)?s?|road\s+cam(?:era)?s?|webcam|live\s*stream|livestream)\b',re.I)
-USBOUND_BORDER = re.compile(r'\b(?:peace\s+bridge|fort\s+erie|buffalo\s+ny|canada\s*[-→>]\s*(?:usa|us)|u\.?s\.?\s*(?:bound|entrance)|entering\s+(?:the\s+)?(?:usa|united\s+states))\b',re.I)
+USBOUND_BORDER = re.compile(r'\b(?:usa\s+entrance|u\.?s\.?\s+inspection|u\.?s\.?\s*[- ]?bound|canada\s*(?:to|[-→>])\s*(?:usa|us)|entering\s+(?:the\s+)?(?:usa|united\s+states))\b',re.I)
 BORDER = re.compile(r'\b(?:canada|ontario|fort\s+erie|peace\s+bridge|buffalo)\b',re.I)
 MOTION_DECEPTION = re.compile(r'\b(?:recorded|archived|loop(?:ing)?|pre[- ]?recorded|highlights|replay|compilation)\b',re.I)
 
