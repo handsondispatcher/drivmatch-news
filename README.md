@@ -1,3 +1,11 @@
+# DrivMatch News v34.6 — fontes de câmeras e fronteira Canadá→EUA (10/10/2026)
+
+A v34.6 **mantém inalterado o layout congelado da v34.5** e integra ao player de rodovias um catálogo auditável de fontes: mapa incorporável oficial FL511 (I-4), link da autoridade Peace Bridge para câmeras de acesso aos EUA, Nevada DOT e link externo MileCheck (sem incorporar dados comerciais sem licença). Busca automática de vídeos passa a reconhecer e priorizar transmissão verificada de caminhoneiro → rodovia dos EUA → fronteira Canadá→EUA; nenhuma fonte ou mapa é declarado vídeo ao vivo apenas por constar no catálogo. Fontes NWS Elko e aplicativo iOS são referências, não streams.
+
+**Arquitetura e direitos:** [War Room v34.6](docs/V34_6_CAMERA_SOURCES_WAR_ROOM.md) · [Catálogo canônico](content/camera-source-network.json) · [Congelamento do layout v34.5](docs/V34_5_WAR_ROOM_FREEZE.md). Snapshot anterior: `snapshot/v34-5-pre-camera-network-2026-10-10`, `946aaf215dcfe1e73c1fcabdbd5916f05e88e18d`. `public_launch_approved=false`. **Vídeo ao vivo real continua não homologado** sem credencial de API, stream reproduzível, embed permitido e auditoria física.
+
+---
+
 # DrivMatch News v34.4 — auditoria Android/operacional
 
 **Revisão motivada por três screenshots reais de 10/10/2026:** railcam fixa indisponível, ticker 12px ilegível no celular e fontes consultadas sem matérias novas na capa. Na v34.4 a Road TV lê **somente candidatos oficialmente verificados** do backend, troca stream quando o player informa erro/encerramento, não fabrica status de live se faltar API; no celular manchetes do ticker têm ≥16px, com métricas independentes de consulta às fontes e recência da notícia. **[Relatório completo](docs/V34_4_AUDIT.md)**. v34.3 preservada em `backup/v34-3-mobile-audit-2026-10-10`, commit `578a713ce3e3a3e90402d2026319756754dca911`. O jornal continua `public_launch_approved=false`.
