@@ -151,8 +151,13 @@ def youtube_discover(key, now, api, errors):
     # is ONLY relevance, never treated as verification of stream geography.
     # The discovery cache is hourly; two cycling LIVE searches plus one
     # completed-broadcast search = 72 YouTube search calls/day maximum.
-    selected_live=(QUERIES[now.hour % len(QUERIES)],
-                   QUERIES[(now.hour+1) % len(QUERIES)])
+    # Search one general category and one named creator EVERY hour, rather
+    # than waiting several hours for creator queries to rotate into the pool.
+    # Two LIVE + one completed search per hour preserves the API quota budget.
+    general_queries=QUERIES[:5]
+    creator_queries=QUERIES[5:]
+    selected_live=(general_queries[now.hour % len(general_queries)],
+                   creator_queries[now.hour % len(creator_queries)])
     for query in selected_live:
         try:
             params = dict(part='snippet', type='video', eventType='live',
@@ -335,11 +340,16 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     # Live first, sorting recent starts; only one player's video is ever loaded.
     lives=[x for x in approved if x.get('live')]
     replays=[x for x in approved if not x.get('live')]
-    lives.sort(key=lambda v:(v.get('source_rank',99),v.get('channel_name','')))
-    replays.sort(key=lambda v:(v.get('source_rank',99),v.get('ended_at','')))
-    result['candidates']=(lives+replays)[:12]
-    result['current_live']=lives[0] if lives else None
-    result['featured_recording']=replays[0] if replays else None
+    # Canonical order: verified LIVE driving POV, qualifying clock-aligned
+    # driving POV replay, verified LIVE highway/border traffic, other replay.
+    # A generic traffic camera never displaces a qualifying driver POV replay.
+    priority=lambda v: (0 if v.get('view_type')=='cargo_cab' and v.get('live') else
+                        1 if v.get('view_type')=='cargo_cab' else
+                        2 if v.get('live') else 3)
+    approved.sort(key=lambda v:(priority(v),v.get('source_rank',99),v.get('channel_name','')))
+    result['candidates']=approved[:12]
+    result['current_live']=next((v for v in approved if v.get('live')),None)
+    result['featured_recording']=next((v for v in approved if not v.get('live')),None)
     result['live_status']='verified_live' if lives else ('verified_replay' if replays else 'none_verified')
     return result
 
