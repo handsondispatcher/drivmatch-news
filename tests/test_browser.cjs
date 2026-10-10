@@ -17,7 +17,7 @@ const {spawn}=require('node:child_process');
    await page.route('https://camstreamer.com/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>CamStreamer native embed test stub</title>'}));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.8','public page has v34.8 version');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.9','public page has v34.9 version');
    assert.equal(await page.locator('#site-version').isVisible(),false,'Internal release must not appear in public masthead');
    assert.equal(await page.locator('#edition-date').isVisible(),false,'Internal edition date is not visible');
    assert.equal((await page.locator('.header').innerText()).includes('EDIÇÃO DIGITAL'),false,'No technical edition text on masthead');
@@ -82,16 +82,33 @@ const {spawn}=require('node:child_process');
    assert.ok(await page.locator('#highlightList li').count()<=5,'Briefing must not fabricate stories');
    // v34 newsroom must be editorial-forward: real licensed thumbnails and tiny
    // commercial bridge; preserve tested compact mobile reading.
-   assert.equal(await page.locator('.newsroom-nav a[data-newsroom-cat]').count(),5);
+   assert.equal(await page.locator('.newsroom-nav').count(),0,'Owner removed redundant top newsroom navigation');
+   assert.equal(await page.locator('#chips,.chip').count(),0,'Owner removed public news category chip grid');
+   assert.equal(await page.locator('#highlights-note').count(),0,'No editorial selection explanatory sentence');
+   assert.equal(await page.locator('#news-commercial-banner .ad-link').count(),1,'A real house banner replaces news chips');
+   assert.equal(await page.locator('#market-commercial-banner .ad-link').count(),1,'Side blank must become clearly labeled house banner');
+   const topAd=await page.locator('#news-commercial-banner').innerText();
+   assert.match(topAd,/DrivMatch/,'No fake third-party paid advertiser');
+   assert.equal(await page.locator('#top-city-select').count(),1,'Reader can choose city/state');
+   assert.equal(await page.locator('#top-city-select').inputValue(),'auto','Default city selection rotates every 10 minutes');
+   assert.equal(await page.locator('#top-city-select option[value="auto"]').count(),1);
    assert.equal(await page.locator('#highlightList .highlight-photo').count(),await page.locator('#highlightList li').count(),'Highlights must carry real source-derived local images or honest illustrated fallback');
    assert.equal(await page.locator('#newsroom-cta-driver').getAttribute('href').then(x=>x.includes('utm_source=drivmatch_news')),true);
    assert.equal(await page.locator('#newsroom-cta-carrier').getAttribute('href').then(x=>x.includes('utm_content=carrier')),true);
    assert.equal(await page.locator('#article-dialog').count(),1,'Never replace original v33 compact mobile reader');
-   const nav=page.locator('.newsroom-nav a[data-newsroom-cat="Fretes"]');
-   await nav.click();
-   assert.equal(await page.locator('#category').inputValue(),'Fretes','Newsroom nav uses existing category filter');
-   await page.locator('.newsroom-nav a[data-newsroom-label="home"]').click();
-   assert.equal(await page.locator('#category').inputValue(),'Todas','Front page resets existing filter');
+   // Category selection remains available in the footer archive search, not as banners/chips.
+   await page.locator('#category').selectOption('Fretes');
+   assert.equal(await page.locator('#category').inputValue(),'Fretes','Footer archive filter still works');
+   await page.locator('#category').selectOption('Todas');
+   assert.equal(await page.locator('#category').inputValue(),'Todas','Footer reset still works');
+   const options=await page.locator('#top-city-select option').count();
+   if(options>1){
+     const city=await page.locator('#top-city-select option').nth(1).getAttribute('value');
+     await page.locator('#top-city-select').selectOption(city);
+     assert.equal(await page.locator('#top-city-select').inputValue(),city,'Explicit city choice pins weather');
+     await page.locator('#top-city-select').selectOption('auto');
+     assert.equal(await page.locator('#top-city-select').inputValue(),'auto','Automatic 10-minute rotation can be restored');
+   }
    if(width===1440) {
      const hero=await page.locator('#features .hero-wrap article').evaluate(el=>({position:getComputedStyle(el).position,visible:el.getBoundingClientRect().width>0}));
      assert.ok(hero.visible,'Newsroom has a visible hero headline');
@@ -123,7 +140,7 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   // v34.8: show one direct camera video embed, never a tiny map or links-only tile.
+   // v34.9: show one direct camera video embed, never a tiny map or links-only tile.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
    assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
@@ -141,13 +158,26 @@ const {spawn}=require('node:child_process');
    for(const id of ['top-usd-value','top-diesel-value','top-brent-value','top-weather-icon','top-risk']) {
      assert.equal(await page.locator('#'+id).count(),1,'Reference strip item '+id+' missing');
    }
-   if(width===944){
-     const grid=await page.locator('.dm-util-inner').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
-     assert.equal(grid,5,'Approved image 2 must remain five horizontal quote/weather cells at 944px');
+   if(width>=944){
+     const layout=await page.locator('.dm-util-inner').evaluate(el=>{
+       const columns=getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length;
+       const rects=[...el.children].map(ch=>ch.getBoundingClientRect());
+       const container=el.getBoundingClientRect();
+       const overflow=rects.some(r=>r.left<container.left-2||r.right>container.right+2);
+       const collision=rects.some((r,i)=>rects.slice(i+1).some(q=>
+         r.left<q.right-1&&r.right>q.left+1&&r.top<q.bottom-1&&r.bottom>q.top+1));
+       const separated=rects.length===6&&
+         Math.min(...rects.slice(3).map(r=>r.top))>=Math.max(...rects.slice(0,3).map(r=>r.bottom))-2;
+       return {columns,overflow,collision,separated};
+     });
+     assert.equal(layout.columns,width===944?3:6,
+       'City selector must use 3×2 responsive market strip at 944px and 6-wide on desktop');
+     if(width===944)assert.equal(layout.separated,true,
+       'Below 1120px weather, city picker, and risk must sit beneath all three quotes');
+     assert.equal(layout.overflow,false,'No weather/quote module should exceed its container');
+     assert.equal(layout.collision,false,'Market/forecast modules must never overlap');
    }
    if(width===1440){
-     const grid=await page.locator('.dm-util-inner').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
-     assert.equal(grid,5,'Approved screenshot uses 5 horizontal cells');
      for(const c of await page.locator('.related-rail p.editorial-context').all()){
        const x=await c.evaluate(el=>({height:el.getBoundingClientRect().height,lineHeight:parseFloat(getComputedStyle(el).lineHeight),text:el.textContent}));
        assert.ok(x.height<=x.lineHeight+1.5,'CTA must fit in a single line: '+x.text);
@@ -236,10 +266,10 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#clima-desktop .weather-top h2').textContent(),'Weather');
    assert.equal(await page.locator('#footer-publisher').innerText(),'DrivMatch News — um produto da Hands On Dispatcher LLC');
    assert.equal(await page.locator('#footer-legal').innerText(),
-     '© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. · v34.8');
-   assert.equal(await page.locator('#footer-version').innerText(),'· v34.8');
+     '© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. · v34.9');
+   assert.equal(await page.locator('#footer-version').innerText(),'· v34.9');
    await page.locator('[data-site-lang="pt"]').click();
-   assert.equal(await page.locator('#footer-version').textContent(),'· v34.8',
+   assert.equal(await page.locator('#footer-version').textContent(),'· v34.9',
      'Release footer must persist when changing language');
    assert.equal(await page.locator('[data-site-lang="pt"]').getAttribute('aria-pressed'),'true');
    assert.match(await page.locator('#footer-publisher').innerText(),/um produto da Hands On Dispatcher LLC/);

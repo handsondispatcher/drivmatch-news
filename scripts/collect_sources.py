@@ -80,6 +80,43 @@ def safe_feed_error(exc):
         return 'URLError'
     return type(exc).__name__
 
+def merge_verified_candidate_history(current, sources, now=None, *, path=None):
+    """Retain only previously fetched original publisher headline metadata for 48 hours.
+
+    A failed feed run must not erase still-valid history. Never relabel a past story
+    with the build timestamp, and never import Google/discovery or untrusted domains.
+    """
+    now=now or datetime.now(timezone.utc)
+    path=path or ROOT/'build/news-candidates-cache.json'
+    trusted={(urlparse(x['url']).hostname or '').removeprefix('www.'):x
+             for x in sources if x.get('access')=='rss' and x.get('url','').startswith('https://')}
+    added=0
+    if not path.exists():return 0
+    try:
+        previous=json.loads(path.read_text(encoding='utf-8'))
+        if not isinstance(previous,list):return 0
+    except (OSError,ValueError,UnicodeDecodeError):return 0
+    for row in previous[:1500]:
+        if not isinstance(row,dict) or row.get('origin_type')!='publisher-feed' or row.get('status')!='pending_review':
+            continue
+        url=row.get('source_url','')
+        p=urlparse(str(url))
+        host=(p.hostname or '').removeprefix('www.')
+        source=trusted.get(host)
+        if p.scheme!='https' or not source or row.get('source')!=source.get('name'):
+            continue
+        if not isinstance(row.get('title'),str) or not row['title'].strip() or len(row['title'])>600:
+            continue
+        try:
+            dt=datetime.fromisoformat(row['published_at'].replace('Z','+00:00'))
+            age=now-dt
+            if dt.tzinfo is None or age<timedelta(minutes=-5) or age>timedelta(hours=48):continue
+        except (ValueError,TypeError,KeyError,AttributeError):continue
+        if url not in current:
+            current[url]=row
+            added+=1
+    return added
+
 def collect():
     sources=json.loads((ROOT/'content/sources.json').read_text())['sources']
     def check(source):
@@ -97,13 +134,19 @@ def collect():
             for row in rows:
                 if row['source_url'] not in candidates:candidates[row['source_url']]=row
     out=ROOT/'build';out.mkdir(exist_ok=True)
+    retained=merge_verified_candidate_history(candidates,sources)
     (out/'news-candidates.json').write_text(json.dumps(list(candidates.values()),ensure_ascii=False,indent=2)+'\n')
+    (out/'news-candidates-cache.json').write_text(
+        json.dumps([x for x in candidates.values() if x.get('origin_type')=='publisher-feed'],
+                   ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     report={'checked_at':datetime.now(timezone.utc).isoformat(),'sources':health,'candidate_count':len(candidates)}
     (out/'source-health.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('Sources:',len(sources),'candidates:',len(candidates),'feed failures:',sum(x['status']=='failed' for x in health))
     failing=[x for x in health if x['status']=='failed']
     if failing:
         print('SOURCE_FAILURE_DIAGNOSTICS:',', '.join(f"{x['id']}:{x['error']}" for x in failing))
+    print('EDITORIAL_SOURCE_HISTORY:', 'retained_48h_original_publications:',retained,
+          'fresh_fetched_candidates:',max(0,len(candidates)-retained))
     print('RSS_RETRY_METRICS:', 'recovered_on_retry:',
           sum(x['status']=='ok' and x.get('attempts',1)>1 for x in health),
           'working:',sum(x['status']=='ok' for x in health),

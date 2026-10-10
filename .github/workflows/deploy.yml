@@ -39,6 +39,15 @@ jobs:
           key: roadtv-discovery-v2-${{ env.ROADTV_CACHE_HOUR }}
           restore-keys: |
             roadtv-discovery-v2-
+      # Reuse only date-verified original publisher headlines after transient RSS outages.
+      # Never change their published_at date or extend their 48-hour validity.
+      - name: Restaurar histórico de manchetes originais
+        uses: actions/cache/restore@v4
+        with:
+          path: build/news-candidates-cache.json
+          key: newsroom-original-headlines-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            newsroom-original-headlines-v1-
       - name: Atualizar conteúdo público e indicadores
         env:
           GOOGLE_TRANSLATE_API_KEY: ${{ secrets.GOOGLE_TRANSLATE_API_KEY }}
@@ -57,6 +66,11 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
         run: python scripts/update.py
+      - name: Preservar histórico verificado por até 48 horas
+        uses: actions/cache/save@v4
+        with:
+          path: build/news-candidates-cache.json
+          key: newsroom-original-headlines-v1-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Verificar, baixar e servir fotos editoriais licenciadas
         run: python scripts/build_news_photos.py --ci
       - name: Gerar links exclusivos e prévias para compartilhamento
@@ -105,12 +119,12 @@ jobs:
           test "$(wc -c < /tmp/drivmatch-social.jpg)" -gt 10000
           echo "PUBLIC SOCIAL PREVIEW PASS: Open Graph HTML and photo JPEG are accessible"
           INDEX="https://handsondispatcher.github.io/drivmatch-news/"
-          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$INDEX" -o /tmp/drivmatch-v34.8-index.html
-          grep -q 'name="drivmatch-news-version" content="v34.8"' /tmp/drivmatch-v34.8-index.html
-          grep -q 'data-site-version="v34.8"' /tmp/drivmatch-v34.8-index.html
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$INDEX" -o /tmp/drivmatch-v34.9-index.html
+          grep -q 'name="drivmatch-news-version" content="v34.9"' /tmp/drivmatch-v34.9-index.html
+          grep -q 'data-site-version="v34.9"' /tmp/drivmatch-v34.9-index.html
           RELEASE="https://handsondispatcher.github.io/drivmatch-news/data/release.json"
-          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v34.8-release.json
-          python -c 'import json; x=json.load(open("/tmp/drivmatch-v34.8-release.json")); assert x["version"]=="v34.8" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v34.8 PASS: prelaunch contract consistent")'
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 4 --retry-all-errors --max-time 18 "$RELEASE" -o /tmp/drivmatch-v34.9-release.json
+          python -c 'import json; x=json.load(open("/tmp/drivmatch-v34.9-release.json")); assert x["version"]=="v34.9" and x["public_launch_approved"] is False and x["lifecycle"]=="development_prelaunch"; print("VERSION v34.9 PASS: prelaunch contract consistent")'
           # Separate truth gate: actual market payload deployed to the public origin.
           # A successful build is not proof of a current rate or correct instrument.
           MARKET_JSON="https://handsondispatcher.github.io/drivmatch-news/data/market.json"
@@ -193,12 +207,12 @@ jobs:
           DOMAIN="https://drivmatch.com/news/"
           if curl --fail --location --silent --show-error --retry 2 --max-time 18 \
               -H "Cache-Control: no-cache" \
-              "${DOMAIN}?__release_probe=v34.8-${BUST}" -o /tmp/drivmatch-domain.html; then
-            if grep -q 'name="drivmatch-news-version" content="v34.8"' /tmp/drivmatch-domain.html \
-                && grep -q 'data-site-version="v34.8"' /tmp/drivmatch-domain.html; then
-              echo "CUSTOM DOMAIN V34.8 PASS: custom domain HTML identifies v34.8"
+              "${DOMAIN}?__release_probe=v34.9-${BUST}" -o /tmp/drivmatch-domain.html; then
+            if grep -q 'name="drivmatch-news-version" content="v34.9"' /tmp/drivmatch-domain.html \
+                && grep -q 'data-site-version="v34.9"' /tmp/drivmatch-domain.html; then
+              echo "CUSTOM DOMAIN V34.9 PASS: custom domain HTML identifies v34.9"
             else
-              echo "::warning::CUSTOM DOMAIN V34.8 MISMATCH: drivmatch.com/news/ does not serve v34.8 HTML; check Cloudflare route/proxy and caching. GitHub Pages is up-to-date."
+              echo "::warning::CUSTOM DOMAIN V34.9 MISMATCH: drivmatch.com/news/ does not serve v34.9 HTML; check Cloudflare route/proxy and caching. GitHub Pages is up-to-date."
               grep -oE 'name="drivmatch-news-version" content="[^"]+"' /tmp/drivmatch-domain.html || true
               grep -oE 'data-site-version="[^"]+"' /tmp/drivmatch-domain.html || true
               echo "CUSTOM DOMAIN HTML first line:"
@@ -209,7 +223,7 @@ jobs:
           fi
           if curl --fail --location --silent --show-error --retry 2 --max-time 18 \
               -H "Cache-Control: no-cache" \
-              "https://drivmatch.com/news/data/release.json?__release_probe=v34.8-${BUST}" \
+              "https://drivmatch.com/news/data/release.json?__release_probe=v34.9-${BUST}" \
               -o /tmp/drivmatch-domain-release.json; then
             python - <<'PY'
           import json
@@ -217,8 +231,8 @@ jobs:
               try: d=json.load(f)
               except (json.JSONDecodeError,UnicodeDecodeError): d={}
           print('CUSTOM DOMAIN RELEASE:',d.get('version','missing/invalid manifest'))
-          if d.get('version')!='v34.8':
-              print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v34.8. Cloudflare routing or cache differs from GitHub Pages.')
+          if d.get('version')!='v34.9':
+              print('::warning::CUSTOM DOMAIN RELEASE MISMATCH: /news/data/release.json does not report v34.9. Cloudflare routing or cache differs from GitHub Pages.')
           PY
           else
             echo "::warning::CUSTOM DOMAIN MANIFEST UNAVAILABLE: /news/data/release.json not served at custom domain."

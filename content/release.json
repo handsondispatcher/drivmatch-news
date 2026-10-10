@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.8",
-  "baseline": "v34.7 snapshot 7f9dd188727d37003ebb08eb6900b8dbd344ec52; owner-directed five-image corrections 2026-10-10",
+  "version": "v34.9",
+  "baseline": "v34.8 snapshot ebe47c6ba961db5c19fa9a1b13537c8f8702a8b4; owner six changes 2026-10-10",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -56,7 +56,15 @@
     "language_selector_standalone_buttons_no_double_border",
     "commercial_usdbrl_09oct_close_and_automatic_bcb_reference",
     "carousel_hero_only_related_cards_frozen",
-    "internal_editorial_freshness_gates_keep_source_dates"
+    "internal_editorial_freshness_gates_keep_source_dates",
+    "remove_duplicate_top_nav_categories",
+    "replace_news_filter_chips_with_owned_ad",
+    "populate_market_sidebar_blank_ad",
+    "state_city_selector_with_10min_rotation_without_choice",
+    "no_empty_highlights_explanation",
+    "standalone_language_buttons_no_outer_frame",
+    "headline_original_language_fallback_but_label",
+    "48_hour_publisher_candidate_cache_strict_original_date"
   ],
   "prior_backups": [
     {
@@ -65,8 +73,8 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "snapshot/v34-7-before-20261010-reader-corrections",
-  "previous_release_commit": "7f9dd188727d37003ebb08eb6900b8dbd344ec52",
+  "previous_release_branch": "snapshot/v34-8-before-v34-9-six-requests-20261010",
+  "previous_release_commit": "ebe47c6ba961db5c19fa9a1b13537c8f8702a8b4",
   "road_tv_policy": {
     "youtube_twitch_only": false,
     "live_claim_requires_authorized_api": true,
@@ -107,5 +115,29 @@
     "hero_only": true,
     "read_also_stable": true
   },
-  "reader_cta_policy": "related_rail_only"
+  "reader_cta_policy": "related_rail_only",
+  "ads_policy": {
+    "inventory": "first_party_house_only_until_paid_sponsor_approved",
+    "slots": [
+      "news-top",
+      "market-sidebar"
+    ],
+    "clearly_labeled": true,
+    "no_false_clients": true
+  },
+  "weather_policy": {
+    "city_selection": "manual_pin_or_auto",
+    "rotation_minutes": 10,
+    "verified_forecast_only": true,
+    "selection_local_device": true
+  },
+  "editorial_policy": {
+    "original_language_allowed_when_translation_missing": true,
+    "always_disclose_untranslated": true,
+    "publisher_original_date_preserved": true,
+    "cache_ttl_hours": 48,
+    "build_cron_minutes": 10,
+    "source_verification_required": true,
+    "no_guaranteed_new_story_when_sources_do_not_publish": true
+  }
 }

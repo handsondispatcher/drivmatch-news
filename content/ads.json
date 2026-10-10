@@ -1,1 +1,26 @@
-{"enabled":false,"placements":[{"slot":"below_panorama","label":"Publicidade","title":"Anuncie no DrivMatch News","text":"Espaço disponível para parceiros do setor de transporte.","url":"https://drivmatch.com/","enabled":false,"relationship":"house"}]}
+{
+  "enabled": true,
+  "commercial_policy": "Owned-media promotional inventory; no paid sponsor without contracted creative approval",
+  "placements": [
+    {
+      "slot": "news-top",
+      "label": "Publicidade",
+      "title": "Conecte seu negócio ao transporte americano",
+      "text": "Motoristas, frotas e empresas em movimento. Conheça o ecossistema DrivMatch.",
+      "url": "https://drivmatch.com/?utm_source=drivmatch_news&utm_medium=owned_banner&utm_campaign=news_top_2026",
+      "enabled": true,
+      "relationship": "house",
+      "sponsor": "DrivMatch"
+    },
+    {
+      "slot": "market-sidebar",
+      "label": "Publicidade",
+      "title": "O transporte move oportunidades",
+      "text": "Uma vitrine para empresas e profissionais que fazem a logística acontecer.",
+      "url": "https://drivmatch.com/?utm_source=drivmatch_news&utm_medium=owned_banner&utm_campaign=sidebar_2026",
+      "enabled": true,
+      "relationship": "house",
+      "sponsor": "DrivMatch"
+    }
+  ]
+}
