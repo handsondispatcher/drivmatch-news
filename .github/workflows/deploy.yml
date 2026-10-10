@@ -69,6 +69,32 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
         run: python scripts/update.py
+      - name: Auditoria automática de frescor editorial
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          path=Path('build/newsroom-health.json')
+          if not path.exists():
+              print('NEWSROOM AUDIT ERROR: health report missing')
+              with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+                  f.write('### Newsroom freshness: ERROR - report missing\\n')
+          else:
+              report=json.loads(path.read_text())
+              print('NEWSROOM AUDIT',json.dumps(report,ensure_ascii=False))
+              with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+                  f.write('### Newsroom freshness\\n')
+                  for key in ('status','latest_original_published_at','latest_original_age_minutes','approved_external_headlines','published_last_60_minutes','published_last_180_minutes'):
+                      f.write(f'- {key}: {report[key]}\\n')
+              if report['status']!='fresh':
+                  print('::warning title=Editorial freshness::No verified original-source headline within three hours. Check publisher feeds and editorial rejection log.')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newsroom-freshness-audit
+          path: build/newsroom-health.json
       - name: Preservar histórico verificado por até 48 horas
         uses: actions/cache/save@v4
         with:
