@@ -10,6 +10,19 @@ sys.path.insert(0,str(BASE/'scripts'))
 import update as up
 from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
+ def test_roadtv_owner_pov_discovery_regression(self):
+  import sys
+  sys.path.insert(0,str(BASE/'scripts'))
+  from road_tv import evidence,QUERIES
+  self.assertTrue(evidence('LIVE: DriveCam POV Driving from Ohio to Texas #Trucking #ASMR'))
+  self.assertTrue(evidence('LIVE Driving POV IRL Denver CO to Schuyler NE trucker ride along'))
+  self.assertFalse(evidence('LIVE driving POV France truck'))
+  self.assertFalse(evidence('USA trucking POV parked at rest stop'))
+  self.assertTrue(any('Trucking Duke' in q for q in QUERIES))
+  self.assertTrue(any('Ride Along Gang' in q for q in QUERIES))
+  player=(BASE/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
+  self.assertIn('CAMERA_ROTATION_MS=5*60*1000',player)
+
  def test_v34_11_release_contract(self):
   version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
   self.assertEqual(version['version'],'v34.11')
