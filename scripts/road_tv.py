@@ -277,6 +277,18 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
                 continue
             title=str(info.get('title') or '')
             desc=str(info.get('description') or '')[:850]
+            if diagnostics is not None and ident in diagnostics.get('_targeted_video_ids',[]):
+                # Public publisher metadata ONLY; never log key/URL or raw errors.
+                diagnostics['targeted_video_title']=title[:150]
+                diagnostics['targeted_metadata_flags']={
+                    'channel_id_match':str(info.get('channelId') or '')==diagnostics.get('_targeted_channel_id'),
+                    'cab_pov':bool(CAB.search(title+' '+desc)),
+                    'cargo_vehicle':bool(CARGO.search(title+' '+desc)),
+                    'us_road_or_route':bool(US.search(title+' '+desc) or US_ROUTE.search(title+' '+desc)),
+                    'stopped_keyword':bool(STOP.search(title+' '+desc)),
+                    'snippet_live':info.get('liveBroadcastContent')=='live',
+                    'actual_start_present':bool(when(live.get('actualStartTime'))),
+                    'actual_end_present':bool(live.get('actualEndTime'))}
             profile=source_profile(title,desc)
             # Narrow, publicly auditable owner-provided visual evidence:
             # on 2026-10-10 this exact Ride Along Gang broadcast showed
@@ -413,6 +425,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
                  'targeted_live_hits':0,'_targeted_video_ids':[],
                  '_targeted_channel_id':None,'targeted_title_match':False,
                  'owner_visual_evidence_used':0,'targeted_failure_reason':None,
+                 'targeted_video_title':None,'targeted_metadata_flags':None,
                  'videos_returned':0,
                  'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
                  'accepted_live':0}
