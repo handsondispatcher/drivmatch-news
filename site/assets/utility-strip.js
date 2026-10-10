@@ -118,8 +118,10 @@ function setSearchLocale(){
    q.setAttribute('aria-label',l==='en'?'Search weather by US city and state':
      l==='es'?'Buscar el pronóstico por ciudad y estado':'Buscar previsão por cidade e estado');
  }
- if(button)button.title=button.getAttribute('aria-label')=
-   l==='en'?'Search forecast':l==='es'?'Buscar pronóstico':'Buscar previsão';
+ if(button){
+   const action=l==='en'?'Search forecast':l==='es'?'Buscar pronóstico':'Buscar previsão';
+   button.title=action;button.setAttribute('aria-label',action);
+ }
  if(weatherSelection!=='auto'&&q&&document.activeElement!==q)q.value=displayCity(weatherSelection);
 }
 function searchMatches(raw,limit=10){
