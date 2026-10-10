@@ -528,6 +528,9 @@ body{background:#f7f9fc;color:#14283c}
 #panorama .hero-wrap .story .byline{color:#c9d8e6;font-size:11px}
 #panorama .hero-wrap .story.illustrated{position:static;display:flex;min-height:auto;background:#fff;border:1px solid #dce5ef;box-shadow:none}
 #panorama .hero-wrap .story.illustrated>img{position:static;height:260px;object-fit:cover}
+/* Operational NWS graphics contain labels and location: never crop them as
+   background photos. These covers have a deliberate 16:9 safe area. */
+#panorama img[data-bulletin="true"],#noticias img[data-bulletin="true"],#highlights img[data-bulletin="true"]{object-fit:contain!important;background:#eaf5fb}
 #panorama .hero-wrap .story.illustrated .info{position:static;background:#fff;color:#14283c;padding:12px 17px}
 #panorama .hero-wrap .story.illustrated h3{color:#14283c;font-size:clamp(24px,2.15vw,33px)}
 #panorama .hero-wrap .story.illustrated .feature-summary{color:#496378}

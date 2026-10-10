@@ -95,5 +95,11 @@ assert.ok(orderedTitles.some(x=>x.includes('Freight')||x.includes('Driver')||x.i
 assert.ok(elements.list.innerHTML.includes('não é fotografia do fenômeno'),
   'NWS cards must use an explicit non-photographic bulletin marker');
 assert.ok(elements.list.innerHTML.includes('data:image/svg'), 'NWS card should use safe graphic marker');
+assert.ok(elements.list.innerHTML.includes('data-bulletin="true"'),
+  'NWS graphic must use contain, not cover, at every card size');
+assert.ok(elements.features.innerHTML.includes('Driver rule update'),
+  'Transport journalism must lead Panorama when non-bulletin reporting exists');
+assert.ok(!elements.features.innerHTML.split('related-rail')[0].includes('NWS Weather Alert'),
+  'NWS alert must not dominate the main feature while transport news exists');
 console.log('EDITORIAL MIX PASS: no five consecutive NWS alerts; semantic NWS graphic; transport headlines interleaved');
 console.log('CLIENT SMOKE PASS: panorama/list/mirrored mobile market/modal/Spanish full text; global language unchanged');
