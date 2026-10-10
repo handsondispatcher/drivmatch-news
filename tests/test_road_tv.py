@@ -62,6 +62,17 @@ class RoadTVTests(unittest.TestCase):
   missing={**REPLAY,"liveStreamingDetails":{}}
   self.assertEqual(self.result(missing)["candidates"],[])
 
+ def test_live_ride_along_with_generic_stop_words_in_description_is_eligible(self):
+  # Real 2026-10-10 YouTube metadata: route title has a Schyuler typo,
+  # and creator boilerplate mentions stopped/parking/rest/shower.
+  # A statement in the video TITLE that it is parked remains a hard veto.
+  title='LIVE Driving POV- IRL- Denver CO ➜ Schyuler NE | Relaxing Ride Along'
+  description='One trucker answers the call. Parking and rest stop tips, shower information.'
+  self.assertEqual(source_profile(title,description)['view_type'],'cargo_cab')
+  stream={**LIVE,'snippet':{**SNIPPET,'title':title,'description':description}}
+  self.assertEqual(self.result(stream)['live_status'],'verified_live')
+  self.assertIsNone(source_profile(title+' — parked for shower',description))
+
  def test_six_days_old_replay_rejected(self):
   stale={**REPLAY,"liveStreamingDetails":{
       "actualStartTime":"2026-10-01T20:10:00Z",
