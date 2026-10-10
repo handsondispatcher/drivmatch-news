@@ -19,7 +19,9 @@ class PublicPayloadProofTests(unittest.TestCase):
         if feed == "content.json":
             core["articles"] = [{"id": "1", "published_at": "2026-10-08T12:00:00Z"}]
         elif feed == "source-headlines.json":
-            core.update({"headlines": [], "latest_headline_at": ""})
+            core.pop("schema_version")  # Actual production file has no schema field
+            core.update({"headlines": [], "source_metrics": {"total": 1, "working": 1},
+                         "latest_headline_at": ""})
         else:
             core.update({"candidates": [], "current_live": None,
                          "live_status": "unverified"})
