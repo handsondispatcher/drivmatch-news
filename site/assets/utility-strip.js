@@ -13,8 +13,12 @@ function showMarket(){
  el('top-usd-label').textContent=l==='en'?'USD / BRL':l==='es'?'Dólar':'Dólar';
  el('top-diesel-label').textContent=l==='en'?'US Diesel':l==='es'?'Diésel EE. UU.':'Diesel EUA';
  el('top-brent-label').textContent=l==='en'?'Brent Oil':l==='es'?'Petróleo Brent':'Petróleo Brent';
+ const usd=spot||market.usdbrl;
+ el('top-usd-label').textContent=usd?.instrument==='ptax_reference'
+     ?(l==='en'?'USD PTAX':l==='es'?'Dólar PTAX':'Dólar PTAX')
+     :(l==='en'?'USD / BRL':l==='es'?'Dólar':'Dólar');
  const values=[
-  {id:'usd',data:spot||market.usdbrl,decimals:4,prefix:'R$ ',suffix:''},
+  {id:'usd',data:usd,decimals:4,prefix:'R$ ',suffix:''},
   {id:'diesel',data:market.diesel,decimals:3,prefix:'US$ ',suffix:'/gal'},
   {id:'brent',data:market.brent,decimals:2,prefix:'US$ ',suffix:'/barril'}
  ];
@@ -30,7 +34,11 @@ function showMarket(){
    chg.hidden=pct===null;
    chg.classList.toggle('negative',pct!==null&&pct<0);
    chg.textContent=pct===null?'':(pct>0?'+':'')+number(pct,2)+'%';
-   const source=fresh?(v.source||'')+' · '+v.observed_at:'Cotação não verificada';
+   const closeLabel=fresh&&v.instrument==='spot'&&v.session_status==='closed'
+     ?'Fechamento comercial ':fresh&&v.instrument==='ptax_reference'
+     ?'Taxa de referência PTAX venda ':'';
+   const source=fresh?closeLabel+(v.source||'')+' · '+v.observed_at
+      :'Cotação não verificada';
    meta.textContent=source;value.title=source;
  }
 }
