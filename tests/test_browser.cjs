@@ -13,11 +13,29 @@ const {spawn}=require('node:child_process');
    page.on('pageerror',e=>errors.push(e.message));
    // YouTube content is owned by the creator; do not depend on its network in CI.
    await page.route('https://www.youtube-nocookie.com/**',route=>route.fulfill({status:200,body:'<!doctype html><title>Official player test stub</title>'}));
+   // Official third-party FL511 is stubbed in CI; actual provider availability is a separate gate.
+   await page.route('https://fl511.com/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>FL511 camera directory test stub</title>'}));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.4','public page has v34.4 version');
-   assert.equal(await page.locator('#site-version').innerText(),'v34.4','public masthead identifies v34.4');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.5','public page has v34.5 version');
+   assert.equal(await page.locator('#site-version').innerText(),'v34.5','public masthead identifies v34.5');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
+   // Immutable editorial composition: search exclusively above institutional footer.
+   const layout=await page.evaluate(()=>{
+     const q=document.getElementById('pesquisa-noticias');
+     const footer=document.querySelector('footer.footer');
+     const cta=document.querySelector('.newsroom-partner-cta');
+     const flags=[...document.querySelectorAll('.language-shortcuts button')].map(x=>x.getBoundingClientRect());
+     return {searchBeforeFooter:q.compareDocumentPosition(footer)&Node.DOCUMENT_POSITION_FOLLOWING,
+             ctaBeforeSearch:cta.compareDocumentPosition(q)&Node.DOCUMENT_POSITION_FOLLOWING,
+             searchCount:document.querySelectorAll('#search').length,
+             inventedTitle:document.body.textContent.includes('NOTÍCIAS DO TRANSPORTE AMERICANO'),
+             flagRows:flags.map(r=>Math.round(r.top))};
+   });
+   assert.ok(layout.searchBeforeFooter&&layout.ctaBeforeSearch&&layout.searchCount===1,'Search must be only above footer');
+   assert.equal(layout.inventedTitle,false,'Unapproved editorial heading must never return');
+   assert.ok(Math.max(...layout.flagRows)-Math.min(...layout.flagRows)<=3,'Language buttons must remain on one horizontal row');
+   assert.equal(await page.locator('#search').isVisible(),true);
    // The approved v31 editorial composition must not silently downgrade to v18 cards.
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
    assert.equal(await page.locator('#features > .related-rail article').count(),3,'v31 requires three related stories');
@@ -80,12 +98,15 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   // v34.4: no stale hardcoded player. No published video without verified catalog.
+   // v34.5: no stale hardcoded player. No published video without verified catalog.
    const tvCard=page.locator(tv);
-   assert.equal(await tvCard.locator('h2').innerText(),'ROAD TV');
-   assert.equal(await tvCard.locator('button,a,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
+   assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
+   assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
    assert.equal(await tvCard.locator('.roadtv-screen').count(),1);
-   assert.equal(await tvCard.locator('.roadtv-screen iframe').count(),0,'Do not show hardcoded unavailable stream');
+   const fl511=tvCard.locator('.roadtv-official-map');
+   await fl511.waitFor({state:'attached',timeout:10000});
+   assert.match(await fl511.getAttribute('src'),/^https:\/\/fl511\.com\/Map\/EmbeddedMap\?layers=Cameras/);
+   assert.equal(await tvCard.locator('a[href="https://fl511.com/"]').count(),1,'Official direct camera directory remains accessible');
    assert.equal(await page.locator('#mercados').isVisible(),width>990);
    assert.equal(await page.locator('#mobile-market').isVisible(),width<=990);
    assert.equal(await page.locator('#news-freshness').count(),1);

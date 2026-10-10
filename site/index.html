@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pt-BR" data-site-version="v34.4">
+<html lang="pt-BR" data-site-version="v34.5">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta name="drivmatch-news-version" content="v34.4"/>
+<meta name="drivmatch-news-version" content="v34.5"/>
 <meta name="drivmatch-news-release-status" content="development-prelaunch"/>
 <title>DrivMatch News — Transporte e logística nos EUA</title>
 <style>
@@ -671,10 +671,50 @@ body{background:#f7f9fc;color:#14283c}
  .dm-crawler-track{gap:46px;animation-duration:80s}
  .news-freshness{font-size:13px;line-height:1.5}
 }
+
+/* v34.5 GOVERNANCE-LOCK — approved screenshot change only; do not relocate without approval. */
+.search-footer{max-width:1390px;margin:20px auto 0;padding:0 26px}
+.search-footer .lead{margin:0;padding:14px 16px;border-radius:7px;border:1px solid #c9ddeb;box-shadow:0 2px 12px #0e2a4010}
+.search-footer .form{display:grid;grid-template-columns:minmax(0,1fr) 210px 150px;gap:9px}
+.search-footer .form input,.search-footer .form select{width:100%;min-width:0;min-height:44px;font-size:14px;background:#fff;border:1px solid #cbd9e5;border-radius:5px;padding:10px 12px}
+.search-footer + .footer{margin-top:18px}
+/* Compact languages, one proportional horizontal group; never stack into a tall box. */
+.header .edition{flex:0 0 auto;min-width:0;max-width:100%;white-space:normal}
+.header .language-picker{display:inline-flex;max-width:100%;align-items:center}
+.header .language-shortcuts{display:inline-flex;flex-flow:row nowrap;justify-content:flex-end;gap:4px;margin-top:5px;max-width:100%}
+.header .language-shortcuts button{display:inline-flex;white-space:nowrap;font:600 11px/1.2 Arial,sans-serif;letter-spacing:0;padding:6px 8px;min-height:32px}
+.header .language-shortcuts img{width:18px;height:13px;max-width:18px}
+.roadtv-card{padding:8px}
+.roadtv-screen{min-height:190px}
+.roadtv-screen .roadtv-official-map{display:block;position:absolute;inset:0;width:100%;height:100%;border:0;background:#081c2c}
+.roadtv-screen .roadtv-map-help{position:absolute;inset:auto 0 0 0;display:flex;justify-content:space-between;gap:7px;align-items:center;padding:6px 9px;background:rgba(4,20,36,.94);font:600 11px/1.35 Arial,sans-serif;color:#fff}
+.roadtv-screen .roadtv-map-help a{color:#b8e7ff;text-decoration:underline}
+@media(max-width:990px){
+ .search-footer{padding:0 15px}
+ .search-footer .form{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .search-footer .form input{grid-column:1/-1}
+}
+@media(max-width:600px){
+ .header .header-inner{flex-wrap:wrap;gap:4px;padding:10px 12px}
+ .header .brand{width:100%;justify-content:center}
+ .header .brand img{width:min(300px,90vw)}
+ .header .edition{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;font-size:9px}
+ .header .language-shortcuts{margin-top:0}
+ .header .language-shortcuts button{font-size:10px;min-height:35px;padding:6px}
+ .header .language-shortcuts img{width:17px;height:12px}
+ /* Under 600px keep the selector in a dedicated line, not squeezed beside edition metadata. */
+ .header .edition{display:block;width:100%;max-width:100%;text-align:center;white-space:normal;min-width:0}
+ .header .language-picker{display:block;width:100%;max-width:100%;margin-top:4px}
+ .header .language-shortcuts{display:flex;justify-content:center;flex-wrap:nowrap;margin-inline:auto}
+ .search-footer{padding:0 11px}
+ .search-footer .lead{padding:11px}
+ .search-footer .form input,.search-footer .form select{font-size:13px;min-height:44px}
+ .roadtv-screen .roadtv-map-help{font-size:10px}
+}
 </style>
 </head>
 <body>
-<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition">EDIÇÃO DIGITAL · <span id="site-version" aria-label="Versão 34.4">v34.4</span> · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
+<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition">EDIÇÃO DIGITAL · <span id="site-version" aria-label="Versão 34.5">v34.5</span> · <span id="edition-date">—</span><br><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
 <nav class="newsroom-nav" aria-label="Editorias DrivMatch News"><div class="newsroom-nav-inner">
   <a href="#panorama" data-newsroom-label="home" class="newsroom-nav-home">Capa</a>
   <a href="#noticias" data-newsroom-cat="Caminhoneiros" data-newsroom-label="drivers">Caminhoneiros</a>
@@ -689,16 +729,12 @@ body{background:#f7f9fc;color:#14283c}
 
 <div class="main">
 <main>
-<div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div>
 <div class="weather-mobile"><section class="weather-card" id="clima-mobile" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section><section class="roadtv-card" id="roadtv-mobile" aria-label="ROAD TV">
-  <h2>ROAD TV</h2>
+
   <div class="roadtv-screen" aria-label="Transmissão em vídeo" aria-live="off"></div>
 </section><section class="mobile-market" id="mobile-market" aria-labelledby="market-title-mobile"><h2 id="market-title-mobile">Mercado em Foco</h2><div id="market-mobile"></div><p class="micro" id="market-note-mobile"></p></section></div>
 <section id="panorama">
-  <div class="newsroom-topline" aria-label="Informação editorial">
-  <span class="newsroom-section-label" id="newsroom-section-label">NOTÍCIAS DO TRANSPORTE AMERICANO</span>
-  <span class="newsroom-section-desc" id="newsroom-section-desc">Informação, mercado e contexto para quem vive o transporte nos EUA.</span>
-</div>
+
   <div class="topline"><h2 class="heading">Panorama do Transporte</h2><div class="carousel-controls" role="group" aria-label="Navegação do panorama"><button class="btn secondary" id="featurePrev" type="button" aria-label="Página anterior" title="Anterior">←</button><div class="carousel-dots" id="featureDots" role="group" aria-label="Ir para página do panorama"></div><button class="btn" id="featureNext" type="button" aria-label="Próxima página" title="Próximas">→</button><span class="sub" id="featureCount" aria-live="polite"></span></div></div>
   <div class="features" id="features"></div>
 </section>
@@ -714,7 +750,7 @@ body{background:#f7f9fc;color:#14283c}
 
 </main>
 <aside class="side" id="mercados"><div class="weather-desktop"><section class="weather-card" id="clima-desktop" aria-label="Clima"><div class="weather-top"><h2>Clima</h2><a class="weather-open" href="https://www.ventusky.com/pt/?p=27.8;-87.5;4&l=rain-3h" target="_blank" rel="noopener noreferrer" aria-label="Abrir Ventusky">Ventusky ↗</a></div><div class="weather-map"><iframe title="Ventusky: mapa meteorológico" src="https://embed.ventusky.com/?p=27.8;-87.5;4&l=rain-3h" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section></div><section class="roadtv-card" id="roadtv-desktop" aria-label="ROAD TV">
-  <h2>ROAD TV</h2>
+
   <div class="roadtv-screen" aria-label="Transmissão em vídeo" aria-live="off"></div>
 </section><h2 id="market-title">Mercado em Foco</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p></aside>
@@ -728,6 +764,7 @@ body{background:#f7f9fc;color:#14283c}
     <a id="newsroom-cta-carrier" href="https://drivmatch.com/?utm_source=drivmatch_news&amp;utm_medium=owned_media&amp;utm_campaign=editorial_to_platform&amp;utm_content=carrier" target="_blank" rel="noopener noreferrer">Sou transportadora ↗</a>
   </div>
 </aside>
+<section class="search-footer" id="pesquisa-noticias" aria-label="Pesquisar notícias e arquivo"><div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div></section>
 <footer class="footer" aria-label="Informações institucionais"><div class="footer-publisher" id="footer-publisher">DrivMatch News — um produto da Hands On Dispatcher LLC</div><div class="footer-legal" id="footer-legal">© 2026 Hands On Dispatcher LLC. Todos os direitos reservados.</div></footer>
 <div class="modalshade" id="shade"><article class="modal" id="article-dialog" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody">
 <h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div>
@@ -758,8 +795,8 @@ body{background:#f7f9fc;color:#14283c}
 </div></article></div>
 <div class="story-preview-overlay" id="story-preview" hidden role="dialog" aria-modal="true" aria-labelledby="story-preview-title"><div class="story-preview-panel"><div class="story-preview-head"><strong id="story-preview-title">Prévia do Story</strong><button id="story-preview-close" type="button" aria-label="Fechar prévia">×</button></div><div class="story-preview-scroll"><img id="story-preview-image" alt="Prévia da imagem vertical da notícia para Stories"></div><div class="story-preview-actions"><a id="story-preview-download" download="drivmatch-news-story.png" href="#">Salvar imagem PNG</a><p id="story-preview-hint">Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.</p></div></div></div>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-3-railcam-20261009" defer></script>
-<script src="assets/road-tv-live.js?v=v34-4-verified-20261010" defer></script>
+<script src="assets/app.js?v=v34-5-warroom-20261010" defer></script>
+<script src="assets/road-tv-live.js?v=v34-5-fl511-20261010" defer></script>
 <script src="assets/utility-strip.js" defer></script>
 <script src="assets/news-crawler.js?v=warroom-20261009-v2" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>

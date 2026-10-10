@@ -39,15 +39,36 @@
   }
   return false;
  };
+ // Official FL511 permits embedding its traffic-camera map (including streaming-video cameras).
+ // It is a usable road-camera directory, NOT a certified autoplaying live broadcast.
+ const floridaCameras='https://fl511.com/Map/EmbeddedMap?layers=Cameras&region=ALL&size=0';
+ const floridaPortal='https://fl511.com/';
  function status(message){
+   const fallback=message===labels[lang()].empty||message===labels[lang()].error;
    for(const card of cards){
-     const area=playbackArea(card);
-     if(!area)return;
+     const area=playbackArea(card);if(!area)return;
      if(area.querySelector('iframe'))continue;
      area.replaceChildren();
-     const p=document.createElement('span');
-     p.className='roadtv-status';p.setAttribute('role','status');p.textContent=message;
-     area.appendChild(p);
+     if(fallback){
+       const iframe=document.createElement('iframe');
+       iframe.className='roadtv-official-map';
+       iframe.title='FL511: câmeras oficiais de rodovias da Flórida; selecione a I-4 e uma câmera de vídeo';
+       iframe.loading='lazy';
+       iframe.referrerPolicy='strict-origin-when-cross-origin';
+       iframe.src=floridaCameras;
+       area.appendChild(iframe);
+       const helper=document.createElement('div');helper.className='roadtv-map-help';
+       const label=document.createElement('span');
+       label.textContent=lang()==='en'?'Florida highway cameras — choose a camera':lang()==='es'?'Cámaras de carretera — elija una cámara':'Câmeras de rodovias — selecione uma câmera';
+       const link=document.createElement('a');
+       link.href=floridaPortal;link.target='_blank';link.rel='noopener noreferrer';
+       link.textContent='FL511 ↗';
+       helper.append(label,link);area.appendChild(helper);
+     }else{
+       const p=document.createElement('span');
+       p.className='roadtv-status';p.setAttribute('role','status');p.textContent=message;
+       area.appendChild(p);
+     }
    }
  }
  function clear(){
