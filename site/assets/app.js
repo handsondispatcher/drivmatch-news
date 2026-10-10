@@ -38,14 +38,21 @@
   function storyGraphic(a){
     if(a.editorial_type==='operational_bulletin'){
       // Never imply a random trucking photo depicts a tornado, flood or blizzard.
-      // This is a generic bulletin marker, not an NWS seal or event photograph.
+      // This is a bulletin marker, not an NWS seal or event photograph.
+      // Region and identifying source text keep each graphic informative and
+      // unique without suggesting imagery from the actual weather event.
+      const alertTitle=cleanHeadline(localeOf(a)?.title||'Boletim meteorológico');
+      const region=(alertTitle.split('—').slice(1).join('—').trim()||alertTitle).slice(0,51);
+      const escapeSvg=t=>String(t||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
       const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520">'+
+        '<desc>'+escapeSvg(String(a.id||'')+' '+alertTitle)+'</desc>'+
         '<rect width="900" height="520" fill="#e8f3fb"/>'+
         '<rect width="900" height="14" fill="#1475b4"/>'+
         '<path d="M450 104L660 455H240Z" fill="none" stroke="#236c9d" stroke-width="24" stroke-linejoin="round"/>'+
         '<rect x="437" y="218" width="26" height="120" rx="12" fill="#236c9d"/>'+
         '<circle cx="450" cy="380" r="16" fill="#236c9d"/>'+
         '<text x="42" y="75" font-size="27" font-weight="bold" font-family="Arial,sans-serif" fill="#125781">BOLETIM METEOROLÓGICO</text>'+
+        '<text x="42" y="151" font-size="28" font-family="Arial,sans-serif" fill="#17486a">'+escapeSvg(region)+'</text>'+
         '<text x="42" y="491" font-size="25" font-family="Arial,sans-serif" fill="#17486a">NWS · FONTE OFICIAL · CONSULTE DOT/511</text></svg>';
       return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
     }
