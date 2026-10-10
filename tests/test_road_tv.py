@@ -152,6 +152,42 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(doc["current_live"]["platform"],"twitch")
   self.assertEqual(doc["current_live"]["channel_login"],"truckroad")
 
+ def test_clock_aligned_cab_replay_precedes_live_highway_camera(self):
+  # User priority is not equivalent to "every LIVE outranks every replay".
+  replay_id='B1b2C3d4E5f'
+  camera_id='C1b2C3d4E5f'
+  cab={**REPLAY,'id':replay_id}
+  cam={**LIVE,'id':camera_id,'snippet':{
+    'title':'Florida I-4 interstate live traffic camera Orlando',
+    'description':'Official USA interstate webcam with real road traffic',
+    'channelId':CHANNEL,'channelTitle':'Road Traffic',
+    'liveBroadcastContent':'live'}}
+  def api(url,**kwargs):
+   if '/videos?' in url:return {'items':[cam,cab]}
+   raise AssertionError(url)
+  d=make_road_tv(now=NOW,api_key='test',get_json=api,
+                 cache=self.cache([camera_id,replay_id]))
+  self.assertEqual([x['video_id'] for x in d['candidates']],[replay_id,camera_id])
+  self.assertEqual(d['current_live']['video_id'],camera_id)
+  self.assertEqual(d['featured_recording']['video_id'],replay_id)
+
+ def test_named_creator_search_is_in_every_hourly_live_discovery(self):
+  calls=[]
+  def api(url,**kwargs):
+   if '/search?' in url:
+    from urllib.parse import parse_qs,urlparse
+    q=parse_qs(urlparse(url).query)
+    calls.append((q['eventType'][0],q['q'][0]))
+    return {'items':[]}
+   raise AssertionError(url)
+  for hour in (0,1,2,3):
+   t=NOW.replace(hour=hour)
+   make_road_tv(now=t,api_key='test',get_json=api,
+                cache={'checked_at':(t-dt.timedelta(hours=2)).isoformat()})
+  live=[q for mode,q in calls if mode=='live']
+  self.assertEqual(len(live),8)
+  self.assertEqual(sum('Trucking Duke' in q or 'Ride Along Gang' in q for q in live),4)
+
  def test_clock_alignment_require_real_recording_duration(self):
   t=dt.datetime(2026,10,8,20,10,tzinfo=dt.timezone.utc)
   self.assertEqual(video_length("PT1H30M"),5400)
