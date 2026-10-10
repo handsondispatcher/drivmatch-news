@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "generated_at": null,
+  "live_checked_at": null,
+  "live_status": "unverified",
+  "current_live": null,
+  "featured_recording": {
+    "video_id": "OyrSHX18bQk",
+    "channel_name": "Johnny Trucker USA",
+    "channel_url": "https://www.youtube.com/@JohnnyTruckerUSA",
+    "video_url": "https://www.youtube.com/watch?v=OyrSHX18bQk",
+    "title": "Vermont to Upstate New York · POV truck ride (4K, recorded)",
+    "published_at": "2025-08-07",
+    "live": false,
+    "verification": "public YouTube watch page; embed availability subject to owner settings"
+  },
+  "channels": [
+    {
+      "name": "Ride Along Gang",
+      "handle": "@Ridealonggang",
+      "channel_url": "https://www.youtube.com/@Ridealonggang",
+      "channel_id": null,
+      "source_note": "Creator channel referenced in public profiles; ID pending verification"
+    },
+    {
+      "name": "51 Logistics",
+      "handle": "@51logistics",
+      "channel_url": "https://www.youtube.com/@51logistics",
+      "channel_id": "UCD-HjSJVaH8-SKm6eNtylOg",
+      "source_note": "Channel ID corroborated by external channel profiles"
+    },
+    {
+      "name": "Freight Relocators Live",
+      "handle": "@freightrelocatorslive",
+      "channel_url": "https://www.youtube.com/@freightrelocatorslive",
+      "channel_id": "UCk6eDzbrH8Z3PU7-7pf7QUg",
+      "source_note": "Channel ID corroborated by creator channel profiles"
+    },
+    {
+      "name": "Johnny Trucker USA",
+      "handle": "@JohnnyTruckerUSA",
+      "channel_url": "https://www.youtube.com/@JohnnyTruckerUSA",
+      "channel_id": null,
+      "source_note": "Published official channel link in Johnny's video"
+    }
+  ],
+  "attribution": "Third-party creators / YouTube. Press play to load YouTube; not a DrivMatch transmission.",
+  "policy": "No live stream claimed without current API verification. Recorded video remains clearly labeled."
+}
