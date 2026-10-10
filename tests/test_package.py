@@ -10,11 +10,11 @@ sys.path.insert(0,str(BASE/'scripts'))
 import update as up
 from collect_sources import parse_feed
 class PublicationTests(unittest.TestCase):
- def test_v34_7_release_contract(self):
+ def test_v34_8_release_contract(self):
   version=json.loads((BASE/'content/release.json').read_text(encoding='utf-8'))
-  self.assertEqual(version['version'],'v34.7')
-  self.assertEqual(version['previous_release_branch'],'snapshot/v34-6-before-v34-7-2026-10-10')
-  self.assertEqual(version['previous_release_commit'],'33e75e0c46767a6c37b118d2bfbf7831f48c541b')
+  self.assertEqual(version['version'],'v34.8')
+  self.assertEqual(version['previous_release_branch'],'snapshot/v34-7-before-20261010-reader-corrections')
+  self.assertEqual(version['previous_release_commit'],'7f9dd188727d37003ebb08eb6900b8dbd344ec52')
   self.assertFalse(version['public_launch_approved'])
   self.assertEqual(version['backup_branch'],'backup/v33-approved-2026-10-09')
   self.assertEqual(version['backup_commit'],'fea227dde034e101ace8299357579ddfe98fe256')
@@ -38,10 +38,10 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('illustrated',app)
   self.assertIn('utm_source=drivmatch_news',page)
   self.assertNotIn('public_launch_approved": true',page)
-  self.assertIn('data-site-version="v34.7"',page)
-  self.assertIn('name="drivmatch-news-version" content="v34.7"',page)
-  self.assertIn('id="site-version" hidden>v34.7',page)
-  self.assertIn('DrivMatch News v34.7',app)
+  self.assertIn('data-site-version="v34.8"',page)
+  self.assertIn('name="drivmatch-news-version" content="v34.8"',page)
+  self.assertIn('id="site-version" hidden>v34.8',page)
+  self.assertIn('DrivMatch News v34.8',app)
   # Clean public player only; dynamic discovery engine retained separately.
   road=(BASE/'scripts/road_tv.py').read_text(encoding='utf-8')
   self.assertIn('YOUTUBE_DATA_API_KEY',road)
@@ -107,6 +107,21 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(version['road_tv_policy']['publisher_direct_camera_embed'])
   self.assertFalse(version['road_tv_policy']['publisher_camera_is_certified_playing_live'])
   self.assertFalse(version['road_tv_policy']['fl511_map_used_as_primary'])
+  # Visual and functional freeze from owner's five screenshot corrections.
+  self.assertIn('id="footer-version">· v34.8',page)
+  self.assertIn('id="footer-version',app)
+  self.assertIn('.header .language-picker{border:0!important',page)
+  self.assertIn('#panorama .carousel-controls{position:absolute',page)
+  self.assertIn('const related=f.slice(1,4)',app)
+  self.assertIn('true,false)',app)
+  self.assertIn('true,true)',app)
+  self.assertIn('showContext?',app)
+  self.assertIn("official_bcb_usdbrl()",update)
+  self.assertIn("verified_previous_close()",update)
+  self.assertEqual(version['reader_cta_policy'],'related_rail_only')
+  self.assertTrue(version['carousel_policy']['hero_only'])
+  self.assertTrue(version['carousel_policy']['read_also_stable'])
+  self.assertTrue(version['market_policy']['no_undated_or_invented_quote'])
   self.assertIn('news-freshness',page)
   self.assertIn('sourceCheckedAt',app)
   self.assertIn('fresh_6h',update)
@@ -125,8 +140,8 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('class="related-rail"',app)
   self.assertIn('shareDestinations',app)
   workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
-  self.assertIn('CUSTOM DOMAIN V34.7 PASS',workflow)
-  self.assertIn('CUSTOM DOMAIN V34.7 MISMATCH',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.8 PASS',workflow)
+  self.assertIn('CUSTOM DOMAIN V34.8 MISMATCH',workflow)
   self.assertIn('drivmatch.com/news/data/release.json',workflow)
 
   self.assertIn('DrivMatch News — um produto da Hands On Dispatcher LLC',page)
@@ -200,6 +215,36 @@ class PublicationTests(unittest.TestCase):
   d={'symbol':'USD/BRL','instrument':'spot','price_type':'commercial','session_status':'open','source':'test fixture','source_url':'https://vendor.example','value':5.1,'observed_at':datetime.now(timezone.utc).isoformat()}
   with patch.dict('os.environ',{'USDBRL_SPOT_URL':'https://vendor.example/feed','USDBRL_REDISTRIBUTION_AUTHORIZED':'true'}),patch.object(up,'fetch',return_value=json.dumps(d)):
    self.assertEqual(up.authorized_spot()['instrument'],'spot')
+ def test_09_oct_2026_commercial_close_is_correct_and_date_bounded(self):
+  quote=json.loads((BASE/'content/usdbrl_last_close.json').read_text(encoding='utf-8'))
+  self.assertEqual(quote['close_date'],'2026-10-09')
+  self.assertEqual(quote['close_value'],4.985)
+  self.assertEqual(quote['change_pct'],-0.79)
+  self.assertIn('/2026/10/09/',quote['source_url'])
+  with patch.object(up,'NOW',return_value=datetime(2026,10,10,12,tzinfo=timezone.utc)):
+   q=up.verified_previous_close()
+   self.assertEqual(q['value'],4.985)
+   self.assertEqual(q['quote_status'],'last_verified_close')
+   self.assertEqual(q['instrument'],'spot')
+  with patch.object(up,'NOW',return_value=datetime(2026,10,16,12,tzinfo=timezone.utc)):
+   with self.assertRaises(ValueError):up.verified_previous_close()
+
+ def test_bcb_ptax_is_dated_separate_instrument_not_fake_commercial_spot(self):
+  fixture=json.dumps([{'data':'08/10/2026','valor':'5.0119'},
+                      {'data':'09/10/2026','valor':'4.9892'}])
+  with patch.object(up,'NOW',return_value=datetime(2026,10,10,12,tzinfo=timezone.utc)):
+   with patch.object(up,'fetch',return_value=fixture):
+    q=up.official_bcb_usdbrl()
+   self.assertEqual(q['value'],4.9892)
+   self.assertEqual(q['observed_at'],'2026-10-09')
+   self.assertEqual(q['instrument'],'ptax_reference')
+   self.assertEqual(q['price_type'],'ptax_venda')
+   self.assertEqual(q['quote_status'],'official_bcb_ptax_last')
+   self.assertLess(q['change_pct'],0)
+  with patch.object(up,'NOW',return_value=datetime(2026,10,20,12,tzinfo=timezone.utc)):
+   with patch.object(up,'fetch',return_value=fixture):
+    with self.assertRaises(ValueError):up.official_bcb_usdbrl()
+
  def test_fred_real_header(self):
   with patch.object(up,'fetch',return_value='observation_date,GASDESW\n2026-09-28,6.382\n2026-10-05,6.199\n'):
    self.assertEqual(up.fred_latest('GASDESW','EIA')['value'],6.199)
