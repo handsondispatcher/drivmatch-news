@@ -29,6 +29,8 @@ QUERIES = (
     'USA semi truck driver POV windshield live interstate',
     'USA box truck cargo van dashcam front cab live',
     'USA pickup truck hotshot trucking forward road live',
+    'Florida I-4 interstate live traffic camera highway',
+    'Peace Bridge Buffalo USA entrance live border traffic webcam trucks',
 )
 TWITCH_QUERIES = ('trucking', 'truckdriver', 'dashcam')
 CACHE_PATH = ROOT / 'build' / 'roadtv-discovery.json'
@@ -57,6 +59,36 @@ def evidence(title, desc=''):
     text = f'{title or ""} {desc or ""}'[:1400]
     return bool(US.search(text) and CAB.search(text) and CARGO.search(text) and not STOP.search(text))
 
+
+
+# Additional approved *discovery categories*; YouTube metadata alone is not motion proof.
+# These never bypass YouTube's public/embeddable/active livestream checks.
+ROAD_US = re.compile(r'\b(?:florida|i[- ]?4|i[- ]?80|interstate\s+\d{1,3}|us\s+highway|united\s+states|nevada|usa)\b',re.I)
+ROAD_CAM = re.compile(r'\b(?:traffic\s+cam(?:era)?s?|highway\s+cam(?:era)?s?|road\s+cam(?:era)?s?|webcam|live\s*stream|livestream)\b',re.I)
+USBOUND_BORDER = re.compile(r'\b(?:usa\s+entrance|u\.?s\.?\s+inspection|u\.?s\.?\s*[- ]?bound|canada\s*(?:to|[-→>])\s*(?:usa|us)|entering\s+(?:the\s+)?(?:usa|united\s+states))\b',re.I)
+BORDER = re.compile(r'\b(?:canada|ontario|fort\s+erie|peace\s+bridge|buffalo)\b',re.I)
+MOTION_DECEPTION = re.compile(r'\b(?:recorded|archived|loop(?:ing)?|pre[- ]?recorded|highlights|replay|compilation)\b',re.I)
+
+
+def source_profile(title, desc=''):
+    """Rank publisher metadata; actual LIVE and embeddability are checked separately."""
+    raw=f'{title or ""} {desc or ""}'[:1400]
+    if STOP.search(raw):
+        return None
+    if evidence(title,desc):
+        return {'source_rank':0,'view_type':'cargo_cab',
+                'geo_evidence':'US stated in publisher metadata',
+                'camera_evidence':'Forward cab view stated in publisher metadata'}
+    if ROAD_CAM.search(raw) and not MOTION_DECEPTION.search(raw):
+        if USBOUND_BORDER.search(raw) and BORDER.search(raw):
+            return {'source_rank':2,'view_type':'usbound_border_traffic',
+                    'geo_evidence':'US-bound Canada border crossing stated in publisher metadata',
+                    'camera_evidence':'Public traffic camera asserted by publisher; active video not independently observed'}
+        if ROAD_US.search(raw):
+            return {'source_rank':1,'view_type':'us_highway_traffic',
+                    'geo_evidence':'US road location stated in publisher metadata',
+                    'camera_evidence':'Highway traffic camera asserted by publisher; truck presence not verified'}
+    return None
 
 def clock_offset(now, start, length_seconds):
     """For archived *complete original livestreams* with actual start time.
@@ -166,15 +198,15 @@ def verify_youtube(ids, key, now, api, errors):
             if status.get('privacyStatus')!='public' or status.get('embeddable') is not True:continue
             title=str(info.get('title') or '')
             desc=str(info.get('description') or '')[:850]
-            if not evidence(title,desc):continue
+            profile=source_profile(title,desc)
+            if not profile:continue
             channel=str(info.get('channelTitle') or 'Criador independente')
             base={'platform':'youtube','video_id':ident,
                   'video_url':'https://www.youtube.com/watch?v='+ident,
                   'channel_name':channel,
                   'channel_url':'https://www.youtube.com/channel/'+str(info.get('channelId') or ''),
-                  'title':title[:160], 'geo_evidence':'US stated in publisher metadata',
-                  'camera_evidence':'Forward cab view stated in publisher metadata',
-                  'verification':'Stream metadata, not frame/motion analysis',
+                  'title':title[:160], **profile,
+                  'verification':'YouTube platform status and publisher metadata; no independent frame/motion or content rights certification',
                   'checked_at':now.isoformat()}
             if (info.get('liveBroadcastContent')=='live'
                 and when(live.get('actualStartTime')) and not live.get('actualEndTime')):
@@ -300,8 +332,8 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     # Live first, sorting recent starts; only one player's video is ever loaded.
     lives=[x for x in approved if x.get('live')]
     replays=[x for x in approved if not x.get('live')]
-    lives.sort(key=lambda v:v.get('checked_at',''),reverse=True)
-    replays.sort(key=lambda v:v.get('ended_at',''),reverse=True)
+    lives.sort(key=lambda v:(v.get('source_rank',99),v.get('channel_name','')))
+    replays.sort(key=lambda v:(v.get('source_rank',99),v.get('ended_at','')))
     result['candidates']=(lives+replays)[:12]
     result['current_live']=lives[0] if lives else None
     result['featured_recording']=replays[0] if replays else None

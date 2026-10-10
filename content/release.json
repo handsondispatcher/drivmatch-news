@@ -1,7 +1,7 @@
 {
   "product": "DrivMatch News",
-  "version": "v34.5",
-  "baseline": "v34.4 snapshot 829169282718c3bf546fdb74d5ae692ff0943bb6; user-approved layout locks and honest FL511 camera fallback",
+  "version": "v34.6",
+  "baseline": "v34.5 snapshot 946aaf215dcfe1e73c1fcabdbd5916f05e88e18d; rights-gated multi-source road-camera discovery, Canada-to-US priority, no invented autoplay",
   "lifecycle": "development_prelaunch",
   "public_launch_approved": false,
   "publisher": "Hands On Dispatcher LLC",
@@ -38,7 +38,13 @@
     "compact_horizontal_language_selector",
     "remove_public_road_tv_heading",
     "official_fl511_traffic_camera_fallback",
-    "immutable_ui_regression_contract"
+    "immutable_ui_regression_contract",
+    "official_border_entry_camera_source_discovery",
+    "US_highway_I4_camera_priority",
+    "milecheck_outbound_link_only_until_licensed",
+    "nevada_511_official_outbound_source",
+    "source_directory_schema_and_rights_gates",
+    "no_false_live_from_directory_or_snapshot"
   ],
   "prior_backups": [
     {
@@ -47,8 +53,8 @@
       "commit": "659a146b8f48c342c2a62d86a1330d59760116d4"
     }
   ],
-  "previous_release_branch": "snapshot/v34-4-pre-war-room-2026-10-10",
-  "previous_release_commit": "829169282718c3bf546fdb74d5ae692ff0943bb6",
+  "previous_release_branch": "snapshot/v34-5-pre-camera-network-2026-10-10",
+  "previous_release_commit": "946aaf215dcfe1e73c1fcabdbd5916f05e88e18d",
   "road_tv_policy": {
     "youtube_twitch_only": false,
     "live_claim_requires_authorized_api": true,
@@ -67,6 +73,11 @@
     "player_error_failover": true,
     "no_video_guarantee_without_authorized_api": true,
     "official_fl511_camera_embed_fallback": true,
-    "official_camera_map_is_verified_autoplay_stream": false
+    "official_camera_map_is_verified_autoplay_stream": false,
+    "camera_source_network_schema": 1,
+    "border_usbound_priority_after_highway": true,
+    "milecheck_requires_commercial_license": true,
+    "source_registry_published": true,
+    "camera_link_is_not_live_certification": true
   }
 }

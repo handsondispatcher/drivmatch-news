@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "policy": "SOURCE DISCOVERY IS NOT LIVE VERIFICATION. Only native officially approved embeds may be displayed; other sources are outbound links pending permission and playback validation. No retransmission, scraping, or unlicensed commercial republishing.",
+  "primary_display": "fl511-i4",
+  "priorities": [
+    "verified_live_cargo_trucker",
+    "verified_live_us_road_camera",
+    "verified_live_canada_to_us_border_traffic",
+    "verified_recent_labeled_recording",
+    "official_cameras_directory_link"
+  ],
+  "sources": [
+    {
+      "id": "fl511-i4",
+      "name": "FL511 — I-4 Florida",
+      "priority": 10,
+      "kind": "official_camera_directory",
+      "display": "approved_official_embed",
+      "embed_url": "https://fl511.com/Map/EmbeddedMap?layers=Cameras&region=ALL&size=0",
+      "source_url": "https://fl511.com/region/Central",
+      "label": "I-4 / FL511",
+      "geo": "I-4 Florida",
+      "verified_playing_live": false,
+      "rights": "State agency explicitly offers map embed; individual video stream playback is not guaranteed.",
+      "note": "Use native camera markers; never claim that a map iframe proves a moving live video."
+    },
+    {
+      "id": "peacebridge-usbound",
+      "name": "Peace Bridge — câmeras oficiais / entrada EUA",
+      "priority": 20,
+      "kind": "official_border_camera_directory",
+      "display": "external_link_only",
+      "source_url": "https://www.peacebridge.com/media-room/traffic-cameras/",
+      "label": "Fronteira EUA",
+      "geo": "Fort Erie ON → Buffalo NY, USA-bound",
+      "verified_playing_live": false,
+      "rights": "Link to bridge authority; no confirmed permission for third-party video rebroadcast.",
+      "note": "Official traffic cameras include U.S. Inspection Plaza, truck approaches; direction must be verified per camera."
+    },
+    {
+      "id": "buffalo-usaentrance",
+      "name": "BuffaloWebcam — Peace Bridge USA Entrance",
+      "priority": 25,
+      "kind": "third_party_youtube_embedded_on_publisher",
+      "display": "external_link_only",
+      "source_url": "https://buffalowebcam.com/live-webcams/peace-bridge-usa-entrance/",
+      "label": "Buffalo",
+      "geo": "Peace Bridge — USA entrance",
+      "verified_playing_live": false,
+      "rights": "Publisher embeds its own YouTube video; DrivMatch embed requires official YouTube API status and license/platform rules, not a harvested player URL.",
+      "note": "Search lead, not an approved live YouTube video ID; no auto-publishing without active & embeddable check."
+    },
+    {
+      "id": "nvroads-nevada",
+      "name": "Nevada 511 — NDOT Traffic Cameras",
+      "priority": 30,
+      "kind": "official_road_camera_directory",
+      "display": "external_link_only",
+      "source_url": "https://www.nvroads.com/",
+      "label": "Nevada 511",
+      "geo": "Nevada — I-80, I-15 and other routes",
+      "verified_playing_live": false,
+      "rights": "Official camera website; direct iframe rights and player endpoint not established.",
+      "note": "Road cameras + live videos listed by Nevada DOT; link to official source."
+    },
+    {
+      "id": "milecheck-cameras",
+      "name": "MileCheck — US/Canada highway cameras",
+      "priority": 40,
+      "kind": "aggregator_directory",
+      "display": "external_link_only_license_required",
+      "source_url": "https://milecheckapp.com/cameras/",
+      "label": "MileCheck",
+      "geo": "43 US states and 5 Canadian provinces (provider claim)",
+      "verified_playing_live": false,
+      "rights": "Provider requires contact and license for commercial map/data embedding; only outbound link currently authorized.",
+      "contact": "info@milecheckapp.com",
+      "note": "Many points are refreshable still images rather than continuous stream."
+    },
+    {
+      "id": "milecheck-i4",
+      "name": "MileCheck — I-4 corridor",
+      "priority": 45,
+      "kind": "aggregator_directory",
+      "display": "reference_only",
+      "source_url": "https://milecheckapp.com/corridors/i-4/",
+      "label": "I-4 MileCheck",
+      "geo": "Florida I-4",
+      "verified_playing_live": false,
+      "rights": "Same license restriction; reference for camera discovery only."
+    },
+    {
+      "id": "weather-lkn",
+      "name": "NWS Elko NV",
+      "priority": 90,
+      "kind": "weather_context",
+      "display": "not_a_camera_provider",
+      "source_url": "https://www.weather.gov/lkn/",
+      "label": "NWS",
+      "geo": "Elko Nevada",
+      "verified_playing_live": false,
+      "rights": "Weather source, not suitable as a road-camera embedded player.",
+      "note": "Do not add to video rotation."
+    },
+    {
+      "id": "usa-traffic-cameras-ios",
+      "name": "USA Traffic Cameras iOS app",
+      "priority": 99,
+      "kind": "mobile_app_reference",
+      "display": "app_only_not_embeddable",
+      "source_url": "https://apps.apple.com/br/app/usa-traffic-cameras/id1529408199",
+      "label": "App Store",
+      "geo": "USA (app listing claim)",
+      "verified_playing_live": false,
+      "rights": "iOS app listing does not grant a reusable web camera feed or license.",
+      "note": "Not an embeddable player."
+    }
+  ]
+}
