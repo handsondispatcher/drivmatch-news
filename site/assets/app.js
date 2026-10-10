@@ -4,7 +4,7 @@
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
   let externalHeadlines = [], photoByStory = {}, data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
-  let sourceCheckedAt='', newestSourceAt='', currentSourceCount=0;
+  let sourceCheckedAt=source.source_monitor?.checked_at||'', newestSourceAt=source.source_monitor?.latest_original_published_at||'', currentSourceCount=(source.articles||[]).filter(x=>x.kind==='external_link').length;
   const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
   const labels = {
