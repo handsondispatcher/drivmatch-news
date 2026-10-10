@@ -8,7 +8,7 @@ const {spawn}=require('node:child_process');
  try {
   await new Promise((resolve,reject)=>{server.stdout.on('data',resolve);server.stderr.on('data',resolve);server.on('error',reject);setTimeout(resolve,1000)});
   browser=await chromium.launch({headless:true});
-  for(const width of [360,390,768,1440]) {
+  for(const width of [360,390,768,944,1440]) {
    const page=await browser.newPage({viewport:{width,height:width<=390?680:900}});const errors=[];
    page.on('pageerror',e=>errors.push(e.message));
    // YouTube content is owned by the creator; do not depend on its network in CI.
@@ -117,6 +117,10 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#news-freshness').isVisible(),false,'Frescor editorial fica na auditoria, nunca no texto público');
    for(const id of ['top-usd-value','top-diesel-value','top-brent-value','top-weather-icon','top-risk']) {
      assert.equal(await page.locator('#'+id).count(),1,'Reference strip item '+id+' missing');
+   }
+   if(width===944){
+     const grid=await page.locator('.dm-util-inner').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
+     assert.equal(grid,5,'Approved image 2 must remain five horizontal quote/weather cells at 944px');
    }
    if(width===1440){
      const grid=await page.locator('.dm-util-inner').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
