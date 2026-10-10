@@ -17,8 +17,11 @@ const {spawn}=require('node:child_process');
    await page.route('https://camstreamer.com/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>CamStreamer native embed test stub</title>'}));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
-   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.9','public page has v34.9 version');
+   assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.10','public page has v34.10 version');
    assert.equal(await page.locator('#site-version').isVisible(),false,'Internal release must not appear in public masthead');
+   assert.equal(await page.locator('.header').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(2, 4, 8)',
+     'Keep approved gradient logo untouched on neutral-black background');
+   assert.equal(await page.locator('.brand img').getAttribute('src'),'assets/logo-drivmatch-news.png');
    assert.equal(await page.locator('#edition-date').isVisible(),false,'Internal edition date is not visible');
    assert.equal((await page.locator('.header').innerText()).includes('EDIÇÃO DIGITAL'),false,'No technical edition text on masthead');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
@@ -89,9 +92,14 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#market-commercial-banner .ad-link').count(),1,'Side blank must become clearly labeled house banner');
    const topAd=await page.locator('#news-commercial-banner').innerText();
    assert.match(topAd,/DrivMatch/,'No fake third-party paid advertiser');
-   assert.equal(await page.locator('#top-city-select').count(),1,'Reader can choose city/state');
-   assert.equal(await page.locator('#top-city-select').inputValue(),'auto','Default city selection rotates every 10 minutes');
-   assert.equal(await page.locator('#top-city-select option[value="auto"]').count(),1);
+   assert.equal(await page.locator('#top-city-query').count(),1,'Reader has a typed city/state search input');
+   assert.equal(await page.locator('#top-city-query').inputValue(),'','Without user choice, forecast rotates every 10 seconds');
+   assert.equal(await page.locator('#top-city-apply').count(),1);
+   assert.equal(await page.locator('#top-city-auto').count(),1);
+   assert.equal(await page.locator('#count').isVisible(),false,'Do not reveal article count');
+   assert.equal((await page.locator('#news-commercial-banner').innerText()).includes('PUBLICIDADE'),false);
+   assert.equal(await page.locator('#news-commercial-banner .ad-kicker').count(),0);
+   assert.equal(await page.locator('#market-commercial-banner .ad-kicker').count(),0);
    assert.equal(await page.locator('#highlightList .highlight-photo').count(),await page.locator('#highlightList li').count(),'Highlights must carry real source-derived local images or honest illustrated fallback');
    assert.equal(await page.locator('#newsroom-cta-driver').getAttribute('href').then(x=>x.includes('utm_source=drivmatch_news')),true);
    assert.equal(await page.locator('#newsroom-cta-carrier').getAttribute('href').then(x=>x.includes('utm_content=carrier')),true);
@@ -101,14 +109,28 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#category').inputValue(),'Fretes','Footer archive filter still works');
    await page.locator('#category').selectOption('Todas');
    assert.equal(await page.locator('#category').inputValue(),'Todas','Footer reset still works');
-   const options=await page.locator('#top-city-select option').count();
-   if(options>1){
-     const city=await page.locator('#top-city-select option').nth(1).getAttribute('value');
-     await page.locator('#top-city-select').selectOption(city);
-     assert.equal(await page.locator('#top-city-select').inputValue(),city,'Explicit city choice pins weather');
-     await page.locator('#top-city-select').selectOption('auto');
-     assert.equal(await page.locator('#top-city-select').inputValue(),'auto','Automatic 10-minute rotation can be restored');
+   const options=await page.locator('#top-city-options option').count();
+   if(options>0){
+     const city=await page.locator('#top-city-options option').first().getAttribute('value');
+     await page.locator('#top-city-query').fill(city);
+     await page.locator('#top-city-query').press('Enter');
+     assert.equal(await page.locator('#top-city-query').inputValue(),city,'Typed city/state is pinned');
+     assert.equal((await page.locator('#top-city').innerText()).trim(),city,
+       'Forecast should display the explicitly selected real city');
+     assert.equal(await page.locator('#top-city-auto').isEnabled(),true);
+     if(width===1440){
+       await page.waitForTimeout(10500);
+       assert.equal((await page.locator('#top-city').innerText()).trim(),city,
+         'Manual selection must remain stable past a 10 second automatic tick');
+     }
+     await page.locator('#top-city-auto').click();
+     assert.equal(await page.locator('#top-city-query').inputValue(),'','Automatic city rotation can be restored');
    }
+   await page.locator('#top-city-query').fill('FictionalCity, ZZ');
+   await page.locator('#top-city-query').press('Enter');
+   assert.ok((await page.locator('#top-city-feedback').innerText()).length>0,
+     'Unknown city must show availability feedback rather than made-up weather');
+   await page.locator('#top-city-auto').click();
    if(width===1440) {
      const hero=await page.locator('#features .hero-wrap article').evaluate(el=>({position:getComputedStyle(el).position,visible:el.getBoundingClientRect().width>0}));
      assert.ok(hero.visible,'Newsroom has a visible hero headline');
@@ -140,7 +162,7 @@ const {spawn}=require('node:child_process');
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
-   // v34.9: show one direct camera video embed, never a tiny map or links-only tile.
+   // v34.10: show one direct camera video embed, never a tiny map or links-only tile.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
    assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
@@ -266,10 +288,10 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#clima-desktop .weather-top h2').textContent(),'Weather');
    assert.equal(await page.locator('#footer-publisher').innerText(),'DrivMatch News — um produto da Hands On Dispatcher LLC');
    assert.equal(await page.locator('#footer-legal').innerText(),
-     '© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. · v34.9');
-   assert.equal(await page.locator('#footer-version').innerText(),'· v34.9');
+     '© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. · v34.10');
+   assert.equal(await page.locator('#footer-version').innerText(),'· v34.10');
    await page.locator('[data-site-lang="pt"]').click();
-   assert.equal(await page.locator('#footer-version').textContent(),'· v34.9',
+   assert.equal(await page.locator('#footer-version').textContent(),'· v34.10',
      'Release footer must persist when changing language');
    assert.equal(await page.locator('[data-site-lang="pt"]').getAttribute('aria-pressed'),'true');
    assert.match(await page.locator('#footer-publisher').innerText(),/um produto da Hands On Dispatcher LLC/);
