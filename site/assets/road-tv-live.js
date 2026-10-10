@@ -26,6 +26,8 @@
  const visible=()=>cards.find(c=>c.getBoundingClientRect().width>0&&getComputedStyle(c).display!=='none'&&c.getClientRects().length)||cards[0];
  const playbackArea=card=>card.querySelector('.roadtv-screen');
  const key=v=>v?.platform==='youtube'?'y:'+v.video_id:'t:'+v?.channel_login;
+ // Priority is driving POV live > recent clock-aligned driving POV replay > verified live road camera.
+ const priority=v=>v.view_type==='cargo_cab'?(v.live?0:1):(v.live?2:3);
  const safeUri=u=>{try{const x=new URL(u);return x.protocol==='https:'&&['www.youtube.com','youtube.com','m.youtube.com','www.twitch.tv','twitch.tv'].includes(x.hostname);}catch{return false}};
  const valid=(v,checkedAt)=>{
   if(!v||typeof v!=='object'||!safeUri(v.video_url)||!safeUri(v.channel_url)||!v.geo_evidence||!v.camera_evidence||!v.verification)return false;
@@ -61,7 +63,7 @@
    embed:'https://camstreamer.com/embed/7WIJom0FTmLGWRea1khwrohdqLpKwHOa2DU5Wjqq?rel=0',
    page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'}
  ];
- const CAMERA_ROTATION_MS=120*1000; // Different embedded live-road-camera source every 2min, NOT a freshness claim.
+ const CAMERA_ROTATION_MS=5*60*1000; // Approved: change live highway camera every five minutes.
  let publisherIndex=0,publisherFrame=null,publisherFailures=new Set(),publisherSince=0;
 
  function publisherUnavailable(area){
@@ -152,7 +154,7 @@
    return (Array.isArray(json.candidates)?json.candidates:[])
      .filter(v=>valid(v,checked))
      .filter(v=>{const id=key(v);if(unique.has(id))return false;unique.add(id);return true})
-     .sort((a,b)=>Number(b.live)-Number(a.live)||(Number(a.source_rank??99)-Number(b.source_rank??99))).slice(0,12);
+     .sort((a,b)=>priority(a)-priority(b)||(Number(a.source_rank??99)-Number(b.source_rank??99))).slice(0,12);
  }
  function markedBad(v){return failed.has(key(v))&&now()-failed.get(key(v))<15*60000}
  function nextVideo(exclude){
@@ -249,9 +251,9 @@
      else if(!old){
        const target=nextVideo('');
        if(target)start(target);else status(labels[lang()].empty);
-     }else if(!matched.live&&videos.some(x=>x.live)){
-       // A real LIVE takes priority over a replay.
-       const target=videos.find(x=>x.live&&!markedBad(x));if(target)start(target);
+     }else if(videos.some(x=>priority(x)<priority(matched)&&!markedBad(x))){
+       // A live driving POV outranks replay; driving replay outranks generic road cam.
+       const target=videos.find(x=>priority(x)<priority(matched)&&!markedBad(x));if(target)start(target);
      }
    }catch{
      if(!active)status(labels[lang()].empty);
@@ -283,7 +285,7 @@
    if(active&&active.platform==='youtube'&&!playing&&attemptingAt&&now()-attemptingAt>35000){
      playbackError(active,epoch);return;
    }
-   if(active&&now()-started>12*60000&&videos.length>1)rotate();
+   if(active&&now()-started>5*60*1000&&videos.length>1)rotate();
  },15000);
  setInterval(rotatePublisherCamera,10000);
  setInterval(refresh,120000);
