@@ -91,7 +91,6 @@
    tvRefresh();
  }
  let selectedCameraId=null;
- applyCameraOrder(fallbackCameraOrder);
  async function loadOwnerPolicy(){
    try{
      const response=await fetch('data/road-tv-policy.json?ts='+now(),{cache:'no-store'});
@@ -386,7 +385,8 @@
  async function loadCameraHealth(){try{const response=await fetch('data/camera-health.json?ts='+now(),{cache:'no-store'});if(!response.ok)return;const j=await response.json();const checked=Date.parse(j.checked_at||'');if(!Number.isFinite(checked)||now()-checked>35*60000||now()-checked< -60000)return;cameraUnavailable=new Set((j.unavailable_ids||[]).filter(id=>directCameras.some(c=>(c.sourceId||c.id)===id)));if(cameraUnavailable.has(directCameras[publisherIndex]?.id)&&!active){const next=directCameras.findIndex(c=>!cameraUnavailable.has(c.id));if(next>=0){publisherIndex=next;showPublisherCamera(true)}}tvRefresh()}catch{}}
  // Compact viewer controls are provided by the channel-control enhancement.
  // Show a specific camera immediately; never require reader to navigate a map.
- tvInstall();Promise.allSettled([loadOwnerPolicy(),loadCameraHealth()]).finally(()=>showPublisherCamera());
+ tvInstall();applyCameraOrder(fallbackCameraOrder);
+ Promise.allSettled([loadOwnerPolicy(),loadCameraHealth()]).finally(()=>showPublisherCamera());
  document.getElementById('language')?.addEventListener('change',()=>{
    if(!active){
      const label=visible().querySelector('.roadtv-camera-credit a');
