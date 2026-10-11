@@ -176,20 +176,8 @@ def youtube_discover(key, now, api, errors):
                     candidates[ident] = item.get('snippet') or {}
         except (OSError, TimeoutError, ValueError, KeyError, TypeError) as exc:
             errors.append('youtube_discovery_'+api_error_tag(exc))
-    # Fresh archived live-replays are not limited to the initial creators.
-    for query in (QUERIES[(now.hour+2) % len(QUERIES)],):
-        try:
-            params = dict(part='snippet',type='video',eventType='completed',
-                          videoEmbeddable='true',order='date',
-                          publishedAfter=(now-dt.timedelta(days=2)).isoformat().replace('+00:00','Z'),
-                          regionCode='US',maxResults='10',q=query,key=key)
-            response=api('https://www.googleapis.com/youtube/v3/search?'+urllib.parse.urlencode(params))
-            for item in response.get('items', []):
-                ident=(item.get('id') or {}).get('videoId')
-                if VIDEO_ID.fullmatch(ident or ''):
-                    candidates[ident]=item.get('snippet') or {}
-        except (OSError, TimeoutError, ValueError, KeyError, TypeError) as exc:
-            errors.append('youtube_replay_search_'+api_error_tag(exc))
+    # Preserve API quota for both verified creator live checks each hour.
+    # Completed recordings can still enter through the creators' uploads list.
     return candidates
 
 
@@ -202,7 +190,7 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
     Discovery does NOT mean live: videos.list still verifies status and embed.
     """
     found = []
-    priority_index = targeted_hour % min(2,len(channels)) if targeted_hour is not None and channels else None
+    priority_set = set(range(min(2,len(channels)))) if targeted_hour is not None else set()
     for index,source in enumerate(channels[:8]):
         handle = str(source.get('handle') or '')
         if not re.fullmatch(r'@[A-Za-z0-9_.-]{3,40}', handle):
@@ -216,7 +204,7 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
             # Broadcasts can be LIVE on YouTube before appearing in uploads.
             # Ask for active broadcasts from this resolved channelId, not only
             # the latest uploaded items. Never trust a handle as a channel ID.
-            if priority_index == index:
+            if index in priority_set:
                 if CHANNEL_ID.fullmatch(channel_id):
                     if diagnostics is not None:
                         diagnostics['targeted_channel_checked'] = source['name']
@@ -234,6 +222,7 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
                                 if diagnostics is not None:
                                     diagnostics['targeted_live_hits']+=1
                                     diagnostics['_targeted_video_ids'].append(ident)
+                                    diagnostics.setdefault('_priority_source_by_video',{})[ident]={'name':source['name'],'channel_id':channel_id}
                     except (OSError,TimeoutError,ValueError,KeyError,TypeError) as exc:
                         errors.append('youtube_targeted_channel_live_'+api_error_tag(exc))
                 elif diagnostics is not None:
@@ -299,10 +288,11 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
             # front-facing truck-cab driving, though its metadata can omit
             # the vehicle keyword. Match the *officially resolved channel*,
             # current targeted broadcast ID, and route/title, not just a name.
+            priority_source=(diagnostics or {}).get('_priority_source_by_video',{}).get(ident,{})
             owner_ride_along=bool(diagnostics and
-                diagnostics.get('targeted_channel_checked')=='Ride Along Gang' and
+                priority_source.get('name')=='Ride Along Gang' and
                 ident in diagnostics.get('_targeted_video_ids',[]) and
-                str(info.get('channelId') or '')==diagnostics.get('_targeted_channel_id') and
+                str(info.get('channelId') or '')==priority_source.get('channel_id') and
                 re.search(r'(?:\bDenver\s*(?:CO|Colorado)\b.*\bSchuyler\s*(?:NE|Nebraska)\b|\bMinden\s*(?:IA|Iowa)\b.*\bIndianapolis\s*(?:IN|Indiana)\b)', title, re.I) and
                 CAB.search(title) and not STOP.search(title))
             if owner_ride_along:
@@ -429,7 +419,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     discovery={'checked_at':now.isoformat(),'discovery_version':5}
     diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
                  'targeted_live_hits':0,'_targeted_video_ids':[],
-                 '_targeted_channel_id':None,'targeted_title_match':False,
+                 '_targeted_channel_id':None,'_priority_source_by_video':{},'targeted_title_match':False,
                  'owner_visual_evidence_used':0,'targeted_failure_reason':None,
                  'targeted_video_title':None,'targeted_metadata_flags':None,
                  'videos_returned':0,
@@ -441,6 +431,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
                                             if VIDEO_ID.fullmatch(str(i))]
         diagnostics['_targeted_channel_id']=cached.get('targeted_channel_id')
         diagnostics['targeted_channel_checked']=cached.get('targeted_channel_checked')
+        diagnostics['_priority_source_by_video']=cached.get('priority_source_by_video') or {}
     if key:
         if fresh_cache and isinstance(cached.get('youtube_ids'),list):
             search_ids=[i for i in cached['youtube_ids'] if VIDEO_ID.fullmatch(str(i))]
@@ -462,6 +453,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         discovery['youtube_ids']=search_ids
         discovery['curated_ids']=creator_ids
         discovery['targeted_video_ids']=diagnostics['_targeted_video_ids']
+        discovery['priority_source_by_video']=diagnostics['_priority_source_by_video']
         discovery['targeted_channel_id']=diagnostics['_targeted_channel_id']
         discovery['targeted_channel_checked']=diagnostics['targeted_channel_checked']
         diagnostics['candidate_ids']=len(ids)
