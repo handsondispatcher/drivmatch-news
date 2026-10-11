@@ -114,7 +114,16 @@ def localize_source_headlines(headlines, errors, offline):
         source_lang=item.get('original_lang') or ('es' if item.get('region')=='MX' else 'en')
         if source_lang not in ('pt','en','es'):source_lang='en'
         titles={source_lang:item['title']}
+        # Human-reviewed exact headline from the original publisher.
+        # Do not depend on an unreliable external translation endpoint for
+        # this high-priority Orlando freight-fraud story.
+        if (str(item.get('source_url') or '').rstrip('/') ==
+            'https://www.freightwaves.com/news/orlando-trucking-owner-pleads-guilty-in-1m-usps-freight-auction-fraud' and
+            item['title'].strip() ==
+            'Orlando trucking owner pleads guilty in $1M USPS freight auction fraud'):
+            titles['pt']='Dono de transportadora de Orlando se declara culpado por fraude de US$ 1 milhão em leilões de frete do USPS'
         for target in ('pt','en','es'):
+            if target in titles:continue
             if target==source_lang:continue
             try:titles[target]=translate_source_headline(item['title'],source_lang,target)
             except Exception:pass
