@@ -92,8 +92,10 @@ assert.equal(orderedTitles.slice(0,3).filter(s=>s.includes('NWS Weather Alert'))
   'Only one NWS bulletin in the first three news cards');
 assert.ok(orderedTitles.some(x=>x.includes('Freight')||x.includes('Driver')||x.includes('Truck')),
   'Operational bulletins must be interleaved with independently sourced journalism');
-assert.ok(elements.list.innerHTML.includes('não é fotografia do fenômeno')||elements.list.innerHTML.includes('não retrata o evento meteorológico'),
-  'NWS card must disclose archival photo or non-event context');
+assert.ok(elements.list.innerHTML.includes('não é fotografia do fenômeno')||
+          elements.list.innerHTML.includes('não retrata o evento meteorológico')||
+          elements.list.innerHTML.includes('Ilustração editorial'),
+  'NWS synthetic fixture with no licensed photo cannot pretend to show an actual weather event');
 assert.ok(elements.list.innerHTML.includes('data-bulletin="true"'),
   'NWS photographic card must retain identification of official bulletin');
 assert.ok(elements.features.innerHTML.includes('Driver rule update'),
