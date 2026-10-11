@@ -79,9 +79,19 @@
 
  ];
 
+ // Owner channel-position map (old channel -> new slot): 5,6,8,7,5,1,3,7.
+ // Repeated source cameras deliberately get distinct slot identities.
+ const sourceCameras=directCameras.slice();
+ const newChannelSourcePositions=[5,6,8,7,5,1,3,7];
+ directCameras.splice(0,directCameras.length,...newChannelSourcePositions.map((position,index)=>{
+   const origin=sourceCameras[position-1];
+   if(!origin)throw Error('Camera reorder source CH'+position+' missing');
+   return {...origin,id:origin.id+'-slot-'+(index+1),sourceId:origin.id};
+ }));
+ const unavailableCamera=c=>cameraUnavailable.has(c.sourceId||c.id);
  let autoSwitch=true,userChannel=false,viewSize='small';
  let cameraUnavailable=new Set();
- const tvChannels=()=>[...videos.filter(v=>!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_title||v.title||'Transmissão'})),...directCameras.filter(v=>!publisherFailures.has(v.id)&&!cameraUnavailable.has(v.id)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name}))];
+ const tvChannels=()=>[...videos.filter(v=>!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_title||v.title||'Transmissão'})),...directCameras.filter(v=>!publisherFailures.has(v.id)&&!unavailableCamera(v)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name}))];
  const tvCurrent=()=>active?key(active):directCameras[publisherIndex]?.id;
  function tvRefresh(){
    cards.forEach(card=>{
@@ -165,9 +175,9 @@
    if(!force&&area.querySelector('.roadtv-publisher-camera'))return;
    cards.forEach(c=>{if(c!==card)playbackArea(c)?.replaceChildren();});
    area.replaceChildren();publisherFrame=null;
-   if(cameraUnavailable.has(directCameras[publisherIndex]?.id)){const idx=directCameras.findIndex(c=>!cameraUnavailable.has(c.id)&&!publisherFailures.has(c.id));if(idx>=0)publisherIndex=idx;}
+   if(unavailableCamera(directCameras[publisherIndex]||{})){const idx=directCameras.findIndex(c=>!unavailableCamera(c)&&!publisherFailures.has(c.id));if(idx>=0)publisherIndex=idx;}
    const source=directCameras[publisherIndex];
-   if(!source||cameraUnavailable.has(source.id)||publisherFailures.size+cameraUnavailable.size>=directCameras.length){publisherUnavailable(area);return;}
+   if(!source||unavailableCamera(source)||publisherFailures.size+cameraUnavailable.size>=directCameras.length){publisherUnavailable(area);return;}
    const frame=document.createElement('iframe');
    frame.className='roadtv-publisher-camera';
    frame.title=source.name+' — câmera rodoviária da fonte';
@@ -198,7 +208,7 @@
    if(publisherFailures.size>=directCameras.length){if(area)publisherUnavailable(area);return;}
    for(let n=0;n<directCameras.length;n++){
      publisherIndex=(publisherIndex+1)%directCameras.length;
-     if(!publisherFailures.has(directCameras[publisherIndex].id)&&!cameraUnavailable.has(directCameras[publisherIndex].id))break;
+     if(!publisherFailures.has(directCameras[publisherIndex].id)&&!unavailableCamera(directCameras[publisherIndex]))break;
    }
    showPublisherCamera(true);tvRefresh();
  }
@@ -213,7 +223,7 @@
    const original=publisherIndex;
    for(let i=1;i<=directCameras.length;i++){
      const idx=(original+i)%directCameras.length;
-     if(!publisherFailures.has(directCameras[idx].id)&&!cameraUnavailable.has(directCameras[idx].id)){
+     if(!publisherFailures.has(directCameras[idx].id)&&!unavailableCamera(directCameras[idx])){
        publisherIndex=idx;break;
      }
    }
@@ -359,7 +369,7 @@
  // No hard-coded video ID, no dead Virtual Railfan train camera.
  cards.forEach(c=>playbackArea(c)?.replaceChildren());
  // Health status comes from automated scheduled browser probes; unknown does not imply live.
- async function loadCameraHealth(){try{const response=await fetch('data/camera-health.json?ts='+now(),{cache:'no-store'});if(!response.ok)return;const j=await response.json();const checked=Date.parse(j.checked_at||'');if(!Number.isFinite(checked)||now()-checked>35*60000||now()-checked< -60000)return;cameraUnavailable=new Set((j.unavailable_ids||[]).filter(id=>directCameras.some(c=>c.id===id)));if(cameraUnavailable.has(directCameras[publisherIndex]?.id)&&!active){const next=directCameras.findIndex(c=>!cameraUnavailable.has(c.id));if(next>=0){publisherIndex=next;showPublisherCamera(true)}}tvRefresh()}catch{}}
+ async function loadCameraHealth(){try{const response=await fetch('data/camera-health.json?ts='+now(),{cache:'no-store'});if(!response.ok)return;const j=await response.json();const checked=Date.parse(j.checked_at||'');if(!Number.isFinite(checked)||now()-checked>35*60000||now()-checked< -60000)return;cameraUnavailable=new Set((j.unavailable_ids||[]).filter(id=>directCameras.some(c=>(c.sourceId||c.id)===id)));if(cameraUnavailable.has(directCameras[publisherIndex]?.id)&&!active){const next=directCameras.findIndex(c=>!cameraUnavailable.has(c.id));if(next>=0){publisherIndex=next;showPublisherCamera(true)}}tvRefresh()}catch{}}
  // Compact viewer controls are provided by the channel-control enhancement.
  // Show a specific camera immediately; never require reader to navigate a map.
  tvInstall();loadCameraHealth().finally(()=>showPublisherCamera());
