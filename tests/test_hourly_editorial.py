@@ -25,3 +25,11 @@ class HourlyEditorialDiscoveryTests(unittest.TestCase):
         for source in sources:
             if source.get('access')=='discovery-rss':
                 self.assertEqual(source.get('publication'),'external-discovery-only')
+
+    def test_every_registered_source_is_scanned(self):
+        registry=json.loads((ROOT/'content/sources.json').read_text(encoding='utf-8'))['sources']
+        collector=(ROOT/'scripts/collect_sources.py').read_text(encoding='utf-8')
+        self.assertEqual(len(registry),203)
+        self.assertIn('discover_feed_urls(source)',collector)
+        self.assertIn("status='no_valid_rss'",collector)
+        self.assertIn('ET.fromstring(raw)',collector)
