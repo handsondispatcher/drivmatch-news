@@ -96,17 +96,17 @@
     visualCacheKey=key;visualCache=map;return map;
   }
   function imageOf(a){
-    if(a.editorial_type==='operational_bulletin')return storyGraphic(a);
+    // Never overwrite an attributed licensed photograph with an NWS icon.
     return storyVisuals().get(a.id)||storyGraphic(a);
   }
   function imageHTML(a,suffix=''){
     const url=imageOf(a),fallback=storyGraphic(a),graphic=url.startsWith('data:image/svg');
     const photo=licensedPhotoOf(a),illustrative=Boolean(photo)||graphic||a.image_context==='illustrative_archive';
-    const alt=a.editorial_type==='operational_bulletin'
-      ?(lang==='pt'?'Identificação gráfica de boletim meteorológico NWS; não é fotografia do fenômeno':lang==='es'?'Gráfico identificador de boletín meteorológico NWS; no es una foto del evento':'NWS bulletin identifier; not an event photograph')
+    const alt=a.editorial_type==='operational_bulletin'&&!graphic
+      ?(lang==='pt'?'Fotografia ilustrativa de rodovia; não retrata o evento meteorológico informado':lang==='es'?'Fotografía ilustrativa de carretera; no representa el evento meteorológico':'Illustrative road archive photograph; not a photo of the reported weather event')
       :graphic?(lang==='pt'?'Ilustração editorial desta manchete':'Editorial illustration'):
       illustrative?(lang==='pt'?'Fotografia de arquivo ilustrativa; não retrata necessariamente o acontecimento':lang==='es'?'Fotografía de archivo ilustrativa; no representa necesariamente el acontecimiento':'Illustrative archive photograph; not necessarily the reported event'):(a.image_alt||localeOf(a)?.title||'Imagem');
-    return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(a.editorial_type==='operational_bulletin'?'Ilustração informativa de alerta meteorológico, não foto do evento':illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" '+(a.editorial_type==='operational_bulletin'?'data-bulletin="true" ':'')+'onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
+    return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(a.editorial_type==='operational_bulletin'?'Foto ilustrativa de rodovia, não imagem do evento meteorológico':illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" '+(a.editorial_type==='operational_bulletin'?'data-bulletin="true" ':'')+'onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
   }
   function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
@@ -122,6 +122,13 @@
   function articlesFiltered(){
     // Original-language headlines remain readable when translations are unavailable.
     const pool=pageStories().filter(a=>matches(a));
+    // Prefer recent verified publisher reporting over old feature stories.
+    // Dates remain intact; only display order changes.
+    const nowTime=Date.now();
+    const recent=a=>a.kind==='external_link'&&a.editorial_type!=='operational_bulletin'&&
+      Number.isFinite(Date.parse(a.published_at))&&nowTime-Date.parse(a.published_at)<24*3600000;
+    const lead=pool.findIndex(recent);
+    if(lead>0)pool.unshift(pool.splice(lead,1)[0]);
     // The original publication time remains intact and is used within each
     // editorial category. But a cluster of government alerts must not swallow
     // the newspaper's lead stories merely by being issued minutes apart.
