@@ -127,6 +127,9 @@
     const nowTime=Date.now();
     const recent=a=>a.kind==='external_link'&&a.editorial_type!=='operational_bulletin'&&
       Number.isFinite(Date.parse(a.published_at))&&nowTime-Date.parse(a.published_at)<24*3600000;
+    // Keep up to the newest verified publisher items visible together,
+    // rather than burying a second real report behind older editorials.
+    pool.sort((a,b)=>Number(recent(b))-Number(recent(a)));
     const lead=pool.findIndex(recent);
     if(lead>0)pool.unshift(pool.splice(lead,1)[0]);
     // The original publication time remains intact and is used within each
