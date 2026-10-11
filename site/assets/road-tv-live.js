@@ -53,6 +53,9 @@
  // These are actual camera-player iframes, not miniature maps or still photos.
  // CamStreamer publishes the embed code; playback is still subject to provider uptime.
  const directCameras=[
+{id:'ambassador-us-bound',name:'Ambassador Bridge · Windsor → Detroit, EUA',
+   embed:'https://ambassador.solutionspal.com/cams/cam2.html',
+   page:'https://www.ambassadorbridge.com/into-the-united-states/'},
   // Provider-published native iframe for a US interstate bridge — vehicles on a trucking route.
   // An iframe alone still cannot certify actual continuous motion.
   {id:'us-i74-bridge',name:'I-74 · Bettendorf, IA — tráfego interestadual',
@@ -69,11 +72,9 @@
    page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'},
   // Original bridge operator publishes this frame under its Into the United
   // States page. Do not claim continuous playback solely from iframe.onload.
-  {id:'ambassador-us-bound',name:'Ambassador Bridge · Windsor → Detroit, EUA',
-   embed:'https://ambassador.solutionspal.com/cams/cam2.html',
-   page:'https://www.ambassadorbridge.com/into-the-united-states/'}
+
  ];
- const CAMERA_ROTATION_MS=5*60*1000; // Reader-approved 5-minute rotation among official camera-player embeds; not a freshness claim.
+ const CAMERA_ROTATION_MS=10*60*1000; // Owner-approved 10-minute rotation of available publisher camera embeds.
  let publisherIndex=0,publisherFrame=null,publisherFailures=new Set(),publisherSince=0;
  // Save rotation position across soft reloads, so an automatic site refresh
  // never pins the first interstate camera indefinitely.
@@ -323,14 +324,14 @@
    if(active&&active.platform==='youtube'&&!playing&&attemptingAt&&now()-attemptingAt>35000){
      playbackError(active,epoch);return;
    }
-   // Five-minute rotation applies to platform-verified highway cameras too;
+   // Ten-minute rotation applies to available verified streams within their tier;
    // driver POV broadcasts remain on screen longer unless they fail.
    if(active&&videos.length>1&&now()-started>=
-       (active.view_type==='cargo_cab'?12*60000:CAMERA_ROTATION_MS))rotate();
+       CAMERA_ROTATION_MS)rotate();
  },15000);
  // Browser-side heartbeat every 60 s: detect missing/detached frame, expired
  // camera time window and refresh publisher source. A third-party blank stream
- // may still be opaque to the browser: rotate preventively after five minutes.
+ // may still be opaque to the browser: rotate preventively after ten minutes.
  setInterval(()=>{
    if(active)return;
    if(publisherFrame&&!publisherFrame.isConnected){
