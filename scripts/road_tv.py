@@ -221,7 +221,7 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
                                 found.append(ident)
                                 if diagnostics is not None:
                                     diagnostics['targeted_live_hits']+=1
-                                    diagnostics['_targeted_video_ids'].append(ident)
+                                    diagnostics.setdefault('_targeted_video_ids',[]).append(ident)
                                     diagnostics.setdefault('_priority_source_by_video',{})[ident]={'name':source['name'],'channel_id':channel_id}
                     except (OSError,TimeoutError,ValueError,KeyError,TypeError) as exc:
                         errors.append('youtube_targeted_channel_live_'+api_error_tag(exc))
