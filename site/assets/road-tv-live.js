@@ -120,6 +120,7 @@
  function tvSelect(i){
    const c=tvChannels()[i];if(!c)return;
    userChannel=true;autoSwitch=false;
+   saveCameraState();
    if(c.kind==='stream')start(c.ref);
    else{if(active)clear();publisherIndex=directCameras.findIndex(v=>v.id===c.id);showPublisherCamera(true)}
    tvRefresh();
@@ -146,7 +147,7 @@
      card.appendChild(bar);
      bar.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>tvMove(Number(b.dataset.move)));
      bar.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>tvSize(b.dataset.size));
-     bar.querySelector('.tv-auto input').onchange=e=>{autoSwitch=e.target.checked;userChannel=!autoSwitch;publisherSince=now();started=now();tvRefresh()};
+     bar.querySelector('.tv-auto input').onchange=e=>{autoSwitch=e.target.checked;userChannel=!autoSwitch;publisherSince=now();started=now();saveCameraState();tvRefresh()};
    });
    tvRefresh();
  }
@@ -157,7 +158,8 @@
  // never pins the first interstate camera indefinitely.
  try{
    const seen=JSON.parse(sessionStorage.getItem('dm-roadtv-cameras')||'{}');
-   if(seen.camera_id){const stable=directCameras.findIndex(c=>c.id===seen.camera_id);if(stable>=0)publisherIndex=stable;}
+   if(seen.camera_id){selectedCameraId=seen.camera_id;const stable=directCameras.findIndex(c=>c.id===seen.camera_id);if(stable>=0)publisherIndex=stable;}
+   if(typeof seen.auto==='boolean'){autoSwitch=seen.auto;userChannel=!autoSwitch;}
    if(Number.isInteger(seen.index)&&seen.index>=0&&seen.index<directCameras.length){
      if(!seen.camera_id)publisherIndex=seen.index;
      if(Number.isFinite(seen.at)&&now()-seen.at>=CAMERA_ROTATION_MS)
@@ -165,7 +167,7 @@
    }
  }catch{}
  function saveCameraState(){
-   try{sessionStorage.setItem('dm-roadtv-cameras',JSON.stringify({index:publisherIndex,camera_id:directCameras[publisherIndex]?.id,at:now()}))}catch{}
+   try{sessionStorage.setItem('dm-roadtv-cameras',JSON.stringify({index:publisherIndex,camera_id:selectedCameraId||directCameras[publisherIndex]?.id,auto:autoSwitch,at:now()}))}catch{}
  }
 
  function publisherUnavailable(area){
