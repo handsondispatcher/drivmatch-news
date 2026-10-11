@@ -68,6 +68,12 @@
   {id:'peace-canada',name:'Peace Bridge · direção Canadá',
    embed:'https://camstreamer.com/embed/7WIJom0FTmLGWRea1khwrohdqLpKwHOa2DU5Wjqq?rel=0',
    page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'},
+  {id:'i35-waco',name:'I-35 · Waco, TX',embed:'https://camstreamer.com/embed/5F3i85dwyqAQrOFWrMENFpy9qWqFZT6rWt5RxhB8?rel=0',page:'https://camstreamer.com/live/stream/682515671-i-35-s-18th-street-waco'},
+  {id:'i29-tea',name:'I-29 · Tea / Sioux Falls, SD',embed:'https://camstreamer.com/embed/TYmozgKiGvkVCfm4QAHMuc4DAqwQVypR0zfz7ln8?rel=0',page:'https://camstreamer.com/live/stream/696756350-digit-all-i-29-tea-exit-livestream'},
+  {id:'oh741-lytle',name:'SR 741 · Springboro, OH',embed:'https://camstreamer.com/embed/fpjlgw9Y5Ht4rUi96v7cjpLDVYWavc7URaPyTWbZ?rel=0',page:'https://camstreamer.com/live/stream/721675885'},
+  {id:'grand-avenue',name:'Grand Avenue Bridge · Glenwood Springs, CO',embed:'https://camstreamer.com/embed/1efd36de1994794/S-8607?rel=0',page:'https://camstreamer.com/live/stream/2446-grand-avenue-bridge-glenwood-springs'},
+  {id:'paso-norte',name:'Paso del Norte · Ciudad Juárez / El Paso',embed:'https://camstreamer.com/embed/RmKKjLTyispBGGbIfFYnNMasTH45jhRs2Wo9Z1nZ?rel=0',page:'https://camstreamer.com/live/stream/101176577'},
+  {id:'lock19-keokuk',name:'Mississippi Lock 19 · Keokuk, IA',embed:'https://camstreamer.com/embed/Co4QnDaJH5JDDx1nWqwolO2bqONwRMOULlVS4xjE?rel=0',page:'https://camstreamer.com/live/stream/625366731-mississippi-river-lock-19-keokuk-ia'},
   // Original bridge operator publishes this frame under its Into the United
   // States page. Do not claim continuous playback solely from iframe.onload.
 
