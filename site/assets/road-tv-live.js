@@ -64,9 +64,7 @@
   {id:'fl-bridge-lions',name:'Bridge of Lions · St. Augustine, FL',
    embed:'https://camstreamer.com/embed/oEfmCvt05RxNKi3KsM8QLw5molD3ifp3ppWj6fJu?rel=0',
    page:'https://camstreamer.com/live/stream/110525310'},
-  {id:'fl-midbay',name:'Mid-Bay Bridge · Destin, FL',
-   embed:'https://camstreamer.com/embed/cYFp9erEDuUm7JuD57twuOPmeT1rdBbh79nyUBx2?rel=0',
-   page:'https://camstreamer.com/live/stream/101125169'},
+  // Mid-Bay Bridge removed from playable lineup: provider reports unavailable recording.
   {id:'peace-canada',name:'Peace Bridge · direção Canadá',
    embed:'https://camstreamer.com/embed/7WIJom0FTmLGWRea1khwrohdqLpKwHOa2DU5Wjqq?rel=0',
    page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'},
@@ -76,7 +74,7 @@
  ];
 
  let autoSwitch=true,userChannel=false,viewSize='small';
- const tvChannels=()=>[...videos.filter(v=>!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_title||v.title||'Transmissão'})),...directCameras.map(v=>({kind:'camera',ref:v,id:v.id,name:v.name}))];
+ const tvChannels=()=>[...videos.filter(v=>!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_title||v.title||'Transmissão'})),...directCameras.filter(v=>!publisherFailures.has(v.id)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name}))];
  const tvCurrent=()=>active?key(active):directCameras[publisherIndex]?.id;
  function tvRefresh(){
    cards.forEach(card=>{
@@ -94,7 +92,7 @@
    const c=tvChannels()[i];if(!c)return;
    userChannel=true;autoSwitch=false;
    if(c.kind==='stream')start(c.ref);
-   else{if(active)clear();publisherIndex=directCameras.findIndex(v=>v.id===c.id);publisherFailures.delete(c.id);showPublisherCamera(true)}
+   else{if(active)clear();publisherIndex=directCameras.findIndex(v=>v.id===c.id);showPublisherCamera(true)}
    tvRefresh();
  }
  function tvMove(d){
@@ -194,7 +192,7 @@
      publisherIndex=(publisherIndex+1)%directCameras.length;
      if(!publisherFailures.has(directCameras[publisherIndex].id))break;
    }
-   showPublisherCamera(true);
+   showPublisherCamera(true);tvRefresh();
  }
  function rotatePublisherCamera(){
    // A stalled cross-origin iframe can't be inspected for motion. Rotate among
