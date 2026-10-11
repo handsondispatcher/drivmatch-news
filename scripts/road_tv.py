@@ -407,6 +407,8 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     now=now or dt.datetime.now(UTC)
     now=now.astimezone(UTC)
     cfg=json.loads((ROOT/'content/road-tv-curated.json').read_text(encoding='utf-8'))
+    policy=json.loads((ROOT/'content/road-tv-policy.json').read_text(encoding='utf-8'))
+    preferred_channels={name.casefold():index for index,name in enumerate(policy['driver_priority_channels'])}
     result={'schema_version':2,'generated_at':now.isoformat(),
       'live_checked_at':None,'live_status':'unverified','current_live':None,
       'candidates':[],'featured_recording':None,'channels':cfg['channel_sources'],
@@ -451,7 +453,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
             key,cfg['channel_sources'],lambda u:api(u),result['warnings'],
             # Prioritize the proven channel EVERY hour rather than looking
             # for an unresolved secondary handle on alternating hours.
-            targeted_hour=(0 if not fresh_cache else None),
+            targeted_hour=(now.hour if not fresh_cache else None),
             diagnostics=diagnostics)
             if cache is None else [])  # Injected discovery fixtures remain deterministic.
         cached_creator_ids=[i for i in ((cached or {}).get('curated_ids') or [])
@@ -490,7 +492,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     priority=lambda v: (0 if v.get('view_type')=='cargo_cab' and v.get('live') else
                         1 if v.get('view_type')=='cargo_cab' else
                         2 if v.get('live') else 3)
-    approved.sort(key=lambda v:(priority(v),v.get('source_rank',99),v.get('channel_name','')))
+    approved.sort(key=lambda v:(priority(v),
+        preferred_channels.get(str(v.get('channel_name','')).casefold(),99) if v.get('live') else 99,
+        v.get('source_rank',99),v.get('channel_name','')))
     result['candidates']=approved[:12]
     result['current_live']=next((v for v in approved if v.get('live')),None)
     result['featured_recording']=next((v for v in approved if not v.get('live')),None)
