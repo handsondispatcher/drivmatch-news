@@ -245,8 +245,11 @@ const {spawn}=require('node:child_process');
        const overflow=rects.some(r=>r.left<container.left-2||r.right>container.right+2);
        const collision=rects.some((r,i)=>rects.slice(i+1).some(q=>
          r.left<q.right-1&&r.right>q.left+1&&r.top<q.bottom-1&&r.bottom>q.top+1));
+       // Official weather/risk data may be temporarily unavailable. Hidden
+       // tiles have zero-size rects and must not be mistaken for row overlap.
+       const visibleSecondRow=rects.slice(3).filter(r=>r.width>0&&r.height>0);
        const separated=rects.length===6&&
-         Math.min(...rects.slice(3).map(r=>r.top))>=Math.max(...rects.slice(0,3).map(r=>r.bottom))-2;
+         (!visibleSecondRow.length||Math.min(...visibleSecondRow.map(r=>r.top))>=Math.max(...rects.slice(0,3).map(r=>r.bottom))-2);
        return {columns,overflow,collision,separated};
      });
      assert.equal(layout.columns,width<=1280?3:6,
