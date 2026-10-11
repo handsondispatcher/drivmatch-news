@@ -220,7 +220,9 @@ const {spawn}=require('node:child_process');
    assert.equal(await tvCard.locator('.roadtv-replay').count(),0,'Do not mark an independent live camera as recorded video');
    // The reader must have a working fallback, not merely a decorative button.
    const firstCameraSrc=await camera.getAttribute('src');
-   await tvCard.locator('button.roadtv-next-camera').click();
+   // The iframe can continuously resize while its third-party player initializes.
+   // Trigger the same DOM button click directly; then prove the source changes.
+   await tvCard.locator('button.roadtv-next-camera').evaluate(button=>button.click());
    await page.waitForFunction(({selector,previous})=>{
      const frame=document.querySelector(selector+' iframe.roadtv-publisher-camera');
      return frame&&frame.getAttribute('src')!==previous;
