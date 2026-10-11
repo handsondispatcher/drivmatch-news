@@ -311,8 +311,9 @@ class PublicationTests(unittest.TestCase):
   self.assertEqual(cdllife['publication'],'review-required')
   self.assertEqual(cdllife['region'],'US')
   dat=next(x for x in sources if x['id']=='dat-freight-blog')
-  self.assertIsNone(dat['feed_url'],'Invalid publisher feed cannot be polled repeatedly')
-  self.assertEqual(dat['access'],'editorial-review')
+  self.assertTrue(dat['feed_url'].startswith('https://news.google.com/rss/search?'))
+  self.assertEqual(dat['feed_kind'],'domain-scoped-aggregator')
+  self.assertEqual(dat['access'],'discovery-rss')
   source=next(x for x in sources if x['id']=='supply-chain-dive')
   now=datetime(2026,10,10,11,0,tzinfo=timezone.utc)
   xml=b'<rss><channel><item><title>Texas truck carriers expand freight hauling</title><link>https://www.supplychaindive.com/news/test-truck-freight/</link><pubDate>Sat, 10 Oct 2026 10:30:00 GMT</pubDate></item></channel></rss>'
