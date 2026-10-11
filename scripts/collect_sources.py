@@ -120,6 +120,7 @@ def merge_verified_candidate_history(current, sources, now=None, *, path=None):
 def collect():
     sources=json.loads((ROOT/'content/sources.json').read_text())['sources']
     def check(source):
+        if source.get('enabled') is False:return [],dict(id=source['id'],status='disabled',url=source['url'])
         if not source.get('feed_url'):return [],dict(id=source['id'],status='manual-review',url=source['url'])
         try:
             raw,attempts_used=fetch_rss_with_retry(source['feed_url'])
@@ -139,7 +140,12 @@ def collect():
     (out/'news-candidates-cache.json').write_text(
         json.dumps([x for x in candidates.values() if x.get('origin_type')=='publisher-feed'],
                    ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-    report={'checked_at':datetime.now(timezone.utc).isoformat(),'sources':health,'candidate_count':len(candidates)}
+    report={'checked_at':datetime.now(timezone.utc).isoformat(),'sources':health,'candidate_count':len(candidates),
+            'working_feeds':sum(x['status']=='ok' for x in health),
+            'failed_feeds':sum(x['status']=='failed' for x in health),
+            'manual_review_sources':sum(x['status']=='manual-review' for x in health),
+            'discovery_only_candidates':sum(x.get('origin_type')=='aggregator-discovery' for x in candidates.values()),
+            'original_publisher_candidates':sum(x.get('origin_type')=='publisher-feed' for x in candidates.values())}
     (out/'source-health.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('Sources:',len(sources),'candidates:',len(candidates),'feed failures:',sum(x['status']=='failed' for x in health))
     failing=[x for x in health if x['status']=='failed']
