@@ -158,9 +158,9 @@ class RoadTVTests(unittest.TestCase):
    raise AssertionError(url)
   c={"checked_at":"2026-10-08T00:00:00Z"}
   doc=make_road_tv(now=NOW,api_key="test",get_json=api,cache=c)
-  self.assertEqual(len(calls),2)
+  self.assertEqual(len(calls),1)
   self.assertEqual(sum(x[0]==["live"] for x in calls),1)
-  self.assertEqual(sum(x[0]==["completed"] for x in calls),1)
+  self.assertEqual(sum(x[0]==["completed"] for x in calls),0)
   self.assertEqual(doc["live_status"],"none_verified")
 
  def test_twitch_discovery_live_but_not_stationary(self):
@@ -218,12 +218,12 @@ class RoadTVTests(unittest.TestCase):
   ids=youtube_curated_channel_discover('test-key',channels,api,[],targeted_hour=0,
                                       diagnostics=diagnostic)
   self.assertEqual(ids,[ID])
-  self.assertEqual(len(calls),1)
-  self.assertEqual(calls[0]['channelId'],[CHANNEL])
+  self.assertEqual(len(calls),2)
+  self.assertTrue(all(c['channelId']==[CHANNEL] for c in calls))
   self.assertEqual(calls[0]['eventType'],['live'])
   self.assertEqual(calls[0]['videoEmbeddable'],['true'])
-  self.assertEqual(diagnostic['targeted_channel_checked'],'Ride Along Gang')
-  self.assertEqual(diagnostic['targeted_live_hits'],1)
+  self.assertEqual(diagnostic['targeted_channel_checked'],'Trucking Duke')
+  self.assertEqual(diagnostic['targeted_live_hits'],2)
 
  def test_priority_channels_alternate_and_no_uploads_required(self):
   from road_tv import youtube_curated_channel_discover
@@ -240,7 +240,7 @@ class RoadTVTests(unittest.TestCase):
             {'name':'Trucking Duke','handle':'@TruckingDuke'}]
   result=youtube_curated_channel_discover('test',channels,api,[],targeted_hour=1)
   self.assertEqual(result,[ID])
-  self.assertEqual(calls,[CHANNEL])
+  self.assertEqual(calls,[CHANNEL,CHANNEL])
 
  def test_ride_along_live_pov_with_trucker_in_description_qualifies(self):
   title='LIVE Driving POV- IRL- Denver CO to Schuyler NE | Relaxing Ride Along'
@@ -258,7 +258,9 @@ class RoadTVTests(unittest.TestCase):
     'liveBroadcastContent':'live'},
     'liveStreamingDetails':{'actualStartTime':'2026-10-10T19:00:00Z'}}
   d={'targeted_channel_checked':'Ride Along Gang','_targeted_channel_id':CHANNEL,
-     '_targeted_video_ids':[ID],'targeted_title_match':False,
+     '_targeted_video_ids':[ID],
+     '_priority_source_by_video':{ID:{'name':'Ride Along Gang','channel_id':CHANNEL}},
+     'targeted_title_match':False,
      'owner_visual_evidence_used':0,'videos_returned':0,
      'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
      'accepted_live':0,'targeted_failure_reason':None}
@@ -285,6 +287,7 @@ class RoadTVTests(unittest.TestCase):
     v={**metadata,'snippet':dict(metadata['snippet'])}
     d={'targeted_channel_checked':'Ride Along Gang',
        '_targeted_channel_id':CHANNEL,'_targeted_video_ids':[ID],
+       '_priority_source_by_video':{ID:{'name':'Ride Along Gang','channel_id':CHANNEL}},
        'owner_visual_evidence_used':0,'videos_returned':0,
        'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
        'accepted_live':0,'targeted_failure_reason':None}
