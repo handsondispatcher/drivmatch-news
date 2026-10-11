@@ -40,8 +40,11 @@ def parse_feed(raw, source, now=None):
         is_discovery=source.get('access')=='discovery-rss'
         allowed_host='news.google.com' if is_discovery else expected.removeprefix('www.')
         if not url.startswith('https://') or hostname.removeprefix('www.')!=allowed_host or not title:continue
-        result.append({'id':hashlib.sha256(url.encode()).hexdigest()[:20], 'title':clean_title(title,source.get('name','')),
-            'source':source['name'],'source_url':url,'published_at':dt.isoformat(),
+        publisher_node=node.find('source')
+        discovered_publisher=''.join(publisher_node.itertext()).strip()[:90] if publisher_node is not None else ''
+        credited_source=('Google News · '+(discovered_publisher or source['name'])) if is_discovery else source['name']
+        result.append({'id':hashlib.sha256(url.encode()).hexdigest()[:20], 'title':clean_title(title,discovered_publisher or source.get('name','')),
+            'source':credited_source,'source_url':url,'published_at':dt.isoformat(),
             'collected_at':now.isoformat(),'category':source['category'],'original_lang':source['original_lang'],
             'region':source.get('region','US'),'origin_type':('aggregator-discovery' if source.get('access')=='discovery-rss' else 'publisher-feed'),
             'status':'pending_review','publication_blockers':['verify-event-and-original-date','write-owned-summary','complete-three-languages','approve-editorially']})
