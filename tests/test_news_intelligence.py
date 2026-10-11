@@ -47,7 +47,9 @@ class NewsIntelligenceTests(unittest.TestCase):
     def test_social_directory_does_not_claim_api_or_automated_publication(self):
         for id_ in ("x-public", "facebook-public", "instagram-public"):
             source = next(s for s in self.sources if s["id"] == id_)
-            self.assertIsNone(source["feed_url"])
+            self.assertTrue(source["feed_url"].startswith("https://news.google.com/rss/search?"))
+            self.assertEqual(source["feed_kind"], "domain-scoped-aggregator")
+            self.assertNotEqual(source["access"], "rss")
             self.assertEqual(source["publication"], "external-discovery-only")
         self.assertIn("NOT_CONNECTED", self.policy["connectors"]["x"])
         self.assertIn("NOT_CONNECTED", self.policy["connectors"]["facebook"])
