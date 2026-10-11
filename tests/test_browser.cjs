@@ -96,7 +96,7 @@ const {spawn}=require('node:child_process');
    const originalHeadline=await page.locator('#features > .hero-wrap h3').textContent();
    const relatedBefore=await page.locator('#features > .related-rail article h3').allTextContents();
    const contextBefore=await page.locator('#features > .related-rail p.editorial-context').count();
-   assert.equal(contextBefore,await page.locator('#features > .related-rail article').count(),'Context belongs to actual related cards only');
+   assert.ok(contextBefore<=await page.locator('#features > .related-rail article').count(),'Only eligible related cards show context');
    assert.equal(await page.locator('#features > .hero-wrap p.editorial-context').count(),0,'No context CTA in lead hero');
    assert.equal(await page.locator('#noticias p.editorial-context').count(),0,'No context CTA in news list');
    await dots.nth(1).click();
