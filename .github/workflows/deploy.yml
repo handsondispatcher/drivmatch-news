@@ -146,8 +146,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Testar consentimento e eventos de audiência
+        run: node tests/test_audience_analytics.cjs
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - name: Provisionar GA4 somente com identificador válido (GitHub Actions Variable)
+        env:
+          GA4_MEASUREMENT_ID: ${{ vars.GA4_MEASUREMENT_ID }}
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const id=String(process.env.GA4_MEASUREMENT_ID||'').trim();
+          if(id&&!/^G-[A-Z0-9]{6,20}$/.test(id))throw Error('Invalid public GA4_MEASUREMENT_ID');
+          fs.writeFileSync('site/data/analytics-config.js','window.DRIVMATCH_ANALYTICS_CONFIG='+JSON.stringify({ga4_id:id})+';\n');
+          console.log(id?'Audience telemetry configured':'Audience telemetry dormant: GA4_MEASUREMENT_ID not set');
+          NODE
       - name: Browser regression (bounded)
         timeout-minutes: 3
         run: npm run test:browser
