@@ -295,8 +295,8 @@
    if(alternative)start(alternative);
    else{
      clear();
-     status(labels[lang()].error);
-     // May be a newly started broadcaster already in a fresh catalog.
+     showPublisherCamera(true);
+     // A newly started verified driver may return in the next manifest.
      refresh();
    }
  }
