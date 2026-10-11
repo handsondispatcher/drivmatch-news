@@ -451,6 +451,11 @@ const {spawn}=require('node:child_process');
          destroy(){this.iframe.remove()}
        }};
      });
+     // The earlier CH+ interaction intentionally disabled AUTO; re-enable it
+     // before testing live-driver promotion, respecting the reader's choice.
+     await page.locator('#roadtv-desktop .tv-auto input').evaluate(el=>{
+       if(!el.checked){el.checked=true;el.dispatchEvent(new Event('change',{bubbles:true}))}
+     });
      await page.reload({waitUntil:'networkidle'});
      await page.locator('#roadtv-desktop iframe').first().waitFor({state:'attached',timeout:9000});
      assert.ok((await page.locator('#roadtv-desktop iframe').getAttribute('src')).includes(first),'First validated stream plays');
