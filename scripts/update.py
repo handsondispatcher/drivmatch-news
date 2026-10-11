@@ -472,7 +472,7 @@ def build(offline=False):
                 external_headlines.append({**{k:item[k] for k in ('title','source','source_url','published_at','category','region','origin_type')},'id':'source-'+hashlib.sha256(item['source_url'].encode()).hexdigest()[:20],'original_lang':item.get('original_lang','en'),'geo_scope_verified':True,'editorial_type':('discovery_link' if discovery else 'publisher_headline')})
                 rejection_counts['eligible_source_links']+=1
                 seen.add(item['source_url'])
-                if len(external_headlines)>=90:break
+                if len(external_headlines)>=240:break
         except (OSError,ValueError,TypeError,KeyError) as exc:
             errors.append('external_headlines:'+type(exc).__name__)
     # Official US weather bulletins are separate from journalistic reporting.
@@ -509,7 +509,7 @@ def build(offline=False):
     # Source-linked headlines are part of the initial issue: an extra failed
     # client fetch must not leave readers staring only at old approved stories.
     # They remain external links, not fabricated DrivMatch original reporting.
-    initial_links=bootstrap_external_story_cards(external_headlines,unique.values())[:75]
+    initial_links=bootstrap_external_story_cards(external_headlines,unique.values())[:160]
     latest_source=max((x.get('published_at','') for x in external_headlines),default='')
     data={'schema_version':1,'site_version':release['version'],'publication_mode':mode,'generated_at':NOW().isoformat(timespec='seconds'),
           'source_monitor':{'checked_at':(NOW().isoformat(timespec='seconds') if not offline else None),
