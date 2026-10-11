@@ -70,15 +70,11 @@ const {spawn}=require('node:child_process');
    // photographs. Verify computed object-fit after every responsive breakpoint.
    const bulletinImages=page.locator('#panorama img[data-bulletin="true"], #noticias img[data-bulletin="true"], #highlights img[data-bulletin="true"]');
    if(await bulletinImages.count()){
-    const pictures=await bulletinImages.evaluateAll(imgs=>imgs.map(img=>({
-     fit:getComputedStyle(img).objectFit,
-     graphic:img.getAttribute('src')?.startsWith('data:image/svg'),
-     source:img.getAttribute('src')
+    const items=await bulletinImages.evaluateAll(imgs=>imgs.map(img=>({
+     src:img.getAttribute('src'),alt:img.getAttribute('alt')
     })));
-    assert.ok(pictures.every(p=>p.fit==='contain'),'Bulletin graphics must not be cropped at '+width+'px');
-    assert.ok(pictures.every(p=>p.graphic),'NWS bulletins must not inherit truck archive images');
-    assert.ok(pictures.some(p=>decodeURIComponent(p.source).includes('viewBox="0 0 960 540"')),
-      'Weather illustration uses restrained 16:9 graphic with safe margins');
+    assert.ok(items.every(x=>x.alt&&/ilustrativ|archive|archivo|rodovia|road|carretera/i.test(x.alt)),
+      'Weather photographic archive cards must disclose non-event photo context');
    }
    assert.equal(await page.locator('#features > .hero-wrap article').count(),1,'v31 requires one lead story');
    assert.equal(await page.locator('#features > .related-rail article').count(),3,'v31 requires three related stories');
@@ -213,7 +209,8 @@ const {spawn}=require('node:child_process');
    // v34.11: show one direct camera video embed, never a tiny map or links-only tile.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
-   assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
+   assert.equal(await tvCard.locator('button:not(.roadtv-next-camera),.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
+   assert.equal(await tvCard.locator('button.roadtv-next-camera').count(),1,'Camera must offer user-visible next-camera control');
    assert.equal(await tvCard.locator('.roadtv-screen').count(),1);
    const camera=tvCard.locator('iframe.roadtv-publisher-camera');
    await camera.waitFor({state:'attached',timeout:11000});
@@ -221,6 +218,16 @@ const {spawn}=require('node:child_process');
    assert.equal(await tvCard.locator('.roadtv-official-map').count(),0,'No embedded map in video area');
    assert.equal(await tvCard.locator('.roadtv-camera-credit a[href^="https://camstreamer.com/live/stream/"]').count(),1,'Publisher credit visible');
    assert.equal(await tvCard.locator('.roadtv-replay').count(),0,'Do not mark an independent live camera as recorded video');
+   // The reader must have a working fallback, not merely a decorative button.
+   const firstCameraSrc=await camera.getAttribute('src');
+   // The iframe can continuously resize while its third-party player initializes.
+   // Trigger the same DOM button click directly; then prove the source changes.
+   await tvCard.locator('button.roadtv-next-camera').evaluate(button=>button.click());
+   await page.waitForFunction(({selector,previous})=>{
+     const frame=document.querySelector(selector+' iframe.roadtv-publisher-camera');
+     return frame&&frame.getAttribute('src')!==previous;
+   },{selector:tv,previous:firstCameraSrc},{timeout:5000});
+   assert.notEqual(await camera.getAttribute('src'),firstCameraSrc,'Next camera must load a distinct publisher source');
    assert.equal(await page.locator('#mercados').isVisible(),width>990);
    assert.equal(await page.locator('#mobile-market').isVisible(),width<=990);
    assert.equal(await page.locator('#news-freshness').count(),1);
@@ -370,7 +377,7 @@ const {spawn}=require('node:child_process');
    assert.ok(await photoNodes.count()>=1,'External news stories must show real locally served photo thumbnails');
    const photos=await photoNodes.evaluateAll(els=>els.map(im=>({complete:im.complete,width:im.naturalWidth,height:im.naturalHeight,alt:im.alt})));
    assert.ok(photos.every(p=>p.complete&&p.width>=340&&p.height>=180),'Real news thumbnail JPEGs must load successfully');
-   assert.ok(photos.every(p=>/arquivo ilustrativa|archive photograph|archivo ilustrativa/i.test(p.alt)),'Archive photographs must not be represented as event photos');
+   assert.ok(photos.every(p=>/arquivo ilustrativa|archive photograph|archivo ilustrativa|fotografia ilustrativa de rodovia|illustrative road archive photograph|fotografía ilustrativa de carretera/i.test(p.alt)),'Archive photographs must not be represented as event photos');
    assert.equal(await page.locator('#footer-description').count(),0,'Institutional footer has exactly two lines');
    assert.equal(await page.locator('footer.footer > div').count(),2,'Footer must have exactly two institutional lines');
    assert.equal(await page.locator('#article-dialog #modalbodytext').evaluate(e=>getComputedStyle(e).maxHeight),'none','Article text must never be clipped');

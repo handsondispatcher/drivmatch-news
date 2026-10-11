@@ -135,7 +135,7 @@ def safe_cached_discovery(now):
     try:
         data = json.loads(CACHE_PATH.read_text(encoding='utf-8'))
         ts = when(data.get('checked_at'))
-        if data.get('discovery_version')==4 and ts and 0 <= (now-ts).total_seconds() < 3700:
+        if data.get('discovery_version')==5 and ts and 0 <= (now-ts).total_seconds() < 3700:
             return data
     except (OSError, ValueError, TypeError):
         pass
@@ -424,7 +424,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     api=get_json or request_json
     cached=cache if cache is not None else safe_cached_discovery(now)
     fresh_cache=cached and when(cached.get('checked_at')) and (now-when(cached['checked_at'])).total_seconds()<3700
-    discovery={'checked_at':now.isoformat(),'discovery_version':4}
+    discovery={'checked_at':now.isoformat(),'discovery_version':5}
     diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
                  'targeted_live_hits':0,'_targeted_video_ids':[],
                  '_targeted_channel_id':None,'targeted_title_match':False,
@@ -449,7 +449,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         # EVERY run, not only once per hour. Official API; no HTML scraping.
         creator_ids=(youtube_curated_channel_discover(
             key,cfg['channel_sources'],lambda u:api(u),result['warnings'],
-            targeted_hour=(now.hour if not fresh_cache else None),
+            # Prioritize the proven channel EVERY hour rather than looking
+            # for an unresolved secondary handle on alternating hours.
+            targeted_hour=(0 if not fresh_cache else None),
             diagnostics=diagnostics)
             if cache is None else [])  # Injected discovery fixtures remain deterministic.
         cached_creator_ids=[i for i in ((cached or {}).get('curated_ids') or [])
