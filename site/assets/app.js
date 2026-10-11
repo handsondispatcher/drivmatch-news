@@ -371,6 +371,39 @@
     if(chosen==='es')return `DRIVMATCH NEWS • RESUMEN DE TITULAR\n\n${sourceName} publicó: «${headline}».\n\nPor qué importa: ${context}\n\nEste texto de contexto es original y se basa únicamente en el titular y los metadatos de la fuente. No es el artículo completo ni una verificación independiente.`;
     return `DRIVMATCH NEWS • LEITURA RÁPIDA\n\nO veículo ${sourceName} publicou a manchete: “${headline}”.\n\nPor que importa: ${context}\n\nEste texto de contextualização é original e se baseia somente na manchete e nos metadados disponíveis. Não é a reportagem integral nem uma confirmação independente do acontecimento.`;
   }
+  // Dispatch Desk reader perspectives: structured editorial analysis takes
+  // precedence; otherwise show clearly labeled professional checkpoints.
+  let impactAudience='driver';
+  const impactPrompts={
+    pt:{driver:{Clima:'Consulte NWS e DOT antes de definir saída, parada ou desvio.',Rodovias:'Confirme restrições e condições oficiais da rota antes de dirigir.',Fiscalização:'Confira regras aplicáveis, CDL, documentos e datas oficiais.',Combustíveis:'Compare o custo real de combustível da viagem; não presuma uma tarifa.',Acidentes:'Cheque interdições e alternativas nas autoridades de tráfego.',Mecânica:'Avalie inspeções e manutenção com profissional qualificado.',Fretes:'Verifique se a mudança afeta a disponibilidade da sua viagem ou equipamento.'},dispatcher:{Clima:'Verifique risco climático, ETA, avisos ao broker e alternativas com o motorista.',Rodovias:'Confirme restrições de rota, ETA, comunicação com broker e shipper.',Fiscalização:'Confira impacto em documentação, compliance e elegibilidade da operação.',Combustíveis:'Reavalie cotação e margem usando valores atuais, sem supor aumento de preço.',Acidentes:'Valide eventuais bloqueios e atualize ETA somente com informação confirmada.',Mecânica:'Considere disponibilidade do equipamento, atendimento, ETA e comunicação.',Fretes:'Compare capacidade, taxas e disponibilidade por lane/equipamento antes de negociar.'}},
+    en:{driver:{Clima:'Verify NWS and state DOT advisories before departure or detours.',Rodovias:'Check official route conditions and restrictions before driving.',Fiscalização:'Verify applicable rules, CDL, documents and effective dates.',Combustíveis:'Check your actual trip fuel cost; do not assume a rate change.',Acidentes:'Check official closures and alternate routes.',Mecânica:'Confirm inspections and maintenance with qualified professionals.',Fretes:'Check whether this may affect your lane or equipment availability.'},dispatcher:{Clima:'Check weather exposure, ETA and broker/driver communications.',Rodovias:'Confirm route restrictions, ETA and shipper/broker updates.',Fiscalização:'Check documentation, compliance and carrier eligibility.',Combustíveis:'Review current cost and margins before repricing.',Acidentes:'Verify closures before changing ETA or commitments.',Mecânica:'Review equipment availability, assistance, ETA and communication.',Fretes:'Compare lane rates and capacity with current verified data.'}},
+    es:{driver:{Clima:'Consulte NWS y DOT antes de salir o desviarse.',Rodovias:'Confirme rutas y restricciones oficiales.',Fiscalização:'Compruebe normas, CDL y documentos vigentes.',Combustíveis:'Calcule los costos reales de combustible.',Acidentes:'Consulte cierres y desvíos oficiales.',Mecânica:'Verifique el mantenimiento con técnicos cualificados.',Fretes:'Compruebe condiciones de la ruta y disponibilidad del equipo.'},dispatcher:{Clima:'Revise clima, ETA y comunicación con broker y conductor.',Rodovias:'Confirme restricciones, ETA y avisos al broker.',Fiscalização:'Compruebe documentos y cumplimiento normativo.',Combustíveis:'Revise márgenes con cifras verificadas.',Acidentes:'Confirme cierres antes de cambiar ETA.',Mecânica:'Revise disponibilidad, asistencia y ETA.',Fretes:'Compare tarifas y capacidad verificadas por ruta.'}}
+  };
+  function renderImpact(){
+    if(!opened)return;
+    const panel=$('article-impact'),buttons=$('article-impact-actions');
+    if(!panel||!buttons)return;
+    const language=articleLang,persona=impactAudience;
+    const isDriver=persona==='driver';
+    const byLanguage=opened.professional_impact?.[persona];
+    const verifiedText=typeof byLanguage==='string'?byLanguage:byLanguage?.[language];
+    const context=impactPrompts[language]?.[persona]?.[opened.category];
+    const fallback=language==='en'
+      ?'Evaluate whether this event affects your routes, costs, timing or regulatory obligations; no specific effect is confirmed by this headline.'
+      :language==='es'
+      ?'Evalúe si afecta rutas, costos, plazos o normas; el titular no confirma ningún efecto específico.'
+      :'Avalie se a notícia altera sua rota, custos, prazos ou obrigações; a manchete não confirma impacto específico.';
+    const header=language==='en'?'Professional perspective':language==='es'?'Perspectiva profesional':'Impacto na profissão';
+    const intro=language==='en'?'Questions to verify, not established consequences.':language==='es'?'Puntos para comprobar; no son consecuencias confirmadas.':'Pontos de atenção, não consequências confirmadas.';
+    $('article-impact-title').textContent=header;
+    $('article-impact-note').textContent=verifiedText?'Análise editorial vinculada à matéria.':intro;
+    $('article-impact-text').textContent=verifiedText||context||fallback;
+    buttons.querySelectorAll('[data-impact-role]').forEach(button=>{
+      const selected=button.dataset.impactRole===persona;
+      button.setAttribute('aria-pressed',String(selected));
+      button.classList.toggle('selected',selected);
+    });
+  }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
     const storyPhoto=licensedPhotoOf(opened);
     $('modalimg').src=imageOf(opened);$('modalimg').onerror=()=>{$('modalimg').onerror=null;$('modalimg').src=storyGraphic(opened);};$('modalimg').alt=storyPhoto?.image_alt||opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
@@ -419,6 +452,7 @@
     $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]&&(opened.kind!=='external_link'||opened.translated_langs?.includes(l))).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
     $('article-reading').hidden=opened.kind==='external_link'&&(!opened.translated_langs||opened.translated_langs.length<2);
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
+    renderImpact();
     $('share-feedback').textContent='';
     $('share-options').hidden=true;
     $('share-picker-feedback').textContent='';
@@ -703,6 +737,7 @@
     $('list').addEventListener('click',clickArticle);$('features').addEventListener('click',clickArticle);$('highlightList').addEventListener('click',clickArticle);
     const keyArticle=e=>{if(e.key==='Enter'||e.key===' '){const item=e.target.closest('[data-story]');if(item){e.preventDefault();clickArticle({target:item});}}};
     $('list').addEventListener('keydown',keyArticle);$('features').addEventListener('keydown',keyArticle);$('highlightList').addEventListener('keydown',keyArticle);
+    $('article-impact-actions').addEventListener('click',e=>{const button=e.target.closest('[data-impact-role]');if(!button)return;impactAudience=button.dataset.impactRole;renderImpact();track('news_impact_view',{...storyInfo(opened),audience:impactAudience});});
     $('articleLanguageButtons').addEventListener('click',e=>{const b=e.target.closest('[data-article-lang]');if(!b)return;articleLang=b.dataset.articleLang;renderArticle();});
     $('shade').addEventListener('click',e=>{if(e.target===$('shade'))closeModal();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
