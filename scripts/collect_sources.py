@@ -37,8 +37,9 @@ def parse_feed(raw, source, now=None):
         # Only first-party URLs. Aggregator redirects and date-less posts are excluded.
         hostname=urlparse(url).hostname or ''
         expected=urlparse(source['url']).hostname or ''
-        if not url.startswith('https://') or hostname.removeprefix('www.')!=expected.removeprefix('www.') or not title:continue
-        if source.get('access')=='discovery-rss' and hostname not in ('news.google.com',):continue
+        is_discovery=source.get('access')=='discovery-rss'
+        allowed_host='news.google.com' if is_discovery else expected.removeprefix('www.')
+        if not url.startswith('https://') or hostname.removeprefix('www.')!=allowed_host or not title:continue
         result.append({'id':hashlib.sha256(url.encode()).hexdigest()[:20], 'title':clean_title(title,source.get('name','')),
             'source':source['name'],'source_url':url,'published_at':dt.isoformat(),
             'collected_at':now.isoformat(),'category':source['category'],'original_lang':source['original_lang'],
