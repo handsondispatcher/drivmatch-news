@@ -209,7 +209,8 @@ const {spawn}=require('node:child_process');
    // v34.11: show one direct camera video embed, never a tiny map or links-only tile.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
-   assert.equal(await tvCard.locator('button,.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
+   assert.equal(await tvCard.locator('button:not(.roadtv-next-camera),.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
+   assert.equal(await tvCard.locator('button.roadtv-next-camera').count(),1,'Camera must offer user-visible next-camera control');
    assert.equal(await tvCard.locator('.roadtv-screen').count(),1);
    const camera=tvCard.locator('iframe.roadtv-publisher-camera');
    await camera.waitFor({state:'attached',timeout:11000});
