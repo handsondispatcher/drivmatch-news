@@ -188,7 +188,7 @@ class PublicationTests(unittest.TestCase):
   self.assertEqual(version['weather_policy']['city_search'],'one_field_one_search_action')
   self.assertEqual(version['weather_policy']['location_index'],'U.S. Census Bureau 2025 National Places')
   self.assertIn('news-candidates-cache.json',(BASE/'scripts/collect_sources.py').read_text(encoding='utf-8'))
-  self.assertIn('original-language headlines remain readable'.lower(),app.lower())
+  self.assertIn('show only verified locale headlines'.lower(),app.lower())
   self.assertNotIn("$('chips').innerHTML",app)
   self.assertNotIn("document.querySelector('.newsroom-nav').addEventListener",app)
   ads=json.loads((BASE/'content/ads.json').read_text(encoding='utf-8'))
