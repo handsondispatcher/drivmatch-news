@@ -209,20 +209,22 @@ const {spawn}=require('node:child_process');
    // v34.11: show one direct camera video embed, never a tiny map or links-only tile.
    const tvCard=page.locator(tv);
    assert.equal(await tvCard.locator('h2').count(),0,'No unapproved TV title');
-   assert.equal(await tvCard.locator('button:not(.roadtv-next-camera),.roadtv-channels,.roadtv-credit,.roadtv-toolbar').count(),0);
-   assert.equal(await tvCard.locator('button.roadtv-next-camera').count(),1,'Camera must offer user-visible next-camera control');
+   assert.equal(await tvCard.locator('.tv-controls').count(),1,'Compact TV channel control panel must exist');
+   assert.equal(await tvCard.locator('[data-move="-1"],[data-move="1"]').count(),2,'CH− and CH+ controls must exist');
+   assert.equal(await tvCard.locator('[data-size]').count(),3,'Three screen sizes must be available');
+   assert.equal(await tvCard.locator('.tv-auto input:checked').count(),1,'Ten-minute auto rotation enabled by default');
    assert.equal(await tvCard.locator('.roadtv-screen').count(),1);
    const camera=tvCard.locator('iframe.roadtv-publisher-camera');
    await camera.waitFor({state:'attached',timeout:11000});
-   assert.match(await camera.getAttribute('src'),/^https:\/\/camstreamer\.com\/embed\//,'Player must open an actual camera embed');
+   assert.match(await camera.getAttribute('src'),/^https:\/\/(?:camstreamer\.com\/embed\/|ambassador\.solutionspal\.com\/cams\/)/,'Player must open a direct publisher camera embed');
    assert.equal(await tvCard.locator('.roadtv-official-map').count(),0,'No embedded map in video area');
-   assert.equal(await tvCard.locator('.roadtv-camera-credit a[href^="https://camstreamer.com/live/stream/"]').count(),1,'Publisher credit visible');
+   assert.equal(await tvCard.locator('.roadtv-camera-credit a').count(),1,'Publisher credit visible');
    assert.equal(await tvCard.locator('.roadtv-replay').count(),0,'Do not mark an independent live camera as recorded video');
    // The reader must have a working fallback, not merely a decorative button.
    const firstCameraSrc=await camera.getAttribute('src');
    // The iframe can continuously resize while its third-party player initializes.
    // Trigger the same DOM button click directly; then prove the source changes.
-   await tvCard.locator('button.roadtv-next-camera').evaluate(button=>button.click());
+   await tvCard.locator('[data-move="1"]').evaluate(button=>button.click());
    await page.waitForFunction(({selector,previous})=>{
      const frame=document.querySelector(selector+' iframe.roadtv-publisher-camera');
      return frame&&frame.getAttribute('src')!==previous;
