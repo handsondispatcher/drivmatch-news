@@ -449,7 +449,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         # EVERY run, not only once per hour. Official API; no HTML scraping.
         creator_ids=(youtube_curated_channel_discover(
             key,cfg['channel_sources'],lambda u:api(u),result['warnings'],
-            targeted_hour=(now.hour if not fresh_cache else None),
+            # Prioritize the proven channel EVERY hour rather than looking
+            # for an unresolved secondary handle on alternating hours.
+            targeted_hour=(0 if not fresh_cache else None),
             diagnostics=diagnostics)
             if cache is None else [])  # Injected discovery fixtures remain deterministic.
         cached_creator_ids=[i for i in ((cached or {}).get('curated_ids') or [])
