@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "driver_live_first": true,
+  "driver_priority_channels": [
+    "Ride Along Gang",
+    "Trucking Duke"
+  ],
+  "camera_priority_ids": [
+    "i35-waco",
+    "ambassador-us-bound",
+    "us-i74-bridge",
+    "fl-bridge-lions",
+    "peace-canada",
+    "i29-tea",
+    "oh741-lytle",
+    "paso-norte"
+  ],
+  "rotation_seconds": 600,
+  "manual_selection_preserved": true,
+  "no_duplicate_channels": true,
+  "require_verified_current_live": true,
+  "recorded_streams_after_cameras": true,
+  "offline_camera_retry": true,
+  "display_title": false
+}
