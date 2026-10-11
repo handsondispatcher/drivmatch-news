@@ -242,7 +242,7 @@ const {spawn}=require('node:child_process');
        const columns=getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length;
        const rects=[...el.children].map(ch=>ch.getBoundingClientRect());
        const container=el.getBoundingClientRect();
-       const overflow=rects.some(r=>r.left<container.left-2||r.right>container.right+2);
+       const overflow=rects.filter(r=>r.width>0&&r.height>0).some(r=>r.left<container.left-2||r.right>container.right+2);
        const collision=rects.some((r,i)=>rects.slice(i+1).some(q=>
          r.left<q.right-1&&r.right>q.left+1&&r.top<q.bottom-1&&r.bottom>q.top+1));
        // Official weather/risk data may be temporarily unavailable. Hidden
