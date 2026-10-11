@@ -367,7 +367,7 @@ const {spawn}=require('node:child_process');
    assert.ok(await photoNodes.count()>=1,'External news stories must show real locally served photo thumbnails');
    const photos=await photoNodes.evaluateAll(els=>els.map(im=>({complete:im.complete,width:im.naturalWidth,height:im.naturalHeight,alt:im.alt})));
    assert.ok(photos.every(p=>p.complete&&p.width>=340&&p.height>=180),'Real news thumbnail JPEGs must load successfully');
-   assert.ok(photos.every(p=>/arquivo ilustrativa|archive photograph|archivo ilustrativa/i.test(p.alt)),'Archive photographs must not be represented as event photos');
+   assert.ok(photos.every(p=>/arquivo ilustrativa|archive photograph|archivo ilustrativa|fotografia ilustrativa de rodovia|illustrative road archive photograph|fotografía ilustrativa de carretera/i.test(p.alt)),'Archive photographs must not be represented as event photos');
    assert.equal(await page.locator('#footer-description').count(),0,'Institutional footer has exactly two lines');
    assert.equal(await page.locator('footer.footer > div').count(),2,'Footer must have exactly two institutional lines');
    assert.equal(await page.locator('#article-dialog #modalbodytext').evaluate(e=>getComputedStyle(e).maxHeight),'none','Article text must never be clipped');
