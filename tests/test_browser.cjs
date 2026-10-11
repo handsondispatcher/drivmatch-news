@@ -218,6 +218,14 @@ const {spawn}=require('node:child_process');
    assert.equal(await tvCard.locator('.roadtv-official-map').count(),0,'No embedded map in video area');
    assert.equal(await tvCard.locator('.roadtv-camera-credit a[href^="https://camstreamer.com/live/stream/"]').count(),1,'Publisher credit visible');
    assert.equal(await tvCard.locator('.roadtv-replay').count(),0,'Do not mark an independent live camera as recorded video');
+   // The reader must have a working fallback, not merely a decorative button.
+   const firstCameraSrc=await camera.getAttribute('src');
+   await tvCard.locator('button.roadtv-next-camera').click();
+   await page.waitForFunction(({selector,previous})=>{
+     const frame=document.querySelector(selector+' iframe.roadtv-publisher-camera');
+     return frame&&frame.getAttribute('src')!==previous;
+   },{selector:tv,previous:firstCameraSrc},{timeout:5000});
+   assert.notEqual(await camera.getAttribute('src'),firstCameraSrc,'Next camera must load a distinct publisher source');
    assert.equal(await page.locator('#mercados').isVisible(),width>990);
    assert.equal(await page.locator('#mobile-market').isVisible(),width<=990);
    assert.equal(await page.locator('#news-freshness').count(),1);
