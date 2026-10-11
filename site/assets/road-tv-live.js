@@ -70,6 +70,19 @@
  ];
  const CAMERA_ROTATION_MS=5*60*1000; // Reader-approved 5-minute rotation among official camera-player embeds; not a freshness claim.
  let publisherIndex=0,publisherFrame=null,publisherFailures=new Set(),publisherSince=0;
+ // Save rotation position across soft reloads, so an automatic site refresh
+ // never pins the first interstate camera indefinitely.
+ try{
+   const seen=JSON.parse(sessionStorage.getItem('dm-roadtv-cameras')||'{}');
+   if(Number.isInteger(seen.index)&&seen.index>=0&&seen.index<directCameras.length){
+     publisherIndex=seen.index;
+     if(Number.isFinite(seen.at)&&now()-seen.at>=CAMERA_ROTATION_MS)
+       publisherIndex=(publisherIndex+1)%directCameras.length;
+   }
+ }catch{}
+ function saveCameraState(){
+   try{sessionStorage.setItem('dm-roadtv-cameras',JSON.stringify({index:publisherIndex,at:now()}))}catch{}
+ }
 
  function publisherUnavailable(area){
    area.replaceChildren();
@@ -108,12 +121,19 @@
    frame.onload=()=>{loaded=true;clearTimeout(guard)};
    frame.onerror=()=>{clearTimeout(guard);failPublisher(source.id)};
    area.appendChild(frame);publisherFrame=frame;lastVisible=card;publisherSince=now();
+   saveCameraState();
    const caption=document.createElement('div');caption.className='roadtv-camera-credit';
    const name=document.createElement('span');name.textContent=source.name;
    const link=document.createElement('a');link.href=source.page;link.target='_blank';
    link.rel='noopener noreferrer';
    link.textContent=lang()==='en'?'Source ↗':lang()==='es'?'Fuente ↗':'Fonte ↗';
-   caption.append(name,link);area.appendChild(caption);
+   const next=document.createElement('button');
+   next.type='button';next.className='roadtv-next-camera';
+   next.textContent=lang()==='en'?'Next camera →':lang()==='es'?'Otra cámara →':'Próxima câmera →';
+   next.setAttribute('aria-label','Alternar para outra câmera rodoviária');
+   next.onclick=()=>{publisherIndex=(publisherIndex+1)%directCameras.length;
+      publisherFailures.clear();showPublisherCamera(true);};
+   caption.append(name,link,next);area.appendChild(caption);
  }
  function failPublisher(id){
    const card=visible(),area=playbackArea(card);
@@ -128,8 +148,8 @@
  function rotatePublisherCamera(){
    // A stalled cross-origin iframe can't be inspected for motion. Rotate among
    // distinct SOURCE PROVIDED camera players; don't repeat one all afternoon.
-   if(active||document.visibilityState!=='visible'||!publisherSince||
-      now()-publisherSince<CAMERA_ROTATION_MS)return;
+   if(active||!publisherSince||now()-publisherSince<CAMERA_ROTATION_MS)return;
+   // The wall clock decides rotation, not the browser's tab-visibility state.
    // Failures are transient; allow retries on another cycle rather than pinning a
    // broken camera forever, but never mark a loaded iframe as certified live.
    if(publisherFailures.size>=directCameras.length){publisherFailures.clear();}
