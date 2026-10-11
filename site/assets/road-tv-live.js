@@ -82,7 +82,7 @@
  // Owner channel-position map (old channel -> new slot): 5,6,8,7,5,1,3,7.
  // Repeated source cameras deliberately get distinct slot identities.
  const sourceCameras=directCameras.slice();
- const newChannelSourcePositions=[5,6,8,7,5,1,3,7];
+ const newChannelSourcePositions=[5,5,6,8,7,1,3,7];
  directCameras.splice(0,directCameras.length,...newChannelSourcePositions.map((position,index)=>{
    const origin=sourceCameras[position-1];
    if(!origin)throw Error('Camera reorder source CH'+position+' missing');
