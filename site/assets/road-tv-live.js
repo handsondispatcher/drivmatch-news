@@ -66,7 +66,12 @@
    page:'https://camstreamer.com/live/stream/101125169'},
   {id:'peace-canada',name:'Peace Bridge · direção Canadá',
    embed:'https://camstreamer.com/embed/7WIJom0FTmLGWRea1khwrohdqLpKwHOa2DU5Wjqq?rel=0',
-   page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'}
+   page:'https://camstreamer.com/live/stream/159142974-peace-bridge-canada-bound'},
+  // Original bridge operator publishes this frame under its Into the United
+  // States page. Do not claim continuous playback solely from iframe.onload.
+  {id:'ambassador-us-bound',name:'Ambassador Bridge · Windsor → Detroit, EUA',
+   embed:'https://ambassador.solutionspal.com/cams/cam2.html',
+   page:'https://www.ambassadorbridge.com/into-the-united-states/'}
  ];
  const CAMERA_ROTATION_MS=5*60*1000; // Reader-approved 5-minute rotation among official camera-player embeds; not a freshness claim.
  let publisherIndex=0,publisherFrame=null,publisherFailures=new Set(),publisherSince=0;
@@ -323,7 +328,19 @@
    if(active&&videos.length>1&&now()-started>=
        (active.view_type==='cargo_cab'?12*60000:CAMERA_ROTATION_MS))rotate();
  },15000);
- setInterval(rotatePublisherCamera,10000);
+ // Browser-side heartbeat every 60 s: detect missing/detached frame, expired
+ // camera time window and refresh publisher source. A third-party blank stream
+ // may still be opaque to the browser: rotate preventively after five minutes.
+ setInterval(()=>{
+   if(active)return;
+   if(publisherFrame&&!publisherFrame.isConnected){
+     publisherFailures.add(directCameras[publisherIndex].id);
+     failPublisher(directCameras[publisherIndex].id);
+     return;
+   }
+   if(!publisherFrame){showPublisherCamera(true);return}
+   rotatePublisherCamera();
+ },60000);
  setInterval(refresh,120000);
  if(document.visibilityState==='visible')refresh();
  document.addEventListener('visibilitychange',()=>{
