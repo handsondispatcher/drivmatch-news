@@ -7,10 +7,11 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 from time import sleep
+from html.parser import HTMLParser
 from editorial_text import clean_title
 ROOT=Path(__file__).resolve().parents[1]
 def parse_feed(raw, source, now=None):
@@ -117,11 +118,62 @@ def merge_verified_candidate_history(current, sources, now=None, *, path=None):
             added+=1
     return added
 
+
+class FeedLinkParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.links=[]
+    def handle_starttag(self, tag, attrs):
+        if tag.lower()!='link':return
+        d=dict(attrs)
+        if 'alternate' in d.get('rel','').lower().split() and any(k in d.get('type','').lower() for k in ('rss','atom','xml')):
+            if d.get('href'):self.links.append(d['href'])
+
+def discover_feed_urls(source):
+    """Attempt official HTML feed discovery, then conservative standard paths.
+
+    Discovery is best effort; no guessed URL is treated as functioning until it
+    returns parseable RSS/Atom and publisher-host article links.
+    """
+    base=source['url']
+    found=[]
+    try:
+        req=Request(base,headers={'User-Agent':'DrivMatchNews/1.1 (+https://drivmatch.com/news)',
+                                  'Accept':'text/html'})
+        with urlopen(req,timeout=5) as res:html=res.read(300000)
+        parser=FeedLinkParser()
+        parser.feed(html.decode('utf-8','replace'))
+        found=[urljoin(base,href) for href in parser.links[:4]]
+    except (HTTPError,URLError,TimeoutError,ValueError,OSError):
+        pass
+    root=urlparse(base)
+    origin=f'{root.scheme}://{root.netloc}'
+    guesses=[origin+'/feed/',origin+'/rss.xml']
+    expected=(root.hostname or '').removeprefix('www.')
+    result=[]
+    for url in found+guesses:
+        parsed=urlparse(url)
+        if parsed.scheme=='https' and (parsed.hostname or '').removeprefix('www.')==expected and url not in result:
+            result.append(url)
+    return result[:4]
+
 def collect():
     sources=json.loads((ROOT/'content/sources.json').read_text())['sources']
     def check(source):
         if source.get('enabled') is False:return [],dict(id=source['id'],status='disabled',url=source['url'])
-        if not source.get('feed_url'):return [],dict(id=source['id'],status='manual-review',url=source['url'])
+        if not source.get('feed_url'):
+            errors=[]
+            for discovered in discover_feed_urls(source):
+                try:
+                    raw,attempts_used=fetch_rss_with_retry(discovered,attempts=1)
+                    root=ET.fromstring(raw)
+                    if root.tag not in ('rss','{http://www.w3.org/2005/Atom}feed','{http://purl.org/rss/1.0/}RDF','{http://www.w3.org/1999/02/22-rdf-syntax-ns#}RDF'):
+                        continue
+                    rows=parse_feed(raw,source)
+                    return rows,dict(id=source['id'],status='ok',discovered=True,candidates=len(rows),url=discovered)
+                except (HTTPError,URLError,ValueError,ET.ParseError,OSError,TimeoutError) as exc:
+                    errors.append(safe_feed_error(exc))
+            return [],dict(id=source['id'],status='no_valid_rss',attempted=True,error=(errors[-1] if errors else 'NOT_FOUND'),url=source['url'])
         try:
             raw,attempts_used=fetch_rss_with_retry(source['feed_url'])
             rows=parse_feed(raw,source)
@@ -143,7 +195,8 @@ def collect():
     report={'checked_at':datetime.now(timezone.utc).isoformat(),'sources':health,'candidate_count':len(candidates),
             'working_feeds':sum(x['status']=='ok' for x in health),
             'failed_feeds':sum(x['status']=='failed' for x in health),
-            'manual_review_sources':sum(x['status']=='manual-review' for x in health),
+            'auto_discovery_without_rss':sum(x['status']=='no_valid_rss' for x in health),
+            'auto_discovered_rss':sum(x.get('discovered') is True for x in health),
             'discovery_only_candidates':sum(x.get('origin_type')=='aggregator-discovery' for x in candidates.values()),
             'original_publisher_candidates':sum(x.get('origin_type')=='publisher-feed' for x in candidates.values())}
     (out/'source-health.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
@@ -156,6 +209,6 @@ def collect():
     print('RSS_RETRY_METRICS:', 'recovered_on_retry:',
           sum(x['status']=='ok' and x.get('attempts',1)>1 for x in health),
           'working:',sum(x['status']=='ok' for x in health),
-          'manual:',sum(x['status']=='manual-review' for x in health))
+          'manual:',sum(x['status']=='no_valid_rss' for x in health))
     return report
 if __name__=='__main__':collect()
