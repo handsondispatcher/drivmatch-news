@@ -627,6 +627,11 @@ def build(offline=False):
     from road_tv import make_road_tv
     road_tv=make_road_tv(offline=offline)
     (path/'road-tv.json').write_text(json.dumps(road_tv,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    # Canonical owner preference survives all scheduled rebuilds and deploys.
+    owner_tv_policy=read_json(ROOT/'content/road-tv-policy.json')
+    if owner_tv_policy.get('schema_version')!=1 or not owner_tv_policy.get('driver_live_first'):
+        raise ValueError('Road TV owner policy contract invalid')
+    (path/'road-tv-policy.json').write_text(json.dumps(owner_tv_policy,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     (path/'bootstrap.js').write_text('window.DRIVMATCH_BOOTSTRAP='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n',encoding='utf-8')
     # Content hashes prevent browsers mixing new HTML with cached runtime/data.
     page=ROOT/'site/index.html'
