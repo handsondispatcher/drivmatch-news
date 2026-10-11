@@ -32,8 +32,8 @@ const sandbox={document,window,navigator:{userAgent:'Desktop smoke test'},locati
 vm.runInNewContext(fs.readFileSync(path.join(root,'site/assets/app.js'),'utf8'),sandbox,{timeout:1000});
 document.ready();
 assert(elements.features.innerHTML.includes('Como interpretar o preço do diesel'));
-assert(elements.list.innerHTML.includes('Como interpretar o preço do diesel'));
-assert(elements.highlightList.innerHTML.includes('highlight-photo'),'v34 newsroom brief photo elements are rendered');
+assert(!elements.list.innerHTML.includes('Como interpretar o preço do diesel'),'Hero cannot repeat in news feed');
+assert(!elements.highlightList.innerHTML.includes('Como interpretar o preço do diesel'),'Hero cannot repeat in headlines');
 assert.strictEqual(elements['newsroom-cta-title'].textContent,'Oportunidades no transporte');
 assert(!elements.market.innerHTML.includes('FDX'),'Do not render unavailable securities');
 assert(!elements.market.innerHTML.includes('Class 8'),'Do not render unavailable Class 8 statistics');
@@ -50,7 +50,7 @@ assert(!elements.market.innerHTML.includes('FDX'));
 assert.strictEqual(elements['market-mobile'].innerHTML,elements.market.innerHTML);
 elements.language.value='pt';elements.language.dispatch('change',{target:{value:'pt'}});
 const sample=0;
-elements.list.dispatch('click',{target:{closest:key=>({dataset:{story:String(sample)}})}});
+elements.features.dispatch('click',{target:{closest:key=>({dataset:{story:String(sample)}})}});
 assert(elements.modalbodytext.textContent.includes('O preço do diesel'));
 assert(elements.articleLanguageButtons.innerHTML.includes('data-article-lang="es"'));
 assert(elements.articleLanguageButtons.innerHTML.includes('data-article-lang="en"'));
@@ -67,7 +67,7 @@ assert(elements.modalbodytext.textContent.includes('Los precios del diésel'));
 const makeSource=(id,title,category,source,published,type)=>({
   id,kind:'external_link',status:'external_source',demo:false,
   category,source,source_url:'https://example.com/'+id,published_at:published,
-  original_lang:'en',editorial_type:type,
+  original_lang:'pt',editorial_type:type,
   locales:Object.fromEntries(['pt','en','es'].map(l=>[l,{title,summary:'',body:''}]))
 });
 const nw=Array.from({length:5},(_,i)=>makeSource('weather-'+i,
@@ -87,11 +87,9 @@ data.articles=[...nw,...other];
 elements.language.value='pt';
 elements.language.dispatch('change',{target:{value:'pt'}});
 const orderedTitles=[...elements.list.innerHTML.matchAll(/<h3>([^<]*)<\/h3>/g)].map(m=>m[1]);
-assert.equal(orderedTitles.length,6);
-assert.equal(orderedTitles.slice(0,3).filter(s=>s.includes('NWS Weather Alert')).length,1,
-  'Only one NWS bulletin in the first three news cards');
-assert.ok(orderedTitles.some(x=>x.includes('Freight')||x.includes('Driver')||x.includes('Truck')),
-  'Operational bulletins must be interleaved with independently sourced journalism');
+assert.equal(orderedTitles.length,3,'Feed contains remaining stories, not copies of hero/rail/highlights');
+assert.equal(new Set([...elements.features.innerHTML.matchAll(/data-story="(\d+)"/g),...elements.highlightList.innerHTML.matchAll(/data-story="(\d+)"/g),...elements.list.innerHTML.matchAll(/data-story="(\d+)"/g)].map(m=>m[1])).size,12,'Every fixture story must appear in one homepage slot');
+assert.ok(orderedTitles.some(x=>x.includes('Freight')||x.includes('Driver')||x.includes('Truck')||x.includes('NWS')),'Remaining feed must contain real unique stories');
 assert.ok(elements.list.innerHTML.includes('não é fotografia do fenômeno')||
           elements.list.innerHTML.includes('não retrata o evento meteorológico')||
           elements.list.innerHTML.includes('Ilustração editorial'),
@@ -102,5 +100,5 @@ assert.ok(elements.features.innerHTML.includes('Driver rule update'),
   'Transport journalism must lead Panorama when non-bulletin reporting exists');
 assert.ok(!elements.features.innerHTML.split('related-rail')[0].includes('NWS Weather Alert'),
   'NWS alert must not dominate the main feature while transport news exists');
-console.log('EDITORIAL MIX PASS: no five consecutive NWS alerts; semantic NWS graphic; transport headlines interleaved');
-console.log('CLIENT SMOKE PASS: panorama/list/mirrored mobile market/modal/Spanish full text; global language unchanged');
+console.log('EDITORIAL MIX PASS: exclusive homepage slots, transport lead and no duplicate fixtures');
+console.log('CLIENT SMOKE PASS: panorama/mirrored mobile market/modal/Spanish full text; global language unchanged');
