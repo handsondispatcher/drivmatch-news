@@ -22,7 +22,7 @@ class RoadTvOwnerContract(unittest.TestCase):
         player=(ROOT/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
         self.assertIn("async function loadOwnerPolicy()",player)
         self.assertIn("Promise.allSettled([loadOwnerPolicy(),loadCameraHealth()])",player)
-        self.assertIn("camera_id:directCameras[publisherIndex]?.id",player)
+        self.assertIn("camera_id:selectedCameraId||directCameras[publisherIndex]?.id",player)
         self.assertIn("videos.filter(v=>v.live",player)
         self.assertIn("return videos.find(v=>v.live",player)
         self.assertNotIn('newChannelSourcePositions',player)
