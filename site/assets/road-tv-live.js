@@ -74,6 +74,56 @@
   // States page. Do not claim continuous playback solely from iframe.onload.
 
  ];
+
+ let autoSwitch=true,userChannel=false,viewSize='small';
+ const tvChannels=()=>[...videos.filter(v=>!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_title||v.title||'Transmissão'})),...directCameras.map(v=>({kind:'camera',ref:v,id:v.id,name:v.name}))];
+ const tvCurrent=()=>active?key(active):directCameras[publisherIndex]?.id;
+ function tvRefresh(){
+   cards.forEach(card=>{
+     const bar=card.querySelector('.tv-controls');if(!bar)return;
+     const channels=tvChannels(),idx=channels.findIndex(c=>c.id===tvCurrent());
+     bar.querySelector('.tv-name').textContent='CH '+String(Math.max(0,idx)+1).padStart(2,'0')+' · '+(channels[idx]?.name||'Câmera');
+     const dots=bar.querySelector('.tv-dots');dots.replaceChildren();
+     channels.forEach((c,i)=>{const b=document.createElement('button');b.type='button';b.title=c.name;b.setAttribute('aria-label',c.name);b.className=i===idx?'selected':'';b.onclick=()=>tvSelect(i);dots.appendChild(b)});
+     bar.querySelector('.tv-auto input').checked=autoSwitch;
+     card.classList.toggle('tv-medium',viewSize==='medium'&&card===visible());
+     bar.querySelectorAll('[data-size]').forEach(b=>b.classList.toggle('selected',b.dataset.size===viewSize));
+   });
+ }
+ function tvSelect(i){
+   const c=tvChannels()[i];if(!c)return;
+   userChannel=true;autoSwitch=false;
+   if(c.kind==='stream')start(c.ref);
+   else{if(active)clear();publisherIndex=directCameras.findIndex(v=>v.id===c.id);publisherFailures.delete(c.id);showPublisherCamera(true)}
+   tvRefresh();
+ }
+ function tvMove(d){
+   const list=tvChannels();if(!list.length)return;
+   const i=list.findIndex(v=>v.id===tvCurrent());tvSelect((i+d+list.length)%list.length);
+ }
+ async function tvSize(mode){
+   if(mode==='full'){
+     try{await visible().requestFullscreen();viewSize='full'}catch{viewSize='medium'}
+   }else{
+     if(document.fullscreenElement)await document.exitFullscreen().catch(()=>{});
+     viewSize=mode;
+   }
+   tvRefresh();
+ }
+ document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&viewSize==='full')viewSize='small';tvRefresh()});
+ function tvInstall(){
+   const style=document.createElement('style');style.textContent='.roadtv-card{padding:7px!important;margin-bottom:10px!important}.roadtv-card h2{display:none!important}.tv-controls{font:600 11px Arial,sans-serif;color:#eff7ff;margin-top:3px}.tv-line,.tv-options{display:flex;align-items:center;gap:4px;min-width:0}.tv-line{min-height:26px}.tv-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:20px}.tv-controls button{color:#edf8ff;background:#173950;border:1px solid #43627a;border-radius:4px;padding:4px 6px;cursor:pointer;font:inherit;white-space:nowrap}.tv-controls button.selected{background:#1475b6}.tv-dots{display:flex;gap:3px;max-width:75px;overflow:auto;align-items:center}.tv-dots button{min-width:8px;width:8px;height:8px;padding:0;border-radius:50%;background:#6b8695;border:0;flex:none}.tv-dots button.selected{background:#30a7f8}.tv-options{margin-top:3px;flex-wrap:wrap;justify-content:space-between}.tv-sizes{display:flex;gap:2px}.tv-options button{font-size:10px;padding:4px 5px}.tv-auto{white-space:nowrap;display:flex;align-items:center;gap:3px;font-size:10px}.tv-auto input{margin:0;accent-color:#189cda}.roadtv-card.tv-medium{position:fixed!important;z-index:9999;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,780px);max-height:95dvh;box-sizing:border-box;box-shadow:0 0 0 100vmax rgba(0,0,0,.78)}.roadtv-card:fullscreen{background:#0b2337;padding:10px!important;display:flex;flex-direction:column;justify-content:center}.roadtv-card:fullscreen .roadtv-screen{min-height:0;max-height:calc(100dvh - 80px);flex:1}.roadtv-card:fullscreen .tv-controls{flex:none}@media(max-width:600px){.tv-controls{font-size:10px}.tv-dots{max-width:55px}.roadtv-card.tv-medium{width:96vw}}@media(orientation:landscape) and (max-height:500px){.roadtv-card:fullscreen .roadtv-screen{max-height:calc(100dvh - 65px)}}';document.head.appendChild(style);
+   cards.forEach(card=>{
+     const bar=document.createElement('div');bar.className='tv-controls';
+     bar.innerHTML='<div class="tv-line"><button type="button" data-move="-1" aria-label="Canal anterior">‹ CH−</button><span class="tv-name"></span><span class="tv-dots"></span><button type="button" data-move="1" aria-label="Próximo canal">CH+ ›</button></div><div class="tv-options"><span class="tv-sizes"><button data-size="small">Pequena</button><button data-size="medium">Média</button><button data-size="full">⛶ Tela cheia</button></span><label class="tv-auto"><input type="checkbox" checked>Auto 10 min</label></div>';
+     card.appendChild(bar);
+     bar.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>tvMove(Number(b.dataset.move)));
+     bar.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>tvSize(b.dataset.size));
+     bar.querySelector('.tv-auto input').onchange=e=>{autoSwitch=e.target.checked;userChannel=!autoSwitch;publisherSince=now();started=now();tvRefresh()};
+   });
+   tvRefresh();
+ }
+
  const CAMERA_ROTATION_MS=10*60*1000; // Owner-approved 10-minute rotation of available publisher camera embeds.
  let publisherIndex=0,publisherFrame=null,publisherFailures=new Set(),publisherSince=0;
  // Save rotation position across soft reloads, so an automatic site refresh
@@ -126,7 +176,7 @@
    },16000);
    frame.onload=()=>{loaded=true;clearTimeout(guard)};
    frame.onerror=()=>{clearTimeout(guard);failPublisher(source.id)};
-   area.appendChild(frame);publisherFrame=frame;lastVisible=card;publisherSince=now();
+   area.appendChild(frame);publisherFrame=frame;lastVisible=card;publisherSince=now();tvRefresh();
    saveCameraState();
    const caption=document.createElement('div');caption.className='roadtv-camera-credit';
    const name=document.createElement('span');name.textContent=source.name;
@@ -154,7 +204,7 @@
  function rotatePublisherCamera(){
    // A stalled cross-origin iframe can't be inspected for motion. Rotate among
    // distinct SOURCE PROVIDED camera players; don't repeat one all afternoon.
-   if(active||!publisherSince||now()-publisherSince<CAMERA_ROTATION_MS)return;
+   if(active||!autoSwitch||!publisherSince||now()-publisherSince<CAMERA_ROTATION_MS)return;
    // The wall clock decides rotation, not the browser's tab-visibility state.
    // Failures are transient; allow retries on another cycle rather than pinning a
    // broken camera forever, but never mark a loaded iframe as certified live.
@@ -229,7 +279,7 @@
  async function start(video){
    if(!video||!safeHost.has(location.hostname))return;
    clear();active=video;activeCard=visible();lastVisible=activeCard;
-   started=now();attemptingAt=started;const seq=epoch;
+   started=now();attemptingAt=started;const seq=epoch;tvRefresh();
    const area=playbackArea(activeCard);
    if(video.platform==='youtube'){
      try{
@@ -279,7 +329,7 @@
      const json=await response.json();
      if(json.schema_version!==2)throw Error('roadtv_manifest_invalid');
      catalogAt=Date.parse(json.generated_at||'')||0;
-     videos=candidates(json);
+     videos=candidates(json);tvRefresh();
      const old=active&&key(active);
      // Keep playing only while the broadcast remains in the verified catalog.
      const matched=videos.find(v=>key(v)===old);
@@ -287,7 +337,7 @@
      else if(!old){
        const target=nextVideo('');
        if(target)start(target);else status(labels[lang()].empty);
-     }else if(videos.some(x=>priority(x)<priority(matched)&&!markedBad(x))){
+     }else if(!userChannel&&videos.some(x=>priority(x)<priority(matched)&&!markedBad(x))){
        // Switch only to a higher-ranked verified source, not a generic camera.
        const target=videos.find(x=>priority(x)<priority(matched)&&!markedBad(x));if(target)start(target);
      }
@@ -299,7 +349,7 @@
  function rotate(){
    // Only rotate WITHIN the active priority tier. A live driver must never
    // be replaced by a lower-ranked generic highway camera just to rotate.
-   const target=active&&videos.find(v=>priority(v)===priority(active)&&
+   const target=autoSwitch&&active&&videos.find(v=>priority(v)===priority(active)&&
      key(v)!==key(active)&&!markedBad(v));
    if(target)start(target);
    else if(active&&now()-started>18*60000)refresh();
@@ -309,7 +359,7 @@
  cards.forEach(c=>playbackArea(c)?.replaceChildren());
  // Compact viewer controls are provided by the channel-control enhancement.
  // Show a specific camera immediately; never require reader to navigate a map.
- showPublisherCamera();
+ tvInstall();showPublisherCamera();
  document.getElementById('language')?.addEventListener('change',()=>{
    if(!active){
      const label=visible().querySelector('.roadtv-camera-credit a');
@@ -327,7 +377,7 @@
    }
    // Ten-minute rotation applies to available verified streams within their tier;
    // driver POV broadcasts remain on screen longer unless they fail.
-   if(active&&videos.length>1&&now()-started>=
+   if(autoSwitch&&active&&videos.length>1&&now()-started>=
        CAMERA_ROTATION_MS)rotate();
  },15000);
  // Browser-side heartbeat every 60 s: detect missing/detached frame, expired
