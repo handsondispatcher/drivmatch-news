@@ -2,6 +2,20 @@
   "schema_version": 1,
   "sources": [
     {
+      "id": "supplychainbrain-original-rss",
+      "name": "SupplyChainBrain",
+      "url": "https://www.supplychainbrain.com",
+      "category": "Fretes",
+      "feed_url": "https://www.supplychainbrain.com/rss/articles",
+      "original_lang": "en",
+      "access": "rss",
+      "publication": "review-required",
+      "enabled": true,
+      "region": "US",
+      "source_type": "publisher-feed",
+      "attribution": "Original publisher RSS; US freight relevance and source date must pass editorial gate"
+    },
+    {
       "id": "freightwaves",
       "name": "FreightWaves",
       "url": "https://www.freightwaves.com",
