@@ -82,12 +82,15 @@
  // Owner channel-position map (old channel -> new slot): 5,6,8,7,5,1,3,7.
  // Repeated source cameras deliberately get distinct slot identities.
  const sourceCameras=directCameras.slice();
- const newChannelSourcePositions=[5,5,6,8,7,1,3,7];
+ const newChannelSourcePositions=[5,5,6,8,7,1,3,7]; // Legacy slot mapping; CH2 explicitly pinned to I-35 Waco below.
  directCameras.splice(0,directCameras.length,...newChannelSourcePositions.map((position,index)=>{
    const origin=sourceCameras[position-1];
    if(!origin)throw Error('Camera reorder source CH'+position+' missing');
    return {...origin,id:origin.id+'-slot-'+(index+1),sourceId:origin.id};
  }));
+ // CH2 is specifically the I-35 Waco camera; preserve remaining order, without duplicate Waco slots.
+ const waco=directCameras.find(c=>c.sourceId==='i35-waco');
+ if(waco){directCameras.splice(0,directCameras.length,...directCameras.filter(c=>c.sourceId!=='i35-waco'));directCameras.splice(1,0,{...waco,id:'i35-waco-slot-2'});}
  const unavailableCamera=c=>cameraUnavailable.has(c.sourceId||c.id);
  let autoSwitch=true,userChannel=false,viewSize='small';
  let cameraUnavailable=new Set();
