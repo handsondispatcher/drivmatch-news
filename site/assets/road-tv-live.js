@@ -103,7 +103,7 @@
  const unavailableCamera=c=>cameraUnavailable.has(c.sourceId||c.id);
  let autoSwitch=true,userChannel=false,viewSize='small';
  let cameraUnavailable=new Set();
- const tvChannels=()=>[...videos.filter(v=>!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_title||v.title||'Transmissão'})),...directCameras.filter(v=>!publisherFailures.has(v.id)&&!unavailableCamera(v)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name}))];
+ const tvChannels=()=>[...videos.filter(v=>v.live&&!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_name||v.title||'Transmissão ao vivo'})),...directCameras.filter(v=>!publisherFailures.has(v.id)&&!unavailableCamera(v)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name})),...videos.filter(v=>!v.live&&!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_name||v.title||'Gravação'}))];
  const tvCurrent=()=>active?key(active):directCameras[publisherIndex]?.id;
  function tvRefresh(){
    cards.forEach(card=>{
@@ -266,7 +266,7 @@
  }
  function markedBad(v){return failed.has(key(v))&&now()-failed.get(key(v))<15*60000}
  function nextVideo(exclude){
-   return videos.find(v=>!markedBad(v)&&key(v)!==exclude)||null;
+   return videos.find(v=>v.live&&!markedBad(v)&&key(v)!==exclude)||null;
  }
  function youtubeApi(){
    if(window.YT?.Player)return Promise.resolve(window.YT);
@@ -357,17 +357,17 @@
      const old=active&&key(active);
      // Keep playing only while the broadcast remains in the verified catalog.
      const matched=videos.find(v=>key(v)===old);
-     if(old&&!matched){const target=nextVideo(old);if(target)start(target);else{clear();status(labels[lang()].empty)}}
+     if(old&&!matched){const target=nextVideo(old);if(target)start(target);else{clear();showPublisherCamera(true)}}
      else if(!old&&!userChannel){
        const target=nextVideo('');
-       if(target)start(target);else status(labels[lang()].empty);
-     }else if(!userChannel&&videos.some(x=>priority(x)<priority(matched)&&!markedBad(x))){
+       if(target)start(target);else if(!publisherFrame)showPublisherCamera(true);
+     }else if(!userChannel&&matched&&videos.some(x=>x.live&&priority(x)<priority(matched)&&!markedBad(x))){
        // Switch only to a higher-ranked verified source, not a generic camera.
-       const target=videos.find(x=>priority(x)<priority(matched)&&!markedBad(x));if(target)start(target);
+       const target=videos.find(x=>x.live&&priority(x)<priority(matched)&&!markedBad(x));if(target)start(target);
      }
    }catch{
-     if(!active)status(labels[lang()].empty);
-     if(catalogAt&&now()-catalogAt>25*60000){clear();videos=[];status(labels[lang()].empty)}
+     if(!active&&!publisherFrame)showPublisherCamera(true);
+     if(catalogAt&&now()-catalogAt>25*60000){clear();videos=[];showPublisherCamera(true)}
    }finally{refreshing=false}
  }
  function rotate(){
