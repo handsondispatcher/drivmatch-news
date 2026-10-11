@@ -108,7 +108,7 @@
       illustrative?(lang==='pt'?'Fotografia de arquivo ilustrativa; não retrata necessariamente o acontecimento':lang==='es'?'Fotografía de archivo ilustrativa; no representa necesariamente el acontecimiento':'Illustrative archive photograph; not necessarily the reported event'):(a.image_alt||localeOf(a)?.title||'Imagem');
     return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(a.editorial_type==='operational_bulletin'?'Foto ilustrativa de rodovia, não imagem do evento meteorológico':illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" '+(a.editorial_type==='operational_bulletin'?'data-bulletin="true" ':'')+'onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
   }
-  function pageStories(){const pool=[...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
+  function pageStories(){const pool=[...(data.articles||[]),...externalHeadlines].filter(s=>(s.kind!=='external_link'||s.original_lang===lang||(s.translated_langs?.includes(lang)&&eventFingerprint(s.locales?.[lang]?.title)!==eventFingerprint(s.locales?.[s.original_lang]?.title))) && (s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
     return score(b)-score(a) || (Date.parse(b.published_at||'2000-01-01')-Date.parse(a.published_at||'2000-01-01'));
   });
@@ -130,7 +130,7 @@
     return !q||t.toLocaleLowerCase(lang).includes(q);
   }
   function articlesFiltered(){
-    // Original-language headlines remain readable when translations are unavailable.
+    // Show only verified locale headlines; untranslated source headlines stay off this edition.
     const pool=pageStories().filter(a=>matches(a));
     // Prefer recent verified publisher reporting over old feature stories.
     // Dates remain intact; only display order changes.
