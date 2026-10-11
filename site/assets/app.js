@@ -108,10 +108,20 @@
       illustrative?(lang==='pt'?'Fotografia de arquivo ilustrativa; não retrata necessariamente o acontecimento':lang==='es'?'Fotografía de archivo ilustrativa; no representa necesariamente el acontecimiento':'Illustrative archive photograph; not necessarily the reported event'):(a.image_alt||localeOf(a)?.title||'Imagem');
     return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(a.editorial_type==='operational_bulletin'?'Foto ilustrativa de rodovia, não imagem do evento meteorológico':illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" '+(a.editorial_type==='operational_bulletin'?'data-bulletin="true" ':'')+'onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
   }
-  function pageStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
+  function pageStories(){const pool=[...(data.articles||[]),...externalHeadlines].filter(s=>(s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
     return score(b)-score(a) || (Date.parse(b.published_at||'2000-01-01')-Date.parse(a.published_at||'2000-01-01'));
-  });}
+  });
+    const unique=[];const seenUrls=new Set(),seenIds=new Set();
+    for(const article of pool){
+      const title=localeOf(article)?.title||article.locales?.en?.title||'';
+      const url=String(article.source_url||'').split('#')[0].replace(/\/$/,'').toLowerCase();
+      if((article.id&&seenIds.has(article.id))||(url&&seenUrls.has(url)))continue;
+      if(unique.some(previous=>duplicateEvent(title,localeOf(previous)?.title||previous.locales?.en?.title||'')))continue;
+      unique.push(article);if(article.id)seenIds.add(article.id);if(url)seenUrls.add(url);
+    }
+    return unique;
+  }
   function matches(a){
     const q=$('search').value.toLocaleLowerCase(lang).trim(), age=$('age').value;
     if(selected!=='Todas' && a.category!==selected)return false;
@@ -216,18 +226,14 @@
       :lang==='en'?en+(story?`Newest identified story: ${story}.`:'No recent source headline identified.')
       :es+(story?`Noticia más reciente identificada: ${story}.`:'No se identificaron titulares recientes.');
   }
-  function renderStories(){const f=articlesFiltered();const pages=Math.max(1,Math.ceil(f.length/pageSize));page=Math.min(page,pages-1);
+  function renderStories(){const f=articlesFiltered();
     const all=pageStories(); indexSet.clear();all.forEach((a,i)=>indexSet.set(a.id,i));
-    $('list').innerHTML=f.length?f.slice(page*pageSize,(page+1)*pageSize).map(a=>storyCard(a,indexSet.get(a.id))).join(''):`<div class="empty">${labels[lang].noResults}</div>`;
-    $('count').textContent=''; // Editorial article counts are internal, not reader-facing.
-    $('pagecount').textContent=`${page+1} / ${pages}`;
-    $('prev').disabled=page===0; $('next').disabled=page===pages-1;
     // The arrow/dot carousel changes the hero image/headline only.
     // The three "Leia Também" stories remain fixed across hero navigation.
     const n=Math.max(1,Math.ceil(f.length/featureSize));
     featurePage=Math.min(featurePage,n-1);
     const hero=f[featurePage*featureSize]||f[0];
-    const related=f.slice(1,4);
+    const related=f.slice(featurePage*featureSize+1,featurePage*featureSize+4);
     const relatedTitle=lang==='pt'?'Leia também':lang==='es'?'Lea también':'Read also';
     $('features').innerHTML=hero
       ? `<div class="hero-wrap">${storyCard(hero,indexSet.get(hero.id),true,false)}</div>${related.length
@@ -243,7 +249,15 @@
       const target=firstDot+i;
       return `<button type="button" class="carousel-dot ${target===featurePage?'active':''}" data-slide="${target}" aria-label="${slideLabel} ${target+1} / ${n}" aria-pressed="${target===featurePage}" ${target===featurePage?'aria-current="page"':''}></button>`;
     }).join('');
-    const shortlist=f.slice(0,5);
+    const reserved=new Set([hero,...related].filter(Boolean).map(a=>a.id));
+    const shortlist=f.filter(a=>!reserved.has(a.id)).slice(0,5);
+    shortlist.forEach(a=>reserved.add(a.id));
+    const feed=f.filter(a=>!reserved.has(a.id));
+    const pages=Math.max(1,Math.ceil(feed.length/pageSize));page=Math.min(page,pages-1);
+    $('list').innerHTML=feed.length?feed.slice(page*pageSize,(page+1)*pageSize).map(a=>storyCard(a,indexSet.get(a.id))).join(''):`<div class="empty">${labels[lang].noResults}</div>`;
+    $('count').textContent='';
+    $('pagecount').textContent=`${page+1} / ${pages}`;
+    $('prev').disabled=page===0; $('next').disabled=page===pages-1;
     $('highlights-title').textContent=lang==='pt'?'5 manchetes em foco':lang==='es'?'5 titulares destacados':'5 headlines in focus';
     $('highlightList').innerHTML=shortlist.map(a=>{
       const i=indexSet.get(a.id),title=cleanHeadline(localeOf(a)?.title||'');
