@@ -114,11 +114,11 @@ def choose_photos(stories: list, available: list):
         sid = story.get("id")
         if not sid or sid in assigned:
             continue
-        # Government severe-weather alerts must never receive a generic truck
-        # archive picture. The client shows a neutral official-bulletin graphic.
-        if (story.get('editorial_type')=='operational_bulletin' or
-                story.get('origin_type')=='official-operational-alert'):
-            continue
+        # Bulletins use legitimate archival ROAD/TRUCK images, not a weather
+        # illustration or an image falsely presented as the actual disaster.
+        # Prefer roads: do not suggest a generic vehicle is in a tornado.
+        is_bulletin=(story.get('editorial_type')=='operational_bulletin' or
+                     story.get('origin_type')=='official-operational-alert')
         headline = _headline(story)
         preferred_url = story.get("image_source_url", "")
         ranked = []
@@ -131,6 +131,10 @@ def choose_photos(stories: list, available: list):
             same_photo = preferred_url and preferred_url == meta["image_source_url"]
             keywords = item.get("keywords") or []
             relevance = sum((12 if " " in kw else 8) for kw in keywords if kw.lower() in headline)
+            if is_bulletin:
+                road_terms=('highway','road','rodovia','estrada','interstate')
+                relevance=sum(25 for kw in keywords if kw.lower() in road_terms)
+                if not relevance:continue
             # Explicit article photography must win; other matches are illustrative.
             ranked.append((1000 if same_photo else relevance, -item["index"], item))
         if not ranked:
