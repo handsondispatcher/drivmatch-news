@@ -71,16 +71,17 @@
   {id:'i35-waco',name:'I-35 · Waco, TX',embed:'https://camstreamer.com/embed/5F3i85dwyqAQrOFWrMENFpy9qWqFZT6rWt5RxhB8?rel=0',page:'https://camstreamer.com/live/stream/682515671-i-35-s-18th-street-waco'},
   {id:'i29-tea',name:'I-29 · Tea / Sioux Falls, SD',embed:'https://camstreamer.com/embed/TYmozgKiGvkVCfm4QAHMuc4DAqwQVypR0zfz7ln8?rel=0',page:'https://camstreamer.com/live/stream/696756350-digit-all-i-29-tea-exit-livestream'},
   {id:'oh741-lytle',name:'SR 741 · Springboro, OH',embed:'https://camstreamer.com/embed/fpjlgw9Y5Ht4rUi96v7cjpLDVYWavc7URaPyTWbZ?rel=0',page:'https://camstreamer.com/live/stream/721675885'},
-  {id:'grand-avenue',name:'Grand Avenue Bridge · Glenwood Springs, CO',embed:'https://camstreamer.com/embed/1efd36de1994794/S-8607?rel=0',page:'https://camstreamer.com/live/stream/2446-grand-avenue-bridge-glenwood-springs'},
+  // Grand Avenue Bridge excluded: provider shows unavailable recording.
   {id:'paso-norte',name:'Paso del Norte · Ciudad Juárez / El Paso',embed:'https://camstreamer.com/embed/RmKKjLTyispBGGbIfFYnNMasTH45jhRs2Wo9Z1nZ?rel=0',page:'https://camstreamer.com/live/stream/101176577'},
-  {id:'lock19-keokuk',name:'Mississippi Lock 19 · Keokuk, IA',embed:'https://camstreamer.com/embed/Co4QnDaJH5JDDx1nWqwolO2bqONwRMOULlVS4xjE?rel=0',page:'https://camstreamer.com/live/stream/625366731-mississippi-river-lock-19-keokuk-ia'},
+  // Lock 19 excluded: provider reports stream offline.
   // Original bridge operator publishes this frame under its Into the United
   // States page. Do not claim continuous playback solely from iframe.onload.
 
  ];
 
  let autoSwitch=true,userChannel=false,viewSize='small';
- const tvChannels=()=>[...videos.filter(v=>!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_title||v.title||'Transmissão'})),...directCameras.filter(v=>!publisherFailures.has(v.id)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name}))];
+ let cameraUnavailable=new Set();
+ const tvChannels=()=>[...videos.filter(v=>!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_title||v.title||'Transmissão'})),...directCameras.filter(v=>!publisherFailures.has(v.id)&&!cameraUnavailable.has(v.id)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name}))];
  const tvCurrent=()=>active?key(active):directCameras[publisherIndex]?.id;
  function tvRefresh(){
    cards.forEach(card=>{
@@ -164,8 +165,9 @@
    if(!force&&area.querySelector('.roadtv-publisher-camera'))return;
    cards.forEach(c=>{if(c!==card)playbackArea(c)?.replaceChildren();});
    area.replaceChildren();publisherFrame=null;
+   if(cameraUnavailable.has(directCameras[publisherIndex]?.id)){const idx=directCameras.findIndex(c=>!cameraUnavailable.has(c.id)&&!publisherFailures.has(c.id));if(idx>=0)publisherIndex=idx;}
    const source=directCameras[publisherIndex];
-   if(!source||publisherFailures.size>=directCameras.length){publisherUnavailable(area);return;}
+   if(!source||cameraUnavailable.has(source.id)||publisherFailures.size+cameraUnavailable.size>=directCameras.length){publisherUnavailable(area);return;}
    const frame=document.createElement('iframe');
    frame.className='roadtv-publisher-camera';
    frame.title=source.name+' — câmera rodoviária da fonte';
@@ -196,7 +198,7 @@
    if(publisherFailures.size>=directCameras.length){if(area)publisherUnavailable(area);return;}
    for(let n=0;n<directCameras.length;n++){
      publisherIndex=(publisherIndex+1)%directCameras.length;
-     if(!publisherFailures.has(directCameras[publisherIndex].id))break;
+     if(!publisherFailures.has(directCameras[publisherIndex].id)&&!cameraUnavailable.has(directCameras[publisherIndex].id))break;
    }
    showPublisherCamera(true);tvRefresh();
  }
@@ -211,7 +213,7 @@
    const original=publisherIndex;
    for(let i=1;i<=directCameras.length;i++){
      const idx=(original+i)%directCameras.length;
-     if(!publisherFailures.has(directCameras[idx].id)){
+     if(!publisherFailures.has(directCameras[idx].id)&&!cameraUnavailable.has(directCameras[idx].id)){
        publisherIndex=idx;break;
      }
    }
@@ -356,9 +358,11 @@
  // Only a verified live or qualifying same-day replay may be used.
  // No hard-coded video ID, no dead Virtual Railfan train camera.
  cards.forEach(c=>playbackArea(c)?.replaceChildren());
+ // Health status comes from automated scheduled browser probes; unknown does not imply live.
+ async function loadCameraHealth(){try{const response=await fetch('data/camera-health.json?ts='+now(),{cache:'no-store'});if(!response.ok)return;const j=await response.json();const checked=Date.parse(j.checked_at||'');if(!Number.isFinite(checked)||now()-checked>35*60000||now()-checked< -60000)return;cameraUnavailable=new Set((j.unavailable_ids||[]).filter(id=>directCameras.some(c=>c.id===id)));if(cameraUnavailable.has(directCameras[publisherIndex]?.id)&&!active){const next=directCameras.findIndex(c=>!cameraUnavailable.has(c.id));if(next>=0){publisherIndex=next;showPublisherCamera(true)}}tvRefresh()}catch{}}
  // Compact viewer controls are provided by the channel-control enhancement.
  // Show a specific camera immediately; never require reader to navigate a map.
- tvInstall();showPublisherCamera();
+ tvInstall();loadCameraHealth().finally(()=>showPublisherCamera());
  document.getElementById('language')?.addEventListener('change',()=>{
    if(!active){
      const label=visible().querySelector('.roadtv-camera-credit a');
@@ -393,6 +397,7 @@
    rotatePublisherCamera();
  },60000);
  setInterval(refresh,120000);
+ setInterval(loadCameraHealth,120000);
  if(document.visibilityState==='visible')refresh();
  document.addEventListener('visibilitychange',()=>{
    if(document.visibilityState==='visible'){rotatePublisherCamera();refresh();}
