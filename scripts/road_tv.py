@@ -304,7 +304,7 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
                 ident in diagnostics.get('_targeted_video_ids',[]) and
                 str(info.get('channelId') or '')==diagnostics.get('_targeted_channel_id') and
                 re.search(r'(?:\bDenver\s*(?:CO|Colorado)\b.*\bSchuyler\s*(?:NE|Nebraska)\b|\bMinden\s*(?:IA|Iowa)\b.*\bIndianapolis\s*(?:IN|Indiana)\b)', title, re.I) and
-                CAB.search(title) and not STOP.search(title+' '+desc))
+                CAB.search(title) and not STOP.search(title))
             if owner_ride_along:
                 diagnostics['targeted_title_match']=True
                 if not profile:
