@@ -71,6 +71,23 @@ OFF_TOPIC = re.compile(r'\b(?:poverty|youth|celebrity|streaming|episode|'
     r'obituaries|entertainment|soccer|cricket|ocean freight|air freight|air cargo)\b',re.I)
 
 
+
+# National trucking-market stories are relevant even when their headlines omit
+# a city/state. This grants topic eligibility, NOT geographic proof for incidents.
+NATIONAL_INDUSTRY = re.compile(
+    r'\b(?:truckload|trucking|freight|freight broker|dispatch(?:er|ing)?|'
+    r'car hauler|car hauling|tow(?:ing)?|reefer|cold chain|refrigerated|'
+    r'flatbed|step deck|conestoga|curtain.?side|sider|dry van|cargo van|'
+    r'box truck|semi truck|tractor trailer|trailer|drayage|intermodal|'
+    r'commercial vehicle|fleet|diesel|truck stop|logistics|supply chain|'
+    r'carrier|shippers?|load board|truck manufacturing|truck OEM|'
+    r'merger|acquisition|bankruptcy|earnings|technology|telematics)\b',re.I)
+BUSINESS_CHANGE = re.compile(
+    r'\b(?:launch|unveil|introduc|new model|acquir|merg|expan|'
+    r'earnings|revenue|bankrupt|rates?|pricing|contract|'
+    r'capacity|forecast|research|report|market|fleet|trailer|truck|'
+    r'freight|broker|diesel|innovation|recall|logistics|supply chain)\b',re.I)
+
 def eligible(item):
     """Return true only if title + source substantiate the permitted corridor."""
     title=str(item.get('title') or '').strip()
@@ -100,8 +117,12 @@ def eligible(item):
     if is_ca_mx or canadian_domain:
         if not (has_us and has_cross):return False
     elif not has_us:
-        # Search-feed geography is a query setting, not evidence of article geography.
-        if not trade_publisher:
+        # National industry coverage need not name a city in its headline.
+        # Do not extend this exception to local accidents, closures or weather.
+        industry=bool(NATIONAL_INDUSTRY.search(title) and BUSINESS_CHANGE.search(title))
+        discovery=(item.get('origin_type')=='aggregator-discovery' and
+                   str(item.get('source','')).startswith('Google News · '))
+        if not (trade_publisher or (industry and (discovery or region in ('US','USA')))):
             return False
     # Weather must have an explicit US route impact, or originate at NHC (US storms).
     if item.get('category')=='Clima':
