@@ -248,6 +248,11 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(source_profile(title,description)['view_type'],'cargo_cab')
   self.assertIsNone(source_profile(title,'A passenger car driving POV'))
  
+ def test_real_owner_live_route_with_unicode_arrow(self):
+  title='LIVE Driving POV- IRL- Minden IA ➜ Indianapolis IN | Relaxing Ride Along'
+  description='Truck driver POV from the road. Generic description may mention truck stop break.'
+  self.assertEqual(source_profile(title,description)['view_type'],'cargo_cab')
+
  def test_owner_screenshot_exact_channel_and_live_title_passes_without_cargo_keyword(self):
   from road_tv import verify_youtube
   t=dt.datetime(2026,10,10,20,0,tzinfo=dt.timezone.utc)
