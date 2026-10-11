@@ -23,7 +23,7 @@ class PublicationTests(unittest.TestCase):
   player=(BASE/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
   self.assertIn('CAMERA_ROTATION_MS=5*60*1000',player)
   self.assertIn("priority(v)===priority(active)",player)
-  self.assertIn("active.view_type==='cargo_cab'?12*60000:CAMERA_ROTATION_MS",player)
+  self.assertIn("autoSwitch&&active&&videos.length>1",player)
 
  def test_automated_newsroom_and_video_health_contract(self):
   workflow=(BASE/'.github/workflows/deploy.yml').read_text(encoding='utf-8')
