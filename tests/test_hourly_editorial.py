@@ -20,6 +20,17 @@ class HourlyEditorialDiscoveryTests(unittest.TestCase):
         brief=(ROOT/'content/HOURLY_EDITORIAL_DISCOVERY_BRIEF.md').read_text(encoding='utf-8')
         self.assertIn('Saturdays, Sundays',brief)
         self.assertIn('No synthetic reports',brief)
+    def test_all_203_sources_have_feed_urls(self):
+        sources=json.loads((ROOT/'content/sources.json').read_text(encoding='utf-8'))['sources']
+        self.assertEqual(len(sources),203)
+        self.assertTrue(all(s.get('enabled') is not False and str(s.get('feed_url','')).startswith('https://') for s in sources))
+        scoped=[s for s in sources if s.get('feed_kind')=='domain-scoped-aggregator']
+        self.assertEqual(len(scoped),122)
+        self.assertTrue(all(s['access']=='discovery-rss' and s['publication']=='external-discovery-only' for s in scoped))
+        self.assertTrue(all('site%3A' in s['feed_url'] for s in scoped))
+        collector=(ROOT/'scripts/collect_sources.py').read_text(encoding='utf-8')
+        self.assertIn("allowed_host='news.google.com' if is_discovery",collector)
+
     def test_discovery_is_not_original_news(self):
         sources=json.loads((ROOT/'content/sources.json').read_text(encoding='utf-8'))['sources']
         for source in sources:
