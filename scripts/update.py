@@ -379,6 +379,8 @@ def bootstrap_external_story_cards(headlines, first_party):
         stamp=item.get('published_at')
         titles=item.get('titles') or {}
         if (not item.get('geo_scope_verified') or
+            (item.get('origin_type')=='aggregator-discovery' and not
+             (item.get('editorial_type')=='discovery_link' and str(item.get('source','')).startswith('Google News · '))) or
             not url.startswith('https://') or not stamp or
             not item.get('source') or not item.get('title') or
             url in existing or item.get('id') in ids):
