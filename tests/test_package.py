@@ -35,7 +35,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('build/newsroom-health.json',update)
   self.assertIn('published_last_180_minutes',update)
   self.assertIn('latest_original_published_at',update)
-  self.assertIn('const CAMERA_ROTATION_MS=5*60*1000',player)
+  self.assertIn('const CAMERA_ROTATION_MS=10*60*1000',player)
   self.assertIn("priority(a)-priority(b)",player)
   self.assertIn("v.get('view_type')=='cargo_cab' and v.get('live')",engine)
   self.assertIn('youtube_curated_channel_discover',engine)
