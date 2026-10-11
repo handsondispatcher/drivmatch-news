@@ -307,6 +307,7 @@
  // Only a verified live or qualifying same-day replay may be used.
  // No hard-coded video ID, no dead Virtual Railfan train camera.
  cards.forEach(c=>playbackArea(c)?.replaceChildren());
+ // Compact viewer controls are provided by the channel-control enhancement.
  // Show a specific camera immediately; never require reader to navigate a map.
  showPublisherCamera();
  document.getElementById('language')?.addEventListener('change',()=>{
