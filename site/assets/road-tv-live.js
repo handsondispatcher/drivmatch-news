@@ -20,6 +20,10 @@
  };
  const lang=()=>labels[document.getElementById('language')?.value]?document.getElementById('language').value:'pt';
  let videos=[],active=null,activeCard=null,player=null,started=0,playing=false,attemptingAt=0;
+ const track=(event,video,kind)=>window.DrivMatchAnalytics?.track?.(event,{
+   video_platform:video?.platform||'camera',video_status:video?.live?'live':video?.status||'camera',
+   player_kind:kind||video?.view_type||'road'
+ });
  let catalogAt=0,refreshing=false,lastVisible=null,epoch=0,apiLoading=null;
  const failed=new Map();
  const now=()=>Date.now();
@@ -79,6 +83,9 @@
    notice.appendChild(link);area.appendChild(notice);
  }
  function showPublisherCamera(force=false){
+   // A camera iframe can load without displaying moving video.
+   // Track selection only; never emit a proven player_started event.
+   track('roadtv_camera_selected',null,'external_iframe');
    if(active)return;
    const card=visible(),area=playbackArea(card);if(!area)return;
    if(!force&&area.querySelector('.roadtv-publisher-camera'))return;
@@ -181,6 +188,7 @@
    area.appendChild(badge);
  }
  function playbackError(video,currentEpoch){
+   track('roadtv_player_error',video,'youtube');
    if(currentEpoch!==epoch||key(video)!==key(active))return;
    failed.set(key(video),now());
    const alternative=nextVideo(key(video));
@@ -215,7 +223,8 @@
              try{e.target.mute();e.target.playVideo()}catch{}},
            onStateChange:e=>{
              if(seq!==epoch)return;
-             if(e.data===1){playing=true;attemptingAt=0}
+             if(e.data===1){if(!playing)track('roadtv_player_started',video,'youtube');playing=true;attemptingAt=0}
+             if(e.data===2){playing=false;track('roadtv_player_paused',video,'youtube')}
              if(e.data===0)playbackError(video,seq);
            },
            onAutoplayBlocked:()=>{attemptingAt=0;/* The native player play control remains available. */},
