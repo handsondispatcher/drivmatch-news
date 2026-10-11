@@ -379,7 +379,6 @@ def bootstrap_external_story_cards(headlines, first_party):
         stamp=item.get('published_at')
         titles=item.get('titles') or {}
         if (not item.get('geo_scope_verified') or
-            item.get('origin_type')=='aggregator-discovery' or
             not url.startswith('https://') or not stamp or
             not item.get('source') or not item.get('title') or
             url in existing or item.get('id') in ids):
@@ -451,7 +450,8 @@ def build(offline=False):
                     continue
                 # Discovery feeds are broad. Exclude entertainment/streaming false positives
                 # rather than labeling them as operational weather alerts.
-                if item.get('origin_type')=='aggregator-discovery' or 'news.google.com' in item.get('source_url',''):
+                discovery=item.get('origin_type')=='aggregator-discovery'
+                if discovery and not item.get('source','').startswith('Google News · '):
                     rejection_counts['aggregator_discovery']+=1
                     continue
                 try:
@@ -467,7 +467,7 @@ def build(offline=False):
                 if item.get('category')=='Clima' and any(term in headline for term in
                     ('season 2','season 3','how to watch','streaming','episode','trailer','rocky mountain wreckers')):
                     continue
-                external_headlines.append({**{k:item[k] for k in ('title','source','source_url','published_at','category','region','origin_type')},'id':'source-'+hashlib.sha256(item['source_url'].encode()).hexdigest()[:20],'original_lang':item.get('original_lang','en'),'geo_scope_verified':True})
+                external_headlines.append({**{k:item[k] for k in ('title','source','source_url','published_at','category','region','origin_type')},'id':'source-'+hashlib.sha256(item['source_url'].encode()).hexdigest()[:20],'original_lang':item.get('original_lang','en'),'geo_scope_verified':True,'editorial_type':('discovery_link' if discovery else 'publisher_headline')})
                 rejection_counts['eligible_source_links']+=1
                 seen.add(item['source_url'])
                 if len(external_headlines)>=90:break
