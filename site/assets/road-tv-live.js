@@ -79,18 +79,28 @@
 
  ];
 
- // Owner channel-position map (old channel -> new slot): 5,6,8,7,5,1,3,7.
- // Repeated source cameras deliberately get distinct slot identities.
- const sourceCameras=directCameras.slice();
- const newChannelSourcePositions=[5,5,6,8,7,1,3,7]; // Legacy slot mapping; CH2 explicitly pinned to I-35 Waco below.
- directCameras.splice(0,directCameras.length,...newChannelSourcePositions.map((position,index)=>{
-   const origin=sourceCameras[position-1];
-   if(!origin)throw Error('Camera reorder source CH'+position+' missing');
-   return {...origin,id:origin.id+'-slot-'+(index+1),sourceId:origin.id};
- }));
- // CH2 is specifically the I-35 Waco camera; preserve remaining order, without duplicate Waco slots.
- const waco=directCameras.find(c=>c.sourceId==='i35-waco');
- if(waco){directCameras.splice(0,directCameras.length,...directCameras.filter(c=>c.sourceId!=='i35-waco'));directCameras.splice(1,0,{...waco,id:'i35-waco-slot-2'});}
+ // Stable, unique camera identities. Owner policy is also stored in content/road-tv-policy.json.
+ const cameraCatalog=directCameras.slice();
+ const fallbackCameraOrder=['i35-waco','ambassador-us-bound','us-i74-bridge','fl-bridge-lions','peace-canada','i29-tea','oh741-lytle','paso-norte'];
+ function applyCameraOrder(ids){
+   const ordered=[...new Set(ids)].map(id=>cameraCatalog.find(c=>c.id===id)).filter(Boolean);
+   ordered.push(...cameraCatalog.filter(c=>!ordered.some(x=>x.id===c.id)));
+   directCameras.splice(0,directCameras.length,...ordered);
+   const current=directCameras.findIndex(c=>c.id===selectedCameraId);
+   publisherIndex=current>=0?current:0;
+   tvRefresh();
+ }
+ let selectedCameraId=null;
+ applyCameraOrder(fallbackCameraOrder);
+ async function loadOwnerPolicy(){
+   try{
+     const response=await fetch('data/road-tv-policy.json?ts='+now(),{cache:'no-store'});
+     if(!response.ok)return;
+     const policy=await response.json();
+     if(policy.schema_version===1&&Array.isArray(policy.camera_priority_ids))
+       applyCameraOrder(policy.camera_priority_ids);
+   }catch{}
+ }
  const unavailableCamera=c=>cameraUnavailable.has(c.sourceId||c.id);
  let autoSwitch=true,userChannel=false,viewSize='small';
  let cameraUnavailable=new Set();
@@ -148,14 +158,15 @@
  // never pins the first interstate camera indefinitely.
  try{
    const seen=JSON.parse(sessionStorage.getItem('dm-roadtv-cameras')||'{}');
+   if(seen.camera_id){const stable=directCameras.findIndex(c=>c.id===seen.camera_id);if(stable>=0)publisherIndex=stable;}
    if(Number.isInteger(seen.index)&&seen.index>=0&&seen.index<directCameras.length){
-     publisherIndex=seen.index;
+     if(!seen.camera_id)publisherIndex=seen.index;
      if(Number.isFinite(seen.at)&&now()-seen.at>=CAMERA_ROTATION_MS)
        publisherIndex=(publisherIndex+1)%directCameras.length;
    }
  }catch{}
  function saveCameraState(){
-   try{sessionStorage.setItem('dm-roadtv-cameras',JSON.stringify({index:publisherIndex,at:now()}))}catch{}
+   try{sessionStorage.setItem('dm-roadtv-cameras',JSON.stringify({index:publisherIndex,camera_id:directCameras[publisherIndex]?.id,at:now()}))}catch{}
  }
 
  function publisherUnavailable(area){
@@ -196,13 +207,13 @@
    frame.onload=()=>{loaded=true;clearTimeout(guard)};
    frame.onerror=()=>{clearTimeout(guard);failPublisher(source.id)};
    area.appendChild(frame);publisherFrame=frame;lastVisible=card;publisherSince=now();tvRefresh();
+   selectedCameraId=source.id;
    saveCameraState();
    const caption=document.createElement('div');caption.className='roadtv-camera-credit';
    const name=document.createElement('span');name.textContent=source.name;
    const link=document.createElement('a');link.href=source.page;link.target='_blank';
    link.rel='noopener noreferrer';
    link.textContent=lang()==='en'?'Source ↗':lang()==='es'?'Fuente ↗':'Fonte ↗';
-   next.onclick=()=>tvMove(1);
    caption.append(name,link);area.appendChild(caption);
  }
  function failPublisher(id){
@@ -375,7 +386,7 @@
  async function loadCameraHealth(){try{const response=await fetch('data/camera-health.json?ts='+now(),{cache:'no-store'});if(!response.ok)return;const j=await response.json();const checked=Date.parse(j.checked_at||'');if(!Number.isFinite(checked)||now()-checked>35*60000||now()-checked< -60000)return;cameraUnavailable=new Set((j.unavailable_ids||[]).filter(id=>directCameras.some(c=>(c.sourceId||c.id)===id)));if(cameraUnavailable.has(directCameras[publisherIndex]?.id)&&!active){const next=directCameras.findIndex(c=>!cameraUnavailable.has(c.id));if(next>=0){publisherIndex=next;showPublisherCamera(true)}}tvRefresh()}catch{}}
  // Compact viewer controls are provided by the channel-control enhancement.
  // Show a specific camera immediately; never require reader to navigate a map.
- tvInstall();loadCameraHealth().finally(()=>showPublisherCamera());
+ tvInstall();Promise.allSettled([loadOwnerPolicy(),loadCameraHealth()]).finally(()=>showPublisherCamera());
  document.getElementById('language')?.addEventListener('change',()=>{
    if(!active){
      const label=visible().querySelector('.roadtv-camera-credit a');
