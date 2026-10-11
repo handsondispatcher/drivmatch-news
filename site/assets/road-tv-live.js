@@ -183,13 +183,8 @@
    const link=document.createElement('a');link.href=source.page;link.target='_blank';
    link.rel='noopener noreferrer';
    link.textContent=lang()==='en'?'Source ↗':lang()==='es'?'Fuente ↗':'Fonte ↗';
-   const next=document.createElement('button');
-   next.type='button';next.className='roadtv-next-camera';
-   next.textContent=lang()==='en'?'Next camera →':lang()==='es'?'Otra cámara →':'Próxima câmera →';
-   next.setAttribute('aria-label','Alternar para outra câmera rodoviária');
-   next.onclick=()=>{publisherIndex=(publisherIndex+1)%directCameras.length;
-      publisherFailures.clear();showPublisherCamera(true);};
-   caption.append(name,link,next);area.appendChild(caption);
+   next.onclick=()=>tvMove(1);
+   caption.append(name,link);area.appendChild(caption);
  }
  function failPublisher(id){
    const card=visible(),area=playbackArea(card);
@@ -334,7 +329,7 @@
      // Keep playing only while the broadcast remains in the verified catalog.
      const matched=videos.find(v=>key(v)===old);
      if(old&&!matched){const target=nextVideo(old);if(target)start(target);else{clear();status(labels[lang()].empty)}}
-     else if(!old){
+     else if(!old&&!userChannel){
        const target=nextVideo('');
        if(target)start(target);else status(labels[lang()].empty);
      }else if(!userChannel&&videos.some(x=>priority(x)<priority(matched)&&!markedBad(x))){
