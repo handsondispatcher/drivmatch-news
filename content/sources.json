@@ -13,7 +13,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "publisher-feed",
-      "attribution": "Original publisher RSS; US freight relevance and source date must pass editorial gate"
+      "attribution": "Original publisher RSS; US freight relevance and source date must pass editorial gate",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "freightwaves",
@@ -24,7 +25,8 @@
       "original_lang": "en",
       "access": "rss",
       "publication": "review-required",
-      "enabled": true
+      "enabled": true,
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "transport-topics",
@@ -35,7 +37,8 @@
       "original_lang": "en",
       "access": "rss",
       "publication": "review-required",
-      "enabled": true
+      "enabled": true,
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "land-line---ooida",
@@ -46,7 +49,8 @@
       "original_lang": "en",
       "access": "rss",
       "publication": "review-required",
-      "enabled": true
+      "enabled": true,
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "the-trucker",
@@ -57,7 +61,8 @@
       "original_lang": "en",
       "access": "rss",
       "publication": "review-required",
-      "enabled": true
+      "enabled": true,
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "truckdrivernews-primary",
@@ -71,7 +76,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "publisher-feed",
-      "attribution": "US CDL, HOS, truck-driver safety, regulation; original article link and timestamp only"
+      "attribution": "US CDL, HOS, truck-driver safety, regulation; original article link and timestamp only",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "supply-chain-dive",
@@ -85,7 +91,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "publisher-feed",
-      "attribution": "Original publication and date must be verified; only US road-freight eligible headlines may surface"
+      "attribution": "Original publication and date must be verified; only US road-freight eligible headlines may surface",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "automotive-fleet",
@@ -99,7 +106,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "publisher-feed",
-      "attribution": "Fleet industry source; road-freight/US eligibility gate remains mandatory"
+      "attribution": "Fleet industry source; road-freight/US eligibility gate remains mandatory",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "dat-freight-blog",
@@ -127,7 +135,8 @@
       "publication": "review-required",
       "enabled": true,
       "source_type": "publisher-feed",
-      "attribution": "Original publisher URL and timestamp; editorial US road-freight relevance gate; external link only, no automatic article approval"
+      "attribution": "Original publisher URL and timestamp; editorial US road-freight relevance gate; external link only, no automatic article approval",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "overdrive",
@@ -172,7 +181,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "mexico-business-news",
@@ -227,7 +237,8 @@
       "original_lang": "en",
       "access": "rss",
       "publication": "review-required",
-      "enabled": true
+      "enabled": true,
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "noaa",
@@ -701,7 +712,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "trucknews-regulations",
@@ -713,7 +725,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "trucknews-security",
@@ -725,7 +738,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "trucknews-equipment",
@@ -737,7 +751,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "trucknews-business",
@@ -749,7 +764,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "trucknews-transportation",
@@ -761,7 +777,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "trucknews-technology",
@@ -773,7 +790,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "trucknews-sustainability",
@@ -785,7 +803,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "trucknews-health-safety",
@@ -797,7 +816,8 @@
       "access": "rss",
       "publication": "review-required",
       "enabled": true,
-      "region": "CA"
+      "region": "CA",
+      "feed_kind": "publisher-rss"
     },
     {
       "id": "radar-us-regulations",
@@ -811,7 +831,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-us-roadworks",
@@ -825,7 +846,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-us-cargo-crime",
@@ -839,7 +861,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-us-road-weather",
@@ -853,7 +876,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-us-diesel",
@@ -867,7 +891,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-us-rest-areas",
@@ -881,7 +906,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-us-tolls",
@@ -895,7 +921,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-us-technology",
@@ -909,7 +936,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-us-logistics",
@@ -923,7 +951,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-ca-trucking",
@@ -937,7 +966,8 @@
       "enabled": true,
       "region": "CA",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-ca-roads",
@@ -951,7 +981,8 @@
       "enabled": true,
       "region": "CA",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-ca-cargo-crime",
@@ -965,7 +996,8 @@
       "enabled": true,
       "region": "CA",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-mx-autotransporte",
@@ -979,7 +1011,8 @@
       "enabled": true,
       "region": "MX",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-mx-carreteras",
@@ -993,7 +1026,8 @@
       "enabled": true,
       "region": "MX",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-mx-frontera",
@@ -1007,7 +1041,8 @@
       "enabled": true,
       "region": "MX",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-northern-plains-winter",
@@ -1021,7 +1056,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-rockies-winter",
@@ -1035,7 +1071,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-pacific-northwest-weather",
@@ -1049,7 +1086,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News discovery — linked articles are not DrivMatch editorials"
+      "attribution": "Google News discovery — linked articles are not DrivMatch editorials",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "reuters",
@@ -2071,7 +2109,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-ice-cdl-english",
@@ -2085,7 +2124,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-wrongway-interstate",
@@ -2099,7 +2139,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-first-responder-x",
@@ -2113,7 +2154,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-eld-hos",
@@ -2127,7 +2169,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-autonomous-drone",
@@ -2141,7 +2184,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-coldchain-agri",
@@ -2155,7 +2199,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-flatbed-carhauler",
@@ -2169,7 +2214,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-container-drayage",
@@ -2183,7 +2229,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-warehouse-ma",
@@ -2197,7 +2244,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-truckparking",
@@ -2211,7 +2259,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-hazmat-fire",
@@ -2225,7 +2274,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-bridge-closures",
@@ -2239,7 +2289,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-oil-refineries",
@@ -2253,7 +2304,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "radar-truck-robbery",
@@ -2267,7 +2319,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use."
+      "attribution": "Google News DISCOVERY ONLY; original source, date, event and independent facts MUST be verified before editorial use.",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-local-tv-truck-crashes",
@@ -2281,7 +2334,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-national-tv-freight",
@@ -2295,7 +2349,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-state-dot-511",
@@ -2309,7 +2364,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-government-fmcsa",
@@ -2323,7 +2379,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-government-nhtsa",
@@ -2337,7 +2394,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-government-economics",
@@ -2351,7 +2409,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-universities-freight",
@@ -2365,7 +2424,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-trade-journals-trucking",
@@ -2379,7 +2439,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-carrier-news",
@@ -2393,7 +2454,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-broker-news",
@@ -2407,7 +2469,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-truck-oem-launches",
@@ -2421,7 +2484,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-van-and-box-truck",
@@ -2435,7 +2499,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-trailer-equipment",
@@ -2449,7 +2514,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-container-drayage",
@@ -2463,7 +2529,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-refrigerated-freight",
@@ -2477,7 +2544,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-specialty-freight",
@@ -2491,7 +2559,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-car-hauler-towing",
@@ -2505,7 +2574,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-general-freight",
@@ -2519,7 +2589,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-fuel-networks",
@@ -2533,7 +2604,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-trucker-services",
@@ -2547,7 +2619,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-dispatch-tech",
@@ -2561,7 +2634,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-m-and-a-logistics",
@@ -2575,7 +2649,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-ai-fleet-tech",
@@ -2589,7 +2664,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-linkedin-trucking",
@@ -2603,7 +2679,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-x-emergency-trucking",
@@ -2617,7 +2694,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-hazmat-closures",
@@ -2631,7 +2709,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-truck-parking",
@@ -2645,7 +2724,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     },
     {
       "id": "hourly-immigration-cdl",
@@ -2659,7 +2739,8 @@
       "enabled": true,
       "region": "US",
       "source_type": "aggregator",
-      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação"
+      "attribution": "Radar de descoberta; requer confirmação na fonte primária antes de publicação",
+      "feed_kind": "aggregator-discovery"
     }
   ]
 }
