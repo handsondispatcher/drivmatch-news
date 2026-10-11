@@ -164,6 +164,10 @@ jobs:
       - name: Browser regression (bounded)
         timeout-minutes: 3
         run: npm run test:browser
+      - name: Verificar automaticamente câmeras de transporte
+        timeout-minutes: 5
+        continue-on-error: true
+        run: node scripts/check_camera_health.cjs
       - name: Auditoria real da Road TV e notícias no domínio público (sem mocks)
         if: ${{ github.event_name == 'pull_request' }}
         timeout-minutes: 5
