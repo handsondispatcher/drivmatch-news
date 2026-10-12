@@ -15,14 +15,14 @@
 
 ## Antes de programar: checkpoint de evidência
 
-O repositório `handsondispatcher/drivmatch-news` está acessível e `content/release.json` indica v34.11 / `development_prelaunch` / `public_launch_approved=false`. Há issues reais abertas sobre playback de Road TV e frescor (#59, #88, #35, #36) e o gate final #18. O repositório `DrivMatch/drivmatch` **não pôde ser acessado** na conexão atual (404). Verifique proprietário, permissões e URL; não reimplemente nada sem esse acesso.
+O repositório `handsondispatcher/drivmatch-news` está acessível e `content/release.json` indica v34.11 / `development_prelaunch` / `public_launch_approved=false`. Issues #59/#88/#35/#36 e gate #18 estavam abertos na inspeção. **O repositório privado `DrivMatch/drivmatch` JÁ HAVIA SIDO ACESSADO em sessão de navegador autorizada pelo Ricardo, em 09–11/10**; a conexão GitHub **desta sessão** não o lista (404). Infraestrutura-base conhecida: GitHub React/Vite/TypeScript, Lovable com Supabase, Cloudflare Pages `drivmatch-app` publicando `drivmatch.com`; snapshot histórico `snapshot/p1-before-codex-2026-10-11` e commit `b785ab3`. Retomar acesso autorizado; **não solicitar novamente senhas nem assumir inexistência do repositório**.
 
 ## Lista ordenada de execução — 28 itens com aceitação
 
 | ID | Prioridade | Ação verificável | Dependência | Owner proposto | Aceite / evidência mínima |
 |---|---|---|---|---|---|
 | E360-01 | P0 | Inventário técnico/negócios: repos, deploy, domínios, bancos, integrações, serviços, campanhas, parceiros, custos | — | Fundador + tech | Matriz com estado `REPO_VERIFIED`/`USER_DECLARED`/`UNKNOWN`, URL, data, responsável, custo; não inferir |
-| E360-02 | P0 | Recuperar acesso de leitura ao repositório/app principal sem circular credenciais no chat | 01 | Fundador + tech | Repo e deploy real localizados, permissões mínimas, rotas inventariadas |
+| E360-02 | P0 | Retomar a inspeção read-only do app principal com acessos JÁ autorizados via navegador/ambiente apropriado; conector GitHub atual pode ser limitado | 01 | Tech/assistente | Conferir branch/HEAD atual, Lovable/Supabase, Pages `drivmatch-app`, rotas e fluxo deploy; registrar evidência sem pedir novamente senhas ao fundador |
 | E360-03 | P0 | Conciliar claim/contagem da homepage, pricing e bases; separar alunos vs drivers | 01,02 | Growth + Finance | Contagens auditadas e copy pública sem alegações inconsistentes; registro do antes/depois |
 | E360-04 | P0 | Testar backup **e restauração**, CI/regressão, disponibilidade, rollback e segurança básica da News | 01 | DevOps/QA | Evidência datada da recuperação em ambiente apropriado, teste de PR e screenshots; não alterar backups congelados |
 | E360-05 | G0 | Fechar issue News #59/#35/#88: Road TV com playback visível/embeddable ou indisponibilidade honesta | 01,04 | Dev + QA + Editorial | Desktop/mobile reais sem bloqueio/black screen falsamente anunciado; direitos/status LIVE corretos |
@@ -67,7 +67,7 @@ O relatório Gemini é **insumo, não execução concluída**. Reaproveitar idei
 
 ```mermaid
 flowchart TD
- A[E360-01 Inventário] --> B[E360-02 Acesso app principal]
+ A[E360-01 Inventário] --> B[E360-02 Retomar inspeção autorizada do app principal]
  A --> C[E360-04 Backup e regressão]
  C --> D[E360-05 Road TV e direitos]
  C --> E[E360-06 Frescor e fontes]
@@ -90,7 +90,7 @@ flowchart TD
 - A operação comercial do fundador continua ativa conforme aplicável; **o bloqueio de lançamento News não deve ser interpretado como proibição de cursos, consultorias ou Instagram já existentes**.
 - Mapeamento de ofertas/parceiros, contratos, consentimento e analytics pode avançar em paralelo à homologação News.
 - Publicidade paga no News só após inventário real, direitos, contrato e autorização comercial; enquanto News prelaunch, o `release.json` documenta apenas house ads.
-- Alterar homepage do app principal depende de acesso a seu código/deploy; não editar o repositório News para simular trabalho no app principal.
+- Alterar homepage do app principal depende de **retomar o ambiente já autorizado** e obter testes/deploy adequados; não editar o repositório News para simular trabalho no app principal.
 
 ## Gates e matriz Go/No-Go
 
@@ -118,6 +118,6 @@ Nenhuma dessas fases é prazo. Estimar esforço após auditoria do app principal
 
 ## Organização e próximos passos técnicos
 
-No Codex, executar **primeiro** um PR separado de auditoria de leitura sobre `drivmatch-news` (sem alterar runtime), conferindo release, workflows, issues, evidências de navegadores, lacunas e plano de correção. No app principal, apenas após acesso correto. Não abrir issues repetidas. Mudanças técnicas futuras em PRs pequenos, com aceite e rollback rastreáveis.
+No Codex, executar **primeiro** auditoria de leitura sobre `drivmatch-news` (sem alterar runtime), conferindo release, workflows, issues, evidências de navegadores, lacunas e plano de correção. No app principal, usar os acessos já liberados pelo Ricardo via contexto/ambiente apropriado; a falta de acesso ao repositório privado pelo conector **deste chat** não equivale a falta de autorização. Não abrir issues repetidas. Mudanças técnicas futuras em PRs pequenos, com aceite e rollback rastreáveis.
 
 Transição segura de chats: ler [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md), [ECOSYSTEM_MASTER.md](ECOSYSTEM_MASTER.md) e registros de decisões antes de responder. Não fazer o usuário repetir o briefing.
