@@ -1,5 +1,8 @@
 # DRIVMATCH ECOSYSTEM 360° — ECOSYSTEM MASTER
 
+
+> **DIRETRIZ COMERCIAL DO FUNDADOR — 12/10/2026:** **FREE FIRST / CORTESIA PARA CRESCIMENTO DA REDE.** Ricardo deixou intencionalmente **sem cobrança** os recursos da plataforma para que usuários, motoristas, carriers e prestadores ingressem, utilizem o produto, criem hábito e ampliem sua base. A presença de tabelas de preço, Stripe, tiers ou checkout no código **não autoriza concluir que cobrança está ativada ou deveria estar**. Não ativar cobrança nem condicionar a expansão à monetização. Planos pagos, destaques e fees são **opções FUTURAS**, sujeitos a volume demonstrado e decisão expressa do fundador, seguida de homologação técnica. **Os cursos, consultorias, brokerage e serviços do fundador já vendidos fora desse modelo de cortesia continuam atividades comerciais próprias; não presumir que tenham sido tornados gratuitos.** Priorizar liquidez, uso, retenção, qualidade de conexão e confiabilidade dos dados, não ARPU imediato.
+
 > **ATUALIZAÇÃO AUDITADA 12/10:** o repositório privado principal `DrivMatch/drivmatch` foi acessado com a segunda conta GitHub. O app **já contém** Marketplace de providers, candidatura e aprovação, fluxo `Request a Quote`, equipamento/classificados, DrivMe, dashboards de driver/carrier/dispatcher, Stripe e Supabase. A classificação anterior de repositório principal `UNKNOWN` se refere à indisponibilidade **da conexão anterior**, agora resolvida. Ver [APP_MAIN_READONLY_AUDIT_2026-10-12.md](APP_MAIN_READONLY_AUDIT_2026-10-12.md). Sem testes de produção nesta inspeção; não duplicar estes módulos.
 
 **Data de consolidação:** 2026-10-12  
