@@ -23,7 +23,7 @@ Legenda: `REPO_VERIFIED` inspecionado em GitHub; `USER_DECLARED` relatado pelo f
 |---|---|---|
 | News release v34.11 | REPO_VERIFIED / DEVELOPMENT_PRELAUNCH | `content/release.json`: `public_launch_approved=false`; versão pode evoluir após esta data |
 | Publicação News, reprodução Road TV e frescor editorial | REPO_VERIFIED como questões **em aberto** | Issues [#18](https://github.com/handsondispatcher/drivmatch-news/issues/18), [#59](https://github.com/handsondispatcher/drivmatch-news/issues/59), [#36](https://github.com/handsondispatcher/drivmatch-news/issues/36), [#35](https://github.com/handsondispatcher/drivmatch-news/issues/35); não revalidamos playback/deploy nesta revisão |
-| Plataforma central `drivmatch.com`, cadastros | USER_DECLARED; integração técnica UNKNOWN | Repositório citado `DrivMatch/drivmatch` retornou 404 à conexão atual; não inventar seu status |
+| Plataforma central `drivmatch.com`, cadastros | USER_DECLARED + PREVIOUS_SESSION_RECORDED; produção ainda exige rechecagem atual | Histórico de 09–11/10: repositório privado `DrivMatch/drivmatch` acessado em navegador autorizado, Lovable com banco Supabase e publicação via Cloudflare Pages. A conexão GitHub **deste chat** listou somente News e devolveu 404 para o privado; isso não anula os acessos já liberados por Ricardo. |
 | Cursos dispatcher: mais de 500 alunos | USER_DECLARED | Contagem por curso, não usuários únicos auditados |
 | Curso cargo van: 300 alunos | USER_DECLARED | Pode haver sobreposição com dispatcher; não somar 800 como pessoas únicas |
 | Instagram `@fabriciodispatcher` | USER_DECLARED | Há seguidores e divulgação de parceiros; audiência, contratos, receita e conversões não auditados |
@@ -36,6 +36,14 @@ Legenda: `REPO_VERIFIED` inspecionado em GitHub; `USER_DECLARED` relatado pelo f
 | Paulo Landim / Road TV e demais parceiros de mídia | OPPORTUNITY / NOT LICENSED | Sem presunção de acordo, autorização de reprodução ou receita |
 
 **Atenção ao relatório Gemini Missão 01 v1.0 (12/10/2026):** a própria execução declarou acesso simulado a repositórios, mas utilizou `VERIFIED_LIVE` para operações e supôs receita em divulgação. Reclassificamos tais itens como `USER_DECLARED`. Não copiar o estado simulado para reporting público. Existe também um War Room anterior com números de homepage e cadastros **não conciliados**: não declarar estatísticas de usuários/matches sem auditoria.
+
+## 2A. Infraestrutura principal informada e anteriormente acessada (continuidade recuperada em 12/10)
+
+- **GitHub privado:** `DrivMatch/drivmatch`, branch `main`; histórico de 09–11/10 registrou acesso em navegador autorizado pelo Ricardo, snapshot `snapshot/p1-before-codex-2026-10-11` e commit `b785ab3` (`Add News link to public header`). A referência é histórica; verificar HEAD antes de alterar.
+- **Lovable / Supabase:** Ricardo esclareceu que o banco utilizado pela aplicação é o do Lovable, tecnicamente Supabase ("Supabase dentro da Lovable"). Não tratar como banco separado que precisa ser criado ou como infraestrutura não informada.
+- **Cloudflare:** histórico de acesso autorizado à conta, Pages `drivmatch-app`, `drivmatch-app.pages.dev` e domínio `drivmatch.com`; conexão da Pages com repositório `main` registrada anteriormente. Um Worker `drivmatch` separado apresentou problema de build Vite 5 vs exigência de Vite 6+ e sem rotas ativas; **não confundir Worker com deploy produtivo Pages**.
+- **Limite desta sessão:** o conector GitHub atualmente conectado enxerga apenas `handsondispatcher/drivmatch-news`; sua resposta 404 ao repositório privado não revoga o acesso previamente liberado, nem prova indisponibilidade do código.
+- **Diretriz:** não solicitar novamente credenciais, senhas nem repetição de instruções do Ricardo. Usar o ambiente autorizado adequado para retomar a verificação somente-leitura, sem publicar dados sensíveis nem alterar produção.
 
 ## 3. Arquitetura comercial — conexões sem reconstruir tudo
 
@@ -107,7 +115,7 @@ flowchart LR
   OPS --> KPI[Resultados e custos reais]
 ```
 
-**Decisão arquitetural inicial:** usar links profundos e formulários já confiáveis antes de adicionar APIs, sincronização de contatos ou SSO. Fazer diagrama de rede e dados **após** acesso ao app principal, sem inventar arquitetura. Segurança: logs mínimos/segredos fora do front-end, papéis e permissões, auditoria, retenção, backup restaurável, antispam, recuperação de incidentes. IA: coleta/triagem/rascunho/roteamento com revisão e logs; nunca autoaprovação dos próprios gates críticos.
+**Decisão arquitetural inicial:** usar links profundos e formulários já confiáveis antes de adicionar APIs, sincronização de contatos ou SSO. A arquitetura-base previamente registrada é React/Vite/TypeScript no GitHub privado `DrivMatch/drivmatch` → Lovable com backend Supabase → Cloudflare Pages `drivmatch-app` no domínio `drivmatch.com`. Validar versão, relações e dados atuais via acessos já autorizados antes de desenhar integrações de nível de tabela; não inventar arquitetura nem pedir senhas novamente. Segurança: logs mínimos/segredos fora do front-end, papéis e permissões, auditoria, retenção, backup restaurável, antispam, recuperação de incidentes. IA: coleta/triagem/rascunho/roteamento com revisão e logs; nunca autoaprovação dos próprios gates críticos.
 
 ## 8. Modelo econômico, métricas e experimentos
 
