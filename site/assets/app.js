@@ -424,24 +424,30 @@
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
     const src=safeUrl(opened.source_url);
-    // Original remains first-party. Translation happens in browser or Google Translate,
-    // not by reproducing a publisher's copyrighted full text.
-    const isFreightWaves=src&&/^https:\/\/(?:www\.)?freightwaves\.com\//i.test(src);
-    const translatedUrl=target=>isFreightWaves
-      ?'https://translate.google.com/translate?sl=en&tl='+encodeURIComponent(target)+'&u='+encodeURIComponent(src)
-      :src;
+    // Links never claim that we own or republish a publisher's complete article.
+    // Every requested non-original language goes through the same translation
+    // service (not just FreightWaves); publishers may block proxied access.
+    const originalSourceLang=langs.includes(opened.original_lang)?opened.original_lang:'en';
+    const translatedUrl=target=>target===originalSourceLang?src:
+      'https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(target)+'&u='+encodeURIComponent(src);
     const sourceLink=(url,label,flag,primary=false)=>{
-      // Compact mobile labels keep all three source actions on one row.
-      // Full translation/attribution wording remains visible on desktop.
-      const concise=flag==='en'?'English · original':flag==='pt'?'Português':'Español';
+      // Compact labels preserve the approved 3-column mobile reader layout.
+      const concise=flag===originalSourceLang
+        ?({pt:'Português · original',en:'English · original',es:'Español · original'}[flag])
+        :({pt:'Português',en:'English',es:'Español'}[flag]);
       return '<a class="article-source-button '+(primary?'primary':'secondary')+'" href="'+escapeHTML(url)+'" target="_blank" rel="noopener noreferrer"><img src="'+flags[flag]+'" alt="" width="19" height="13"><span class="source-label-full">'+escapeHTML(label)+'</span><span class="source-label-mobile">'+escapeHTML(concise)+'</span><span class="source-link-arrow" aria-hidden="true">↗</span></a>';
     };
-    const ptButton=src?sourceLink(translatedUrl('pt'),isFreightWaves?'Português · tradução automática':'Português · traduzir no navegador','pt',articleLang==='pt'):'';
-    const enButton=src?sourceLink(src,'English · original','en',articleLang==='en'):'';
-    const esButton=src?sourceLink(translatedUrl('es'),isFreightWaves?'Español · traducción automática':'Español · traducir en navegador','es',articleLang==='es'):'';
+    const sourceLabels={
+      pt:originalSourceLang==='pt'?'Português · original':'Português · tradução automática',
+      en:originalSourceLang==='en'?'English · original':'English · automatic translation',
+      es:originalSourceLang==='es'?'Español · original':'Español · traducción automática'
+    };
+    const ptButton=src?sourceLink(translatedUrl('pt'),sourceLabels.pt,'pt',articleLang==='pt'):'';
+    const enButton=src?sourceLink(translatedUrl('en'),sourceLabels.en,'en',articleLang==='en'):'';
+    const esButton=src?sourceLink(translatedUrl('es'),sourceLabels.es,'es',articleLang==='es'):'';
     const heading=articleLang==='pt'?'REPORTAGEM COMPLETA NA FONTE':articleLang==='es'?'REPORTAJE COMPLETO EN LA FUENTE':'COMPLETE ORIGINAL REPORT';
-    const tip=articleLang==='pt'?'Para português ou espanhol, a tradução automática abre pelo Google Tradutor quando disponível. Nos demais veículos, abra a fonte e use “Traduzir página” no navegador. O acesso depende do veículo.':articleLang==='es'?'La traducción automática depende del navegador o del editor.':'The full report belongs to the publisher. Automatic translation may depend on the browser.';
-    const shortTip=articleLang==='pt'?'Português e espanhol: tradução pelo navegador, quando disponível.':articleLang==='es'?'Traducción mediante el navegador, cuando esté disponible.':'Translation through the browser, when available.';
+    const tip=articleLang==='pt'?'Os botões de tradução abrem a reportagem pelo Google Tradutor, independentemente do veículo. Alguns sites bloqueiam tradutores, exigem assinatura ou não permitem traduzir o conteúdo dinâmico. Se falhar, abra a versão original e use “Traduzir página” no navegador. A tradução automática não é uma reportagem escrita ou verificada pela DrivMatch.':articleLang==='es'?'La traducción abre el sitio mediante Google Traductor cuando el editor lo permite. Si falla, abra el original y use la función de traducción del navegador.':'Translated links open the publisher via Google Translate where permitted. If blocked, open the original and use your browser translation feature.';
+    const shortTip=articleLang==='pt'?'Tradução automática; se o site bloquear, use “Traduzir página” no navegador.':articleLang==='es'?'Traducción automática; si falla, traduzca con el navegador.':'Machine translation; if blocked, use your browser translator.';
     $('article-source').innerHTML=src?'<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+ptButton+enButton+esButton+'</div><p class="source-access-warning">'+tip+'</p><p class="source-access-short">'+shortTip+'</p>':escapeHTML(opened.source||'');
     const attribution=storyPhoto||opened;
     const photoCredit=attribution.image_source_url && safeUrl(attribution.image_source_url)
