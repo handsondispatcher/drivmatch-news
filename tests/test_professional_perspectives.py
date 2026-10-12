@@ -8,7 +8,9 @@ class ProfessionalPerspectiveContract(unittest.TestCase):
         self.assertEqual(html.count('data-impact-role="driver"'),1)
         self.assertEqual(html.count('data-impact-role="dispatcher"'),1)
         self.assertIn('id="article-impact-text"',html)
-        self.assertIn('aria-live="polite"',html)
+        self.assertIn('id="newsdesk-impact-shade"',html)
+        self.assertIn('id="newsdesk-impact-close"',html)
+        self.assertIn('aria-modal="true"',html)
     def test_verified_analysis_and_safe_fallback(self):
         app=(ROOT/'site/assets/app.js').read_text(encoding='utf-8')
         self.assertIn('opened.professional_impact?.[persona]',app)
