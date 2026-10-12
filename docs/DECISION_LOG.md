@@ -1,4 +1,7 @@
 # DRIVMATCH ECOSYSTEM 360° — DECISION LOG
+
+> **D-015 — REPO_FACT / 12/10/2026:** o acesso ao privado `DrivMatch/drivmatch` está confirmado via conexão GitHub da conta DrivMatch, branch principal `main` e commit listado `b785ab3`. Inspeção de `src/App.tsx`, `src/pages/Marketplace.tsx`, `src/pages/ProviderProfile.tsx`, `docs/contexto-projeto.md` e documentação do provider demonstrou módulos DrivMe, Marketplace, equipment listings, quote requests, contratação/convites e Supabase já construídos. **Resultado:** não construir diretório, jobs, banco, CRM ou transporte paralelos sem auditar as estruturas existentes. Isso não é homologação produtiva. [Relatório read-only](APP_MAIN_READONLY_AUDIT_2026-10-12.md).
+
 **Atualizado:** 2026-10-12 · **Escopo deste PR:** documentação para revisão; as entradas registram o que foi declarado, recomendado ou comprovado; **não** são aprovações automáticas para executar software, assumir obrigações comerciais ou lançar.
 
 ## Convenção
