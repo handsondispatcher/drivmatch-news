@@ -230,7 +230,7 @@
     const all=pageStories(); indexSet.clear();all.forEach((a,i)=>indexSet.set(a.id,i));
     // The arrow/dot carousel changes the hero image/headline only.
     // The three "Leia Também" stories remain fixed across hero navigation.
-    const n=Math.max(1,Math.ceil(f.length/featureSize));
+    const n=Math.max(1,Math.min(5,Math.ceil(f.length/featureSize)));
     featurePage=Math.min(featurePage,n-1);
     const hero=f[featurePage*featureSize]||f[0];
     const related=f.slice(featurePage*featureSize+1,featurePage*featureSize+4);
@@ -252,8 +252,7 @@
     // Reserve ALL carousel leads (not just the current slide) plus their read-more
     // companions. Older reports remain in the lower archive without hero repeats.
     const heroIds=new Set(Array.from({length:n},(_,i)=>f[i*featureSize]).filter(Boolean).map(a=>a.id));
-    const readMoreIds=new Set();
-    for(let i=0;i<n;i++)f.slice(i*featureSize+1,i*featureSize+4).forEach(a=>readMoreIds.add(a.id));
+    const readMoreIds=new Set(related.map(a=>a.id));
     const reserved=new Set([...heroIds,...readMoreIds]);
     const shortlist=f.filter(a=>!reserved.has(a.id)).slice(0,5);
     shortlist.forEach(a=>reserved.add(a.id));
