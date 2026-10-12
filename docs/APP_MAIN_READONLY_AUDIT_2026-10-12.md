@@ -1,5 +1,8 @@
 # Auditoria inicial SOMENTE LEITURA — aplicação principal DrivMatch
 **Data:** 2026-10-12  
+
+> **CORREÇÃO DE INTERPRETAÇÃO / fundador, 12/10:** o sistema do Ricardo está propositalmente com **cobranças desativadas** por estratégia de cortesia para aumentar o número de participantes e acostumá-los à plataforma. Referências no código a Stripe/tiers/pricing não constituem falha operacional por não cobrarem e não devem justificar ativação. O potencial ponto técnico de atualização de benefícios pagos deve ser analisado **quando** for decidida a monetização, conforme [DrivMatch issue #1](https://github.com/DrivMatch/drivmatch/issues/1), sem prejuízo das verificações normais de RLS e segurança. Serviços comerciais diretos já vendidos pelo fundador permanecem fora dessa interpretação de gratuidade do app.
+
 **Fonte:** repositório privado `DrivMatch/drivmatch`, conectado à conta `DrivMatch`; inspeção do `main` por GitHub; **não** executou deploy, login, consulta direta ao Supabase nem teste de visitante real.  
 **Objetivo:** corrigir o backlog transversal, evitando construir novamente módulos que o Ricardo já desenvolveu.
 
