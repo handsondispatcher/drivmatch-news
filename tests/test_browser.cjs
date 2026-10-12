@@ -307,6 +307,23 @@ const {spawn}=require('node:child_process');
     throw new Error('No approved editorial article reachable through news pagination');
    };
    await openEditorial();
+   if(width===1440){
+     const options=page.locator('#article-impact-actions [data-impact-role]');
+     assert.equal(await options.count(),2,'News Desk must offer exactly Driver and Dispatcher');
+     await options.nth(0).click();
+     await page.locator('#newsdesk-impact-shade').waitFor({state:'visible'});
+     const driver=await page.locator('#article-impact-text').textContent();
+     assert.ok(driver.trim().length>25);
+     await page.locator('#newsdesk-impact-close').click();
+     assert.equal(await page.locator('#newsdesk-impact-shade').isVisible(),false);
+     await options.nth(1).click();
+     await page.locator('#newsdesk-impact-shade').waitFor({state:'visible'});
+     const dispatcher=await page.locator('#article-impact-text').textContent();
+     assert.notEqual(driver,dispatcher,'Professional views must have distinct content');
+     await page.keyboard.press('Escape');
+     assert.equal(await page.locator('#newsdesk-impact-shade').isVisible(),false);
+     assert.equal(await page.locator('#article-dialog').isVisible(),true,'Escape closes analysis only');
+   }
    // On mobile, sharing must fit in the article, not need a fixed overlay or scrollbar.
    const order=await page.evaluate(()=>Object.fromEntries(['modaltitle','modalmeta','article-reading','article-original','article-share-footer'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
    assert.ok(order.modaltitle<order['article-reading'] && order['article-reading']<order['article-original'] && order['article-original']<order['article-share-footer'],`semantic reading flow ${JSON.stringify(order)}`);
