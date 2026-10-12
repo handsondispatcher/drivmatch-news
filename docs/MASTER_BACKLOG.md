@@ -1,4 +1,7 @@
 # DRIVMATCH ECOSYSTEM 360° — MASTER BACKLOG
+
+> **CORREÇÃO DE ESCOPO após acesso real ao app principal (12/10):** E360-02 (recuperação de visibilidade GitHub) está **CONCLUÍDA apenas para acesso read-only**; ainda falta auditoria de Cloudflare/Lovable e banco vivo. E360-18 não é `criar diretório`: é **auditar, fechar lacunas e escalar Marketplace existente**, inclusive `service_requests` e aprovação admin. E360-22 deve integrar/revisar fluxos **já presentes** de carreira/job invitations; E360-23 deve adaptar **DrivMe/requests existentes**; E360-25 deve partir dos **equipment listings existentes**. Não criar novo CRM, tabelas de users, auth ou Stripe por presunção. Documento de evidência: [APP_MAIN_READONLY_AUDIT_2026-10-12.md](APP_MAIN_READONLY_AUDIT_2026-10-12.md). Registrar revisão de `.env` versionado como P0 de segurança, sem ler ou expor segredo nos documentos.
+
 **Consolidado:** 2026-10-12 · **Estado:** proposta técnica/comercial em branch de documentação; nenhum item abaixo está marcado como entregue por este documento.  
 **Atenção:** o usuário já vende serviços, forma alunos, opera brokerage e divulga parceiros no Instagram; a estratégia é **integrar, provar e escalar**, não declarar que a operação ainda precisa "lançar" do zero.
 
