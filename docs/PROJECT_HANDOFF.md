@@ -1,4 +1,7 @@
 # DRIVMATCH ECOSYSTEM 360° — PROJECT HANDOFF
+
+> **STATUS NOVO / 12/10:** acesso à conta **DrivMatch** e ao privado `DrivMatch/drivmatch` confirmado nesta sessão; a conexão ao repo News da conta `handsondispatcher` permanece. Leia o inventário com evidências em [APP_MAIN_READONLY_AUDIT_2026-10-12.md](APP_MAIN_READONLY_AUDIT_2026-10-12.md). O Marketplace de providers, equipment, DrivMe/requests, driver/carrier/dispatcher e fluxos de lead já têm código; **não recriar**. O próximo passo não é reautorizar GitHub, e sim auditar fluxos reais, RLS, segurança e integração News→app. Nenhum site foi alterado.
+
 **Edição:** 2026-10-12  
 **Propósito:** continuar o trabalho em novos chats com ChatGPT/Gemini/Codex sem colar todo o histórico.  
 **IMPORTANTÍSSIMO:** este handoff resume um plano; ele não confirma produção, integração, contratos, pagamentos ou aprovação de lançamento.
