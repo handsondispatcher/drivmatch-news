@@ -885,6 +885,21 @@ body{background:#f7f9fc;color:#14283c}
 #article-dialog .article-impact-actions button:focus-visible{outline:3px solid #f0bd44;outline-offset:2px}
 #article-dialog #article-impact-note{font:12px/1.5 Arial,sans-serif;color:#536a7c;margin:12px 0 4px}
 #article-dialog #article-impact-text{font:14px/1.65 Arial,sans-serif;color:#17354b;white-space:pre-line;margin:0}
+/* News Desk: accessible pop-up professional analyses, distinct from sharing. */
+#article-dialog .newsdesk-actions{margin:17px 0;padding:15px;border:1px solid #c9dfef;background:#f4f9fd;border-radius:8px}
+#article-dialog .newsdesk-actions h3{font:700 17px/1.35 Arial,sans-serif;color:#163954;margin:0 0 11px}
+#article-dialog .article-impact-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#article-dialog .article-impact-actions button{min-height:45px;border:1px solid #91b6d0;border-radius:6px;background:white;color:#173d60;font:700 13px Arial,sans-serif}
+#article-dialog .article-impact-actions button:hover{border-color:#096ab8;background:#e6f4ff}
+.newsdesk-impact-shade:not([hidden]){position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:#051525b8;padding:16px;z-index:120}
+.newsdesk-impact-dialog{background:#fff;width:min(640px,100%);max-height:min(84vh,740px);overflow-y:auto;border-radius:12px;padding:24px;box-shadow:0 20px 70px #0005;color:#17354b}
+.newsdesk-impact-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.newsdesk-impact-head h2{font:700 21px/1.35 Georgia,serif;margin:0}
+#newsdesk-impact-close{font-size:26px;line-height:1;min-width:42px;min-height:42px;border-radius:5px;background:#ecf4fa;border:1px solid #c9dbe9}
+#article-impact-note{font:12px/1.5 Arial,sans-serif;color:#526879}
+#article-impact-text{font:15px/1.7 Arial,sans-serif;white-space:pre-line}
+.newsdesk-impact-source{margin-top:18px;padding-top:12px;border-top:1px solid #dce7ef;font:11px/1.5 Arial,sans-serif;color:#687d8e}
+.newsdesk-impact-dialog :focus-visible,#article-dialog .article-impact-actions button:focus-visible{outline:3px solid #d9a83d;outline-offset:3px}
 </style>
 </head>
 <body>
@@ -981,14 +996,12 @@ body{background:#f7f9fc;color:#14283c}
 <p id="translation" class="smalltext"></p>
 </section>
 <p id="modalbodytext"></p><p id="modalbrief" aria-label="Resumo do acesso à fonte"></p><p class="disclosure" id="article-disclosure"></p>
-<section class="article-impact" id="article-impact" aria-label="Análise profissional DrivMatch">
-<h3 id="article-impact-title">Impacto na profissão</h3>
-<div id="article-impact-actions" class="article-impact-actions" role="group" aria-label="Escolha a profissão">
-<button type="button" data-impact-role="driver" aria-pressed="true" class="selected">Motorista</button>
-<button type="button" data-impact-role="dispatcher" aria-pressed="false">Dispatcher</button>
+<section class="newsdesk-actions" aria-label="Análises profissionais News Desk">
+<h3>Como esta notícia impacta sua profissão?</h3>
+<div id="article-impact-actions" class="article-impact-actions" role="group" aria-label="Abrir análise por profissão">
+<button type="button" data-impact-role="driver" aria-haspopup="dialog">🚛 Motorista</button>
+<button type="button" data-impact-role="dispatcher" aria-haspopup="dialog">🎧 Dispatcher</button>
 </div>
-<p id="article-impact-note">Pontos de atenção, não consequências confirmadas.</p>
-<p id="article-impact-text" aria-live="polite"></p>
 </section>
 <section class="article-original" id="article-original" aria-label="Reportagem completa na fonte"><div id="article-source"></div></section>
 <section class="article-share-footer" id="article-share-footer" aria-label="Compartilhamento da notícia">
@@ -1009,11 +1022,17 @@ body{background:#f7f9fc;color:#14283c}
 </div></section>
 
 </div></article></div>
+<div class="newsdesk-impact-shade" id="newsdesk-impact-shade" hidden role="presentation">
+<section class="newsdesk-impact-dialog" role="dialog" aria-modal="true" aria-labelledby="article-impact-title" tabindex="-1">
+<div class="newsdesk-impact-head"><h2 id="article-impact-title">Análise News Desk</h2><button id="newsdesk-impact-close" type="button" aria-label="Fechar análise">×</button></div>
+<p id="article-impact-note"></p><div id="article-impact-text" aria-live="polite"></div>
+<p class="newsdesk-impact-source">Avaliação News Desk — confira os dados e links da matéria original antes de qualquer decisão operacional.</p>
+</section></div>
 <div class="story-preview-overlay" id="story-preview" hidden role="dialog" aria-modal="true" aria-labelledby="story-preview-title"><div class="story-preview-panel"><div class="story-preview-head"><strong id="story-preview-title">Prévia do Story</strong><button id="story-preview-close" type="button" aria-label="Fechar prévia">×</button></div><div class="story-preview-scroll"><img id="story-preview-image" alt="Prévia da imagem vertical da notícia para Stories"></div><div class="story-preview-actions"><a id="story-preview-download" download="drivmatch-news-story.png" href="#">Salvar imagem PNG</a><p id="story-preview-hint">Revise o card e depois publique no Instagram, TikTok ou Status do WhatsApp.</p></div></div></div>
 <script src="data/analytics-config.js" defer></script>
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-19-dispatchdesk-perspectives-20261011" defer></script>
+<script src="assets/app.js?v=v34-20-newsdesk-modal-20261011" defer></script>
 <script src="assets/road-tv-live.js?v=v34-18-durable-live-first-20261011" defer></script>
 <script src="assets/utility-strip.js?v=v34-11-national-weather-20261010" defer></script>
 <script src="assets/news-crawler.js?v=v34-10-20261010" defer></script>
