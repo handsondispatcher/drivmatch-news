@@ -180,7 +180,7 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(version['reader_ui']['no_article_count'])
   self.assertIn('id="count" hidden aria-hidden="true"',page)
   self.assertNotIn('Publicidade · DrivMatch',app)
-  self.assertIn('assets/app.js?v=v34-20-newsdesk-modal-',page)
+  self.assertIn('assets/app.js?v=v34-21-editorial-labels-',page)
   self.assertIn('assets/utility-strip.js?v=v34-11-',page)
   self.assertIn('function searchCity()', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
   self.assertIn('function officialForecast(', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
@@ -334,7 +334,7 @@ class PublicationTests(unittest.TestCase):
   self.assertEqual(parsed[0]['status'],'pending_review')
  def test_visual_and_weather(self):
   page=(BASE/'site/index.html').read_text()
-  for text in ['Panorama do Transporte','assets/logo-drivmatch-news.png','DrivMatch News — um produto da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
+  for text in ['Destaque','assets/logo-drivmatch-news.png','DrivMatch News — um produto da Hands On Dispatcher LLC','weather-mobile','weather-desktop','id="market-title"']:self.assertIn(text,page)
   self.assertLess(page.index('id="clima-desktop"'),page.index('id="roadtv-desktop"'))
   self.assertLess(page.index('id="roadtv-desktop"'),page.index('id="market-title"'))
   self.assertLess(page.index('id="clima-mobile"'),page.index('id="roadtv-mobile"'))
