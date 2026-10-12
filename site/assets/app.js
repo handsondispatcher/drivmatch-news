@@ -234,7 +234,7 @@
     featurePage=Math.min(featurePage,n-1);
     const hero=f[featurePage*featureSize]||f[0];
     const related=f.slice(featurePage*featureSize+1,featurePage*featureSize+4);
-    const relatedTitle=lang==='pt'?'Leia também':lang==='es'?'Lea también':'Read also';
+    const relatedTitle=lang==='pt'?'Leia Mais':lang==='es'?'Leer más':'Read More';
     $('features').innerHTML=hero
       ? `<div class="hero-wrap">${storyCard(hero,indexSet.get(hero.id),true,false)}</div>${related.length
         ? `<div class="related-rail" aria-label="${relatedTitle}"><div class="related-head">${relatedTitle}</div>${related.map(a=>storyCard(a,indexSet.get(a.id),true,true)).join('')}</div>` : ''}`
