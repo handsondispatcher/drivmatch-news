@@ -102,4 +102,36 @@ assert.ok(elements.features.innerHTML.includes('Driver rule update'),
 assert.ok(!elements.features.innerHTML.split('related-rail')[0].includes('NWS Weather Alert'),
   'NWS alert must not dominate the main feature while transport news exists');
 console.log('EDITORIAL MIX PASS: exclusive homepage slots, transport lead and no duplicate fixtures');
+// Reproduce the reported bug: source is English but reader selects Português.
+data.articles=[{
+ id:'translation-test',kind:'external_link',status:'external_source',demo:false,
+ category:'Fretes',source:'Fixture publisher',source_url:'https://example.org/trucking-story',
+ original_lang:'en',translated_langs:['pt','en','es'],
+ published_at:'2026-10-12T12:00:00Z',
+ locales:{
+  pt:{title:'Transporte americano tem novidades',summary:'',body:''},
+  en:{title:'American trucking has new developments',summary:'',body:''},
+  es:{title:'El transporte estadounidense presenta novedades',summary:'',body:''}
+ }
+}];
+elements.language.value='pt';
+elements.language.dispatch('change',{target:{value:'pt'}});
+elements.features.dispatch('click',{target:{closest:key=>({dataset:{story:'0'}})}});
+const publisherLinks=elements['article-source'].innerHTML;
+assert(publisherLinks.includes('translate.google.com/translate?sl=auto&amp;tl=pt&amp;u=https%3A%2F%2Fexample.org%2Ftrucking-story'),
+ 'Portuguese source button must use translation for every English-language publisher');
+assert(publisherLinks.includes('translate.google.com/translate?sl=auto&amp;tl=es&amp;u=https%3A%2F%2Fexample.org%2Ftrucking-story'),
+ 'Spanish source button must use translation for every English-language publisher');
+assert(publisherLinks.includes('href="https://example.org/trucking-story"'),
+ 'English original must remain directly accessible');
+assert(publisherLinks.includes('tradução automática'),
+ 'The reader must disclose that the translated publisher page is automatic');
+data.articles[0].original_lang='pt';
+elements.language.dispatch('change',{target:{value:'pt'}});
+elements.features.dispatch('click',{target:{closest:key=>({dataset:{story:'0'}})}});
+assert(elements['article-source'].innerHTML.includes('href="https://example.org/trucking-story"'),
+ 'When the original is already Portuguese, Portuguese must open the original');
+assert(elements['article-source'].innerHTML.includes('translate.google.com/translate?sl=auto&amp;tl=en'),
+ 'A Portuguese original must still offer English automatic translation');
+console.log('SOURCE TRANSLATION PASS: Portuguese/Spanish publisher links, original retained, fallback disclosed');
 console.log('CLIENT SMOKE PASS: panorama/mirrored mobile market/modal/Spanish full text; global language unchanged');

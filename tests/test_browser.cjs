@@ -30,7 +30,10 @@ const {spawn}=require('node:child_process');
        ]}};
      return route.fulfill({...base,body:JSON.stringify(result)});
    });
-   await page.goto('http://127.0.0.1:8765/',{waitUntil:'networkidle'});
+   // The newsroom continuously polls live sources/widgets. Network idle is not a reliable
+   // readiness signal, and timed out scheduled production deployments.
+   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
+   await page.locator('.brand img').waitFor({state:'visible'});
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
    assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.11','public page has v34.11 version');
    assert.equal(await page.locator('#site-version').isVisible(),false,'Internal release must not appear in public masthead');
