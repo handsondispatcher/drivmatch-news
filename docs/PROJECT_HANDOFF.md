@@ -1,5 +1,8 @@
 # DRIVMATCH ECOSYSTEM 360° — PROJECT HANDOFF
 
+
+> **NÃO REABRIR DEBATE SOBRE COBRANÇA AGORA — fundador esclareceu em 12/10/2026:** a ausência de pagamentos ativos dos usuários/prestadores é **cortesia estratégica de crescimento** já adotada por Ricardo. **Não ativar** Stripe/assinaturas/taxas/featured pagos; não qualificar ausência de pagamento como bug. Código de planos é capacidade/experimento futuro, não situação comercial vigente. **DrivMatch issue #1** é auditoria de segurança **somente antes de ligar cobrança futura**, não bloqueio de expansão gratuita. Preservar as atividades comerciais que o fundador já vende independentemente: cursos, consultoria e transporte. Ler D-016 em DECISION_LOG. Próximo foco: News→Marketplace já existente, campanhas de parceiros, geração e encaminhamento de leads, uso/recorrência/qualidade, não cobrar.
+
 > **STATUS NOVO / 12/10:** acesso à conta **DrivMatch** e ao privado `DrivMatch/drivmatch` confirmado nesta sessão; a conexão ao repo News da conta `handsondispatcher` permanece. Leia o inventário com evidências em [APP_MAIN_READONLY_AUDIT_2026-10-12.md](APP_MAIN_READONLY_AUDIT_2026-10-12.md). O Marketplace de providers, equipment, DrivMe/requests, driver/carrier/dispatcher e fluxos de lead já têm código; **não recriar**. O próximo passo não é reautorizar GitHub, e sim auditar fluxos reais, RLS, segurança e integração News→app. Nenhum site foi alterado.
 
 **Edição:** 2026-10-12  
