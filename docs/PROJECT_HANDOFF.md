@@ -16,7 +16,8 @@
 ## Repositórios e fronteira
 
 - News disponível: `handsondispatcher/drivmatch-news`, branch principal `main`, docs `docs/`.
-- Repositório principal citado: `DrivMatch/drivmatch`; em 12/10/2026 retornou 404 à conexão disponível: **acesso não confirmado**. Confirmar endereço e permissão antes de qualquer afirmação ou PR técnico.
+- **Aplicação principal já mapeada e anteriormente acessada:** repositório privado `DrivMatch/drivmatch` (branch `main`, snapshot `snapshot/p1-before-codex-2026-10-11`, commit histórico `b785ab3`), arquitetura React/Vite/TypeScript. Ricardo já concedeu acesso ao GitHub e Cloudflare em conversas anteriores. **Não pedir senhas/acessos novamente.** Em 12/10, apenas o conector GitHub desta conversa não lista o repositório privado (404); isso é limitação da sessão, não falta de informação do fundador.
+- **Lovable/Supabase:** Ricardo informou que o banco da aplicação é o Supabase disponibilizado pelo Lovable ("Supabase dentro da Lovable"); não criar instância adicional. **Cloudflare Pages:** projeto `drivmatch-app`, endereço `drivmatch-app.pages.dev` e domínio `drivmatch.com`, conectado ao repo principal e branch `main` segundo acesso anterior. Worker `drivmatch` é componente separado, não confundir com o Pages em produção; houve relato de falha de build Vite 5/Vite 6+ do Worker, não concluir que o site principal está quebrado.
 - Site principal: `https://drivmatch.com/`; News: `https://drivmatch.com/news/`. **URL de site não prova que função esteja homologada.**
 - Baseline News consultada: `v34.11`, `development_prelaunch`, `public_launch_approved=false`. Checar novamente a cada retomada.
 - Docs deste pacote foram propostas em branch `docs/ecosystem-360-master-20261012`; **não presumir merge** na `main` até consultar o PR.
@@ -36,7 +37,7 @@
 **Missão de inventário somente leitura, E360-01 e E360-02.**
 
 1. Revisar GitHub main/release, issues abertas, últimas execuções e evidências de teste da News.
-2. Conferir o repositório principal da DrivMatch se o acesso já existir, mapeando páginas/funcionalidades realmente existentes.
+2. Retomar o acesso **já autorizado** ao GitHub privado, Lovable/Supabase e Cloudflare Pages, mapeando páginas/funcionalidades existentes e verificando o estado atual, sem pedir nova senha nem novo briefing.
 3. Produzir tabela `FEATURE | ESTADO | URL/ARQUIVO | EVIDÊNCIA | FALTA | DONO` e reconciliar com backlog.
 4. Não duplicar issue nem instalar outro CRM/matching sem estudar o atual.
 5. Atualizar o `DECISION_LOG` ou propor PR separado documentando apenas fatos novos.
@@ -57,7 +58,7 @@ Preserve UX, logos e backups existentes. Nenhum deploy ou alteração na main.
 Tarefa desta execução: [ID e texto do backlog].
 Entregue: evidências, arquivos afetados, testes, riscos, dependências,
 próximo passo e decisões humanas necessárias.
-Se o app principal não estiver acessível, declare UNKNOWN e não invente.
+Se a sessão atual não alcançar o repo privado, registre LIMITAÇÃO DO CONECTOR DESTA SESSÃO; use contexto técnico anteriormente confirmado como histórico e não conclua que o acesso nunca foi liberado. Não peça credenciais ao fundador.
 ```
 
 ## Forma segura de trabalhar com Codex
@@ -76,4 +77,4 @@ Evidência da jornada completa `origem → conteúdo/oferta → clique → conse
 
 Ao concluir tarefa material: registrar data, status, evidência e PR/issue; atualizar backlog/decisions com mínimo necessário; manter histórico, não apagar bloqueadores para parecer que projeto está pronto. Se um documento antigo afirmar número conflitante, marcar divergência e buscar fontes primárias em vez de escolher o maior.
 
-**Próximo avanço imediato:** acesso/inspeção do app principal e auditoria de flows existentes, em paralelo às issues editoriais abertas. Publicação pública da News permanece bloqueada até aprovação humana expressa.
+**Próximo avanço imediato:** retomar a inspeção read-only do app principal pelos acessos já liberados e auditar os fluxos existentes, em paralelo às issues editoriais abertas. Publicação pública da News permanece bloqueada até aprovação humana expressa.
