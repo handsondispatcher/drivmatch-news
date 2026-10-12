@@ -1,4 +1,7 @@
 # DRIVMATCH ECOSYSTEM 360° — ECOSYSTEM MASTER
+
+> **ATUALIZAÇÃO AUDITADA 12/10:** o repositório privado principal `DrivMatch/drivmatch` foi acessado com a segunda conta GitHub. O app **já contém** Marketplace de providers, candidatura e aprovação, fluxo `Request a Quote`, equipamento/classificados, DrivMe, dashboards de driver/carrier/dispatcher, Stripe e Supabase. A classificação anterior de repositório principal `UNKNOWN` se refere à indisponibilidade **da conexão anterior**, agora resolvida. Ver [APP_MAIN_READONLY_AUDIT_2026-10-12.md](APP_MAIN_READONLY_AUDIT_2026-10-12.md). Sem testes de produção nesta inspeção; não duplicar estes módulos.
+
 **Data de consolidação:** 2026-10-12  
 **Estado:** proposta documental para revisão; sem autorização de deploy, novas cobranças ou lançamento público  
 **Escopo:** DrivMatch (plataforma/negócios) + DrivMatch News (mídia) + educação + parceiros + serviços + solicitações
