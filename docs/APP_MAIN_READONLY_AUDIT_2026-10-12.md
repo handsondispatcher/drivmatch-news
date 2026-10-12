@@ -1,6 +1,9 @@
 # Auditoria inicial SOMENTE LEITURA — aplicação principal DrivMatch
 **Data:** 2026-10-12  
 
+
+> **VALIDAÇÃO VISUAL E ESCLARECIMENTO DO FUNDADOR (12/10):** captura do Marketplace público em dispositivo móvel mostra categorias, providers destacados, a seção de serviços e aproximadamente 28 anúncios na listagem regular. O fundador esclareceu que **Ricardo realizou testes, mas clientes reais também efetuaram cadastros**. Portanto, a base é mista; **não** presumir que todos são testes, apagar registros ou ocultá-los em lote. O frontend em `src/pages/Marketplace.tsx` lê `marketplace_providers` com `is_active=true`; isso não distingue testes de clientes reais. Necessária conciliação controlada de dados por origem/consentimento/ownership e verificação das avaliações antes de eventual ação de curadoria, com aprovação do responsável. Próximo teste manual: abrir perfil de um prestador confirmado pelo fundador como real e conferir CTA de orçamento sem enviar dados pessoais de teste.
+
 > **CORREÇÃO DE INTERPRETAÇÃO / fundador, 12/10:** o sistema do Ricardo está propositalmente com **cobranças desativadas** por estratégia de cortesia para aumentar o número de participantes e acostumá-los à plataforma. Referências no código a Stripe/tiers/pricing não constituem falha operacional por não cobrarem e não devem justificar ativação. O potencial ponto técnico de atualização de benefícios pagos deve ser analisado **quando** for decidida a monetização, conforme [DrivMatch issue #1](https://github.com/DrivMatch/drivmatch/issues/1), sem prejuízo das verificações normais de RLS e segurança. Serviços comerciais diretos já vendidos pelo fundador permanecem fora dessa interpretação de gratuidade do app.
 
 **Fonte:** repositório privado `DrivMatch/drivmatch`, conectado à conta `DrivMatch`; inspeção do `main` por GitHub; **não** executou deploy, login, consulta direta ao Supabase nem teste de visitante real.  
