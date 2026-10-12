@@ -25,7 +25,10 @@
 | D-009 | REPO_FACT | `content/release.json` na inspeção de 12/10: News v34.11 / `public_launch_approved=false` | Public launch ainda requer issue #18 e evidência |
 | D-010 | REPO_FACT | News tem histórico de backups v32/v33 e v34.x com proibições de regressão | Preservar layout, identidade, funcionalidades e backups; PRs de baixo escopo |
 | D-011 | REPO_FACT | Issues #59/#36/#35/#88 reportam falhas/restrições de vídeo e frescor editorial; abertas na inspeção | Não considerar build verde confirmação de player ao vivo ou notícia nova |
-| D-012 | REPO_FACT | `DrivMatch/drivmatch` retornou 404 na conexão disponível em 12/10 | Engenharia do app principal: UNKNOWN até recuperar acesso |
+| D-012 | REPO_FACT (LIMITAÇÃO DO CONECTOR ATUAL) | `DrivMatch/drivmatch` retornou 404 ao conector do chat em 12/10, **mas** histórico 09–11/10 registra acesso anterior em navegador autorizado, repo privado e Pages em Cloudflare | Não pedir acesso de novo; apenas retomar inspeção autorizada e conferir estado atual |
+
+| D-013 | PREVIOUS_SESSION_RECORDED | Ricardo informou: banco no Lovable é Supabase; GitHub privado `DrivMatch/drivmatch`; Cloudflare Pages `drivmatch-app` no domínio principal. Em 11/10 registrado snapshot `snapshot/p1-before-codex-2026-10-11` / commit `b785ab3`; não confirmado novamente nesta sessão | Preservar topologia conhecida; não recriar banco, não misturar Worker separado com Pages principal |
+| D-014 | FOUNDER_DIRECTIVE | Ricardo já forneceu acessos e senhas nas interações anteriores; não solicitar novamente | Usar canais/ambientes autorizados existentes e não publicar credenciais em documentação |
 
 ## Hipóteses e propostas ainda NÃO aprovadas
 
@@ -44,7 +47,7 @@
 
 | ID | Questão | Opções sem pressupor resposta | Gate/dependência |
 |---|---|---|---|
-| R-001 | Qual é o repositório/instância oficial do app DrivMatch? | Acesso à URL correta por integração GitHub ou revisão assistida read-only | E360-02 |
+| R-001 | Como retomar a auditoria técnica dos ambientes já liberados pelo Ricardo? | Usar GitHub privado `DrivMatch/drivmatch` + Lovable/Supabase + Cloudflare Pages no ambiente autorizado; checar HEAD, deploy e schema, sem pedir senhas novamente | E360-02 |
 | R-002 | Quais serviços têm preço, operador, formulário e contrato vigentes? | Catálogo por operação, não por ideia de produto | E360-08, G-SERVICES |
 | R-003 | Qual a finalidade legítima das bases de contatos para campanhas? | Contato individual legítimo, opt-in renovado, apenas atendimento de contrato; avaliar cada caso | E360-10, G-DATA |
 | R-004 | Como parceiros existentes são remunerados ou divulgados? | Cortesia, anúncio contratado, patrocinador, referral quando permitido, outros | E360-16, G-PARTNERS |
