@@ -249,7 +249,12 @@
       const target=firstDot+i;
       return `<button type="button" class="carousel-dot ${target===featurePage?'active':''}" data-slide="${target}" aria-label="${slideLabel} ${target+1} / ${n}" aria-pressed="${target===featurePage}" ${target===featurePage?'aria-current="page"':''}></button>`;
     }).join('');
-    const reserved=new Set([hero,...related].filter(Boolean).map(a=>a.id));
+    // Reserve ALL carousel leads (not just the current slide) plus their read-more
+    // companions. Older reports remain in the lower archive without hero repeats.
+    const heroIds=new Set(Array.from({length:n},(_,i)=>f[i*featureSize]).filter(Boolean).map(a=>a.id));
+    const readMoreIds=new Set();
+    for(let i=0;i<n;i++)f.slice(i*featureSize+1,i*featureSize+4).forEach(a=>readMoreIds.add(a.id));
+    const reserved=new Set([...heroIds,...readMoreIds]);
     const shortlist=f.filter(a=>!reserved.has(a.id)).slice(0,5);
     shortlist.forEach(a=>reserved.add(a.id));
     const feed=f.filter(a=>!reserved.has(a.id));
@@ -381,8 +386,8 @@
   };
   function renderImpact(){
     if(!opened)return;
-    const panel=$('article-impact'),buttons=$('article-impact-actions');
-    if(!panel||!buttons)return;
+    const buttons=$('article-impact-actions');
+    if(!buttons)return;
     const language=articleLang,persona=impactAudience;
     const isDriver=persona==='driver';
     const byLanguage=opened.professional_impact?.[persona];
@@ -398,11 +403,7 @@
     $('article-impact-title').textContent=header;
     $('article-impact-note').textContent=verifiedText?'Análise editorial vinculada à matéria.':intro;
     $('article-impact-text').textContent=verifiedText||context||fallback;
-    buttons.querySelectorAll('[data-impact-role]').forEach(button=>{
-      const selected=button.dataset.impactRole===persona;
-      button.setAttribute('aria-pressed',String(selected));
-      button.classList.toggle('selected',selected);
-    });
+
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
     const storyPhoto=licensedPhotoOf(opened);
@@ -737,12 +738,15 @@
     $('list').addEventListener('click',clickArticle);$('features').addEventListener('click',clickArticle);$('highlightList').addEventListener('click',clickArticle);
     const keyArticle=e=>{if(e.key==='Enter'||e.key===' '){const item=e.target.closest('[data-story]');if(item){e.preventDefault();clickArticle({target:item});}}};
     $('list').addEventListener('keydown',keyArticle);$('features').addEventListener('keydown',keyArticle);$('highlightList').addEventListener('keydown',keyArticle);
-    $('article-impact-actions').addEventListener('click',e=>{const button=e.target.closest('[data-impact-role]');if(!button)return;impactAudience=button.dataset.impactRole;renderImpact();track('news_impact_view',{...storyInfo(opened),audience:impactAudience});});
+    const dismissImpact=()=>{$('newsdesk-impact-shade').hidden=true;$('article-impact-actions').querySelector('[data-impact-role="'+impactAudience+'"]')?.focus();};
+    $('article-impact-actions').addEventListener('click',e=>{const button=e.target.closest('[data-impact-role]');if(!button)return;impactAudience=button.dataset.impactRole;renderImpact();$('newsdesk-impact-shade').hidden=false;$('newsdesk-impact-close').focus();track('news_impact_view',{...storyInfo(opened),audience:impactAudience});});
+    $('newsdesk-impact-close').addEventListener('click',dismissImpact);
+    $('newsdesk-impact-shade').addEventListener('click',e=>{if(e.target===$('newsdesk-impact-shade'))dismissImpact();});
     $('articleLanguageButtons').addEventListener('click',e=>{const b=e.target.closest('[data-article-lang]');if(!b)return;articleLang=b.dataset.articleLang;renderArticle();});
     $('shade').addEventListener('click',e=>{if(e.target===$('shade'))closeModal();});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('newsdesk-impact-shade').hidden)dismissImpact();else closeModal();}else if(e.key==='Tab'&&!$('newsdesk-impact-shade').hidden){e.preventDefault();$('newsdesk-impact-close').focus();}});
     // v18 uses onclick="closeModal()" on dialog close button.
-    const closeModal=()=>{$('shade').classList.remove('open');opened=null;};window.closeModal=closeModal;
+    const closeModal=()=>{$('newsdesk-impact-shade').hidden=true;$('shade').classList.remove('open');opened=null;};window.closeModal=closeModal;
     window.translateTo=l=>{articleLang=l;renderArticle();};
     languageSet('pt');
     openSharedStory();
