@@ -249,11 +249,10 @@
       const target=firstDot+i;
       return `<button type="button" class="carousel-dot ${target===featurePage?'active':''}" data-slide="${target}" aria-label="${slideLabel} ${target+1} / ${n}" aria-pressed="${target===featurePage}" ${target===featurePage?'aria-current="page"':''}></button>`;
     }).join('');
-    // Reserve ALL carousel leads (not just the current slide) plus their read-more
-    // companions. Older reports remain in the lower archive without hero repeats.
-    const heroIds=new Set(Array.from({length:n},(_,i)=>f[i*featureSize]).filter(Boolean).map(a=>a.id));
-    const readMoreIds=new Set(related.map(a=>a.id));
-    const reserved=new Set([...heroIds,...readMoreIds]);
+    // A story appears in exactly one currently visible section.
+    // Recompute on every carousel movement: older stories stay below until
+    // they are promoted to the visible lead or Read More rail.
+    const reserved=new Set([hero,...related].filter(Boolean).map(a=>a.id));
     const shortlist=f.filter(a=>!reserved.has(a.id)).slice(0,5);
     shortlist.forEach(a=>reserved.add(a.id));
     const feed=f.filter(a=>!reserved.has(a.id));
