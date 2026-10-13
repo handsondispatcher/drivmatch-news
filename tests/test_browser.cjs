@@ -422,6 +422,7 @@ const {spawn}=require('node:child_process');
    assert.ok(!waText.includes('Manchete e contexto no DrivMatch News'),'No generic summary should displace the WhatsApp photo/title');
    assert.ok(!waText.includes('news.google.com/rss/'));
    assert.equal((waText.match(/https:\/\//g)||[]).length,1,'One unambiguous clickable link per message');
+   assert.ok(waText.endsWith('?v=og-photo-top-20261013-r3'), 'New WhatsApp URL must invalidate previous image-less preview');
    if(width===1440){
     await page.locator('#share-story').click();
     await page.locator('#story-preview').waitFor({state:'visible',timeout:15000});
