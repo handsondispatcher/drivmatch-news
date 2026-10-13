@@ -406,7 +406,7 @@
       :language==='es'
       ?'El titular no confirma un cierre, desvío o retraso de la carretera.'
       :'A manchete não confirma interdição, desvio ou atraso na rodovia.';
-    const lack=language==='en'?'No article-specific professional analysis has been verified.':language==='es'?'No se ha verificado un análisis profesional específico de esta noticia.':'Não há análise profissional específica desta notícia verificada pela redação.';
+    const lack=language==='en'?'No article-specific professional analysis has been verified.':language==='es'?'No se ha verificado un análisis profesional específico de esta noticia.':'Não há análise profissional específica desta notícia verificada pela redação; a manchete não confirma impacto específico.';
     const verifiedIntro=language==='en'?'Verified editorial perspective:':language==='es'?'Perspectiva editorial revisada:':'Análise editorial vinculada à matéria:';
     const sourceIntro=language==='en'?'Context limited to the source headline; not a confirmed operational alert.':language==='es'?'Contexto basado solo en el titular; no es una alerta operacional confirmada.':'Contexto limitado à manchete da fonte; não é alerta operacional confirmado.';
     $('article-impact-title').textContent=language==='en'?'Professional perspective':language==='es'?'Impacto profesional':'Impacto na profissão';
@@ -448,7 +448,9 @@
     const heading=articleLang==='pt'?'LER NO DRIVMATCH NEWS':articleLang==='es'?'LEER EN DRIVMATCH NEWS':'READ ON DRIVMATCH NEWS';
     const sourceLabel=originalSourceLang==='pt'?'Português':originalSourceLang==='es'?'español':'English';
     const originalTitle=articleLang==='pt'?'Abrir reportagem original em '+sourceLabel+' ↗':articleLang==='es'?'Abrir noticia original en '+sourceLabel+' ↗':'Open original publisher report ('+sourceLabel+') ↗';
-    const sourceWarning=articleLang==='pt'?'A leitura acima resume somente as informações disponíveis na manchete. Não é tradução integral nem análise verificada do conteúdo original.':articleLang==='es'?'El texto anterior se basa solamente en el titular disponible; no es una traducción completa.':'The text above is based on the available headline only; it is not a full translated publisher report.';
+    const sourceWarning=isExternal
+      ?(articleLang==='pt'?'A leitura acima usa somente a manchete disponível; não é tradução integral da fonte.':articleLang==='es'?'Este texto usa solo el titular disponible; no es una traducción íntegra.':'This is a headline-only brief, not a full translated publisher report.')
+      :(articleLang==='pt'?'Texto editorial da DrivMatch News; a publicação original permanece disponível na fonte.':articleLang==='es'?'Texto editorial de DrivMatch News; la fuente original está disponible.':'DrivMatch News editorial text; the publisher source remains available.');
     const originalLink=src?'<a class="article-original-link" href="'+escapeHTML(src)+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(originalTitle)+'</a>':'';
     $('article-source').innerHTML='<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+buttons+'</div>'+originalLink+'<p class="source-access-warning">'+sourceWarning+'</p><p class="source-access-short">'+sourceWarning+'</p>';
     const attribution=storyPhoto||opened;
