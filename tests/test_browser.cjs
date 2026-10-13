@@ -434,8 +434,10 @@ const {spawn}=require('node:child_process');
    await page.locator('#share-native').click();
    assert.equal(await page.locator('#share-options').isVisible(),false);
    assert.equal(await page.locator('#article-reading [data-article-lang]').count(),3);
-   const langGrid=await page.locator('.source-translations').evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(' ').length);
-   assert.equal(langGrid,3,'The source links must stay on a single row, also at 768px');
+   assert.equal(await page.locator('#article-source .source-translations').count(),0,
+     'Approved three-language articles must not render a redundant second language toolbar');
+   assert.equal(await page.locator('#article-source a.article-original-link').count(),1,
+     'Approved article must retain a direct link to the original report');
    assert.equal(await page.locator('#article-disclosure').isVisible(),false);
    const ptTitle=await page.locator('#modaltitle').textContent();
    await page.locator('[data-article-lang="es"]').click();
