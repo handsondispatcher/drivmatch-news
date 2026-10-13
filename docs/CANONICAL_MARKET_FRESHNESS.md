@@ -49,3 +49,14 @@ Owner approval: "Aprovado / Ativar / Salvar" — 2026-10-13. This policy superse
 - **Self-audit:** scripts/audit_market.py records the actual provider state and detects source-publication lag, including EIA weekly release-day adjustments. GitHub Actions opens/updates one persistent [Market Watch] issue when feeds are late, quotes invalid or an upstream build fails before the audit; it closes only after recovery. Never silently close an active source failure.
 - **Protected scope:** No advertising artwork, placement, newspaper typography, editorial order, or unrelated products may be changed by market-feed maintenance.
 - **Acceptance gate:** Successful commit alone is not proof that drivmatch.com/news is updated. Confirm the scheduled workflow succeeds, public market JSON carries new observation dates, and the same values plus their status are displayed in the rendered desktop/mobile header and market panel.
+
+## Canonical compact market presentation — approved 2026-10-13
+
+- The public quote strip and market sidebar MUST show only **instrument name + valid current/reference price + percentage change**. Never print long paragraphs, audit explanations, observation dates or third-party comparison links beneath these three values.
+- Source, true observation time, instrument type, freshness classification and errors remain in the data contract, behind-the-scenes audit, a readable HTML title/accessible text and GitHub Market Watch. Do not delete the underlying provenance to simplify visual layout.
+- In the same slot, changing market data updates the values and variations in place. When unchanged at source, preserve the legitimate last verified close or last published weekly diesel reference. Do not simulate tick-by-tick pricing for weekly diesel.
+- **USD/BRL:** when only BCB PTAX is available, call it "Dólar PTAX", never label it "Dólar comercial". A commercial spot label requires actual licensed commercial quote data.
+- **Brent:** if the most recent EIA physical Brent data is classified historical, do NOT show that historic numeric value as a current market price. Render an em dash until a genuinely current source observation or separately licensed Brent feed is available. Keep the older value in diagnostics, not in the customer quote.
+- Keep all three slots visible, with an em dash on unavailable values. No fabricated numbers, no legal/technical paragraphs in public UI.
+- Preserve mobile compact scale, no new lines beneath the price. PT/EN/ES must follow the same rules. Tests must enforce no visible market-provenance footers and no historical Brent marketed as live.
+- This is only a presentation adjustment; changing the HTML does not activate unlicensed real-time providers. Publication success requires the public-domain parity and source freshness checks, not a GitHub commit alone.
