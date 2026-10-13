@@ -511,7 +511,7 @@ def build(offline=False):
         if approved.get('status')!='owner_approved_asset_pending_repo':
             continue
         rel=approved.get('asset','')
-        if not re.fullmatch(r'assets/ads/carhauler-photo1-(?:pt|es)-approved-20261013\\.png',rel):
+        if not re.fullmatch(r'assets/ads/carhauler-photo1-(?:pt|es)-approved-20261013\.png',rel):
             raise ValueError('Invalid localized artwork path')
         target=ROOT/'site'/rel
         if target.exists():
