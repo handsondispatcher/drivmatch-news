@@ -307,8 +307,10 @@ jobs:
           if not candidates:
               print('::warning::WHATSAPP PREVIEW NOT EXERCISED: no eligible external news source')
           for story in candidates[:1]:
-              url='https://handsondispatcher.github.io/drivmatch-news/share/'+story['id']+'/'
-              image=url+'social.jpg'
+              root='https://handsondispatcher.github.io/drivmatch-news/share/'+story['id']+'/'
+              suffix='?v=og-photo-top-20261013-r3'
+              url=root+suffix
+              image=root+'social.jpg'+suffix
               headers={'User-Agent':'facebookexternalhit/1.1','Accept':'text/html,image/jpeg,*/*'}
               def fetch(uri):
                   last=None
