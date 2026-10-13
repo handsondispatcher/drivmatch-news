@@ -25,17 +25,34 @@ function marketFresh(v,key){
    return age<=21*86400000;
  return age<=({usd:5,diesel:12,brent:5}[key]*86400000);
 }
+// TradingView's own embeddable ticker is the public data provider for FX
+// and ICE Brent futures. No unlicensed widget scraping or fabricated ticks.
+function initializeTradingViewMarket(){
+ if(typeof window==='undefined'||!window.customElements||
+    !window.customElements.whenDefined)return;
+ const loader=window.customElements.whenDefined('tv-tickers');
+ const cutoff=new Promise(resolve=>setTimeout(()=>resolve(false),10000));
+ Promise.race([loader.then(()=>true),cutoff]).then(ready=>{
+  if(!ready)return;
+  for(const key of ['usd','brent']){
+   const host=el('top-'+key+'-tradingview');
+   if(host)host.hidden=false;
+  }
+ }).catch(()=>{});
+}
 // MARKET_QUOTE_UI_RELEASE: compact-prices-only-20261013
 function showMarket(){
  const l=lang(),localized=(pt,en,es)=>l==='en'?en:l==='es'?es:pt;
- const freshSpot=marketFresh(spot,'usd')&&spot?.session_status==='open';
- const usd=freshSpot?spot:market.usdbrl;
+ const freshSpot=marketFresh(spot,'usd')&&spot?.instrument==='spot'&&spot?.session_status==='open';
+ const publicSpot=market.usdbrl?.instrument==='spot'&&marketFresh(market.usdbrl,'usd')
+  ?market.usdbrl:null;
+ // PTAX is a different BCB reference, NOT a commercial-market price.
+ // Keep PTAX only in the diagnostic dataset, not as a false live USD quote.
+ const usd=freshSpot?spot:publicSpot;
  const liveBrent=marketFresh(brentSpot,'brent')&&brentSpot?.instrument==='brent_spot';
  const brent=liveBrent?brentSpot:market.brent;
  // Never relabel an official PTAX reference as a traded commercial quote.
- el('top-usd-label').textContent=usd?.instrument==='ptax_reference'
-  ?localized('Dólar PTAX','USD PTAX','Dólar PTAX')
-  :localized('Dólar comercial','USD / BRL','Dólar comercial');
+ el('top-usd-label').textContent=localized('Dólar','US Dollar','Dólar');
  el('top-diesel-label').textContent=localized('Diesel nos EUA','US Diesel','Diésel en EE. UU.');
  el('top-brent-label').textContent=localized('Petróleo Brent','Brent Crude Oil','Petróleo Brent');
  const values=[
@@ -362,6 +379,7 @@ function init(){
  el('language')?.addEventListener('change',()=>{showMarket();showCity();setSearchLocale()});
  document.addEventListener('drivmatch:language',()=>{showMarket();showCity();setSearchLocale()});
  if(location.protocol.startsWith('http')){
+   initializeTradingViewMarket();
    weather();quotes();live();liveBrent();loadPlaces();
    setInterval(weather,15*60000);setInterval(quotes,60*1000);setInterval(live,15000);setInterval(liveBrent,15000);
  }
