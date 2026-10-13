@@ -71,6 +71,14 @@ function showMarket(){
      a.textContent=localized(' · Ver Brent negociado (futuros)',' · View traded Brent (futures)',' · Ver Brent negociado (futuros)');
      meta.appendChild(a);
    }
+   if(item.id==='usd'){
+     // UOL is an independent reader cross-check, NOT an unlicensed quote feed.
+     const verify=document.createElement('a');
+     verify.href='https://economia.uol.com.br/cotacoes/cambio/';
+     verify.target='_blank';verify.rel='noopener noreferrer';
+     verify.textContent=localized(' · Conferir dólar na UOL',' · Cross-check at UOL',' · Comprobar dólar en UOL');
+     meta.appendChild(verify);
+   }
    meta.title=source;value.title=source;
  }
 }
