@@ -489,7 +489,7 @@
     $('share-label').textContent=next==='en'?'Share':next==='es'?'Compartir':'Compartilhar';
     $('share-section-title').textContent=next==='en'?'Share this story':next==='es'?'Comparte esta noticia':'Compartilhe esta notícia';
     $('share-copy').textContent=next==='en'?'Copy link':next==='es'?'Copiar enlace':'Copiar link';
-    $('share-whatsapp-copy').textContent=next==='en'?'WhatsApp Web already open? Copy message to paste in your chat':next==='es'?'¿Ya tienes WhatsApp Web abierto? Copia el mensaje':'Já está no WhatsApp Web? Copiar mensagem para colar na conversa';
+    $('share-whatsapp-copy').textContent=next==='en'?'WhatsApp open? Copy preview link':next==='es'?'¿Ya tienes WhatsApp abierto? Copia el enlace':'WhatsApp aberto? Copiar link com foto';
     $('share-story-label').textContent=next==='en'?'Story image':next==='es'?'Imagen Story':'Card Stories';
     $('share-system-label').textContent=next==='en'?'Other apps':next==='es'?'Otras apps':'Outros apps';
     $('share-stories-hint').textContent=next==='en'?'Stories: save the image and publish it in your app. Not an automatic post.':next==='es'?'Historias: guarda la imagen y publícala en tu app. No se publica automáticamente.':'Stories: salve a imagem e publique no seu aplicativo. Não há publicação automática em Stories.';
@@ -559,6 +559,7 @@
         }
       }
       renderStories();
+      renderAds(); // Refresh owner-approved banners after content.json updates.
       if(opened)renderArticle();
       openSharedStory();
     }catch(e){/* Keep last successfully loaded issue when offline. */}
@@ -596,10 +597,15 @@
     const storyInfo=story=>({article_id:story?.id,article_category:story?.category,article_source:story?.source});
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){track('news_article_open',storyInfo(opened));renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function'){track('news_source_click',storyInfo(opened));window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');}};
     const shareText=()=>opened?cleanHeadline(localeOf(opened,lang)?.title||'DrivMatch News'):'DrivMatch News';
-    // WhatsApp needs one complete HTTPS share-page URL for its image preview.
-    // Avoid extra generic context that displaces the headline and confuses crawlers.
-    // WhatsApp's *...* syntax bolds the visible headline in the message.
-    const whatsappMessage=(title,url)=>'*'+String(title||'').replace(/[\\*_`~]/g,'').trim()+'*\n\n'+url;
+    // WhatsApp rich cards require a SINGLE, complete HTTPS URL in the message.
+    // The crawler builds the photo/headline card from og:image and og:title.
+    // Do not prepend a headline, copy a relative route or depend on an app
+    // interpreting an extra text fragment before it recognizes the link.
+    const whatsappMessage=(_title,url)=>{
+      const valid=/^https:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\/[a-zA-Z0-9-]+\/\?v=[a-zA-Z0-9-]+$/;
+      if(!valid.test(url))throw new Error('Invalid absolute WhatsApp preview URL');
+      return url;
+    };
     const shareOptions=$('share-options');
     const shareDestinations=(title,url)=>({
       whatsapp:(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'')?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent(whatsappMessage(title,url)),
@@ -636,7 +642,7 @@
     };
     $('share-whatsapp-copy').addEventListener('click',async()=>{
       if(!opened)return;
-      try{await copyToClipboard(shareMessage());pickerFeedback.textContent=lang==='en'?'Message copied. Paste it in your open WhatsApp Web chat.':lang==='es'?'Mensaje copiado. Pégalo en tu conversación abierta de WhatsApp Web.':'Mensagem copiada. Cole na conversa que já está aberta no WhatsApp Web.';}
+      try{await copyToClipboard(shareMessage());pickerFeedback.textContent=lang==='en'?'Full HTTPS link copied. Paste it into WhatsApp to display the photo preview.':lang==='es'?'Enlace HTTPS copiado. Pégalo en WhatsApp para mostrar la foto.':'Link HTTPS completo copiado. Cole no WhatsApp para exibir a prévia com foto.';}
       catch(_){pickerFeedback.textContent=lang==='en'?'Copy the headline and link manually.':lang==='es'?'Copia el titular y el enlace manualmente.':'Não foi possível copiar automaticamente. Use Copiar link.';}
     });
     let storyPreviewBlobUrl=null;
@@ -735,7 +741,7 @@
       if(!opened)return;
       const title=shareText(),url=shareUrlOf(opened);
       if(typeof navigator.share==='function'){
-        try{await navigator.share({title,url});}catch(e){if(e?.name!=='AbortError')$('share-feedback').textContent=lang==='pt'?'Use uma das opções acima ou copie o link.':'Choose a destination above or copy the link.';}
+        try{await navigator.share({url});}catch(e){if(e?.name!=='AbortError')$('share-feedback').textContent=lang==='pt'?'Use uma das opções acima ou copie o link.':'Choose a destination above or copy the link.';}
       }else $('share-feedback').textContent=lang==='pt'?'Escolha uma rede acima ou copie o link.':'Choose a network above or copy the link.';
     });
     $('share-copy').addEventListener('click',async()=>{

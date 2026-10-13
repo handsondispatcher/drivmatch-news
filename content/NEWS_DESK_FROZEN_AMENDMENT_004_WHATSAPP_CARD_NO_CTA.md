@@ -30,3 +30,6 @@ The receiving app itself makes the card clickable; don't depict a fake button. T
 
 ## Change governance
 Changing this no-CTA rule requires explicit founder approval, a versioned amendment and regression tests. No future automated layout or share-card optimization may silently restore promotional overlay controls.
+
+## Absolute-link-only WhatsApp delivery invariant (2026-10-13)
+When a reader taps WhatsApp, share exactly ONE absolute `https://handsondispatcher.github.io/drivmatch-news/share/{article_id}/?v={preview_version}` URL. Never add an extra title, Markdown, summary or relative `/news/share/` route. WhatsApp renders the image and bold headline from publicly crawlable Open Graph metadata. Android, WhatsApp Web, clipboard fallback and native share must obey this URL-only rule. Keep the no-CTA image and require Samsung/Android regression checks. Actual app preview remains subject to WhatsApp parsing/cache.
