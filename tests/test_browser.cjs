@@ -310,6 +310,15 @@ const {spawn}=require('node:child_process');
    }
    // CANONICAL MARKET UI: values and percentages only. Source timestamps
    // stay in DOM accessibility metadata, not as three large footer lines.
+   assert.equal(await page.locator('#top-usd-tradingview tv-tickers[symbols="FX_IDC:USDBRL"]').count(),1,
+     'USD/BRL must use a verified native TradingView forex widget, not PTAX displayed as spot');
+   assert.equal(await page.locator('#top-brent-tradingview tv-tickers[symbols="ICEEUR:BRN1!"]').count(),1,
+     'Brent traded futures must use the real ICE contract through native widget');
+   assert.equal(await page.locator('#top-usd-label').innerText(),'Dólar','No PTAX label in the headline');
+   assert.equal(await page.locator('#top-usd-date').getAttribute('hidden')!==null,true,
+     'Historical exchange reference details never appear below dollar quote');
+   assert.equal(await page.locator('#top-brent-date').getAttribute('hidden')!==null,true,
+     'No Brent source paragraphs under headline');
    for(const id of ['top-usd-date','top-diesel-date','top-brent-date']){
      const metadata=await page.locator('#'+id).evaluate(el=>{
        const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
