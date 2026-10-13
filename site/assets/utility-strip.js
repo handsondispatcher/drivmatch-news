@@ -50,7 +50,7 @@ function showMarket(){
    chg.classList.toggle('negative',pct!==null&&pct<0);
    chg.textContent=pct===null?'':(pct>0?'+':'')+number(pct,2)+'%';
    const kind=item.id==='usd'
-     ?v?.instrument==='ptax_reference'?localized('PTAX oficial de referência','Official PTAX reference','Referencia PTAX oficial')
+     ?v?.instrument==='ptax_reference'?(v?.session_status==='reference_intraday'?localized('PTAX — boletim parcial de hoje','PTAX — latest intraday bulletin','PTAX — boletín parcial de hoy'):localized('PTAX oficial de referência','Official PTAX reference','Referencia PTAX oficial'))
       :v?.session_status==='open'?localized('Cotação comercial','Commercial live snapshot','Cotización comercial')
       :localized('Último fechamento comercial','Last commercial close','Último cierre comercial')
      :item.id==='diesel'?localized('Último relatório semanal EIA','Latest weekly EIA release','Último informe semanal EIA')
