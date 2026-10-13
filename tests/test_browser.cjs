@@ -143,9 +143,10 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#market-commercial-banner .ucr-wa').getAttribute('href').then(x=>x.startsWith('https://wa.me/19082913386')),true,'UCR sidebar WhatsApp opens advertiser chat');
    assert.equal(await page.locator('#market-commercial-banner .ucr-ig').getAttribute('href'),'https://ig.me/m/fabriciodispatcher','UCR sidebar Instagram opens Direct');
    // Source master has three lower-row images separated by white gutters.
-   // Lock the crop positions in BOTH square UCR renderers (desktop and mobile).
+   // Verify exact crop positions for the approved sidebar square in all three languages.
+   // The lower UCR is landscape-only at all responsive widths.
    const checkUcrSquareCrop=async (language,position)=>{
-     for(const selector of ['#market-commercial-banner .ucr-frame-square .ucr-visual','#news-carhauler-banner .ucr-approved-art']){
+     for(const selector of ['#market-commercial-banner .ucr-frame-square .ucr-visual']){
        const style=await page.locator(selector).getAttribute('style');
        assert.ok(style.includes('background-size:454.202% auto'),language+' square art has original aspect ratio');
        assert.ok(style.includes('background-position:'+position+' 100%'),language+' square UCR art excludes the white source gutter at '+selector);

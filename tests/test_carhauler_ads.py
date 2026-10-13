@@ -59,7 +59,7 @@ class AdvertisingCampaigns(unittest.TestCase):
     self.assertEqual(rect[3]-rect[1],364)
     self.assertAlmostEqual(x/(2162-476)*100,float(pos.rstrip('%')),delta=0.01)
     self.assertIn("square:{size:'454.202% auto',pos:'"+pos+" 100%'}",js)
-  self.assertIn("const squareBg=",js)
+  self.assertIn("const bg=",js)
   self.assertIn("const crop=(crops[lang]||crops.pt)[isWide?'horizontal':'square']",js)
   self.assertIn("ucr-frame-square",js)
  def test_official_master_asset_immutable(self):

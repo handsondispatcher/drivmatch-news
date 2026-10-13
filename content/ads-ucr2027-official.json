@@ -13,8 +13,8 @@
     "es"
   ],
   "placements": [
-    "market-sidebar (approved square)",
-    "news-carhauler (approved horizontal crop, all screen sizes)"
+    "market-sidebar (square)",
+    "news-carhauler (horizontal at all viewports)"
   ],
   "crops": {
     "pt": {
@@ -101,7 +101,7 @@
         727
       ]
     },
-    "validation": "All three square crops preserve the 476x364 artwork and its aspect ratio, exclude white separator gutters, and retain the original art and CTA hotspots. Test both desktop sidebar and mobile square."
+    "validation": "All three 476x364 square crops exclude white separator gutters and retain approved artwork and CTA hotspots. Verify PT, EN and ES in the sidebar; reuse the same coordinates if a square mobile slot is enabled in the future."
   },
   "immutable_creative": true,
   "creative_drift_prohibited": true
