@@ -135,7 +135,19 @@ jobs:
           key: census-places-2025-v1
       - name: Validar cidades do Censo e gerar índice público
         run: python scripts/build_us_places.py
+      # Keep independently license-verified JPEGs across frequent (10m) updates,
+      # without re-downloading hundreds of Commons photos on every publication.
+      - name: Identificador diário de cache fotográfico licenciado
+        run: echo "NEWS_PHOTO_CACHE_DAY=$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
+      - name: Reaproveitar fotografias verificadas
+        uses: actions/cache@v4
+        with:
+          path: site/assets/news-photos
+          key: licensed-news-archive-v1-${{ env.NEWS_PHOTO_CACHE_DAY }}
+          restore-keys: |
+            licensed-news-archive-v1-
       - name: Verificar, baixar e servir fotos editoriais licenciadas
+        timeout-minutes: 11
         run: python scripts/build_news_photos.py --ci
       - name: Gerar links exclusivos e prévias para compartilhamento
         run: python scripts/build_share_pages.py

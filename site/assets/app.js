@@ -3,7 +3,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
-  let externalHeadlines = [], photoByStory = {}, data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
+  let externalHeadlines = [], photoByStory = {}, photoLibrary = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
   let sourceCheckedAt=source.source_monitor?.checked_at||'', newestSourceAt=source.source_monitor?.latest_original_published_at||'', currentSourceCount=(source.articles||[]).filter(x=>x.kind==='external_link').length;
   const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
@@ -34,9 +34,27 @@
   };
   const localizedCategory=c=>catLabels[c]?.[indices[lang]]||c;
   function localeOf(article, chosen=lang){return article.locales?.[chosen] || article.locales?.[article.original_lang] || null}
-  // Editorial image gate: no two distinct stories may reuse the same photograph.
-  // Exhausted/unavailable images get a UNIQUE story-specific illustrated card.
-  // Only licensed, credited, story-specific photography; no generic stock repetition.
+  // Editorial archive rule: only attributed local licensed photos; never
+  // present an illustrative archive image as a verified scene of an incident.
+  // A photo may recur, but NEVER within the preceding 20 cards.
+  const validArchivePhoto=p=>p&&safeNewsPhotoUrl(p.image)&&
+    safeUrl(p.image_source_url)&&Boolean(p.image_credit&&p.image_license);
+  const photoTopics={
+    Rodovias:'road highway rodovia interstate caminhão truck parking',
+    Caminhoneiros:'truck trucking caminhoneiro motorista driver cdl',
+    Fretes:'freight shipping cargo container port truck logistics',
+    Fiscalização:'fmcsa inspection highway safety truck cdl',
+    Segurança:'road highway truck safety rodovia',
+    Clima:'road highway interstate rodovia estrada',
+    Empregos:'driver truck cdl training caminhoneiro',
+    Caminhões:'truck class 8 caminhão diesel',
+    Tecnologia:'autonomous technology truck transport',
+    Transporte:'transport truck trucking highway',
+    Combustíveis:'diesel fuel truck',
+    Acidentes:'road highway truck rodovia estrada',
+    Negócios:'freight warehouse logistics cargo truck'
+  };
+  const normPhotoText=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   function storyGraphic(a){
     if(a.editorial_type==='operational_bulletin'){
       // Visual identification, never a simulated event photo, official NWS logo,
@@ -82,28 +100,49 @@
     const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520"><rect width="900" height="520" fill="hsl('+hue+',65%,20%)"/><path d="M0 490L900 180M0 510L900 230" stroke="#65c4f5" stroke-width="7" opacity=".2"/><path d="M670 370h130v-60h-35l-35-50h-60v110h-90v-140h90" stroke="#c9efff" stroke-width="12" fill="none"/><circle cx="625" cy="380" r="22" fill="#c9efff"/><circle cx="765" cy="380" r="22" fill="#c9efff"/><rect x="45" y="40" width="170" height="6" fill="#39baff"/><text x="45" y="92" font-family="Arial,sans-serif" font-weight="bold" font-size="23" fill="#a2ddff">DRIVMATCH NEWS</text>'+text+'<text x="45" y="490" font-family="Arial,sans-serif" font-size="17" fill="#d4eaff">ILUSTRAÇÃO EDITORIAL · '+esc(a.category||'TRANSPORTE')+'</text></svg>';
     return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
   }
+  const PHOTO_REUSE_GAP=20;
   let visualCacheKey='',visualCache=new Map();
   function storyVisuals(){
-    const stories=pageStories(),key=stories.map(a=>(a.id||a.source_url)+'|'+(licensedPhotoOf(a)?.image||a.image||'')).join('~');
+    const stories=pageStories();
+    const key=stories.map(a=>(a.id||a.source_url)+'|'+(licensedPhotoOf(a)?.image||a.image||'')).join('~')+'#'+photoLibrary.length;
     if(key===visualCacheKey)return visualCache;
-    const used=new Set(),map=new Map();
-    for(const a of stories){
-      const cached=licensedPhotoOf(a);
-      const credited=a.kind!=='external_link'&&a.image_license&&a.image_credit;
-      const supplied=cached?safeNewsPhotoUrl(cached.image):(credited?safeUrl(a.image):'');
-      const unique=supplied&&!used.has(supplied)?supplied:'';
-      if(unique)used.add(unique);
-      map.set(a.id,unique||storyGraphic(a));
+    const recent=new Map(),map=new Map();
+    const curated=photoLibrary.filter(validArchivePhoto);
+    for(const [index,a] of stories.entries()){
+      const direct=licensedPhotoOf(a);
+      const credited=a.kind!=='external_link'&&a.image_license&&a.image_credit&&
+        (safeNewsPhotoUrl(a.image)||safeUrl(a.image))&&safeUrl(a.image_source_url||a.image);
+      const primary=direct||(credited?{
+        image:a.image,image_credit:a.image_credit,image_license:a.image_license,
+        image_source_url:a.image_source_url||a.image,image_alt:a.image_alt||'Fotografia ilustrativa de arquivo'
+      }:null);
+      const allowed=p=>validArchivePhoto(p)&&
+        (recent.get(p.image)===undefined||index-recent.get(p.image)>PHOTO_REUSE_GAP);
+      let chosen=allowed(primary)?primary:null;
+      if(!chosen){
+        const candidates=a.editorial_type==='operational_bulletin'
+          ?curated.filter(p=>(p.keywords||[]).some(k=>/road|highway|interstate|rodovia|estrada/i.test(k)))
+          :curated;
+        const title=normPhotoText(
+          (photoTopics[a.category]||photoTopics.Transporte)+' '+
+          (localeOf(a,'pt')?.title||localeOf(a)?.title||''));
+        const ranked=candidates.filter(allowed).map((p,i)=>{
+          const keywords=(p.keywords||[]).filter(k=>normPhotoText(k).length>2);
+          const relevance=keywords.reduce((n,k)=>n+(title.includes(normPhotoText(k))?1:0),0);
+          return {p,relevance,i};
+        }).sort((x,y)=>y.relevance-x.relevance||x.i-y.i);
+        chosen=ranked[0]?.p||null;
+      }
+      if(chosen)recent.set(chosen.image,index);
+      map.set(a.id,chosen);
     }
     visualCacheKey=key;visualCache=map;return map;
   }
-  function imageOf(a){
-    // Never overwrite an attributed licensed photograph with an NWS icon.
-    return storyVisuals().get(a.id)||storyGraphic(a);
-  }
+  function displayedPhotoOf(a){return storyVisuals().get(a.id)||null;}
+  function imageOf(a){return displayedPhotoOf(a)?.image||storyGraphic(a);}
   function imageHTML(a,suffix=''){
     const url=imageOf(a),fallback=storyGraphic(a),graphic=url.startsWith('data:image/svg');
-    const photo=licensedPhotoOf(a),illustrative=Boolean(photo)||graphic||a.image_context==='illustrative_archive';
+    const photo=displayedPhotoOf(a),illustrative=Boolean(photo)||graphic||a.image_context==='illustrative_archive';
     const alt=a.editorial_type==='operational_bulletin'&&!graphic
       ?(lang==='pt'?'Fotografia ilustrativa de rodovia; não retrata o evento meteorológico informado':lang==='es'?'Fotografía ilustrativa de carretera; no representa el evento meteorológico':'Illustrative road archive photograph; not a photo of the reported weather event')
       :graphic?(a.editorial_type==='operational_bulletin'?(lang==='pt'?'Ilustração editorial de rodovia; não retrata o evento meteorológico informado':lang==='es'?'Ilustración de carretera; no representa el evento meteorológico':'Illustrative road graphic; not a depiction of the reported weather event'):(lang==='pt'?'Ilustração editorial desta manchete':lang==='es'?'Ilustración editorial de esta noticia':'Editorial illustration')):
@@ -327,10 +366,18 @@
   function renderAds(){
     const placements=(data.ads?.enabled&&Array.isArray(data.ads.placements))?data.ads.placements:[];
     const unused=$('ad-slot');if(unused){unused.hidden=true;unused.innerHTML='';}
+    const adIdentity=a=>String(a?.campaign_id||data.ads?.campaign_id||
+      a?.creative_id||a?.whatsapp_url||a?.url||'').trim().toLowerCase();
+    const top=placements.find(a=>a.enabled===true&&a.slot==='news-top');
+    const topIdentity=top&&adIdentity(top);
     for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner']]){
       const box=$(id);if(!box)continue;
       const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion'&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(a.url||'')&&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(a.whatsapp_url||'')&&/^https:\/\/cdn\.openart\.ai\/openart-uploads\/production\/attachment-transfers\/[a-f0-9]+\.png$/.test(a.image||''));
-      box.hidden=!ad;if(!ad){box.innerHTML='';continue;}
+      // One campaign can have separate responsive creatives, but must not
+      // occupy both the main news banner and sidebar simultaneously.
+      const repeatSide=slot==='market-sidebar'&&Boolean(ad&&topIdentity&&adIdentity(ad)===topIdentity);
+      box.hidden=!ad||repeatSide;
+      if(!ad||repeatSide){box.innerHTML='';continue;}
       const ig=escapeHTML(ad.url),wa=escapeHTML(ad.whatsapp_url),src=escapeHTML(ad.image);
       box.innerHTML=`<div class="car-ad"><div class="car-ad-disclosure">PUBLICIDADE · AVAILABLE LOAD / CAR HAULERS</div>
         <a class="car-ad-creative" href="${ig}" target="_blank" rel="noopener noreferrer" aria-label="Ver a oferta no Instagram fabriciodispatcher"><img src="${src}" loading="lazy" alt="Frete para transportar 1991 Ferrari 348 TS, 2027 Chevrolet Corvette e 2023 Dodge Challenger de Kissimmee FL 34741 para Miami FL 33126."></a>
@@ -401,7 +448,7 @@
     $('article-impact-text').textContent=verifiedText||paragraphs.filter(Boolean).join('\n\n');
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
-    const storyPhoto=licensedPhotoOf(opened);
+    const storyPhoto=displayedPhotoOf(opened);
     $('modalimg').src=imageOf(opened);$('modalimg').onerror=()=>{$('modalimg').onerror=null;$('modalimg').src=storyGraphic(opened);};$('modalimg').alt=storyPhoto?.image_alt||opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
     $('modaltitle').textContent=cleanHeadline(txt.title);
     $('modaltitle').classList.remove('headline-expanded');
@@ -555,7 +602,7 @@
       if(photographs.ok){
         const gallery=await photographs.json();
         if(gallery.schema_version===1&&gallery.license_policy==='curated_commons'&&gallery.images&&typeof gallery.images==='object'){
-          photoByStory=gallery.images; visualCacheKey='';
+          photoByStory=gallery.images; photoLibrary=Array.isArray(gallery.library)?gallery.library:[]; visualCacheKey='';
         }
       }
       renderStories();

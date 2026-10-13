@@ -55,6 +55,21 @@ def _download_photo(photo: dict):
         return None
     if not str(photo["source_url"]).startswith("https://commons.wikimedia.org/wiki/File:"):
         return None
+    destination = DEST / (ident + ".jpg")
+    if destination.is_file():
+        try:
+            with Image.open(destination) as cached:
+                cached.verify()
+            with Image.open(destination) as cached:
+                if cached.width >= 340 and cached.height >= 180 and destination.stat().st_size > 8000:
+                    return {"image":"assets/news-photos/"+ident+".jpg",
+                            "image_credit":photo["credit"],"image_license":photo["license"],
+                            "image_source_url":photo["source_url"],
+                            "image_alt":photo.get("description") or "Fotografia de arquivo ilustrativa",
+                            "image_context":"illustrative_archive",
+                            "source_library_id":ident}
+        except (OSError,ValueError,UnidentifiedImageError):
+            destination.unlink(missing_ok=True)
     diagnostics=[]
     for url in _candidate_urls(photo):
         try:
@@ -148,15 +163,22 @@ def choose_photos(stories: list, available: list):
 
 def build(minimum=0):
     photos = read_json(LIBRARY)["photos"]
+    if minimum:
+        try:
+            from discover_commons_photos import discover
+            photos += discover(photos,goal=350)
+        except Exception as exc:
+            # CDN/API failures must not stop newspaper publication; license
+            # verification of already-curated local files remains mandatory.
+            print("PHOTO DISCOVERY PARTIAL: verified manual catalog only:",type(exc).__name__)
     ids = [p.get("id") for p in photos]
     if len(ids) != len(set(ids)) or len(ids) < 8:
         raise ValueError("Photo catalog must contain at least eight distinct licensed photos")
     DEST.mkdir(parents=True, exist_ok=True)
-    # A clean gallery means old, unlicensed or no-longer-valid images cannot linger.
-    for p in DEST.glob("*.jpg"):
-        p.unlink()
+    # Cache only after validation against CURRENT metadata. Reuse verified
+    # local JPEGs across frequent news deploys; preserve open-license credits.
     downloaded = {}
-    with ThreadPoolExecutor(max_workers=2) as pool:
+    with ThreadPoolExecutor(max_workers=8) as pool:
         pending = {pool.submit(_download_photo, p): p for p in photos}
         for future in as_completed(pending):
             photo = pending[future]
@@ -167,6 +189,11 @@ def build(minimum=0):
                 result = None
             if result:
                 downloaded[photo["id"]] = result
+    # Prune only assets not present in the current, license-verified pool.
+    verified_files = {p["id"]+".jpg" for p in photos if p["id"] in downloaded}
+    for old_file in DEST.glob("*.jpg"):
+        if old_file.name not in verified_files:
+            old_file.unlink()
     available = [{"index": i, "meta": downloaded[p["id"]],
                   "keywords": p.get("keywords", [])}
                  for i, p in enumerate(photos) if p["id"] in downloaded]
@@ -176,10 +203,19 @@ def build(minimum=0):
     # News on the first page gets first claim on unique, relevant photographs.
     stories.sort(key=lambda s: str(s.get("published_at") or ""), reverse=True)
     assigned = choose_photos(stories, available)
+    # Curated, successfully downloaded local files also form an attributed
+    # visual fallback catalogue. The one-photo-per-story assignment remains
+    # preferred; when a long issue outnumbers available photos, browser cards
+    # may reuse clearly labelled archival photography rather than showing
+    # title-on-graphic tiles throughout the newspaper.
+    library = [
+        {**downloaded[entry["id"]], "keywords": entry.get("keywords", [])}
+        for entry in photos if entry["id"] in downloaded
+    ]
     manifest = {
         "schema_version": 1, "generated_at": datetime.now(timezone.utc).isoformat(),
         "image_context": "illustrative_archive", "license_policy": "curated_commons",
-        "images": assigned
+        "images": assigned, "library": library
     }
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
