@@ -184,7 +184,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('assets/app.js?v=market-moving-widgets-20261013-a',page)
   self.assertIn('tv-tickers symbols="FX_IDC:USDBRL"',page)
   self.assertIn('tv-tickers symbols="ICEEUR:BRN1!"',page)
-  self.assertIn('assets/utility-strip.js?v=v34-11-',page)
+  self.assertIn('assets/utility-strip.js?v=market-moving-widgets-20261013-a',page)
   self.assertIn('function searchCity()', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
   self.assertIn('function officialForecast(', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
   self.assertIn('data/us-places.json', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
