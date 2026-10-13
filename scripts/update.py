@@ -243,6 +243,55 @@ def authorized_spot():
     return normalize_spot_quote(d)
 
 
+
+def authorized_awesomeapi_usdbrl():
+    """Independent indicative USD/BRL spot quote (ASK); publication requires rights.
+
+    AwesomeAPI has a documented API and minute-level source timestamps.
+    Do not scrape the UOL site or embed an account API token in frontend JS.
+    Do not infer a formal closing auction from its last market tick.
+    """
+    if os.getenv('AWESOMEAPI_REDISTRIBUTION_AUTHORIZED')!='true':
+        raise ValueError('AwesomeAPI publication rights not approved')
+    token=os.getenv('AWESOMEAPI_API_KEY','')
+    if not token:raise ValueError('AWESOMEAPI_API_KEY not configured')
+    url='https://economia.awesomeapi.com.br/json/last/USD-BRL'
+    response=json.loads(fetch(url,headers={'x-api-key':token},timeout=12))
+    row=response.get('USDBRL',{})
+    if row.get('code')!='USD' or row.get('codein')!='BRL':
+        raise ValueError('AwesomeAPI unexpected USD/BRL pair')
+    try:
+        ask=float(row['ask'])
+        bid=float(row['bid'])
+        when=datetime.fromtimestamp(int(row['timestamp']),UTC)
+    except (ValueError,KeyError,OverflowError,TypeError) as exc:
+        raise ValueError('Invalid AwesomeAPI spot payload') from exc
+    if not (0<bid<=ask<50):
+        raise ValueError('Invalid AwesomeAPI USD/BRL bid/ask spread')
+    # This endpoint is indicative, not a certified B3 official close.
+    if when>NOW()+timedelta(seconds=30) or NOW()-when>timedelta(minutes=5):
+        raise ValueError('AwesomeAPI quote is stale; do not pass off as live')
+    try:change=float(row['pctChange'])
+    except (ValueError,KeyError,TypeError):change=None
+    q=dated_quote(ask,'AwesomeAPI — USD/BRL venda indicativa',
+                  when.isoformat(timespec='seconds'),change,
+                  'https://docs.awesomeapi.com.br/api-de-moedas')
+    q.update(symbol='USD/BRL',instrument='spot',price_type='commercial',
+             quote_status='live_snapshot',session_status='open',
+             rate_side='ask',bid=bid,ask=ask,indicative=True)
+    return q
+
+
+def authorized_fx_market_quote():
+    """Prefer approved contracted FX feed; fail over to independently licensed API."""
+    failures=[]
+    for name,reader in [('primary_spot',authorized_spot),
+                        ('awesomeapi',authorized_awesomeapi_usdbrl)]:
+        try:return reader()
+        except Exception as exc:failures.append(name+':'+type(exc).__name__)
+    raise ValueError('No currently licensed USD/BRL spot provider: '+','.join(failures))
+
+
 def verified_previous_close():
     """Last *commercial spot* close, accepted only for the immediate nontrading window."""
     q=normalize_spot_quote(read_json(ROOT/'content/usdbrl_last_close.json'))
@@ -571,7 +620,7 @@ def make_market(offline=False):
     market={'generated_at':NOW().isoformat(timespec='seconds'),'mode':'verified-or-unavailable','indicators':{},'stocks':{},'errors':[]}
     if offline:
         market['mode']='offline-test';return market
-    for key,fn in [('usdbrl',authorized_spot),('diesel',lambda:eia_reference_with_fred_fallback('diesel')),
+    for key,fn in [('usdbrl',authorized_fx_market_quote),('diesel',lambda:eia_reference_with_fred_fallback('diesel')),
                    ('brent',lambda:eia_reference_with_fred_fallback('brent'))]:
         try:
             if key=='brent' and os.getenv('BRENT_REDISTRIBUTION_AUTHORIZED')=='true' and os.getenv('BRENT_SPOT_URL'):
