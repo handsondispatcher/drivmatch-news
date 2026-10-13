@@ -609,8 +609,10 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('index-recent.get(p.image)>PHOTO_REUSE_GAP',js)
   self.assertIn('Array.isArray(gallery.library)',js)
   self.assertIn('"library": library',photos)
-  self.assertIn("slot==='market-sidebar'",js)
-  self.assertIn("adIdentity(ad)===topIdentity",js)
+  self.assertIn("['market-sidebar','market-commercial-banner']",js)
+  self.assertIn("carhauler-approved-photo1",js)
+  self.assertIn("approved_master_sha256",js)
+  self.assertIn("car-official-hit",js)
  def test_topic_images_and_no_duplicate_refresh(self):
   js=(BASE/'site/assets/app.js').read_text()
   self.assertIn('storyVisuals()',js)
