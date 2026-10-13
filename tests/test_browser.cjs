@@ -293,12 +293,16 @@ const {spawn}=require('node:child_process');
       const bottom=document.getElementById('share-copy').getBoundingClientRect().bottom;
       return {scroll:dialog.scrollHeight,client:dialog.clientHeight,bottom,visible:innerHeight};
     });
-    assert.match(await page.locator('#modalbodytext').innerText(),/O QUE A FONTE PUBLICOU/,'External story must show an in-app Portuguese brief');
-    assert.equal(await page.locator('#article-source button.article-source-button').count(),3,'External story retains three in-app locale buttons');
+    assert.equal((await page.locator('#modalbodytext').innerText()).trim(),'','No false headline-summary article');
+    assert.equal(await page.locator('#article-source a.article-source-button').count(),3,'External story retains three original-source language links');
     assert.equal(await page.locator('#article-source a.article-original-link').count(),1,'External story retains a direct source link');
-    await page.locator('#share-copy').scrollIntoViewIfNeeded();
-    const shareBottom=await page.locator('#share-copy').evaluate(x=>x.getBoundingClientRect().bottom);
-    assert.ok(shareBottom<=actual.visible,'External story share remains reachable after scrolling the factual brief');
+    const orderExt=await page.evaluate(()=>Object.fromEntries(['article-original','article-share-footer','article-impact-actions'].map(id=>[id,document.getElementById(id).getBoundingClientRect().top])));
+    assert.ok(orderExt['article-original']<orderExt['article-share-footer']&&orderExt['article-share-footer']<orderExt['article-impact-actions'],
+      'Approved order: original translated source, sharing, professional buttons last');
+    assert.equal(await page.locator('#article-source .full-article-heading').innerText(),'REPORTAGEM COMPLETA NA FONTE');
+    assert.equal(await page.locator('#article-dialog #modaltitle').evaluate(el=>getComputedStyle(el).webkitLineClamp),'3','Long titles must not hide lower actions');
+    assert.ok((await page.locator('#article-impact-actions').boundingBox()).y+40<=actual.visible,
+      'Last professional actions must appear without scrolling on mobile');
     await page.screenshot({path:`test-results/mobile-live-headline-${width}.png`});
     await page.locator('#article-dialog .x').click();
    }
@@ -353,17 +357,17 @@ const {spawn}=require('node:child_process');
     assert.ok(fit.scrollHeight<=fit.clientHeight+2,`Article must fit without internal scroll at ${width}px: ${JSON.stringify(fit)}`);
     await page.screenshot({path:`test-results/mobile-compact-reader-${width}.png`});
    }
-   const sourceButtons=page.locator('#article-source button.article-source-button');
-   assert.equal(await sourceButtons.count(),0,'Owned trilingual reports already have a language selector above; do not duplicate it');
-   assert.equal(await page.locator('#article-reading [data-article-lang]').count(),3,'Approved editorial keeps PT-BR, EN-US and ES-419 in-page');
+   const sourceButtons=page.locator('#article-source a.article-source-button');
+   assert.equal(await sourceButtons.count(),3,'Source translation links must appear in three languages');
+   assert.equal(await page.locator('#article-reading [data-article-lang]').count(),3,'Headline locale buttons must stay available');
    const originalLink=page.locator('#article-source a.article-original-link');
    assert.equal(await originalLink.count(),1,'The real publisher must remain directly accessible');
-   assert.ok(!(await originalLink.getAttribute('href')).includes('translate.google.com'),'Never open Google translate proxy');
+   assert.ok(!(await originalLink.getAttribute('href')).includes('translate.google.com'),'Direct original must remain untranslated');
    if(width<=390){
-    assert.match(await page.locator('#article-source .source-access-short').innerText(),/manchete|titular|headline|editorial|original/);
+    assert.match(await page.locator('#article-source .source-access-short').innerText(),/Traduzir|Translate|Traducir/);
     assert.ok(await originalLink.isVisible(),'Original editorial reference must be accessible');
    }else{
-    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/manchete|titular|headline|editorial|original/);
+    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/Traduzir|Translate|Traducir/);
    }
    // Switching the entire site to English must translate weather and publisher footer.
    await page.locator('#article-dialog .x').click();
@@ -434,8 +438,8 @@ const {spawn}=require('node:child_process');
    await page.locator('#share-native').click();
    assert.equal(await page.locator('#share-options').isVisible(),false);
    assert.equal(await page.locator('#article-reading [data-article-lang]').count(),3);
-   assert.equal(await page.locator('#article-source .source-translations').count(),0,
-     'Approved three-language articles must not render a redundant second language toolbar');
+   assert.equal(await page.locator('#article-source .source-translations').count(),1,
+     'Original publisher section must show one compact row of source language links');
    assert.equal(await page.locator('#article-source a.article-original-link').count(),1,
      'Approved article must retain a direct link to the original report');
    assert.equal(await page.locator('#article-disclosure').isVisible(),false);
