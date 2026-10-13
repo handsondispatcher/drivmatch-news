@@ -38,6 +38,8 @@ function initializeTradingViewMarket(){
    const host=el('top-'+key+'-tradingview');
    if(host)host.hidden=false;
   }
+  el('top-brent-label').textContent=lang()==='en'?'Brent Futures':lang()==='es'?'Brent (futuros)':'Brent (futuros)';
+  document.dispatchEvent(new CustomEvent('drivmatch:tradingview-ready'));
  }).catch(()=>{});
 }
 // MARKET_QUOTE_UI_RELEASE: compact-prices-only-20261013
@@ -54,7 +56,10 @@ function showMarket(){
  // Never relabel an official PTAX reference as a traded commercial quote.
  el('top-usd-label').textContent=localized('Dólar','US Dollar','Dólar');
  el('top-diesel-label').textContent=localized('Diesel nos EUA','US Diesel','Diésel en EE. UU.');
- el('top-brent-label').textContent=localized('Petróleo Brent','Brent Crude Oil','Petróleo Brent');
+ el('top-brent-label').textContent=
+  el('top-brent-tradingview')?.hidden===false
+   ?localized('Brent (futuros)','Brent Futures','Brent (futuros)')
+   :localized('Petróleo Brent','Brent Crude Oil','Petróleo Brent');
  const values=[
   {id:'usd',data:usd,decimals:4,prefix:'R$ ',suffix:''},
   {id:'diesel',data:market.diesel,decimals:3,prefix:'US$ ',suffix:'/gal'},
