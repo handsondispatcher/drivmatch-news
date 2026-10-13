@@ -901,6 +901,18 @@ body{background:#f7f9fc;color:#14283c}
 .newsdesk-impact-source{margin-top:18px;padding-top:12px;border-top:1px solid #dce7ef;font:11px/1.5 Arial,sans-serif;color:#687d8e}
 .newsdesk-impact-dialog :focus-visible,#article-dialog .article-impact-actions button:focus-visible{outline:3px solid #d9a83d;outline-offset:3px}
 #noticias > .topline{display:none!important}
+
+/* Reader recovery: no Google proxy or blank translator page inside in-app browsers. */
+#article-dialog .article-original-link{display:block;margin:10px 0 6px;padding:10px 12px;border:1px solid #92b5d0;border-radius:6px;background:#eaf5ff;color:#0d4b7c;font:700 13px/1.45 Arial,sans-serif;text-align:center;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+#article-dialog .article-original-link:hover,#article-dialog .article-original-link:focus-visible{background:#d9efff;outline-offset:2px}
+#article-dialog .source-translations button.article-source-button{cursor:pointer;font-family:Arial,sans-serif}
+#article-dialog.external-article #modalbodytext{display:block;white-space:pre-line;color:#25445a;line-height:1.5;font-size:13px;margin:10px 0 8px}
+#article-dialog.external-article #modalbrief:empty{display:none}
+@media(max-width:650px){
+ #article-dialog.external-article #modalbodytext{display:block;font-size:11.5px;line-height:1.42;margin:7px 0 10px;white-space:pre-line}
+ #article-dialog.external-article .article-original-link{padding:7px 9px;font-size:11px;margin:7px 0 3px}
+ #article-dialog .source-translations button.article-source-button{height:35px;min-height:35px}
+}
 </style>
 </head>
 <body>
@@ -1033,9 +1045,9 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/analytics-config.js" defer></script>
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-21-editorial-labels-pt-br-es419-20261012" defer></script>
+<script src="assets/app.js?v=v34-21-editorial-labels-native-reader-20261013" defer></script>
 <script src="assets/road-tv-live.js?v=v34-18-durable-live-first-20261011" defer></script>
 <script src="assets/utility-strip.js?v=v34-11-national-weather-20261010" defer></script>
-<script src="assets/news-crawler.js?v=pt-br-es419-20261012" defer></script>
+<script src="assets/news-crawler.js?v=native-reader-20261013" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>

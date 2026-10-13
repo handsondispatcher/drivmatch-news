@@ -12,6 +12,7 @@ class Element {
  querySelectorAll(){return [];}
 
  get classList(){return {add(){},remove(){},toggle(){}};}
+ focus(){}
  scrollIntoView(){}
 }
 const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','highlights','highlights-title','highlights-note','highlightList','newsroom-section-label','newsroom-section-desc','newsroom-cta-eyebrow','newsroom-cta-title','newsroom-cta-desc','newsroom-cta-driver','newsroom-cta-carrier','market','market-note','news-freshness','market-mobile','market-note-mobile','market-title-mobile','ad-slot','news-commercial-banner','market-commercial-banner','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','modalbrief','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-impact-actions','article-impact-title','article-impact-note','article-impact-text','newsdesk-impact-shade','newsdesk-impact-close','article-dialog','translation','shade','noticias','footer-publisher','footer-legal','story-preview','story-preview-image','story-preview-download','story-preview-close','story-preview-title','story-preview-hint'];
@@ -118,24 +119,27 @@ elements.language.value='pt';
 elements.language.dispatch('change',{target:{value:'pt'}});
 elements.features.dispatch('click',{target:{closest:key=>({dataset:{story:'0'}})}});
 const publisherLinks=elements['article-source'].innerHTML;
-assert(publisherLinks.includes('translate.google.com/translate?sl=auto&amp;tl=pt-BR&amp;u=https%3A%2F%2Fexample.org%2Ftrucking-story'),
- 'Portuguese source button must use translation for every English-language publisher');
-assert(publisherLinks.includes('translate.google.com/translate?sl=auto&amp;tl=es-419&amp;u=https%3A%2F%2Fexample.org%2Ftrucking-story'),
- 'Spanish source button must use translation for every English-language publisher');
+assert(publisherLinks.includes('data-source-lang="pt"')&&publisherLinks.includes('data-source-lang="es"'),
+ 'Every reader language must switch in-app instead of opening Google Translate');
+assert(!publisherLinks.includes('translate.google.com')&&!publisherLinks.includes('.translate.goog'),
+ 'Do not open broken Google Translate proxy pages');
 assert(publisherLinks.includes('href="https://example.org/trucking-story"'),
- 'English original must remain directly accessible');
-assert(publisherLinks.includes('tradução automática'),
- 'The reader must disclose that the translated publisher page is automatic');
-data.articles[0].original_lang='pt';
-elements.language.dispatch('change',{target:{value:'pt'}});
-elements.features.dispatch('click',{target:{closest:key=>({dataset:{story:'0'}})}});
-assert(elements['article-source'].innerHTML.includes('href="https://example.org/trucking-story"'),
- 'When the original is already Portuguese, Portuguese must open the original');
-assert(elements['article-source'].innerHTML.includes('translate.google.com/translate?sl=auto&amp;tl=en-US'),
- 'A Portuguese original must still offer English automatic translation');
-assert(publisherLinks.includes('Português (Brasil) · tradução automática'),
- 'Full source label must explicitly mean Brazilian Portuguese');
-assert(publisherLinks.includes('Español (Latinoamérica) · traducción automática'),
- 'Full source label must explicitly mean Latin American Spanish');
-console.log('SOURCE TRANSLATION PASS: Portuguese/Spanish publisher links, original retained, fallback disclosed');
+ 'The original reporting must remain available as a direct outbound link');
+assert(elements.modalbodytext.textContent.includes('Transporte americano tem novidades'),
+ 'The reader must display a Portuguese headline-based brief locally');
+assert(elements.modalbodytext.textContent.includes('não a tradução integral'),
+ 'An external headline must not masquerade as the full publisher report');
+elements['article-source'].dispatch('click',{target:{closest:key=>key==='[data-source-lang]'?{dataset:{sourceLang:'es'}}:null}});
+assert(elements.modaltitle.textContent.includes('estadounidense'),
+ 'Spanish-LatAm reader must update the visible article in DrivMatch News');
+assert(elements.modalbodytext.textContent.includes('El transporte estadounidense'),
+ 'Spanish-LatAm reader must update the local brief too');
+assert.strictEqual(elements.language.value,'pt','Source language must not change the whole-site edition');
+elements['article-source'].dispatch('click',{target:{closest:key=>key==='[data-source-lang]'?{dataset:{sourceLang:'pt'}}:null}});
+elements['article-impact-actions'].dispatch('click',{target:{closest:key=>({dataset:{impactRole:'driver'}})}});
+assert(elements['article-impact-text'].textContent.includes('Transporte americano tem novidades'),
+ 'Professional impact must mention the exact article, not a generic category-only warning');
+assert(elements['article-impact-note'].textContent.includes('manchete'),
+ 'Professional impact must say when only headline evidence is available');
+console.log('NATIVE READER PASS: local pt-BR/es-419, direct original source, contextual and disclosed professional impact');
 console.log('CLIENT SMOKE PASS: panorama/mirrored mobile market/modal/Spanish full text; global language unchanged');

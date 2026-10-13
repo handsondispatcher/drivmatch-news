@@ -6,11 +6,9 @@ const clean=s=>String(s||'').replace(/[\u0000-\u001f]/g,'').trim();
 const headline=s=>clean(s).replace(/https?:\/\/\S+/gi,'').replace(/\s+-\s+[^-]{2,75}$/,'').replace(/\s*\[original\]\s*/gi,'').trim();
 // Reader-access gate: never send visitors to a known geo-blocked publisher.
 const blockedPublisher=url=>/^https:\/\/(?:[a-z0-9-]+\.)*thetrucker\.com(?:[\/:?#]|$)/i.test(String(url||''));
-// A ticker click in Portuguese or Spanish should not silently open English source text.
-// The original publisher link is retained whenever it already matches the reader language.
-const readerLocales={pt:'pt-BR',en:'en-US',es:'es-419'};
-const sourceReadingUrl=(url,original,target)=>target===(['pt','en','es'].includes(original)?original:'en')?url:
-  'https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(readerLocales[target])+'&u='+encodeURIComponent(url);
+// Ticker clicks always open DrivMatch News in the selected edition. Never
+// route readers through a Google proxy that can return a blank in-app page.
+const sourceReadingUrl=id=>'?story='+encodeURIComponent(id);
 /* The crawler is a latest-headlines ticker, not the historical article archive.
    Fail closed when GitHub's scheduled source snapshot stops updating. */
 const MAX_HEADLINE_AGE_MS=48*60*60*1000;
@@ -36,16 +34,16 @@ function display(){
    seenTitles.add(fingerprint(title));seen.add(a.source_url);
    const untranslated=!a.titles?.[l] ||
      (l!==(a.original_lang||'en') && clean(a.titles?.[l]).toLowerCase()===clean(a.title).toLowerCase());
-   links.push({title,untranslated,source:a.source||'External source',url:a.source_url,originalLang:a.original_lang||'en',external:true,region:a.region||'US',date:a.published_at||'',category:a.category||'Transporte'});
+   links.push({id:a.id,title,untranslated,source:a.source||'External source',url:a.source_url,originalLang:a.original_lang||'en',external:true,region:a.region||'US',date:a.published_at||'',category:a.category||'Transporte'});
  }
  // Supplement with approved stories not already included in the source monitor.
  for(const a of validStories){
    if(seen.has(a.source_url)||seenTitles.has(fingerprint(a.locales[l].title)))continue;seen.add(a.source_url);seenTitles.add(fingerprint(a.locales[l].title));
-   links.push({title:a.locales[l].title,source:a.source||'DrivMatch News',url:a.source_url,originalLang:a.original_lang||'en',external:false,region:'US',date:a.published_at||'',category:a.category||'Transporte'});
+   links.push({id:a.id,title:a.locales[l].title,source:a.source||'DrivMatch News',url:a.source_url,originalLang:a.original_lang||'en',external:false,region:'US',date:a.published_at||'',category:a.category||'Transporte'});
  }
  if(!links.length){bar.hidden=true;return;}
  const els=links.slice(0,65).map(a=>{
-   const link=document.createElement('a');link.className='dm-crawler-link';link.href=sourceReadingUrl(a.url,a.originalLang,l);link.target='_blank';link.rel='noopener noreferrer';
+   const link=document.createElement('a');link.className='dm-crawler-link';link.href=a.id?sourceReadingUrl(a.id):a.url;link.target='_blank';link.rel='noopener noreferrer';
    const k=document.createElement('span');k.className='dm-crawler-label';const categories={Clima:['CLIMA','WEATHER','CLIMA'],Rodovias:['RODOVIAS','ROADS','CARRETERAS'],Acidentes:['ACIDENTE','ACCIDENT','ACCIDENTE'],Combustíveis:['DIESEL E COMBUSTÍVEIS','DIESEL AND FUEL','DIÉSEL Y COMBUSTIBLES'],Tecnologia:['TECNOLOGIA E TRANSPORTE','TRANSPORT TECHNOLOGY','TECNOLOGÍA Y TRANSPORTE'],Imigração:['IMIGRAÇÃO','IMMIGRATION','INMIGRACIÓN'],Segurança:['SEGURANÇA','SAFETY','SEGURIDAD'],Energia:['ENERGIA','ENERGY','ENERGÍA'],Transporte:['TRANSPORTE','TRANSPORT','TRANSPORTE'],Fretes:['FRETES','FREIGHT','FLETES'],Negócios:['NEGÓCIOS','BUSINESS','NEGOCIOS'],Fiscalização:['FISCALIZAÇÃO','ENFORCEMENT','FISCALIZACIÓN'],Caminhoneiros:['CAMINHONEIROS','TRUCK DRIVERS','CAMIONEROS']};
    const category=categories[a.category]||[clean(a.category||'TRANSPORTE')];
    k.textContent=(category[['pt','en','es'].indexOf(l)]||category[0])+
