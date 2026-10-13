@@ -397,6 +397,30 @@ jobs:
             echo "::warning::CUSTOM DOMAIN MANIFEST UNAVAILABLE: /news/data/release.json not served at custom domain."
           fi
 
+      - name: Verificar banners reais no site publicado
+        run: |
+          set -euo pipefail
+          for ROOT in "https://handsondispatcher.github.io/drivmatch-news" "https://drivmatch.com/news"; do
+            echo "CHECKING APPROVED AD PLACEMENT: $ROOT"
+            curl --fail --location --silent --show-error --retry 3 --max-time 25 -H "Cache-Control: no-cache" "$ROOT/data/bootstrap.js?ad-layout-check=${{ github.run_id }}" -o /tmp/drivmatch-ad-bootstrap.js
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          text=Path('/tmp/drivmatch-ad-bootstrap.js').read_text(encoding='utf-8')
+          prefix='window.DRIVMATCH_BOOTSTRAP='
+          assert text.startswith(prefix),'Public ad bootstrap absent/incorrect'
+          data=json.loads(text[len(prefix):].rstrip().removesuffix(';'))
+          ads=data['ads']
+          enabled={p['slot']:p for p in ads['placements'] if p.get('enabled')}
+          assert enabled['news-top']['creative_type']=='carhauler-approved-photo1','WRONG PUBLIC TOP BANNER: expected vehicle load'
+          assert enabled['news-carhauler']['creative_type']=='ucr-2027-official','WRONG PUBLIC LOWER BANNER: expected UCR'
+          assert enabled['market-sidebar']['creative_type']=='ucr-2027-official','WRONG PUBLIC SIDEBAR: expected square UCR'
+          assert enabled['news-carhauler']['format']=='horizontal','Lower UCR banner needs horizontal variant'
+          assert not any(p.get('enabled') and p['slot']=='mobile-inline' for p in ads['placements']),'Duplicate UCR mobile slot'
+          print('PUBLIC AD PLACEMENT PASS: car-hauler TOP, UCR LOWER, UCR RIGHT')
+          PY
+          done
+
       - name: Checkout para prova de conteúdo publicado
         uses: actions/checkout@v4
       - name: Prova de produção — manchetes e Road TV no domínio público
