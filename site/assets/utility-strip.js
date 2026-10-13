@@ -16,7 +16,7 @@ function marketFresh(v,key){
  const date=Date.parse(v.observed_at||'');
  if(!Number.isFinite(date))return false;
  const age=Date.now()-date;
- if(age< -86400000)return false;
+ if(age< -5*60000)return false;
  // A real-time quote expires in 5 minutes; published references use their
  // own official source cadence. A cached web page cannot prolong freshness.
  if(v.session_status==='open')return age<=5*60000;
