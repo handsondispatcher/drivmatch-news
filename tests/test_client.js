@@ -10,6 +10,7 @@ class Element {
  add(option){this.options.push(option);}
  setAttribute(name,value){this[name]=value;}
  querySelectorAll(){return [];}
+ querySelector(){return null;}
 
  get classList(){return {add(){},remove(){},toggle(){}};}
  focus(){}
