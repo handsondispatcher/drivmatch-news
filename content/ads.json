@@ -112,6 +112,23 @@
       "source_note": "Owner-requested cinematic UCR horizontal creative rebuilt natively at 1774x394 (4.5025:1), distinct PT/EN/ES images, no side bars. Approved square sidebar and car-hauler art unchanged.",
       "format": "horizontal",
       "native_image_pattern": "assets/ads/ucr-2027-{lang}-wide-1774x394.webp"
+    },
+    {
+      "slot": "market-sidebar-driver",
+      "enabled": true,
+      "relationship": "third_party_classified",
+      "sponsor": "Aileen Souza",
+      "creative_type": "approved-driver-poster-original",
+      "campaign_id": "driver-availability-aileen-souza-20261013",
+      "format": "vertical-portrait",
+      "image": "assets/ads/aileen-souza-motorista-disponivel-original.jpg",
+      "original_width": 1229,
+      "original_height": 1536,
+      "approved_original_sha256": "191ab228dd8bf894e8ab4ff3585fd372eca9fff83c38cb8901a754afa66d1bc5",
+      "phone_display": "(407) 285-2874",
+      "whatsapp_url": "https://wa.me/14072852874",
+      "image_status": "original_uploaded_chat_asset_pending_repo_binary",
+      "source_note": "Arte exata fornecida pelo usuário em 13/10/2026. É proibido reconstruir, recortar, reescrever ou trocar a imagem. Ajustar exclusivamente a escala CSS (width:100%;height:auto;object-fit:contain) dentro da coluna lateral, abaixo do UCR quadrado. Área invisível clicável sobre o número (407) 285-2874 abre o WhatsApp do anunciante. Publicar apenas quando a imagem original com hash verificado existir no repositório."
     }
   ],
   "approved_creative_rules": {
