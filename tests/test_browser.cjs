@@ -425,6 +425,16 @@ const {spawn}=require('node:child_process');
    assert.equal((waText.match(/https:\/\//g)||[]).length,1,'Single clickable image-card URL per WhatsApp message');
    assert.ok(!waText.includes('\n'),'No freeform headline text before the preview URL');
    assert.ok(waText.endsWith('?v=og-photo-top-no-cta-20261013-r4'), 'New WhatsApp URL must invalidate previous image-less preview');
+   if(width===390){
+     await page.evaluate(()=>Object.defineProperty(navigator,'userAgent',{configurable:true,value:'Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 Chrome/124.0 Mobile Safari/537.36'}));
+     await page.locator('#share-native').click();
+     await page.locator('#share-native').click();
+     const androidShare=await page.locator('[data-share-platform="whatsapp"]').getAttribute('href');
+     assert.match(androidShare,/^https:\/\/wa\.me\/\?text=/,'Samsung/Android must open the WhatsApp app');
+     const androidText=new URL(androidShare).searchParams.get('text');
+     assert.equal(androidText,waText,'Android and desktop must share the same one absolute photo-preview link');
+     assert.ok(!androidText.includes('\\n')&&!androidText.startsWith('/news/share/'),'No relative path or split message on Samsung');
+   }
    if(width===1440){
     await page.locator('#share-story').click();
     await page.locator('#story-preview').waitFor({state:'visible',timeout:15000});
