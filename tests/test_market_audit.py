@@ -30,6 +30,18 @@ class MarketAudit(unittest.TestCase):
         self.assertEqual(report['indicators']['brent'],'invalid')
         self.assertIn('brent:expired observation',report['errors'])
 
+    def test_official_but_aged_brent_is_explicitly_historical(self):
+        now=datetime(2026,10,13,15,tzinfo=UTC)
+        q={'instrument':'brent_eia_reference','session_status':'historical_reference',
+           'quote_status':'historical_reference','value':125.44,'source':'EIA / FRED (diário)',
+           'source_url':'https://fred.stlouisfed.org/series/DCOILBRENTEU',
+           'observed_at':'2026-10-06'}
+        report=validate({'indicators':{'brent':q}},now)
+        self.assertEqual(report['status'],'partial')
+        self.assertEqual(report['indicators']['brent']['status'],'historical_reference')
+        self.assertIn('brent:EIA_reference_is_historical_not_current_market',report['warnings'])
+        self.assertFalse(report['errors'])
+
     def test_missing_feeds_warn_without_fabricating(self):
         now=datetime(2026,10,13,15,tzinfo=UTC)
         report=validate({'indicators':{}},now)
