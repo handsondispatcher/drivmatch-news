@@ -416,8 +416,12 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#article-dialog #modalbodytext').evaluate(e=>getComputedStyle(e).maxHeight),'none','Article text must never be clipped');
    assert.equal(await page.locator('#share-story').isVisible(),true);
    const shareLink=await page.locator('[data-share-platform="whatsapp"]').getAttribute('href');
-   assert.match(decodeURIComponent(shareLink),/handsondispatcher.github.io\/drivmatch-news\/share\//);
-   assert.ok(!decodeURIComponent(shareLink).includes('news.google.com/rss/'));
+   const waText=new URL(shareLink).searchParams.get('text');
+   assert.match(waText,/^\*[^*]+\*\n\nhttps:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\//,
+     'WhatsApp message must use bold headline plus one absolute HTTPS OG preview link');
+   assert.ok(!waText.includes('Manchete e contexto no DrivMatch News'),'No generic summary should displace the WhatsApp photo/title');
+   assert.ok(!waText.includes('news.google.com/rss/'));
+   assert.equal((waText.match(/https:\/\//g)||[]).length,1,'One unambiguous clickable link per message');
    if(width===1440){
     await page.locator('#share-story').click();
     await page.locator('#story-preview').waitFor({state:'visible',timeout:15000});

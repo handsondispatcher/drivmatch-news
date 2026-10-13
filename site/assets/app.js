@@ -606,12 +606,13 @@
     const storyInfo=story=>({article_id:story?.id,article_category:story?.category,article_source:story?.source});
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){track('news_article_open',storyInfo(opened));renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function'){track('news_source_click',storyInfo(opened));window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');}};
     const shareText=()=>opened?cleanHeadline(localeOf(opened,lang)?.title||'DrivMatch News'):'DrivMatch News';
-    const shareSummary=()=>opened?(opened.kind==='external_link'
-      ?(lang==='en'?'Headline and context from DrivMatch News.':lang==='es'?'Titular y contexto en DrivMatch News.':'Manchete e contexto no DrivMatch News.')
-      :String(localeOf(opened,lang)?.summary||'').trim()):'';
+    // WhatsApp needs one complete HTTPS share-page URL for its image preview.
+    // Avoid extra generic context that displaces the headline and confuses crawlers.
+    // WhatsApp's *...* syntax bolds the visible headline in the message.
+    const whatsappMessage=(title,url)=>'*'+String(title||'').replace(/[\\*_`~]/g,'').trim()+'*\n\n'+url;
     const shareOptions=$('share-options');
-    const shareDestinations=(title,url,summary='')=>({
-      whatsapp:(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'')?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent([title,summary,url].filter(Boolean).join('\n\n')),
+    const shareDestinations=(title,url)=>({
+      whatsapp:(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'')?'https://wa.me/?text=':'https://web.whatsapp.com/send?text=')+encodeURIComponent(whatsappMessage(title,url)),
       facebook:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url),
       threads:'https://www.threads.net/intent/post?text='+encodeURIComponent(title+' '+url),
       x:'https://twitter.com/intent/tweet?text='+encodeURIComponent(title)+'&url='+encodeURIComponent(url),
@@ -628,12 +629,12 @@
       pickerFeedback.textContent='';
       $('share-native').setAttribute('aria-expanded',String(expanded));
       if(!expanded)return;
-      const urls=shareDestinations(shareText(),shareUrlOf(opened),shareSummary());
+      const urls=shareDestinations(shareText(),shareUrlOf(opened));
       shareOptions.querySelectorAll('[data-share-platform]').forEach(a=>{a.href=urls[a.dataset.sharePlatform]||'#';});
     });
     $('share-options-close').addEventListener('click',()=>{shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');$('share-native').focus();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!shareOptions.hidden){shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');e.stopPropagation();}});
-    const shareMessage=()=>[shareText(),shareSummary(),shareUrlOf(opened)].filter(Boolean).join('\n\n');
+    const shareMessage=()=>whatsappMessage(shareText(),shareUrlOf(opened));
     const pickerFeedback=$('share-picker-feedback');
     const shareSystem=$('share-system');
     shareSystem.hidden=typeof navigator.share!=='function';
