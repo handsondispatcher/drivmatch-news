@@ -21,7 +21,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 SHARE_BASE = "https://handsondispatcher.github.io/drivmatch-news"
-SHARE_PREVIEW_VERSION = "og-photo-top-20261013-r3"
+SHARE_PREVIEW_VERSION = "og-photo-top-no-cta-20261013-r4"
 ARTICLE_BASE = "https://drivmatch.com/news"
 SAFE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,99}$")
 CARD_SIZE = (1200, 630)
@@ -104,7 +104,7 @@ def _illustrative_photo(category):
 
 
 def create_card(title: str, category: str, target: Path, story=None):
-    """1200x630 social preview: news photo TOP, bold title below, concise CTA.
+    """1200x630 social preview: news photo on top, bold headline below.
 
     Reuse only licensed, attributed, first-party archive photographs. When no
     appropriate licensed news illustration exists, fall back to an explicitly
@@ -140,7 +140,7 @@ def create_card(title: str, category: str, target: Path, story=None):
             image.paste(logo,(48,335),logo)
     else:
         draw.text((48,341),"DrivMatch News",font=_font(25,True),fill="#65c0ff")
-    # Scale long syndicated headlines to fit without eating the CTA area.
+    # Scale long syndicated headlines to fit a legible news card.
     title=str(title).strip()
     for size in (40,38,36,34,32,30,28):
         font=_font(size,True)
@@ -152,8 +152,6 @@ def create_card(title: str, category: str, target: Path, story=None):
         draw.text((48,387+n*(size+8)),line,font=font,fill="white")
     draw.text((50,577),"NOTÍCIAS DE TRANSPORTE E LOGÍSTICA",
               font=_font(15,True),fill="#d3e4f4")
-    draw.rounded_rectangle((914,563,1155,607),radius=8,fill=(8,122,201,255))
-    draw.text((943,575),"CLIQUE E LEIA ↗",font=_font(18,True),fill="white")
     target.parent.mkdir(parents=True,exist_ok=True)
     image.save(target,"JPEG",quality=89,optimize=True,progressive=False)
 
