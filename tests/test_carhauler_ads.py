@@ -18,7 +18,7 @@ class AdvertisingCampaigns(unittest.TestCase):
   self.assertEqual({p['slot'] for p in car},{'news-top','article-inline'})
   self.assertEqual({p['slot'] for p in car if p['enabled']},{'news-top','article-inline'})
   self.assertEqual(ads['placement_policy']['desktop']['news-top'],'carhauler-approved-photo1 / horizontal')
-  self.assertEqual(ads['placement_policy']['desktop']['news-carhauler'],'ucr-2027-official / compact horizontal below article list')
+  self.assertIn('ucr-2027-official / horizontal 1774:394',ads['placement_policy']['desktop']['news-carhauler'])
   self.assertTrue(all(p['creative_type']=='carhauler-approved-photo1' for p in car))
   self.assertTrue(all(p['approved_master_sha256']=='1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d' for p in car))
   self.assertTrue(all(p['approved_master']==ads['approved_creative_rules']['carhauler_photo1']['master_image'] for p in car))
