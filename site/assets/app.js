@@ -400,7 +400,7 @@
         const ig='https://ig.me/m/fabriciodispatcher';
         box.innerHTML='<div class="ucr-ad"><div class="ucr-ad-disclosure">'+escapeHTML(copy.label)+'</div>'+
           '<div class="ucr-frame '+(isWide?'ucr-frame-horizontal':'ucr-frame-square')+'"'+(isWide?' style="aspect-ratio:'+crop.ratio+'"':'')+'>'+
-          '<div class="ucr-visual" role="img" aria-label="'+escapeHTML('UCR 2027 — '+copy.note)+'" style="'+bg+'">'+
+          '<div class="ucr-visual" role="group" aria-label="'+escapeHTML('UCR 2027 — '+copy.note)+'" style="'+bg+'">'+
           '<a class="ucr-hit ucr-wa" href="'+href+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.wa)+'"></a>'+
           '<a class="ucr-hit ucr-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.ig)+'"></a>'+
           '</div></div><p class="ucr-ad-note">'+escapeHTML(copy.note)+'</p></div>';
