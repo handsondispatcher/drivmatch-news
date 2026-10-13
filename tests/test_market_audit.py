@@ -68,6 +68,15 @@ class MarketReleaseSchedule(unittest.TestCase):
         self.assertFalse(any(x.startswith('diesel:official_release_due')
                              for x in source_schedule_warnings(q,t)))
 
+    def test_october_2026_brazil_holiday_preserves_last_real_ptax(self):
+        from scripts.audit_market import fx_expected_observation
+        # Tuesday morning follows 12 October banking holiday.
+        t=datetime(2026,10,13,15,tzinfo=UTC)
+        self.assertEqual(fx_expected_observation(t).isoformat(),'2026-10-09')
+        # After afternoon BCB publishing window, a 13 Oct bulletin is due.
+        t=datetime(2026,10,13,19,tzinfo=UTC)
+        self.assertEqual(fx_expected_observation(t).isoformat(),'2026-10-13')
+
     def test_warn_when_new_diesel_release_is_due(self):
         from scripts.audit_market import diesel_expected_observation,source_schedule_warnings
         t=datetime(2026,10,14,18,tzinfo=UTC)
