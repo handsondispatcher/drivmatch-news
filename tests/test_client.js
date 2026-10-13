@@ -12,6 +12,7 @@ class Element {
  querySelectorAll(){return [];}
 
  get classList(){return {add(){},remove(){},toggle(){}};}
+ focus(){}
  scrollIntoView(){}
 }
 const ids=['search','age','language','languageFlag','edition-date','category','chips','list','count','pagecount','prev','next','features','featureCount','featurePrev','featureNext','featureDots','highlights','highlights-title','highlights-note','highlightList','newsroom-section-label','newsroom-section-desc','newsroom-cta-eyebrow','newsroom-cta-title','newsroom-cta-desc','newsroom-cta-driver','newsroom-cta-carrier','market','market-note','news-freshness','market-mobile','market-note-mobile','market-title-mobile','ad-slot','news-commercial-banner','market-commercial-banner','modalimg','modalkicker','modaltitle','modalmeta','modalbodytext','modalbrief','article-disclosure','article-source','articleLanguageTitle','articleLanguageButtons','share-whatsapp','share-copy','share-native','share-label','share-section-title','share-feedback','share-options','share-options-close','share-system','share-system-label','share-story','share-story-label','share-whatsapp-copy','share-stories-hint','share-picker-feedback','article-reading','article-impact-actions','article-impact-title','article-impact-note','article-impact-text','newsdesk-impact-shade','newsdesk-impact-close','article-dialog','translation','shade','noticias','footer-publisher','footer-legal','story-preview','story-preview-image','story-preview-download','story-preview-close','story-preview-title','story-preview-hint'];
