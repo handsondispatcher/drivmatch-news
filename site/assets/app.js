@@ -346,15 +346,19 @@
     const value=Number(v.value),observed=Date.parse(v.observed_at||'');
     if(!Number.isFinite(value)||value<=0||!Number.isFinite(observed)||!String(v.source||'').trim())return false;
     const age=Date.now()-observed;
-    const maxAge={usdbrl:5,diesel:35,brent:14}[key]*86400000;
-    return age>=-86400000 && age<=maxAge;
+    const maxAge={usdbrl:5,diesel:12,brent:5}[key]*86400000;
+    return age>=-86400000 && age<=(v.session_status==='open'?5*60000:maxAge);
   }
   function marketValue(v,key){
     const status=key==='usdbrl'
       ?(v.instrument==='ptax_reference'
-         ?(lang==='pt'?'Última PTAX oficial de venda':lang==='es'?'Última PTAX oficial de venta':'Last official BCB PTAX sell reference')
-         :(lang==='pt'?'Último fechamento comercial verificado':lang==='es'?'Último cierre comercial verificado':'Last verified commercial close'))
-      : (v.quote_status||({pt:'Último dado disponível',es:'Último dato disponible',en:'Last available observation'}[lang]));
+         ?(lang==='pt'?'Última PTAX oficial de venda':lang==='es'?'Última PTAX oficial de venta':'Last official PTAX sell reference')
+         :v.session_status==='open'
+           ?(lang==='pt'?'Cotação comercial recente':lang==='es'?'Cotización comercial reciente':'Recent commercial spot quote')
+           :(lang==='pt'?'Último fechamento comercial verificado':lang==='es'?'Último cierre comercial verificado':'Last verified commercial close'))
+      :key==='diesel'
+        ?(lang==='pt'?'Última publicação semanal EIA':lang==='es'?'Última publicación semanal EIA':'Latest weekly EIA release')
+        :(lang==='pt'?'Última referência diária EIA':lang==='es'?'Última referencia diaria EIA':'Latest daily EIA observation');
     const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
     const unit=key==='usdbrl'?'R$': 'US$';
     const observed=String(v.observed_at||'').slice(0,16).replace('T',' ');
