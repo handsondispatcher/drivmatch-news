@@ -21,6 +21,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 SHARE_BASE = "https://handsondispatcher.github.io/drivmatch-news"
+SHARE_PREVIEW_VERSION = "og-photo-top-20261013-r3"
 ARTICLE_BASE = "https://drivmatch.com/news"
 SAFE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,99}$")
 CARD_SIZE = (1200, 630)
@@ -103,61 +104,69 @@ def _illustrative_photo(category):
 
 
 def create_card(title: str, category: str, target: Path, story=None):
-    """Always produces a 1200x630 JPEG, even when editorial photography is offline."""
-    w, h = CARD_SIZE
-    image = Image.new("RGB", (w, h), "#07192c")
-    # Render the gradient in scanlines instead of expensive per-pixel Python loops.
-    d = ImageDraw.Draw(image)
-    for y in range(h):
-        d.line((0,y,w,y),fill=(7,26+8*y//h,53+13*y//h))
-    photo = _image_for_story(story or {}) or _illustrative_photo(category)
+    """1200x630 social preview: news photo TOP, bold title below, concise CTA.
+
+    Reuse only licensed, attributed, first-party archive photographs. When no
+    appropriate licensed news illustration exists, fall back to an explicitly
+    illustrative photo or the branded abstract graphic, not scraped publisher art.
+    """
+    w,h=CARD_SIZE
+    image=Image.new("RGB",(w,h),"#07192c")
+    draw=ImageDraw.Draw(image)
+    photo=_image_for_story(story or {}) or _illustrative_photo(category)
     if photo:
-        image.paste(ImageOps.fit(photo, (465, 630), Image.Resampling.LANCZOS), (735, 0))
-        d = ImageDraw.Draw(image, "RGBA")
-        d.rectangle((688, 0, 810, 630), fill=(7, 24, 43, 155))
-        d.rectangle((735, 0, 1200, 630), outline=(255, 255, 255, 18), width=2)
-        d.rounded_rectangle((762, 570, 1145, 608), radius=7, fill=(3, 18, 32, 208))
-        d.text((778, 579), 'IMAGEM ILUSTRATIVA', font=_font(18, True), fill='white')
+        image.paste(ImageOps.fit(photo,(w,325),Image.Resampling.LANCZOS,
+                                centering=(0.5,0.55)),(0,0))
     else:
-        d = ImageDraw.Draw(image)
+        for y in range(325):
+            draw.line((0,y,w,y),fill=(7,32+y//12,54+y//12))
         for i in range(7):
-            x = 860 + i*46
-            d.line((x, 115, x-120, 510), fill=(15, 68+i*6, 113+i*7), width=16)
-        d.ellipse((870, 167, 1200, 497), outline="#1d90f1", width=5)
-        d.line((787, 500, 1190, 500), fill="#2b9ee8", width=6)
-    d = ImageDraw.Draw(image)
-    d.rectangle((0, 0, 16, 630), fill="#148ff0")
-    # Use the approved horizontal logo file; do not recreate its symbol or type.
-    logo_path = SITE / "assets" / "logo-drivmatch-news.png"
+            draw.line((140+i*180,62,20+i*180,320),fill="#176da2",width=13)
+    draw=ImageDraw.Draw(image,"RGBA")
+    draw.rectangle((0,0,w,88),fill=(0,16,32,190))
+    draw.rounded_rectangle((39,224,300,277),radius=8,fill=(6,109,185,245))
+    draw.text((57,238),str(category or "TRANSPORTE").upper()[:22],
+              font=_font(20,True),fill="white")
+    draw.rounded_rectangle((840,269,1165,307),radius=6,fill=(0,17,34,200))
+    draw.text((854,279),"FOTO ILUSTRATIVA • ARQUIVO",
+              font=_font(16,True),fill="white")
+    draw.rectangle((0,325,w,h),fill=(6,26,49,255))
+    # Preserve the official logo asset.
+    logo_path=SITE/"assets"/"logo-drivmatch-news.png"
     if logo_path.is_file():
-        with Image.open(logo_path) as logo:
-            logo = logo.convert("RGBA")
-            logo.thumbnail((470, 112), Image.Resampling.LANCZOS)
-            image.paste(logo, (55, 40), logo)
+        with Image.open(logo_path) as logo_img:
+            logo=logo_img.convert("RGBA")
+            logo.thumbnail((325,57),Image.Resampling.LANCZOS)
+            image.paste(logo,(48,335),logo)
     else:
-        d.text((61, 65), "DrivMatch News", font=_font(40, True), fill="white")
-    d = ImageDraw.Draw(image)
-    label = (str(category or "TRANSPORTE").upper())[:36]
-    d.rounded_rectangle((62, 176, min(700, 90+len(label)*17), 220), radius=10, fill="#1379bc")
-    d.text((78, 188), label, font=_font(19, True), fill="white")
-    font = _font(45, True)
-    lines = _line_wrap(d, title, font, 620, max_lines=4)
-    for n, line in enumerate(lines):
-        d.text((60, 248+n*63), line, font=font, fill="#ffffff", stroke_width=0)
-    d.line((62, 556, 680, 556), fill="#38aeff", width=4)
-    d.text((62, 575), "NOTÍCIAS DE TRANSPORTE E LOGÍSTICA", font=_font(17, True), fill="#c5e4f9")
-    target.parent.mkdir(parents=True, exist_ok=True)
-    image.save(target, "JPEG", quality=89, optimize=True, progressive=False)
+        draw.text((48,341),"DrivMatch News",font=_font(25,True),fill="#65c0ff")
+    # Scale long syndicated headlines to fit without eating the CTA area.
+    title=str(title).strip()
+    for size in (40,38,36,34,32,30,28):
+        font=_font(size,True)
+        lines=_line_wrap(draw,title,font,1095,max_lines=4)
+        if len(lines)*(size+8)<=181 and (len(lines)<4 or size<=32):
+            break
+    lines=_line_wrap(draw,title,font,1095,max_lines=4)
+    for n,line in enumerate(lines):
+        draw.text((48,387+n*(size+8)),line,font=font,fill="white")
+    draw.text((50,577),"NOTÍCIAS DE TRANSPORTE E LOGÍSTICA",
+              font=_font(15,True),fill="#d3e4f4")
+    draw.rounded_rectangle((914,563,1155,607),radius=8,fill=(8,122,201,255))
+    draw.text((943,575),"CLIQUE E LEIA ↗",font=_font(18,True),fill="white")
+    target.parent.mkdir(parents=True,exist_ok=True)
+    image.save(target,"JPEG",quality=89,optimize=True,progressive=False)
 
 
 def _write_page(directory, story, slug, title, description, locale="pt-BR"):
     if not SAFE_ID.fullmatch(slug):return False
-    share_url=SHARE_BASE+"/share/"+slug+"/"
+    share_root=SHARE_BASE+"/share/"+slug+"/"
+    share_url=share_root+"?v="+SHARE_PREVIEW_VERSION
     article_url=ARTICLE_BASE+"/?story="+slug
     target=directory/slug
     target.mkdir(parents=True,exist_ok=True)
     create_card(title,str(story.get("category") or "Transporte"),target/"social.jpg",story)
-    image_url=share_url+"social.jpg"
+    image_url=share_root+"social.jpg?v="+SHARE_PREVIEW_VERSION
     esc=lambda v:escape(str(v),quote=True)
     og_locale={"pt-BR":"pt_BR","en-US":"en_US","es-419":"es_MX"}.get(locale,"pt_BR")
     page=f"""<!doctype html>

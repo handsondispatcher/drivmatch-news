@@ -350,7 +350,7 @@
   }
   // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.
   // Social platforms require our own crawlable Open Graph page, never an RSS redirect.
-  const shareUrlOf = a => 'https://handsondispatcher.github.io/drivmatch-news/share/'+encodeURIComponent(a.id)+'/';
+  const shareUrlOf = a => 'https://handsondispatcher.github.io/drivmatch-news/share/'+encodeURIComponent(a.id)+'/?v=og-photo-top-20261013-r3';
   let sharedStoryConsumed=false;
   function openSharedStory(){
     if(sharedStoryConsumed)return;
