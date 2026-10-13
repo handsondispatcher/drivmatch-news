@@ -402,8 +402,9 @@ class PublicationTests(unittest.TestCase):
     with self.assertRaises(ValueError):up.official_bcb_usdbrl()
 
  def test_fred_real_header(self):
-  with patch.object(up,'fetch',return_value='observation_date,GASDESW\n2026-09-28,6.382\n2026-10-05,6.199\n'):
-   self.assertEqual(up.fred_latest('GASDESW','EIA')['value'],6.199)
+  with patch.object(up,'NOW',return_value=datetime(2026,10,6,12,tzinfo=timezone.utc)):
+   with patch.object(up,'fetch',return_value='observation_date,GASDESW\n2026-09-28,6.382\n2026-10-05,6.199\n'):
+    self.assertEqual(up.fred_latest('GASDESW','EIA')['value'],6.199)
  def test_feed_date_host_and_dedup_input(self):
   feed='<rss><channel><item><title>Transport event</title><link>https://example.com/news/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item><item><title>Bad date</title><link>https://example.com/2</link></item><item><title>Wrong host</title><link>https://evil.example/1</link><pubDate>Thu, 08 Oct 2026 10:00:00 GMT</pubDate></item></channel></rss>'
   rows=parse_feed(feed,{'url':'https://example.com','name':'Fixture','category':'Transporte','original_lang':'en'},datetime(2026,10,8,23,tzinfo=timezone.utc))
