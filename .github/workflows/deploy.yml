@@ -82,6 +82,7 @@ jobs:
           BRENT_PUBLIC_URL: ${{ vars.BRENT_PUBLIC_URL }}
           BRENT_REDISTRIBUTION_AUTHORIZED: ${{ vars.BRENT_REDISTRIBUTION_AUTHORIZED }}
           BRENT_SPOT_TOKEN: ${{ secrets.BRENT_SPOT_TOKEN }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
           YOUTUBE_DATA_API_KEY: ${{ secrets.YOUTUBE_DATA_API_KEY }}
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
