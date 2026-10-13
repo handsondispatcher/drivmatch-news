@@ -347,7 +347,7 @@
     if(!Number.isFinite(value)||value<=0||!Number.isFinite(observed)||!String(v.source||'').trim())return false;
     const age=Date.now()-observed;
     const maxAge={usdbrl:5,diesel:12,brent:5}[key]*86400000;
-    return age>=-86400000 && age<=(v.session_status==='open'?5*60000:maxAge);
+    return age>=-5*60000 && age<=(v.session_status==='open'?5*60000:maxAge);
   }
   function marketValue(v,key){
     const status=key==='usdbrl'
