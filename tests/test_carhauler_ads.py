@@ -28,6 +28,13 @@ class AdvertisingCampaigns(unittest.TestCase):
   for name in ('news-commercial-banner','market-commercial-banner','article-commercial-banner','mobile-commercial-banner','news-carhauler-banner'):
    self.assertIn('id="'+name+'"',html)
   self.assertIn('function renderAds()',js)
+  self.assertIn('const carLabels={',js)
+  self.assertIn('FRETE DISPONÍVEL PARA TRANSPORTE DE VEÍCULOS',js)
+  self.assertIn('AVAILABLE LOAD FOR CAR HAULERS',js)
+  self.assertIn('CARGA DISPONIBLE PARA TRANSPORTISTAS DE VEHÍCULOS',js)
+  self.assertIn('escapeHTML(carCopy.disclosure)',js)
+  self.assertIn('escapeHTML(carCopy.visual)',js)
+  self.assertIn('carhauler-photo1-'+"'"+",js)
   self.assertIn('ucr-frame-horizontal',js)
   self.assertIn('ucr-approved-landscape',js)
   self.assertIn('ucr-approved-art',js)
