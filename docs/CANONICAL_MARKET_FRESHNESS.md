@@ -77,3 +77,15 @@ Owner approval: "Aprovado / Ativar / Salvar" — 2026-10-13. This policy superse
 - When a legitimately published third-party TradingView component is the visible market provider, **its internal decimal precision is controlled by TradingView and cannot be reliably rewritten without replacing it with a separately licensed numerical quote API**. Do not claim two-digit control over content inside an external provider's web component. Pursue direct licensed commercial feeds to meet both strict two-decimal precision and automatic minute-by-minute updating in the identical native design.
 - Show ICE Brent Futures with its exchange/session/quote-delay conditions via the official provider-managed widget. Never show a stale EIA daily figure as live Brent.
 - If no authorized commercial quote can be confirmed, retain a *verified commercial closing quote within the bounded off-market period* or show unavailable. Do not invent a real-time price or fabricate price movements.
+
+## Market UI clean source-link correction — 2026-10-13
+
+Approved scope: only market header/sidebar display. This replaces the previous widget-based visual implementation above.
+
+- Headings Dólar, Diesel nos EUA, and Petróleo Brent must be legible and prominent (about 15 px desktop, 14 px responsive), with large prices (about 19 px desktop, 17 px compact). Use 2 decimal places for DrivMatch's own price fields.
+- Do not embed `tv-tickers` or any other vendor marketplace panel in the news header or sidebar. It cluttered the strip, changed typography, and TradingView does not authorize certain ICEEUR:BRN1! symbols for embedded displays. Source-link text is permitted and preferred.
+- Click **Dólar** to open the USD/BRL market page at TradingView; click **Diesel nos EUA** to open the official EIA/FRED retail diesel chart; click **Petróleo Brent** to open the Investing.com Brent futures page. Links must be outside any source price extraction.
+- Show a fresh validated quote and its percentage in the newspaper's own clean style only where we have a suitably licensed feed. When a quote is missing or stale (including EIA historical Brent), display a compact **Ver cotação ↗** source hyperlink inside the value slot; do NOT fabricate prices, pretend to stream data, misrepresent PTAX as live USD/BRL, scrape websites, or reuse expired physical-spot observations.
+- Audit source state and timestamp behind the scenes. No timestamp paragraphs under prices. Weekly EIA pump-price average remains weekly.
+- This UI fix is not proof of a working minute-by-minute USD/BRL or Brent numerical API. Source contracts and authorization remain outstanding until configured and observed in production. Report that limitation transparently.
+- This release must not move or edit any UCR, car-hauler or driver advertisement, news order or other approved site element.
