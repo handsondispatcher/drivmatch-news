@@ -913,10 +913,78 @@ body{background:#f7f9fc;color:#14283c}
  #article-dialog.external-article .article-original-link{padding:7px 9px;font-size:11px;margin:7px 0 3px}
  #article-dialog .source-translations button.article-source-button{height:35px;min-height:35px}
 }
+
+/* Official compact News Desk reader: source links before sharing; professional
+   actions LAST. Restore original source instead of a headline summary. */
+#article-dialog.external-article #modalbodytext,
+#article-dialog.external-article #modalbrief{display:none!important}
+#article-dialog.external-article #modaltitle{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+  overflow:hidden;line-height:1.17;max-height:3.51em;overflow-wrap:anywhere;
+}
+#article-dialog.external-article #modaltitle.headline-expanded{
+  display:block;max-height:none;-webkit-line-clamp:unset;overflow:visible;
+}
+#article-dialog .article-original-link{
+  display:inline-block;margin:2px 0;padding:0;border:0;background:transparent;
+  box-shadow:none;font:11px/1.2 Arial,sans-serif;text-decoration:underline;color:#315b76;
+}
+#article-dialog .article-original-link:hover{background:transparent}
+#article-dialog .source-translations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin:3px 0}
+#article-dialog .source-translations .article-source-button,
+#article-dialog .source-translations .article-source-button.primary,
+#article-dialog.external-article .source-translations .article-source-button,
+#article-dialog.external-article .source-translations .article-source-button.primary{
+  display:flex;align-items:center;justify-content:center;flex-direction:row;
+  flex:initial;width:100%;min-width:0;min-height:30px;height:30px;
+  box-sizing:border-box;padding:2px 3px;gap:4px;font-size:11px;line-height:1.1;
+  text-decoration:none;white-space:nowrap;border-radius:4px
+}
+#article-dialog .source-translations .article-source-button img{width:17px;height:12px;flex:none}
+#article-dialog .source-translations .source-label-full{display:inline!important}
+#article-dialog .source-translations .source-label-mobile{display:none!important}
+#article-dialog .full-article-heading{margin:0 0 2px}
+#article-dialog .article-original{padding-top:3px;margin:4px 0}
+#article-dialog .source-access-warning{font-size:10px;line-height:1.2;margin:2px 0 0}
+#article-dialog .image-credit{font-size:9px;line-height:1.15;margin:3px 0}
+#article-dialog .newsdesk-actions{
+  margin:5px 0 0;padding:6px 8px;border:1px solid #c9dfef;
+  background:#f4f9fd;border-radius:7px
+}
+#article-dialog .newsdesk-actions h3{font-size:12px;line-height:1.2;margin:0 0 5px}
+#article-dialog .article-impact-actions{gap:5px}
+#article-dialog .article-impact-actions button{min-height:34px;font-size:12px;padding:5px}
+@media(max-width:650px){
+ #article-dialog .modalhero img{height:30px}
+ #article-dialog .modalhead{min-height:26px;padding:2px 9px}
+ #article-dialog .modalbody{padding:0 9px 4px}
+ #article-dialog h1{font-size:15px;line-height:1.16;margin:3px 0 2px}
+ #article-dialog #modalmeta{font-size:10px}
+ #article-dialog .article-reading{padding:3px 5px;margin:4px 0}
+ #article-dialog .article-reading strong{font-size:10px}
+ #article-dialog .article-reading .article-language-buttons{margin-top:3px;gap:4px}
+ #article-dialog .article-reading .article-language-buttons button{
+  min-height:29px;height:29px;padding:3px 1px;font-size:10.5px
+ }
+ #article-dialog .article-original{padding-top:3px;margin:4px 0 3px}
+ #article-dialog .full-article-heading{font-size:10px;margin:0 0 2px}
+ #article-dialog .source-translations{margin:2px 0}
+ #article-dialog .source-access-warning{display:none}
+ #article-dialog .source-access-short{display:block;font-size:9px;line-height:1.15;margin:2px 0}
+ #article-dialog .article-original-link{font-size:10px;line-height:1.1;margin:1px 0}
+ #article-dialog .article-share-footer{margin:4px 0 0;padding:4px 0 0}
+ #article-dialog .article-share-footer>strong{font-size:10px}
+ #article-dialog .article-share-actions{margin:3px 0 0;gap:5px}
+ #article-dialog .article-share-actions button{min-height:31px;height:31px;padding:3px 5px;font-size:11px}
+ #article-dialog .newsdesk-actions{margin:4px 0 0;padding:5px 7px}
+ #article-dialog .newsdesk-actions h3{font-size:11px;margin:0 0 4px}
+ #article-dialog .article-impact-actions button{min-height:31px;height:31px;padding:3px;font-size:11px}
+ #article-dialog.external-article #modaltitle{max-height:3.51em}
+}
 </style>
 </head>
 <body>
-<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.11</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português (Brasil)</option><option value="en">English</option><option value="es">Español (Latinoamérica)</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true" title="Português brasileiro (pt-BR)"><img src="assets/flag-br.svg" alt="">Português BR</button><button type="button" data-site-lang="en" aria-pressed="false" title="English (US)"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false" title="Español latinoamericano (es-419)"><img src="assets/flag-es.svg" alt="">Español LatAm</button></span></span></div></div></header>
+<header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.11</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português (Brasil)</option><option value="en">English</option><option value="es">Español (Latinoamérica)</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true" title="Português brasileiro (pt-BR)"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false" title="English (US)"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false" title="Español latinoamericano (es-419)"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
 
 <section id="dm-utility" class="dm-utility" aria-label="Cotações e condições do tempo">
  <div class="dm-util-inner">
@@ -1009,13 +1077,6 @@ body{background:#f7f9fc;color:#14283c}
 <p id="translation" class="smalltext"></p>
 </section>
 <p id="modalbodytext"></p><p id="modalbrief" aria-label="Resumo do acesso à fonte"></p><p class="disclosure" id="article-disclosure"></p>
-<section class="newsdesk-actions" aria-label="Análises profissionais News Desk">
-<h3>Como esta notícia impacta sua profissão?</h3>
-<div id="article-impact-actions" class="article-impact-actions" role="group" aria-label="Abrir análise por profissão">
-<button type="button" data-impact-role="driver" aria-haspopup="dialog">🚛 Motorista</button>
-<button type="button" data-impact-role="dispatcher" aria-haspopup="dialog">🎧 Dispatcher</button>
-</div>
-</section>
 <section class="article-original" id="article-original" aria-label="Reportagem completa na fonte"><div id="article-source"></div></section>
 <section class="article-share-footer" id="article-share-footer" aria-label="Compartilhamento da notícia">
 <strong id="share-section-title">Compartilhe esta notícia</strong>
@@ -1033,6 +1094,13 @@ body{background:#f7f9fc;color:#14283c}
 <a data-share-platform="email" aria-label="Compartilhar no E-mail" target="_self" rel="noopener noreferrer"><img src="https://cdn.simpleicons.org/gmail/EA4335" alt="" width="26" height="26" loading="lazy"><span>E-mail</span></a><button id="share-story" type="button" class="share-picker-story" aria-label="Criar imagem para publicar em Stories do Instagram, TikTok ou WhatsApp"><span class="story-icons" aria-hidden="true"><img src="https://cdn.simpleicons.org/instagram/E4405F" alt="" width="23" height="23"><img src="https://cdn.simpleicons.org/tiktok/111111" alt="" width="23" height="23"></span><span id="share-story-label">Card Stories</span></button><button id="share-system" type="button" class="share-picker-system" hidden><span aria-hidden="true">↗</span><span id="share-system-label">Outros apps</span></button></div><button id="share-whatsapp-copy" type="button" class="share-whatsapp-copy">Já está no WhatsApp Web? Copiar mensagem para colar na conversa</button><p class="share-hint" id="share-stories-hint">Stories: salve a imagem e publique no seu aplicativo. Não há publicação automática em Stories.</p><p id="share-picker-feedback" role="status" aria-live="polite"></p></div>
 <span id="share-feedback" role="status" aria-live="polite"></span>
 </div></section>
+<section class="newsdesk-actions" aria-label="Análises profissionais News Desk">
+<h3>Como esta notícia impacta sua profissão?</h3>
+<div id="article-impact-actions" class="article-impact-actions" role="group" aria-label="Abrir análise por profissão">
+<button type="button" data-impact-role="driver" aria-haspopup="dialog">🚛 Motorista</button>
+<button type="button" data-impact-role="dispatcher" aria-haspopup="dialog">🎧 Dispatcher</button>
+</div>
+</section>
 
 </div></article></div>
 <div class="newsdesk-impact-shade" id="newsdesk-impact-shade" hidden role="presentation">
@@ -1045,9 +1113,9 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/analytics-config.js" defer></script>
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-21-editorial-labels-native-reader-20261013" defer></script>
+<script src="assets/app.js?v=v34-21-editorial-labels-restore-source-20261013" defer></script>
 <script src="assets/road-tv-live.js?v=v34-18-durable-live-first-20261011" defer></script>
 <script src="assets/utility-strip.js?v=v34-11-national-weather-20261010" defer></script>
-<script src="assets/news-crawler.js?v=native-reader-20261013" defer></script>
+<script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>
