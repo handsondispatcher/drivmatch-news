@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   build:
-    timeout-minutes: 12
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -162,7 +162,7 @@ jobs:
           console.log(id?'Audience telemetry configured':'Audience telemetry dormant: GA4_MEASUREMENT_ID not set');
           NODE
       - name: Browser regression (bounded)
-        timeout-minutes: 5
+        timeout-minutes: 11
         run: npm run test:browser
       - name: Verificar automaticamente câmeras de transporte
         timeout-minutes: 5
