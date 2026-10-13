@@ -25,22 +25,7 @@ function marketFresh(v,key){
    return age<=21*86400000;
  return age<=({usd:5,diesel:12,brent:5}[key]*86400000);
 }
-// TradingView's own embeddable ticker is the public data provider for FX
-// and ICE Brent futures. No unlicensed widget scraping or fabricated ticks.
-function initializeTradingViewMarket(){
- if(typeof window==='undefined'||!window.customElements||
-    !window.customElements.whenDefined)return;
- // The 10-second race used to permanently suppress Brent even after the
- // actual provider component arrived. Never time out provider activation.
- window.customElements.whenDefined('tv-tickers').then(()=>{
-  for(const key of ['usd','brent']){
-   const host=el('top-'+key+'-tradingview');
-   if(host)host.hidden=false;
-  }
-  el('top-brent-label').textContent=lang()==='en'?'Brent Futures':lang()==='es'?'Brent (futuros)':'Brent (futuros)';
-  document.dispatchEvent(new CustomEvent('drivmatch:tradingview-ready'));
- }).catch(()=>{});
-}
+// External quotes remain attributed links, not unsupported market embeds.
 // MARKET_QUOTE_UI_RELEASE: compact-prices-only-20261013
 function showMarket(){
  const l=lang(),localized=(pt,en,es)=>l==='en'?en:l==='es'?es:pt;
@@ -55,10 +40,7 @@ function showMarket(){
  // Never relabel an official PTAX reference as a traded commercial quote.
  el('top-usd-label').textContent=localized('Dólar','US Dollar','Dólar');
  el('top-diesel-label').textContent=localized('Diesel nos EUA','US Diesel','Diésel en EE. UU.');
- el('top-brent-label').textContent=
-  el('top-brent-tradingview')?.hidden===false
-   ?localized('Brent (futuros)','Brent Futures','Brent (futuros)')
-   :localized('Petróleo Brent','Brent Crude Oil','Petróleo Brent');
+ el('top-brent-label').textContent=localized('Petróleo Brent','Brent Crude Oil','Petróleo Brent');
  const values=[
   {id:'usd',data:usd,decimals:2,prefix:'R$ ',suffix:''},
   {id:'diesel',data:market.diesel,decimals:2,prefix:'US$ ',suffix:'/gal'},
@@ -72,7 +54,25 @@ function showMarket(){
    const value=el('top-'+item.id+'-value');
    const chg=el('top-'+item.id+'-change');
    const meta=el('top-'+item.id+'-date');
-   value.textContent=current?item.prefix+number(v.value,item.decimals)+item.suffix:'—';
+   if(current){
+     value.textContent=item.prefix+number(v.value,item.decimals)+item.suffix;
+     value.classList.remove('dm-market-missing');
+   }else{
+     // Clear but useful fallback: opens a real provider page, never an old
+     // number labeled as the current price.
+     const url=item.id==='usd'
+       ?'https://br.tradingview.com/symbols/FX_IDC-USDBRL/'
+       :item.id==='brent'
+       ?'https://br.investing.com/commodities/brent-oil'
+       :'https://www.tradingview.com/symbols/FRED-GASDESW/';
+     value.textContent='';
+     const link=document.createElement('a');
+     link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+     link.textContent=localized('Ver cotação ↗','View quote ↗','Ver cotización ↗');
+     link.setAttribute('aria-label',localized('Consultar cotação na fonte','Check quote at source','Consultar cotización en la fuente'));
+     value.appendChild(link);
+     value.classList.add('dm-market-missing');
+   }
    const pct=current&&v.change_pct!==null&&v.change_pct!==undefined&&Number.isFinite(Number(v.change_pct))?Number(v.change_pct):null;
    chg.hidden=pct===null;
    chg.classList.toggle('negative',pct!==null&&pct<0);
@@ -383,7 +383,6 @@ function init(){
  el('language')?.addEventListener('change',()=>{showMarket();showCity();setSearchLocale()});
  document.addEventListener('drivmatch:language',()=>{showMarket();showCity();setSearchLocale()});
  if(location.protocol.startsWith('http')){
-   initializeTradingViewMarket();
    weather();quotes();live();liveBrent();loadPlaces();
    setInterval(weather,15*60000);setInterval(quotes,60*1000);setInterval(live,15000);setInterval(liveBrent,15000);
  }
