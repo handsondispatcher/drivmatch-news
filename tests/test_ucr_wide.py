@@ -23,8 +23,9 @@ class UCRNativeWideCreativeQA(unittest.TestCase):
     for x,y in ((0,200),(1773,200),(500,0),(1773,393)):
      self.assertLess(sum(im.getpixel((x,y))),650,'Unexpected blank white band')
     # Native WhatsApp and Instagram regions are visibly green/purple.
-    r,g,b=im.getpixel((300,370));self.assertGreater(g,r)
-    r,g,b=im.getpixel((1000,370));self.assertGreater(r,b//2)
+    # Sample CTA backgrounds away from the intentionally white phone text.
+    r,g,b=im.getpixel((500,330));self.assertGreater(g,r)
+    r,g,b=im.getpixel((1100,330));self.assertGreater(b,g);self.assertGreater(r,g)
  def test_build_script_source_integrity_guard(self):
   script=(ROOT/'scripts/build_ucr_exact_wide.py').read_text()
   self.assertIn('MASTER_PIXEL_SHA256',script)
