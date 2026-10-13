@@ -57,5 +57,25 @@ class MarketAudit(unittest.TestCase):
         report=validate({'indicators':{'usdbrl':q}},now)
         self.assertEqual(report['indicators']['usdbrl'],'invalid')
 
+class MarketReleaseSchedule(unittest.TestCase):
+    def test_columbus_day_2026_no_false_diesel_alarm_tuesday(self):
+        from scripts.audit_market import diesel_expected_observation,source_schedule_warnings
+        t=datetime(2026,10,13,16,tzinfo=UTC)
+        expected,release=diesel_expected_observation(t)
+        self.assertEqual(expected.isoformat(),'2026-10-05')
+        self.assertIn('2026-10-14T10:00:00',release)
+        q={'diesel':{'observed_at':'2026-10-05'}}
+        self.assertFalse(any(x.startswith('diesel:official_release_due')
+                             for x in source_schedule_warnings(q,t)))
+
+    def test_warn_when_new_diesel_release_is_due(self):
+        from scripts.audit_market import diesel_expected_observation,source_schedule_warnings
+        t=datetime(2026,10,14,18,tzinfo=UTC)
+        expected,_=diesel_expected_observation(t)
+        self.assertEqual(expected.isoformat(),'2026-10-12')
+        q={'diesel':{'observed_at':'2026-10-05'}}
+        self.assertTrue(any(x.startswith('diesel:official_release_due')
+                            for x in source_schedule_warnings(q,t)))
+
 if __name__=='__main__':
     unittest.main()
