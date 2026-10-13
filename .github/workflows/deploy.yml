@@ -156,6 +156,8 @@ jobs:
       - name: Instalar e verificar Foto 1 oficial sem alterações
         timeout-minutes: 3
         run: python scripts/install_carhauler_photo1.py
+      - name: Verificar arte original do classificado Aileen Souza
+        run: python scripts/verify_aileen_driver_classified.py
       - name: War Room — verificar frescor editorial e descoberta de vídeos
         if: always()
         run: |
