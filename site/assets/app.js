@@ -355,7 +355,7 @@
   function marketValue(v,key){
     const status=key==='usdbrl'
       ?(v.instrument==='ptax_reference'
-         ?(lang==='pt'?'Última PTAX oficial de venda':lang==='es'?'Última PTAX oficial de venta':'Last official PTAX sell reference')
+         ?(v.session_status==='reference_intraday'?(lang==='pt'?'PTAX parcial de hoje — não é dólar comercial':lang==='es'?'PTAX parcial de hoy — no es dólar comercial':'Intraday PTAX reference — not commercial spot'):(lang==='pt'?'Última PTAX oficial de venda':lang==='es'?'Última PTAX oficial de venta':'Last official PTAX sell reference'))
          :v.session_status==='open'
            ?(lang==='pt'?'Cotação comercial recente':lang==='es'?'Cotización comercial reciente':'Recent commercial spot quote')
            :(lang==='pt'?'Último fechamento comercial verificado':lang==='es'?'Último cierre comercial verificado':'Last verified commercial close'))
