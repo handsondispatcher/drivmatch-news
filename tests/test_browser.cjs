@@ -121,6 +121,22 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#news-commercial-banner .ucr-frame').count(),0,'UCR must never replace the horizontal vehicle load banner');
    assert.equal(await page.locator('#market-commercial-banner .ucr-frame-square').count(),1,'UCR square creative stays in the right sidebar');
    assert.equal(await page.locator('#market-commercial-banner').isVisible(),width>=991,'Right sidebar UCR is visible only on desktop');
+   // Independent approved driver classified directly under UCR, not dependent
+   // on the dynamic ads bootstrap. Contact hotspot keeps Aileen's own phone.
+   const driverPoster=page.locator('#market-driver-availability-banner .dm-driver-poster-open img');
+   assert.equal(await driverPoster.count(),1,'Original Aileen JPG must exist in the static sidebar HTML');
+   assert.equal(await page.locator('#market-driver-availability-banner .dm-driver-whatsapp-hotspot').getAttribute('href'),
+     'https://wa.me/14072852874','Printed driver phone must open Aileen WhatsApp');
+   const driverLoaded=await driverPoster.evaluate(img=>img.complete&&img.naturalWidth===1229&&img.naturalHeight===1536);
+   assert.equal(driverLoaded,true,'Exact original 1229x1536 classified should load successfully');
+   assert.equal(await page.locator('#market-driver-availability-banner').isVisible(),width>=991,
+     'Aileen classified is visible directly under UCR when desktop sidebar is visible');
+   if(width>=991){
+     const rect=await driverPoster.evaluate(img=>img.getBoundingClientRect());
+     assert.ok(rect.width>140&&rect.width<=330,'Portrait must fit within sidebar limits');
+     assert.ok(Math.abs(rect.width/rect.height-(1229/1536))<0.01,'Original image aspect must remain unchanged');
+   }
+
    assert.equal(await page.locator('#news-carhauler-banner .car-official-ad').count(),0,'No duplicate vehicle creative below the stories');
    assert.equal(await page.locator('#news-carhauler-banner .ucr-native-banner').count(),1,'Native UCR fills lower horizontal ad slot');
    assert.equal(await page.locator('#news-carhauler-banner .ucr-approved-landscape').count(),0,'No letterboxed 2:1 image in the 4.5:1 slot');
