@@ -21,6 +21,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 SHARE_BASE = "https://handsondispatcher.github.io/drivmatch-news"
+SHARE_PREVIEW_VERSION = "og-photo-top-20261013-r3"
 ARTICLE_BASE = "https://drivmatch.com/news"
 SAFE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,99}$")
 CARD_SIZE = (1200, 630)
@@ -159,12 +160,13 @@ def create_card(title: str, category: str, target: Path, story=None):
 
 def _write_page(directory, story, slug, title, description, locale="pt-BR"):
     if not SAFE_ID.fullmatch(slug):return False
-    share_url=SHARE_BASE+"/share/"+slug+"/"
+    share_root=SHARE_BASE+"/share/"+slug+"/"
+    share_url=share_root+"?v="+SHARE_PREVIEW_VERSION
     article_url=ARTICLE_BASE+"/?story="+slug
     target=directory/slug
     target.mkdir(parents=True,exist_ok=True)
     create_card(title,str(story.get("category") or "Transporte"),target/"social.jpg",story)
-    image_url=share_url+"social.jpg"
+    image_url=share_root+"social.jpg?v="+SHARE_PREVIEW_VERSION
     esc=lambda v:escape(str(v),quote=True)
     og_locale={"pt-BR":"pt_BR","en-US":"en_US","es-419":"es_MX"}.get(locale,"pt_BR")
     page=f"""<!doctype html>
