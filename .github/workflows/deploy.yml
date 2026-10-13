@@ -91,6 +91,51 @@ jobs:
         run: python scripts/update.py
       - name: Auditar atualização real de dólar, diesel e Brent
         run: python scripts/audit_market.py
+      - name: Market Watch — registrar anomalias de fonte no GitHub
+        if: always() && github.event_name != 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const title = '[Market Watch] Fontes de dólar, diesel e Brent';
+            const {owner,repo} = context.repo;
+            const open = await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
+            const existing = open.find(x => x.title===title && !x.pull_request);
+            if (!fs.existsSync('build/market-health.json')) {
+              core.warning('Market health report missing; check earlier build/audit steps.');
+              return;
+            }
+            const r=JSON.parse(fs.readFileSync('build/market-health.json','utf8'));
+            const problems = [
+              ...(r.errors||[]),
+              ...(r.warnings||[]),
+              ...Object.entries(r.indicators||{}).filter(([k,v]) => v==='unavailable').map(([k])=>k+':source_unavailable')
+            ].filter((v,i,a)=>a.indexOf(v)===i);
+            const statusLine = Object.entries(r.indicators||{}).map(([k,v])=>
+              k+': '+(typeof v==='object' ? [v.status,v.observed_at,v.source].join(' / '):v)
+            ).join('\n');
+            const body = [
+              '## Market Feed Watchdog',
+              'Gerado automaticamente pelo workflow de publicação.',
+              'Instrumentos com frequências diferentes (USD/BRL, EIA diesel semanal, Brent diário).',
+              '### Anomalias atuais',
+              ...problems.map(p=>'- '+p),
+              '### Última referência verificada',
+              statusLine,
+              'Corrigir fonte e verificar direitos de republicação.',
+              'Nunca substituir PTAX por spot ou diesel de bomba por futuros ULSD.'
+            ].join('\n');
+            if (problems.length) {
+              if (!existing) {
+                await github.rest.issues.create({owner,repo,title,body});
+                core.warning('Market Watch opened an issue: '+problems.join('; '));
+              } else if (existing.body!==body) {
+                await github.rest.issues.update({owner,repo,issue_number:existing.number,body});
+              }
+            } else if (existing) {
+              await github.rest.issues.update({owner,repo,issue_number:existing.number,state:'closed'});
+            }
+
       # Keep the exact, checksum-verified advertiser-approved PNG in Pages,
       # so the browser never depends on third-party hotlinking or image changes.
       - name: Cache da arte oficial Foto 1 (SHA-256 fixo)
