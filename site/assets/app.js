@@ -514,6 +514,39 @@
       box.hidden=true;box.innerHTML='';
 
     }
+    // CLASSIFIED LOCK: new ad belongs AFTER the UCR square, not inside or
+    // in place of the approved UCR/car-hauler creatives.
+    const driverBox=$('market-driver-availability-banner');
+    if(driverBox){
+      driverBox.hidden=true;driverBox.innerHTML='';
+      const driver=(data.ads?.placements||[]).find(p=>
+        p.slot==='market-sidebar-driver'&&p.enabled===true&&
+        p.relationship==='third_party_classified'&&
+        p.creative_type==='approved-driver-poster-original');
+      const art='assets/ads/aileen-souza-motorista-disponivel-original.jpg';
+      const wa='https://wa.me/14072852874';
+      const valid=driver&&driver.image===art&&
+        driver.approved_original_sha256==='191ab228dd8bf894e8ab4ff3585fd372eca9fff83c38cb8901a754afa66d1bc5'&&
+        driver.whatsapp_url===wa&&driver.phone_display==='(407) 285-2874';
+      if(valid){
+        const label=lang==='en'?'ADVERTISEMENT · DRIVER AVAILABLE':
+          lang==='es'?'PUBLICIDAD · CONDUCTORA DISPONIBLE':'PUBLICIDADE · MOTORISTA DISPONÍVEL';
+        driverBox.innerHTML='<div class="dm-driver-ad-label">'+escapeHTML(label)+'</div>'+
+          '<div class="dm-driver-visual">'+
+            '<a class="dm-driver-poster-open" href="'+art+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="Ampliar anúncio original de Aileen Souza">'+
+              '<img src="'+art+'" width="1229" height="1536" alt="Anúncio original enviado por Aileen Souza: motorista disponível, início imediato, informações profissionais e contato WhatsApp (407) 285-2874." decoding="async">'+
+            '</a>'+
+            '<a class="dm-driver-whatsapp-hotspot" href="'+wa+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="Conversar com Aileen Souza no WhatsApp: (407) 285-2874" title="WhatsApp: (407) 285-2874"></a>'+
+          '</div>';
+        const img=driverBox.querySelector('.dm-driver-poster-open img');
+        if(img){
+          const check=()=>{if(img.isConnected)driverBox.hidden=!(img.naturalWidth>0&&img.naturalHeight>0);};
+          img.addEventListener('load',check,{once:true});
+          img.addEventListener('error',()=>{if(img.isConnected){driverBox.hidden=true;driverBox.innerHTML='';}},{once:true});
+          if(img.complete)check();
+        }
+      }
+    }
   }
   // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.
   // Social platforms require our own crawlable Open Graph page, never an RSS redirect.
