@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "commercial_policy": "Anúncios de serviços privados claramente identificados; não representar UCR.gov nem agência governamental. Preço a partir de US$110 é oferta do anunciante, não taxa oficial. Confirmar escopo, disponibilidade e valores.",
-  "campaign_id": "ucr-2027-fabriciodispatcher",
+  "campaign_id": "fabricio-carhauler-photo1-20261013",
   "official_campaign": {
     "id": "ucr-2027-fabriciodispatcher",
     "name": "UCR 2027",
@@ -13,7 +13,6 @@
       "es"
     ],
     "formats": [
-      "horizontal",
       "square"
     ],
     "instagram_direct": "https://ig.me/m/fabriciodispatcher",
@@ -27,19 +26,14 @@
       "enabled": true,
       "relationship": "owner_promotion",
       "sponsor": "Fabricio Dispatcher",
-      "creative_type": "ucr-2027-official",
-      "campaign_id": "ucr-2027-fabriciodispatcher",
-      "master_image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/4b041d683a7a9321c7264a6a45db2ab572285dfcb901699caf3c363086f75174.png",
-      "url": "https://ig.me/m/fabriciodispatcher",
-      "whatsapp_url": "https://wa.me/19082913386?text=Ol%C3%A1%2C%20gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20o%20servi%C3%A7o%20UCR%202027.",
-      "price_from_usd": 110,
-      "service_type": "private_ucr_assistance",
-      "artwork_language_variants": [
-        "pt",
-        "en",
-        "es"
-      ],
-      "source_note": "Imagem oficial aprovada pelo anunciante; não é anúncio oficial do UCR Plan."
+      "creative_type": "carhauler-approved-photo1",
+      "campaign_id": "fabricio-carhauler-photo1-20261013",
+      "approved_master": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9d0e786f0c9e07c6d708a1759af5b9ea1734fb4a210330efaacc9dc317f2437a.png",
+      "approved_master_sha256": "1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d",
+      "format": "horizontal",
+      "url": "https://instagram.com/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami.",
+      "source_note": "Foto 1 fornecida e aprovada pelo usuário. Exibir somente recortes geométricos das três artes presentes na foto original; proibição de redesenho, recoloração ou elementos gráficos adicionais."
     },
     {
       "slot": "market-sidebar",
@@ -79,7 +73,7 @@
     {
       "slot": "mobile-inline",
       "label": "Publicidade",
-      "enabled": true,
+      "enabled": false,
       "relationship": "owner_promotion",
       "sponsor": "Fabricio Dispatcher",
       "creative_type": "ucr-2027-official",
@@ -99,7 +93,7 @@
     {
       "slot": "news-carhauler",
       "label": "Publicidade",
-      "enabled": true,
+      "enabled": false,
       "relationship": "owner_promotion",
       "sponsor": "Fabricio Dispatcher",
       "creative_type": "carhauler-approved-photo1",
@@ -155,5 +149,18 @@
         "small external sponsored disclosure"
       ]
     }
+  },
+  "placement_policy": {
+    "version": "2026-10-13-fixed-slots",
+    "desktop": {
+      "news-top": "carhauler-approved-photo1 / horizontal",
+      "market-sidebar": "ucr-2027-official / square"
+    },
+    "restrictions": [
+      "Never replace news-top car hauler with UCR",
+      "Never display the extra news-carhauler slot while news-top hosts the same campaign",
+      "UCR is restricted to the right sidebar; do not publish UCR as a horizontal banner",
+      "Preserve advertiser-approved artwork and clickable contact hotspots"
+    ]
   }
 }
