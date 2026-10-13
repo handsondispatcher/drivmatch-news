@@ -292,6 +292,25 @@ const {spawn}=require('node:child_process');
    for(const id of ['top-usd-value','top-diesel-value','top-brent-value','top-weather-icon','top-risk']) {
      assert.equal(await page.locator('#'+id).count(),1,'Reference strip item '+id+' missing');
    }
+   // CANONICAL MARKET UI: values and percentages only. Source timestamps
+   // stay in DOM accessibility metadata, not as three large footer lines.
+   for(const id of ['top-usd-date','top-diesel-date','top-brent-date']){
+     const metadata=await page.locator('#'+id).evaluate(el=>{
+       const r=el.getBoundingClientRect(),cs=getComputedStyle(el);
+       return {text:el.textContent.trim(),width:r.width,height:r.height,clip:cs.clipPath};
+     });
+     assert.ok(metadata.text.length>0,'Source and quote state must remain accessible');
+     assert.ok(metadata.width<=2&&metadata.height<=2,
+       'Quote metadata must not add visible rows on mobile or desktop');
+     assert.match(metadata.clip,/inset\(50%\)/,'Quote source is visually hidden');
+   }
+   assert.equal(await page.locator('#market-note').evaluate(el=>getComputedStyle(el).display),'none',
+     'No public market prose footer below the sidebar');
+   const asof=page.locator('#market .market-asof').first();
+   if(await asof.count()){
+     const r=await asof.evaluate(el=>el.getBoundingClientRect());
+     assert.ok(r.width<=2&&r.height<=2,'Sidebar data provenance must not become a visible paragraph');
+   }
    if(width>=944){
      const layout=await page.locator('.dm-util-inner').evaluate(el=>{
        const columns=getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length;
