@@ -450,6 +450,30 @@ class PublicationTests(unittest.TestCase):
    self.assertIn('handsondispatcher.github.io/drivmatch-news/share/source-',html)
    self.assertIn('drivmatch.com/news/?story=source-',html)
    self.assertIn('twitter:card" content="summary_large_image"',html)
+ def test_whatsapp_source_share_preview_is_generated_from_live_article(self):
+  """External stories visible in the reader must receive a crawlable social card."""
+  import tempfile
+  from unittest.mock import patch
+  import build_share_pages as share
+  with tempfile.TemporaryDirectory() as tmp:
+   site=Path(tmp)
+   (site/'data').mkdir()
+   (site/'data'/'content.json').write_text(json.dumps({'articles':[
+     {'id':'source-4b971529a12a4211b8ac','kind':'external_link','status':'external_source',
+      'category':'Caminhoneiros','source':'CDLLife','source_url':'https://cdllife.com/example',
+      'original_lang':'en','origin_type':'publisher-feed','locales':{'pt':{'title':'Operadora Chameleon desativada'}}},
+     {'id':'source-aggr-test','kind':'external_link','status':'external_source',
+      'source':'Google News','source_url':'https://news.google.com/rss/articles/abc',
+      'origin_type':'aggregator-discovery','locales':{'pt':{'title':'Notícia não original'}}}
+   ]}),encoding='utf-8')
+   with patch.object(share,'SITE',site),patch.object(share,'create_card'):
+    self.assertEqual(share.build(),1)
+   html=(site/'share'/'source-4b971529a12a4211b8ac'/'index.html').read_text(encoding='utf-8')
+   self.assertIn('property="og:title" content="Operadora Chameleon desativada"',html)
+   self.assertIn('property="og:image" content="https://handsondispatcher.github.io/drivmatch-news/share/source-4b971529a12a4211b8ac/social.jpg"',html)
+   self.assertIn('property="og:image:width" content="1200"',html)
+   self.assertIn('window.location.replace("https://drivmatch.com/news/?story=source-4b971529a12a4211b8ac")',html)
+   self.assertFalse((site/'share'/'source-aggr-test').exists())
  def test_verified_kodiak_original_summary(self):
   stories=json.loads((BASE/'content/editorial.json').read_text())
   kodiak=next(x for x in stories if x['id']=='kodiak-charger-dallas-laredo-20261008')
