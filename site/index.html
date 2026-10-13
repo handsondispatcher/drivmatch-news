@@ -1092,6 +1092,10 @@ body{background:#f7f9fc;color:#14283c}
  #news-carhauler-banner .ucr-native-mobile-actions a:last-child{background:#a02ca2}
 }
 
+/* Source details NEVER create visible lines, regardless of cached CSS. */
+#dm-utility .dm-util-provenance,
+#market .market-asof,
+#market-mobile .market-asof{display:none!important}
 /* CANONICAL COMPACT QUOTES: values and percentage only, no public prose footer. */
 .dm-util-quote{grid-template-rows:16px 23px!important;min-height:52px!important;align-content:center!important}
 .dm-util-quote .dm-util-provenance,
@@ -1163,20 +1167,20 @@ body{background:#f7f9fc;color:#14283c}
    <span id="top-usd-label" class="dm-util-label">Dólar</span>
    <div class="dm-util-money"><strong id="top-usd-value">—</strong><em id="top-usd-change" hidden></em></div>
    <div id="top-usd-tradingview" class="dm-market-embed" data-market-symbol="FX_IDC:USDBRL" role="group" aria-label="USD/BRL forex quote from TradingView" hidden><tv-tickers symbols="FX_IDC:USDBRL" hide-chart item-size="compact"></tv-tickers></div>
-   <small id="top-usd-date" class="dm-util-provenance" title="Fonte e data da cotação">Sem cotação</small>
+   <small id="top-usd-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">Sem cotação</small>
   </div>
   <div class="dm-util-quote">
    <span class="dm-util-icon" aria-hidden="true">⛽</span>
    <span id="top-diesel-label" class="dm-util-label">Diesel EUA</span>
    <div class="dm-util-money"><strong id="top-diesel-value">—</strong><em id="top-diesel-change" hidden></em></div>
-   <small id="top-diesel-date" class="dm-util-provenance" title="Fonte e data da cotação">EIA · semanal</small>
+   <small id="top-diesel-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">EIA · semanal</small>
   </div>
   <div class="dm-util-quote">
    <span class="dm-util-icon" aria-hidden="true">💧</span>
    <span id="top-brent-label" class="dm-util-label">Petróleo Brent</span>
    <div class="dm-util-money"><strong id="top-brent-value">—</strong><em id="top-brent-change" hidden></em></div>
    <div id="top-brent-tradingview" class="dm-market-embed" data-market-symbol="ICEEUR:BRN1!" role="group" aria-label="ICE Brent futures quote from TradingView, exchange delay may apply" hidden><tv-tickers symbols="ICEEUR:BRN1!" hide-chart item-size="compact"></tv-tickers></div>
-   <small id="top-brent-date" class="dm-util-provenance" title="Fonte e data da cotação">Sem cotação</small>
+   <small id="top-brent-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">Sem cotação</small>
   </div>
   <div class="dm-util-city" aria-live="off" hidden>
    <span id="top-weather-icon" aria-hidden="true">🌤️</span>
@@ -1295,10 +1299,10 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/analytics-config.js" defer></script>
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-21-editorial-labels-ucr-cinematic-native-1774x394-20261013-r11" defer></script>
+<script src="assets/app.js?v=market-moving-widgets-20261013-a" defer></script>
 <script src="assets/road-tv-live.js?v=v34-18-durable-live-first-20261011" defer></script>
 <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-tickers.js"></script>
-<script src="assets/utility-strip.js?v=v34-11-national-weather-20261010" defer></script>
+<script src="assets/utility-strip.js?v=market-moving-widgets-20261013-a" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 </body></html>
