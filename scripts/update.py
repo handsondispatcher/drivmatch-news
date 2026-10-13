@@ -516,6 +516,17 @@ def make_market(offline=False):
                 if fallback:
                     fallback.sort(key=lambda q:(q['observed_at'][:10],q.get('instrument')=='spot',q['observed_at']),reverse=True)
                     market['indicators'][key]=fallback[0]
+    # Protect against a configured FX provider that returns only Friday's
+    # close during Tuesday's active session. Newer BCB bulletins are preferred,
+    # explicitly reclassified as PTAX (never mislabeled as commercial spot).
+    fx=market['indicators'].get('usdbrl')
+    if fx and fx.get('instrument')=='spot' and fx.get('session_status')=='closed':
+        try:
+            latest_ptax=official_bcb_ptax_odata()
+            if latest_ptax['observed_at'][:10]>fx['observed_at'][:10]:
+                market['indicators']['usdbrl']=latest_ptax
+        except Exception as close_exc:
+            market['errors'].append('usdbrl_close_comparison:'+type(close_exc).__name__)
     # V34.1: unproven securities/Class 8 feeds no longer requested or rendered.
     # Retain authorized source adapters for future separately approved pilots.
     return market
