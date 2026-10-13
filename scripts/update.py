@@ -404,9 +404,16 @@ def cached_verified_market_reference(key):
     series={'diesel':'GASDESW','brent':'DCOILBRENTEU'}
     if record.get('source')!=expected[key] or record.get('source_url')!='https://fred.stlouisfed.org/series/'+series[key]:
         raise ValueError('Previously served snapshot has wrong source')
-    if not market_reference_current(record,key):
-        raise ValueError('Cached market snapshot expired')
-    record={**record,'quote_status':'previous_verified_publication','session_status':'published_reference',
+    historic=key=='brent' and not market_reference_current(record,key)
+    if historic:
+        day=datetime.fromisoformat(record['observed_at']).date()
+        if not 0<=(NOW().date()-day).days<=21:
+            raise ValueError('Cached Brent historical observation older than 21 days')
+    elif not market_reference_current(record,key):
+        raise ValueError('Cached official quote expired')
+    record={**record,
+            'quote_status':'historical_reference' if historic else 'previous_verified_publication',
+            'session_status':'historical_reference' if historic else 'published_reference',
             'instrument':key+'_eia_reference','cadence':'weekly' if key=='diesel' else 'daily',
             'checked_at':NOW().isoformat(timespec='seconds')}
     return record
