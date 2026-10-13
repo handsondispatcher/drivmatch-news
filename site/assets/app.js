@@ -366,10 +366,18 @@
   function renderAds(){
     const placements=(data.ads?.enabled&&Array.isArray(data.ads.placements))?data.ads.placements:[];
     const unused=$('ad-slot');if(unused){unused.hidden=true;unused.innerHTML='';}
+    const adIdentity=a=>String(a?.campaign_id||data.ads?.campaign_id||
+      a?.creative_id||a?.whatsapp_url||a?.url||'').trim().toLowerCase();
+    const top=placements.find(a=>a.enabled===true&&a.slot==='news-top');
+    const topIdentity=top&&adIdentity(top);
     for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner']]){
       const box=$(id);if(!box)continue;
       const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion'&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(a.url||'')&&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(a.whatsapp_url||'')&&/^https:\/\/cdn\.openart\.ai\/openart-uploads\/production\/attachment-transfers\/[a-f0-9]+\.png$/.test(a.image||''));
-      box.hidden=!ad;if(!ad){box.innerHTML='';continue;}
+      // One campaign can have separate responsive creatives, but must not
+      // occupy both the main news banner and sidebar simultaneously.
+      const repeatSide=slot==='market-sidebar'&&Boolean(ad&&topIdentity&&adIdentity(ad)===topIdentity);
+      box.hidden=!ad||repeatSide;
+      if(!ad||repeatSide){box.innerHTML='';continue;}
       const ig=escapeHTML(ad.url),wa=escapeHTML(ad.whatsapp_url),src=escapeHTML(ad.image);
       box.innerHTML=`<div class="car-ad"><div class="car-ad-disclosure">PUBLICIDADE · AVAILABLE LOAD / CAR HAULERS</div>
         <a class="car-ad-creative" href="${ig}" target="_blank" rel="noopener noreferrer" aria-label="Ver a oferta no Instagram fabriciodispatcher"><img src="${src}" loading="lazy" alt="Frete para transportar 1991 Ferrari 348 TS, 2027 Chevrolet Corvette e 2023 Dodge Challenger de Kissimmee FL 34741 para Miami FL 33126."></a>
