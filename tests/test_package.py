@@ -419,7 +419,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("interfaceLocale={pt:'pt-BR',en:'en-US',es:'es-419'}",app)
   self.assertNotIn("sourceBrief(opened,articleLang)",app)
   self.assertIn("article-original-link",app)
-  self.assertIn("s.origin_type!=='aggregator-discovery'",app)
+  self.assertIn("a.origin_type!=='aggregator-discovery'",app)
   self.assertLess(page.index('id="article-original"'),page.index('id="article-share-footer"'))
   self.assertLess(page.index('id="article-share-footer"'),page.index('id="article-impact-actions"'))
   self.assertIn("const sourceReadingUrl=id=>'?story='", (BASE/'site/assets/news-crawler.js').read_text(encoding='utf-8'))
