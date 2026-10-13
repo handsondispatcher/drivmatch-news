@@ -36,3 +36,16 @@ BCB PTAX: https://dadosabertos.bcb.gov.br/dataset/dolar-americano-usd-todos-os-b
 - Distinct traded diesel futures: TradingView NYMEX:HO1! (https://br.tradingview.com/symbols/NYMEX-HO1%21/). Do not substitute for retail diesel.
 - Brent futures: Investing.com (https://br.investing.com/commodities/brent-oil). Do not substitute for EIA physical Brent daily spot; identify contract and possible delay.
 - These references are clickable external sources, not automated price APIs. Display data inside official attributed vendor widgets only after separate site-layout review, respecting vendor terms and feed delays.
+
+## Market Source Reliability & Audit — ACTIVATED 2026-10-13
+
+Owner approval: "Aprovado / Ativar / Salvar" — 2026-10-13. This policy supersedes any workflow that leaves stale quotes unaudited. The user is NOT the human auditor for missing or frozen quotes.
+
+- The published GitHub Actions workflow is scheduled at the ten-minute target (GitHub Actions may delay scheduled executions). Every update attempts approved sources and records instrument, observation time, source and release status. A new build is not a new market quote.
+- **Priority — USD/BRL:** contractually authorized commercial provider, optional separately authorized AwesomeAPI spot-ask adapter, official BCB Olinda PTAX (explicitly marked PTAX/intraday or close), BCB SGS daily PTAX, bounded last verified commercial close. Never scrape UOL: UOL is a cross-check link, not an API license.
+- **Priority — U.S. diesel:** EIA official weekly API (EIA_API_KEY when provided), FRED's identical EIA GASDESW series as backup; release calendar including U.S. holidays. TradingView FRED:GASDESW is a reader cross-check, not a separate faster source. No claim of intraday retail diesel.
+- **Priority — Brent:** EIA official daily physical spot reference (EIA_API_KEY), FRED EIA observation backup, optional licensed Brent spot provider where contracted; Investing Brent futures and NYMEX ULSD may be linked only as *distinct financial instruments*. If the EIA source has stopped, a historical observation must carry an explicit NOT CURRENT label.
+- **Publication source gates:** AWESOMEAPI_API_KEY and EIA_API_KEY are secret environment variables and never in client files. AWESOMEAPI_REDISTRIBUTION_AUTHORIZED, BRENT_REDISTRIBUTION_AUTHORIZED and USDBRL_REDISTRIBUTION_AUTHORIZED must be explicitly set based on valid use rights. User approval of this *policy* is not proof of any provider's data license.
+- **Self-audit:** scripts/audit_market.py records the actual provider state and detects source-publication lag, including EIA weekly release-day adjustments. GitHub Actions opens/updates one persistent [Market Watch] issue when feeds are late, quotes invalid or an upstream build fails before the audit; it closes only after recovery. Never silently close an active source failure.
+- **Protected scope:** No advertising artwork, placement, newspaper typography, editorial order, or unrelated products may be changed by market-feed maintenance.
+- **Acceptance gate:** Successful commit alone is not proof that drivmatch.com/news is updated. Confirm the scheduled workflow succeeds, public market JSON carries new observation dates, and the same values plus their status are displayed in the rendered desktop/mobile header and market panel.
