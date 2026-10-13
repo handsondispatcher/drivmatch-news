@@ -5,7 +5,6 @@
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
   let externalHeadlines = [], photoByStory = {}, photoLibrary = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
   let brentRealtime=null;
-  let tradingViewReady=false;
   let sourceCheckedAt=source.source_monitor?.checked_at||'', newestSourceAt=source.source_monitor?.latest_original_published_at||'', currentSourceCount=(source.articles||[]).filter(x=>x.kind==='external_link').length;
   const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
@@ -363,21 +362,23 @@
     return '<b>'+unit+' '+n+'</b>'+pct;
   }
   function mrow(name,ticker,v,key){
-    const providerWidget=tradingViewReady&&(key==='usdbrl'||key==='brent');
-    const symbol=key==='usdbrl'?'FX_IDC:USDBRL':'ICEEUR:BRN1!';
-    // Official TradingView widget is intact, no extraction or rebranding.
-    // Brent is ICE futures here, distinct from EIA spot and may be delayed.
+    const source=key==='usdbrl'
+      ?'https://br.tradingview.com/symbols/FX_IDC-USDBRL/'
+      :key==='brent'
+      ?'https://br.investing.com/commodities/brent-oil'
+      :'https://www.tradingview.com/symbols/FRED-GASDESW/';
     const valid=verifiedMarketQuote(v,key)&&
       !(key==='brent'&&v?.quote_status==='historical_reference')&&
       !(key==='usdbrl'&&v?.instrument==='ptax_reference');
     const detail=valid?
       String(v.source||'')+' · '+String(v.observed_at||'')+' · '+String(v.quote_status||v.session_status||''):
-      (lang==='pt'?'Cotação comercial atual indisponível':lang==='es'?'Cotización comercial actual no disponible':'Current commercial quote unavailable');
-    const value=providerWidget?
-      '<div class="dm-market-side-widget"><tv-tickers symbols="'+symbol+'" hide-chart item-size="compact"></tv-tickers></div>':
-      valid?marketValue(v,key):'<b>—</b>';
+      (lang==='pt'?'Cotação atual não verificada':lang==='es'?'Cotización actual no verificada':'Current quote not verified');
+    const label='<a href="'+source+'" target="_blank" rel="noopener noreferrer" class="market-source-link">'+escapeHTML(name)+'</a>';
+    const value=valid?marketValue(v,key)
+      :'<a href="'+source+'" target="_blank" rel="noopener noreferrer" class="market-source-link">'+
+        (lang==='en'?'View quote ↗':lang==='es'?'Ver cotización ↗':'Ver cotação ↗')+'</a>';
     return '<div class="sideitem market-live-row" data-market-key="'+key+
-      '" title="'+escapeHTML(detail)+'"><div><strong>'+escapeHTML(name)+
+      '" title="'+escapeHTML(detail)+'"><div><strong>'+label+
       '</strong><small>'+escapeHTML(ticker)+'</small></div><div class="value">'+value+
       '</div></div>';
   }
@@ -388,7 +389,7 @@
     const body=[
       mrow(lang==='en'?'US Dollar':'Dólar','USD/BRL',inds.usdbrl,'usdbrl'),
       mrow(lang==='en'?'US Diesel':lang==='es'?'Diésel en EE. UU.':'Diesel nos EUA','EIA · US$/gal',inds.diesel,'diesel'),
-      mrow(tradingViewReady?(lang==='en'?'Brent Futures':'Brent (futuros)'):(lang==='en'?'Brent crude':'Petróleo Brent'),'US$/bbl',inds.brent,'brent')
+      mrow(lang==='en'?'Brent crude':'Petróleo Brent','US$/bbl',inds.brent,'brent')
     ].filter(Boolean);
     // Securities and Class 8 data were never reliably available on the public
     // News site. They are deliberately not shown, even as placeholders.
@@ -403,10 +404,6 @@
     $('market-note').textContent='';
     $('market-note-mobile').textContent='';
   }
-  document.addEventListener('drivmatch:tradingview-ready',()=>{
-    tradingViewReady=true;
-    if($('market')&&$('market-mobile'))renderMarket();
-  });
   document.addEventListener('drivmatch:brent-spot',event=>{
     const quote=event.detail;
     brentRealtime=quote?.instrument==='brent_spot'?quote:null;
