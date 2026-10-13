@@ -16,6 +16,8 @@
     'Transporte':['Transporte','Transportation','Transporte'],'Combustíveis':['Combustíveis','Fuel','Combustibles'],'Acidentes':['Acidentes','Accidents','Accidentes'],'Clima':['Clima','Weather','Clima'],'Rodovias':['Rodovias','Highways','Carreteras'],'Fiscalização':['Fiscalização','Enforcement','Fiscalización'],'Tecnologia':['Tecnologia','Technology','Tecnología'],'Fretes':['Fretes','Freight','Cargas'],'Empregos':['Empregos','Jobs','Empleos'],'Caminhões':['Caminhões','Trucks','Camiones'],'Mecânica':['Mecânica','Mechanics','Mecánica'],'Caminhoneiros':['Caminhoneiros','Drivers','Camioneros'],'Socorro':['Socorro','Roadside Assistance','Auxilio'],'Negócios':['Negócios','Business','Negocios'],'Governo':['Governo','Government','Gobierno'],'Imigração':['Imigração','Immigration','Inmigración'],'Segurança':['Segurança','Security','Seguridad']
   };
   const langs=['pt','en','es'], indices={pt:0,en:1,es:2};
+  // Display variants are regional; internal content keys stay pt/en/es.
+  const readerLocales={pt:'pt-BR',en:'en-US',es:'es-419'};
   const texts = {pt:'🇧🇷 Ler em Português',en:'🇺🇸 Read in English',es:'🇪🇸 Leer en Español'};
   const flags={pt:'assets/flag-br.svg',en:'assets/flag-us.svg',es:'assets/flag-es.svg'};
   const listed=[['JBHT','J.B. Hunt','Nasdaq'],['KNX','Knight-Swift','NYSE'],['SNDR','Schneider National','NYSE'],['WERN','Werner Enterprises','Nasdaq'],['ODFL','Old Dominion','Nasdaq'],['XPO','XPO','NYSE'],['LSTR','Landstar','Nasdaq'],['CHRW','C.H. Robinson','Nasdaq'],['FDX','FedEx','NYSE']];
@@ -429,18 +431,18 @@
     // service (not just FreightWaves); publishers may block proxied access.
     const originalSourceLang=langs.includes(opened.original_lang)?opened.original_lang:'en';
     const translatedUrl=target=>target===originalSourceLang?src:
-      'https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(target)+'&u='+encodeURIComponent(src);
+      'https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(readerLocales[target])+'&u='+encodeURIComponent(src);
     const sourceLink=(url,label,flag,primary=false)=>{
       // Compact labels preserve the approved 3-column mobile reader layout.
       const concise=flag===originalSourceLang
-        ?({pt:'Português · original',en:'English · original',es:'Español · original'}[flag])
-        :({pt:'Português',en:'English',es:'Español'}[flag]);
+        ?({pt:'Português BR',en:'English',es:'Español LatAm'}[flag])
+        :({pt:'Português BR',en:'English',es:'Español LatAm'}[flag]);
       return '<a class="article-source-button '+(primary?'primary':'secondary')+'" href="'+escapeHTML(url)+'" target="_blank" rel="noopener noreferrer"><img src="'+flags[flag]+'" alt="" width="19" height="13"><span class="source-label-full">'+escapeHTML(label)+'</span><span class="source-label-mobile">'+escapeHTML(concise)+'</span><span class="source-link-arrow" aria-hidden="true">↗</span></a>';
     };
     const sourceLabels={
-      pt:originalSourceLang==='pt'?'Português · original':'Português · tradução automática',
-      en:originalSourceLang==='en'?'English · original':'English · automatic translation',
-      es:originalSourceLang==='es'?'Español · original':'Español · traducción automática'
+      pt:originalSourceLang==='pt'?'Português (Brasil) · original':'Português (Brasil) · tradução automática',
+      en:originalSourceLang==='en'?'English (US) · original':'English (US) · automatic translation',
+      es:originalSourceLang==='es'?'Español (Latinoamérica) · original':'Español (Latinoamérica) · traducción automática'
     };
     const ptButton=src?sourceLink(translatedUrl('pt'),sourceLabels.pt,'pt',articleLang==='pt'):'';
     const enButton=src?sourceLink(translatedUrl('en'),sourceLabels.en,'en',articleLang==='en'):'';
@@ -454,7 +456,7 @@
       ? `<p class="image-credit"><span class="photo-credit-label">${articleLang==='en'?'Illustrative archive photo':articleLang==='es'?'Foto ilustrativa de archivo':'Foto ilustrativa de arquivo'} (não é imagem do acontecimento): </span><a href="${escapeHTML(attribution.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(attribution.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(attribution.image_license||'Licença na fonte')} <span class="photo-transform-note">· corte/redimensionamento</span></p>`:'';
     $('article-source').innerHTML+=photoCredit;
     $('articleLanguageTitle').textContent=lang==='en'?'Article language':lang==='es'?'Idioma de la noticia':'Idioma da notícia';
-    $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]&&(opened.kind!=='external_link'||opened.translated_langs?.includes(l))).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
+    $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]&&(opened.kind!=='external_link'||opened.translated_langs?.includes(l))).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português BR':l==='en'?'English':'Español LatAm'}</button>`).join('');
     $('article-reading').hidden=opened.kind==='external_link'&&(!opened.translated_langs||opened.translated_langs.length<2);
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     renderImpact();
@@ -466,7 +468,7 @@
   }
   function languageSet(next,rerender=true){if(!langs.includes(next))return;lang=next;document.documentElement.lang=next==='pt'?'pt-BR':next==='es'?'es-419':'en-US';
     document.querySelectorAll('[data-site-lang]').forEach(b=>{b.classList.toggle('selected',b.dataset.siteLang===next);b.setAttribute('aria-pressed',String(b.dataset.siteLang===next));});
-    $('language').value=next;$('languageFlag').src=flags[next];$('languageFlag').alt=next==='pt'?'Bandeira do Brasil':next==='en'?'US flag':'Bandera de España';
+    $('language').value=next;$('languageFlag').src=flags[next];$('languageFlag').alt=next==='pt'?'Bandeira do Brasil':next==='en'?'US flag':'Idioma espanhol latino-americano';
     // Flag-button clicks do not fire change on the hidden select automatically.
     // Tell independently initialized quote/weather/video modules to translate too.
     if(typeof CustomEvent==='function')document.dispatchEvent(new CustomEvent('drivmatch:language',{detail:{language:next}}));
