@@ -25,6 +25,7 @@ function marketFresh(v,key){
    return age<=21*86400000;
  return age<=({usd:5,diesel:12,brent:5}[key]*86400000);
 }
+// MARKET_QUOTE_UI_RELEASE: compact-prices-only-20261013
 function showMarket(){
  const l=lang(),localized=(pt,en,es)=>l==='en'?en:l==='es'?es:pt;
  const freshSpot=marketFresh(spot,'usd')&&spot?.session_status==='open';
