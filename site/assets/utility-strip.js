@@ -71,6 +71,20 @@ function showMarket(){
      a.textContent=localized(' · Ver Brent negociado (futuros)',' · View traded Brent (futures)',' · Ver Brent negociado (futuros)');
      meta.appendChild(a);
    }
+   // Publisher-hosted cross-checks, NEVER scraped as website market data.
+   // FRED:GASDESW is the same weekly US retail diesel series as our EIA quote.
+   // Investing.com's Brent Futures is a DIFFERENT instrument from EIA spot.
+   if(item.id==='diesel'||item.id==='brent'){
+     const link=document.createElement('a');
+     link.href=item.id==='diesel'
+       ?'https://www.tradingview.com/symbols/FRED-GASDESW/'
+       :'https://br.investing.com/commodities/brent-oil';
+     link.target='_blank';link.rel='noopener noreferrer';
+     link.textContent=item.id==='diesel'
+       ?localized(' · Conferir na TradingView',' · Verify at TradingView',' · Verificar en TradingView')
+       :localized(' · Ver Brent futuro no Investing',' · View Brent futures at Investing',' · Ver futuros Brent en Investing');
+     meta.appendChild(link);
+   }
    if(item.id==='usd'){
      // UOL is an independent reader cross-check, NOT an unlicensed quote feed.
      const verify=document.createElement('a');
