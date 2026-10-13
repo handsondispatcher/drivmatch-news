@@ -476,11 +476,16 @@
         };
         const renderCut=fmt=>{
           const v=cuts[fmt];
-          // Serve a cryptographically verified, pixel-exact crop from our own domain.
-          // No remote hotlink and no visual reinterpretation of approved Foto 1.
-          const localArt='assets/ads/carhauler-photo1-'+fmt+'.png';
-          const style="background-image:url('"+localArt+"');background-size:100% 100%;background-position:0 0;";
-          return '<div class="car-official-frame car-official-'+fmt+'" style="aspect-ratio:'+v.ratio+'">'+
+          // Use only owner-approved raster files from our own origin.
+          // Never substitute a generated asset unless the build verified its SHA-256.
+          const loc=data.ads?.approved_localized_creatives?.[lang];
+          const localized=fmt==='horizontal'&&slot==='news-top'&&
+            (lang==='pt'||lang==='es')&&loc?.status==='published_locked'&&
+            loc.asset==='assets/ads/carhauler-photo1-'+lang+'-approved-20261013.png';
+          const localArt=localized?loc.asset:'assets/ads/carhauler-photo1-'+fmt+'.png';
+          const ratio=localized?'3 / 1':v.ratio;
+          const style="background-image:url('"+escapeHTML(localArt)+"');background-size:100% 100%;background-position:0 0;";
+          return '<div class="car-official-frame car-official-'+fmt+(localized?' car-official-localized':'')+'" style="aspect-ratio:'+ratio+'" data-art-locale="'+(localized?lang:'en')+'">'+
             '<div class="car-official-visual" role="group" aria-label="'+escapeHTML(carCopy.visual)+'" style="'+style+'">'+
             '<a class="car-official-hit car-official-wa" href="'+escapeHTML(ad.whatsapp_url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+v.wa+'" aria-label="'+escapeHTML(carCopy.wa)+'"></a>'+
             '<a class="car-official-hit car-official-ig" href="'+escapeHTML(ad.url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+v.ig+'" aria-label="Instagram @fabriciodispatcher"></a>'+
