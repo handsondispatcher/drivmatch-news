@@ -629,7 +629,13 @@ def build(offline=False):
           'articles':list(unique.values())+initial_links,'market':market,'ads':ads}
     path=ROOT/'site/data';path.mkdir(parents=True,exist_ok=True)
     public_spot=os.getenv('USDBRL_PUBLIC_URL','')
-    runtime={'spot_url':public_spot if public_spot.startswith('https://') else ''}
+    public_brent=os.getenv('BRENT_PUBLIC_URL','')
+    runtime={
+        'spot_url':public_spot if (public_spot.startswith('https://') and
+                                  os.getenv('USDBRL_REDISTRIBUTION_AUTHORIZED')=='true') else '',
+        'brent_spot_url':public_brent if (public_brent.startswith('https://') and
+                                        os.getenv('BRENT_REDISTRIBUTION_AUTHORIZED')=='true') else ''
+    }
     # Curated live-camera discovery directory: sources are not automatically video streams.
     # Publish only explicitly allowed outbound references and the official FL511 map embed.
     camera_network=read_json(ROOT/'content/camera-source-network.json')
