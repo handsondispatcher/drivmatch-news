@@ -104,12 +104,16 @@
   // Canonical editorial rhythm: never repeat the same archive photo in adjacent
   // cards; a photo is eligible again only after at least 15 intervening stories.
   // A real locally stored, licensed image always wins over a decorative SVG.
-  const PHOTO_REUSE_GAP=15;
+  const PHOTO_REUSE_GAP=20;
   let visualCacheKey='',visualCache=new Map(),visualPhotoCredits=new Map();
   const validArchivePhoto=p=>p&&safeNewsPhotoUrl(p.image)&&safeUrl(p.image_source_url)&&
     p.image_credit&&p.image_license;
   function storyVisuals(){
-    const stories=pageStories();
+    const raw=pageStories();
+    // Preserve home reading order: hero, related features, highlight strip, list.
+    // Assign one photo for each story identity, including when the same card is
+    // referenced in multiple sections of the page.
+    const stories=[...new Map(raw.map(a=>[a.id,a])).values()];
     const key=stories.map(a=>(a.id||a.source_url)+'|'+(licensedPhotoOf(a)?.image||a.image||'')).join('~')+
       '|'+photoLibrary.map(p=>p.image).join('~');
     if(key===visualCacheKey)return visualCache;
