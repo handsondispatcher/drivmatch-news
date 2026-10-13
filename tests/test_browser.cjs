@@ -13,9 +13,6 @@ const {spawn}=require('node:child_process');
    page.on('pageerror',e=>errors.push(e.message));
    // Never depend on a third-party market server during CI. Verify the
    // official widget DOM contract here; real price delivery is provider-owned.
-   await page.route('https://widgets.tradingview-widget.com/**',route=>
-     route.fulfill({status:200,contentType:'application/javascript',
-       body:'customElements.define("tv-tickers",class extends HTMLElement {});'}));
 
    // YouTube content is owned by the creator; do not depend on its network in CI.
    await page.route('https://www.youtube-nocookie.com/**',route=>route.fulfill({status:200,body:'<!doctype html><title>Official player test stub</title>'}));
@@ -316,10 +313,16 @@ const {spawn}=require('node:child_process');
    }
    // CANONICAL MARKET UI: values and percentages only. Source timestamps
    // stay in DOM accessibility metadata, not as three large footer lines.
-   assert.equal(await page.locator('#top-usd-tradingview tv-tickers[symbols="FX_IDC:USDBRL"]').count(),1,
-     'USD/BRL must use a verified native TradingView forex widget, not PTAX displayed as spot');
-   assert.equal(await page.locator('#top-brent-tradingview tv-tickers[symbols="ICEEUR:BRN1!"]').count(),1,
-     'Brent traded futures must use the real ICE contract through native widget');
+   assert.equal(await page.locator('tv-tickers').count(),0,
+     'No unsupported TradingView components should pollute the market strip');
+   assert.equal(await page.locator('#top-usd-label').getAttribute('href'),
+     'https://br.tradingview.com/symbols/FX_IDC-USDBRL/',
+     'Dólar title itself links to USD/BRL source');
+   assert.equal(await page.locator('#top-brent-label').getAttribute('href'),
+     'https://br.investing.com/commodities/brent-oil',
+     'Brent title links to actual quote source instead of a blocked market widget');
+   const marketFont=await page.locator('#top-brent-label').evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+   assert.ok(marketFont>=14,'Market headings must be legible');
    assert.equal(await page.locator('#top-usd-label').innerText(),'Dólar','No PTAX label in the headline');
    assert.equal(await page.locator('#top-usd-date').getAttribute('hidden')!==null,true,
      'Historical exchange reference details never appear below dollar quote');
