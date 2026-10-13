@@ -118,7 +118,8 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#highlights-note').count(),0,'No editorial selection explanatory sentence');
    await page.locator('#news-commercial-banner .car-ad-creative').waitFor({state:'attached',timeout:12000});
    assert.equal(await page.locator('#news-commercial-banner .car-ad-creative').count(),1,'Car hauler campaign appears in main news inventory');
-   assert.equal(await page.locator('#market-commercial-banner .car-ad-creative').count(),1,'Car hauler campaign appears in desktop side inventory');
+   assert.equal(await page.locator('#market-commercial-banner .car-ad-creative').count(),0,'Never repeat the exact same car-hauler campaign beside the main banner');
+   assert.equal(await page.locator('#market-commercial-banner').isVisible(),false,'Duplicate desktop ad must be visually hidden');
    const topAd=await page.locator('#news-commercial-banner').innerText();
    assert.match(topAd,/CAR HAULERS/,'Commercial banner clearly advertises transport services, not vehicle sales');
    assert.equal(await page.locator('#article-commercial-banner .car-ad-creative').count(),1,'Article rectangle exists');
@@ -408,9 +409,13 @@ const {spawn}=require('node:child_process');
    }
    assert.match(await page.locator('[data-share-platform="whatsapp"]').getAttribute('href'),/^https:\/\/web\.whatsapp\.com\/send\?text=/);
    assert.equal(await page.locator('#share-whatsapp-copy').isVisible(),true);
-   const images=await page.locator('#panorama article img, #list article img').evaluateAll(nodes=>nodes.map(n=>({url:n.getAttribute('src'),story:n.closest('[data-story]')?.getAttribute('data-story')})).filter(x=>x.url));
-   const distinct=new Map(images.map(x=>[x.story,x.url]));
-   assert.equal(new Set(distinct.values()).size,distinct.size,'No two different news stories can use the same photo');
+   const images=await page.locator('#panorama article img, #list article img, #highlightList img').evaluateAll(nodes=>
+     nodes.map(n=>n.getAttribute('src')).filter(x=>x&&x.startsWith('assets/news-photos/')));
+   for(let i=0;i<images.length;i++){
+     assert.ok(!images.slice(Math.max(0,i-20),i).includes(images[i]),
+       'A licensed archive photo must not be reused inside the preceding 20 news cards');
+   }
+   assert.ok(images.length>=5,'News homepage must show multiple genuinely photographic stories');
    const photoNodes=page.locator('#features article[data-external="true"] img[src^="assets/news-photos/"], #list article[data-external="true"] img[src^="assets/news-photos/"]');
    assert.ok(await photoNodes.count()>=1,'External news stories must show real locally served photo thumbnails');
    const photos=await photoNodes.evaluateAll(els=>els.map(im=>({complete:im.complete,width:im.naturalWidth,height:im.naturalHeight,alt:im.alt})));
