@@ -39,6 +39,14 @@ def diesel_expected_observation(now):
     return monday,release_at.isoformat()
 
 
+# Brazilian national FX-market holidays (2026); no same-day PTAX is expected.
+# The BCB calendar may also have banking-specific closure days; these are
+# monitored by observation age rather than invented PTAX rates.
+BCB_2026_CLOSED_DAYS={
+    '2026-01-01','2026-04-03','2026-04-21','2026-05-01',
+    '2026-09-07','2026-10-12','2026-11-02','2026-11-20','2026-12-25'
+}
+
 def fx_expected_observation(now):
     """Calendar-level check; holidays can delay PTAX without faking rates."""
     sao=now.astimezone(BRAZIL)
@@ -46,7 +54,7 @@ def fx_expected_observation(now):
     # PTAX has four daily observations; expect some bulletin by ~15:30 BRT.
     if sao.hour<15 or (sao.hour==15 and sao.minute<30):
         target-=timedelta(days=1)
-    while target.weekday()>=5:
+    while target.weekday()>=5 or target.isoformat() in BCB_2026_CLOSED_DAYS:
         target-=timedelta(days=1)
     return target
 
