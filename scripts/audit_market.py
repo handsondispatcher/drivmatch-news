@@ -8,6 +8,74 @@ BASE=Path(__file__).resolve().parents[1]
 UTC=timezone.utc
 MAX_DAYS={'usdbrl':5,'diesel':12,'brent':5}
 
+from zoneinfo import ZoneInfo
+
+EASTERN=ZoneInfo('America/New_York')
+BRAZIL=ZoneInfo('America/Sao_Paulo')
+# EIA's published 2026 holiday schedule (release date is for MONDAY'S price).
+# This is maintained from eia.gov/petroleum/gasdiesel/schedule.php.
+EIA_DIESEL_HOLIDAY_RELEASES={
+    '2026-01-19':'2026-01-21',
+    '2026-02-16':'2026-02-18',
+    '2026-05-25':'2026-05-27',
+    '2026-09-07':'2026-09-09',
+    '2026-10-12':'2026-10-14',
+}
+
+def diesel_expected_observation(now):
+    """Latest Monday whose EIA release is expected to have appeared.
+
+    Allow 2 hours for vendor delivery / EIA-to-FRED propagation; Saturday
+    and Sunday are not extra daily diesel observations.
+    """
+    et=now.astimezone(EASTERN)
+    monday=et.date()-timedelta(days=et.weekday())
+    release_override=EIA_DIESEL_HOLIDAY_RELEASES.get(monday.isoformat())
+    release_day=(datetime.fromisoformat(release_override).date() if release_override
+                 else monday+timedelta(days=1))
+    release_at=datetime.combine(release_day,datetime.min.time().replace(hour=10),tzinfo=EASTERN)
+    if et < release_at+timedelta(hours=2):
+        return monday-timedelta(days=7),release_at.isoformat()
+    return monday,release_at.isoformat()
+
+
+def fx_expected_observation(now):
+    """Calendar-level check; holidays can delay PTAX without faking rates."""
+    sao=now.astimezone(BRAZIL)
+    target=sao.date()
+    # PTAX has four daily observations; expect some bulletin by ~15:30 BRT.
+    if sao.hour<15 or (sao.hour==15 and sao.minute<30):
+        target-=timedelta(days=1)
+    while target.weekday()>=5:
+        target-=timedelta(days=1)
+    return target
+
+
+def source_schedule_warnings(indicators,now):
+    warnings=[]
+    diesel=indicators.get('diesel')
+    expected,scheduled=diesel_expected_observation(now)
+    if diesel:
+        try:
+            day=datetime.fromisoformat(diesel['observed_at'][:10]).date()
+            if day<expected:
+                warnings.append('diesel:official_release_due_since_'+scheduled)
+        except (ValueError,TypeError,KeyError):
+            warnings.append('diesel:missing_observation_date')
+    usd=indicators.get('usdbrl')
+    if usd and usd.get('instrument')=='ptax_reference':
+        try:
+            day=datetime.fromisoformat(usd['observed_at'][:10]).date()
+            if day<fx_expected_observation(now):
+                warnings.append('usdbrl:ptax_older_than_expected_bulletin_check_BCB_holiday_calendar')
+        except (ValueError,TypeError,KeyError):
+            warnings.append('usdbrl:invalid_ptax_date')
+    brent=indicators.get('brent')
+    if brent and brent.get('quote_status')=='historical_reference':
+        warnings.append('brent:latest_EIA_publication_is_historical_licensed_market_feed_needed')
+    return warnings
+
+
 def validate(data, now=None):
     now=now or datetime.now(UTC)
     indicators=data.get('indicators') or {}
@@ -44,6 +112,13 @@ def validate(data, now=None):
         except (ValueError,KeyError,TypeError) as exc:
             report['indicators'][key]='invalid'
             report['errors'].append(key+':'+str(exc))
+    report['warnings'].extend(source_schedule_warnings(indicators,now))
+    report['source_failures']=data.get('errors',[])
+    report['next_expected_diesel']={'monday_observation':diesel_expected_observation(now)[0].isoformat(),
+                                    'release_et':diesel_expected_observation(now)[1]}
+    report['source_registry']={'usdbrl':'Commercial licensed / BCB PTAX',
+                               'diesel':'EIA weekly (FRED backup)',
+                               'brent':'EIA daily spot reference / licensed Brent spot'}
     report['status']='invalid' if report['errors'] else 'partial' if report['warnings'] else 'ok'
     return report
 
