@@ -26,7 +26,10 @@ def validate(data, now=None):
             instant=datetime.fromisoformat(q['observed_at'].replace('Z','+00:00'))
             if instant.tzinfo is None:instant=instant.replace(tzinfo=UTC)
             age=now-instant.astimezone(UTC)
-            limit=timedelta(minutes=5) if q.get('session_status')=='open' else timedelta(days=MAX_DAYS[key])
+            historical=(key=='brent' and q.get('session_status')=='historical_reference'
+                        and q.get('quote_status')=='historical_reference'
+                        and q.get('instrument')=='brent_eia_reference')
+            limit=timedelta(minutes=5) if q.get('session_status')=='open' else timedelta(days=21 if historical else MAX_DAYS[key])
             if not timedelta(minutes=-5)<=age<=limit:
                 raise ValueError('expired observation')
             if key=='usdbrl' and q.get('instrument') not in ('spot','ptax_reference'):
@@ -36,6 +39,8 @@ def validate(data, now=None):
             if key=='diesel' and q.get('instrument')!='diesel_eia_reference':
                 raise ValueError('diesel not verified official weekly reference')
             report['indicators'][key]={'status':q.get('session_status','reference'),'observed_at':q['observed_at'],'source':q['source']}
+            if historical:
+                report['warnings'].append('brent:EIA_reference_is_historical_not_current_market')
         except (ValueError,KeyError,TypeError) as exc:
             report['indicators'][key]='invalid'
             report['errors'].append(key+':'+str(exc))
