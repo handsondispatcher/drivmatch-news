@@ -38,5 +38,18 @@
     "whatsapp": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami.",
     "instagram": "https://instagram.com/fabriciodispatcher"
   },
-  "rule": "NO CREATIVE REINTERPRETATION: use only source pixel crops, proportional scaling, transparent click areas, external PUBLICIDADE label. Changes require new explicit advertiser approval."
+  "rule": "NO CREATIVE REINTERPRETATION: use only source pixel crops, proportional scaling, transparent click areas, external PUBLICIDADE label. Changes require new explicit advertiser approval.",
+  "delivery": {
+    "host": "drivmatch-news-github-pages",
+    "local_master": "assets/ads/carhauler-photo1-master.png",
+    "local_crops": [
+      "assets/ads/carhauler-photo1-horizontal.png",
+      "assets/ads/carhauler-photo1-rectangle.png",
+      "assets/ads/carhauler-photo1-square.png"
+    ],
+    "sha256_required": "1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d",
+    "pixel_exact": true,
+    "build_script": "scripts/install_carhauler_photo1.py",
+    "policy": "Never render third-party replacement, only original exact pixels"
+  }
 }

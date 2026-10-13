@@ -35,6 +35,18 @@ class AdvertisingCampaigns(unittest.TestCase):
   self.assertIn('car-official-visual',js)
   self.assertIn('data-approved-photo1-sha256',js)
   self.assertNotIn('car-ad-actions',js)
+  self.assertIn('assets/ads/carhauler-photo1-',js)
+  self.assertIn('background-size:100% 100%',js)
+ def test_official_master_asset_immutable(self):
+  builder=(P/'scripts/install_carhauler_photo1.py').read_text()
+  workflow=(P/'.github/workflows/deploy.yml').read_text()
+  self.assertIn('1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d',builder)
+  self.assertIn('ImageChops.difference',builder)
+  self.assertIn('"horizontal": (0, 0, 1774, 394)',builder)
+  self.assertIn('"rectangle": (668, 449, 1677, 810)',builder)
+  self.assertIn('"square": (55, 445, 595, 821)',builder)
+  self.assertIn('python scripts/install_carhauler_photo1.py',workflow)
+  self.assertIn('OFFICIAL PHOTO 1 PASS',builder)
  def test_legacy_art_kept(self):
   for name,size in [('horizontal','1440 480'),('rectangle','1200 628'),('square','1080 1080')]:
    s=(P/f'site/assets/ads/carhauler-{name}.svg').read_text()

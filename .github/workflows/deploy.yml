@@ -72,6 +72,20 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
         run: python scripts/update.py
+      # Keep the exact, checksum-verified advertiser-approved PNG in Pages,
+      # so the browser never depends on third-party hotlinking or image changes.
+      - name: Cache da arte oficial Foto 1 (SHA-256 fixo)
+        uses: actions/cache@v4
+        with:
+          path: |
+            site/assets/ads/carhauler-photo1-master.png
+            site/assets/ads/carhauler-photo1-horizontal.png
+            site/assets/ads/carhauler-photo1-rectangle.png
+            site/assets/ads/carhauler-photo1-square.png
+          key: carhauler-photo1-1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d-v1
+      - name: Instalar e verificar Foto 1 oficial sem alterações
+        timeout-minutes: 3
+        run: python scripts/install_carhauler_photo1.py
       - name: War Room — verificar frescor editorial e descoberta de vídeos
         if: always()
         run: |
@@ -387,3 +401,18 @@ jobs:
         uses: actions/checkout@v4
       - name: Prova de produção — manchetes e Road TV no domínio público
         run: python scripts/verify_public_payloads.py
+      - name: Prova de produção — imagem Foto 1 publicada com hash oficial
+        run: |
+          set -eu
+          BASE="https://handsondispatcher.github.io/drivmatch-news"
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 3 --retry-all-errors --max-time 25             "$BASE/assets/ads/carhauler-photo1-master.png?verify=${{ github.run_id }}" -o /tmp/carhauler-photo1-master.png
+          echo "1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d  /tmp/carhauler-photo1-master.png" | sha256sum -c -
+          for format in horizontal rectangle square; do
+            curl --fail --location --silent --show-error --retry 6 --retry-delay 3 --retry-all-errors --max-time 25               "$BASE/assets/ads/carhauler-photo1-$format.png?verify=${{ github.run_id }}" -o "/tmp/carhauler-photo1-$format.png"
+            test "$(wc -c < "/tmp/carhauler-photo1-$format.png")" -gt 30000
+            echo "OFFICIAL PHOTO 1 PUBLIC PASS: $format PNG served from our own domain"
+          done
+          curl --fail --location --silent --show-error --retry 6 --retry-delay 3 --retry-all-errors --max-time 25             "$BASE/assets/app.js?verify=${{ github.run_id }}" -o /tmp/carhauler-photo1-app.js
+          grep -q "assets/ads/carhauler-photo1-" /tmp/carhauler-photo1-app.js
+          echo "OFFICIAL PHOTO 1 PUBLIC PASS: published script points to locally hosted approved pixels"
+

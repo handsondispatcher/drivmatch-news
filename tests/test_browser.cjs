@@ -126,7 +126,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#news-carhauler-banner .car-official-horizontal').count(),1,'Exact approved Photo 1 horizontal remains on home');
    assert.equal(await page.locator('#news-carhauler-banner .car-official-square').count(),1,'Original Photo 1 sidebar/mobile artwork is preserved');
    assert.equal(await page.locator('#news-carhauler-banner .car-official-ad').getAttribute('data-approved-photo1-sha256'),'1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d','The approved Photo 1 identity is locked');
-   assert.equal(await page.locator('#news-carhauler-banner .car-official-visual').first().getAttribute('style').then(x=>x.includes('9d0e786f0c9e07c6d708a1759af5b9ea1734fb4a210330efaacc9dc317f2437a.png')),true,'Approved master image is used, not a rebuilt creative');
+   assert.equal(await page.locator('#news-carhauler-banner .car-official-visual').first().getAttribute('style').then(x=>x.includes('assets/ads/carhauler-photo1-horizontal.png')),true,'Verified local pixel-perfect crop is used, not a rebuilt creative');
    assert.equal(await page.locator('#news-carhauler-banner .car-official-wa').first().getAttribute('href').then(x=>x.startsWith('https://wa.me/19082913386')),true,'Transparent hotspot leads to WhatsApp');
    assert.equal(await page.locator('#news-carhauler-banner .car-official-ig').first().getAttribute('href'),'https://instagram.com/fabriciodispatcher','Transparent hotspot leads to Instagram');
    assert.equal(await page.locator('#news-carhauler-banner .car-ad-actions').count(),0,'No unapproved extra CTA bar may be added to the approved artwork');

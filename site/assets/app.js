@@ -423,7 +423,10 @@
         };
         const renderCut=fmt=>{
           const v=cuts[fmt];
-          const style="background-image:url('"+escapeHTML(expected)+"');background-size:"+v.size+";background-position:"+v.pos+";";
+          // Serve a cryptographically verified, pixel-exact crop from our own domain.
+          // No remote hotlink and no visual reinterpretation of approved Foto 1.
+          const localArt='assets/ads/carhauler-photo1-'+fmt+'.png';
+          const style="background-image:url('"+localArt+"');background-size:100% 100%;background-position:0 0;";
           return '<div class="car-official-frame car-official-'+fmt+'" style="aspect-ratio:'+v.ratio+'">'+
             '<div class="car-official-visual" role="group" aria-label="Arte original aprovada: Available Load for Car Haulers, 3 veículos, Kissimmee FL para Miami FL" style="'+style+'">'+
             '<a class="car-official-hit car-official-wa" href="'+escapeHTML(ad.whatsapp_url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+v.wa+'" aria-label="Contato por WhatsApp ou texto (908) 291-3386"></a>'+
