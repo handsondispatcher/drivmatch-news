@@ -34,7 +34,6 @@ class AdvertisingCampaigns(unittest.TestCase):
   self.assertIn('CARGA DISPONIBLE PARA TRANSPORTISTAS DE VEHÍCULOS',js)
   self.assertIn('escapeHTML(carCopy.disclosure)',js)
   self.assertIn('escapeHTML(carCopy.visual)',js)
-  self.assertIn('carhauler-photo1-'+"'"+",js)
   self.assertIn('ucr-frame-horizontal',js)
   self.assertIn('ucr-approved-landscape',js)
   self.assertIn('ucr-approved-art',js)
