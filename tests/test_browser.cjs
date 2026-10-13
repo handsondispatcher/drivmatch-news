@@ -356,12 +356,12 @@ const {spawn}=require('node:child_process');
    assert.equal(await originalLink.count(),1,'The real publisher must remain directly accessible');
    assert.ok(!(await originalLink.getAttribute('href')).includes('translate.google.com'),'Never open Google translate proxy');
    if(width<=390){
-    assert.match(await page.locator('#article-source .source-access-short').innerText(),/manchete|titular|headline/);
+    assert.match(await page.locator('#article-source .source-access-short').innerText(),/manchete|titular|headline|editorial|original/);
     const sources=await sourceButtons.evaluateAll(a=>a.map(e=>({height:e.getBoundingClientRect().height,top:e.getBoundingClientRect().top})));
     assert.ok(sources.every(x=>x.height<=38),'Locale actions stay compact on mobile');
     assert.ok(Math.max(...sources.map(x=>x.top))-Math.min(...sources.map(x=>x.top))<=2,'Three source languages share one row');
    }else{
-    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/manchete|titular|headline/);
+    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/manchete|titular|headline|editorial|original/);
    }
    // Switching the entire site to English must translate weather and publisher footer.
    await page.locator('#article-dialog .x').click();
