@@ -28,6 +28,16 @@ jobs:
           python-version: '3.12'
       - name: Dependência para cards sociais 1200x630
         run: python -m pip install Pillow==11.3.0
+      # Native 4.5:1 UCR creative is built BEFORE tests and never stretches a 2:1 photo.
+      - name: Cache da matriz UCR aprovada
+        uses: actions/cache@v4
+        with:
+          path: build/ucr-master-six-panel.png
+          key: ucr-2027-master-pixels-0721e8bfc5afe7d8-v1
+      - name: Gerar e revisar UCR horizontal exato PT EN ES
+        run: |
+          python scripts/build_ucr_exact_wide.py
+          UCR_WIDE_REQUIRED=1 python -m unittest discover -s tests -p 'test_ucr_wide.py'
       - name: Testes de publicação e interface
         run: |
           python -m unittest discover -s tests
