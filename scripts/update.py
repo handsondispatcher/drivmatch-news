@@ -285,6 +285,43 @@ def official_bcb_usdbrl():
     return quote
 
 
+def normalize_brent_spot_quote(d):
+    """Authorized Brent physical spot USD/bbl, not a futures contract or CFD."""
+    if d.get('instrument')!='brent_spot' or d.get('unit')!='USD/bbl':
+        raise ValueError('Only Brent spot, USD/bbl, may replace EIA Brent reference')
+    if not d.get('source') or not str(d.get('source_url','')).startswith('https://'):
+        raise ValueError('Brent provider attribution required')
+    state=d.get('session_status')
+    if state=='open':
+        dt=datetime.fromisoformat(str(d['observed_at']).replace('Z','+00:00'))
+        if dt.tzinfo is None or dt>NOW()+timedelta(seconds=30) or NOW()-dt>timedelta(minutes=5):
+            raise ValueError('Stale Brent live snapshot')
+        q=dated_quote(float(d['value']),d['source'],dt.isoformat(),d.get('change_pct'),d['source_url'])
+        q.update(instrument='brent_spot',unit='USD/bbl',session_status='open',quote_status='live_snapshot')
+        return q
+    if state=='closed':
+        day=datetime.strptime(str(d['close_date']),'%Y-%m-%d').date()
+        if not 0<=(NOW().date()-day).days<=5:
+            raise ValueError('Brent last close expired')
+        value=float(d['close_value'])
+        q=dated_quote(value,d['source'],day.isoformat(),d.get('change_pct'),d['source_url'])
+        q.update(instrument='brent_spot',unit='USD/bbl',session_status='closed',
+                 close_date=day.isoformat(),close_value=value,quote_status='last_verified_close')
+        return q
+    raise ValueError('Unknown Brent session state')
+
+
+def authorized_brent_spot():
+    url=os.getenv('BRENT_SPOT_URL','')
+    if not url or os.getenv('BRENT_REDISTRIBUTION_AUTHORIZED')!='true':
+        raise ValueError('Authorized Brent spot feed not configured')
+    if not url.startswith('https://'):
+        raise ValueError('Brent provider must use HTTPS')
+    token=os.getenv('BRENT_SPOT_TOKEN','')
+    obj=json.loads(fetch(url,headers={'Authorization':'Bearer '+token} if token else {},timeout=12))
+    return normalize_brent_spot_quote(obj)
+
+
 def market_reference_current(quote, key, now=None):
     """Bound age by actual source cadence, never by website polling frequency.
 
@@ -385,7 +422,13 @@ def make_market(offline=False):
         market['mode']='offline-test';return market
     for key,fn in [('usdbrl',authorized_spot),('diesel',lambda:fred_latest('GASDESW','EIA / FRED (semanal)')),
                    ('brent',lambda:fred_latest('DCOILBRENTEU','EIA / FRED (diário)'))]:
-        try:market['indicators'][key]=fn()
+        try:
+            if key=='brent' and os.getenv('BRENT_REDISTRIBUTION_AUTHORIZED')=='true' and os.getenv('BRENT_SPOT_URL'):
+                try:market['indicators'][key]=authorized_brent_spot()
+                except Exception as provider_exc:
+                    market['errors'].append('brent_spot:'+type(provider_exc).__name__)
+                    market['indicators'][key]=fn()
+            else:market['indicators'][key]=fn()
         except Exception as exc:
             market['errors'].append(f'{key}:{type(exc).__name__}')
             if key in ('diesel','brent'):
