@@ -13,9 +13,8 @@
     "es"
   ],
   "placements": [
-    "news-top",
     "market-sidebar",
-    "mobile-inline"
+    "news-carhauler (square on mobile)"
   ],
   "crops": {
     "pt": {
@@ -29,9 +28,9 @@
       },
       "square": {
         "source_rect": [
-          248,
+          261,
           363,
-          724,
+          737,
           727
         ]
       }
@@ -47,9 +46,9 @@
       },
       "square": {
         "source_rect": [
-          803,
+          848,
           363,
-          1279,
+          1324,
           727
         ]
       }
@@ -65,9 +64,9 @@
       },
       "square": {
         "source_rect": [
-          1360,
+          1435,
           363,
-          1836,
+          1911,
           727
         ]
       }
@@ -78,5 +77,30 @@
     "instagram_direct": "https://ig.me/m/fabriciodispatcher"
   },
   "commercial_disclosure": "Independent private service advertisement. Not affiliated with the UCR Plan. $110 is the advertiser's starting service price, not a government fee.",
-  "production_rule": "Do not replace approved imagery with generic drawings. Preserve round UCR seal and original trucks. Each language changes the entire visual crop."
+  "production_rule": "Do not replace approved imagery with generic drawings. Preserve round UCR seal and original trucks. Each language changes the entire visual crop.",
+  "square_crop_quality_gate": {
+    "source": "advertiser-approved six-panel master, 2162x727",
+    "finding": "The old x coordinates included white gutters of 13px (pt), 45px (en) and 75px (es), cutting off the right edge of the approved artwork.",
+    "required_source_rects": {
+      "pt": [
+        261,
+        363,
+        737,
+        727
+      ],
+      "en": [
+        848,
+        363,
+        1324,
+        727
+      ],
+      "es": [
+        1435,
+        363,
+        1911,
+        727
+      ]
+    },
+    "validation": "All three square crops preserve the 476x364 artwork and its aspect ratio, exclude white separator gutters, and retain the original art and CTA hotspots. Test both desktop sidebar and mobile square."
+  }
 }

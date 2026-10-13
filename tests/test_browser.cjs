@@ -138,16 +138,29 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#news-commercial-banner .car-official-ig').first().getAttribute('href'),'https://instagram.com/fabriciodispatcher','Car-hauler Instagram link preserved');
    assert.equal(await page.locator('#market-commercial-banner .ucr-wa').getAttribute('href').then(x=>x.startsWith('https://wa.me/19082913386')),true,'UCR sidebar WhatsApp opens advertiser chat');
    assert.equal(await page.locator('#market-commercial-banner .ucr-ig').getAttribute('href'),'https://ig.me/m/fabriciodispatcher','UCR sidebar Instagram opens Direct');
+   // Source master has three lower-row images separated by white gutters.
+   // Lock the crop positions in BOTH square UCR renderers (desktop and mobile).
+   const checkUcrSquareCrop=async (language,position)=>{
+     for(const selector of ['#market-commercial-banner .ucr-frame-square .ucr-visual','#news-carhauler-banner .ucr-compact-mobile .ucr-frame-square .ucr-visual']){
+       const style=await page.locator(selector).getAttribute('style');
+       assert.ok(style.includes('background-size:454.202% auto'),language+' square art has original aspect ratio');
+       assert.ok(style.includes('background-position:'+position+' 100%'),language+' square UCR art excludes the white source gutter at '+selector);
+     }
+   };
+   await checkUcrSquareCrop('pt','15.48%');
    const ptArtwork=await page.locator('#market-commercial-banner .ucr-visual').getAttribute('style');
    await page.locator('[data-site-lang="en"]').click();
    assert.match(await page.locator('#market-commercial-banner').innerText(),/PRIVATE UCR 2027 SERVICE/,'English UCR sidebar disclosure is translated');
    assert.notEqual(await page.locator('#market-commercial-banner .ucr-visual').getAttribute('style'),ptArtwork,'English square ad artwork switches crop');
+   await checkUcrSquareCrop('en','50.30%');
    assert.match(await page.locator('#news-carhauler-banner').innerText(),/PRIVATE UCR 2027 SERVICE/,'Lower UCR translates to English');
    await page.locator('[data-site-lang="es"]').click();
    assert.match(await page.locator('#market-commercial-banner').innerText(),/SERVICIO PRIVADO UCR 2027/,'Spanish UCR sidebar disclosure is translated');
+   await checkUcrSquareCrop('es','85.11%');
    assert.match(await page.locator('#news-carhauler-banner').innerText(),/SERVICIO PRIVADO UCR 2027/,'Lower UCR translates to Spanish');
    await page.locator('[data-site-lang="pt"]').click();
    assert.equal(await page.locator('#market-commercial-banner .ucr-visual').getAttribute('style'),ptArtwork,'Portuguese UCR sidebar original crop is restored');
+   await checkUcrSquareCrop('pt','15.48%');
    assert.equal(await page.locator('#top-city-query').count(),1,'Reader has a typed city/state search input');
    assert.equal(await page.locator('#top-city-query').inputValue(),'','Without user choice, forecast rotates every 10 seconds');
    assert.equal(await page.locator('#top-city-search').count(),1,'One search icon only');

@@ -389,9 +389,9 @@
     // Exact crop windows of the advertiser-approved six-panel master. All
     // language editions share the SAME photo, round UCR seal and artwork.
     const crops={
-      pt:{horizontal:{ratio:'681 / 342',size:'317.5% auto',pos:'0% 0%'},square:{size:'454.2% auto',pos:'14.7% 100%'}},
-      en:{horizontal:{ratio:'675 / 342',size:'320.3% auto',pos:'46.3% 0%'},square:{size:'454.2% auto',pos:'47.6% 100%'}},
-      es:{horizontal:{ratio:'791 / 342',size:'273.3% auto',pos:'100% 0%'},square:{size:'454.2% auto',pos:'80.7% 100%'}}
+      pt:{horizontal:{ratio:'681 / 342',size:'317.5% auto',pos:'0% 0%'},square:{size:'454.202% auto',pos:'15.48% 100%'}},
+      en:{horizontal:{ratio:'675 / 342',size:'320.3% auto',pos:'46.3% 0%'},square:{size:'454.202% auto',pos:'50.30% 100%'}},
+      es:{horizontal:{ratio:'791 / 342',size:'273.3% auto',pos:'100% 0%'},square:{size:'454.202% auto',pos:'85.11% 100%'}}
     };
     for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner'],['news-carhauler','news-carhauler-banner']]){
       const box=$(id);if(!box)continue;

@@ -44,6 +44,22 @@ class AdvertisingCampaigns(unittest.TestCase):
   self.assertNotIn('car-ad-actions',js)
   self.assertIn('assets/ads/carhauler-photo1-',js)
   self.assertIn('background-size:100% 100%',js)
+ def test_ucr_square_crops_exclude_white_source_gutters_in_all_languages(self):
+  spec=json.loads((P/'content/ads-ucr2027-official.json').read_text())
+  js=(P/'site/assets/app.js').read_text()
+  self.assertEqual(spec['source_dimensions'],{'width':2162,'height':727})
+  expected={'pt':(261,'15.48%'),'en':(848,'50.30%'),'es':(1435,'85.11%')}
+  for lang,(x,pos) in expected.items():
+   with self.subTest(language=lang):
+    rect=spec['crops'][lang]['square']['source_rect']
+    self.assertEqual(rect,[x,363,x+476,727])
+    self.assertEqual(rect[2]-rect[0],476)
+    self.assertEqual(rect[3]-rect[1],364)
+    self.assertAlmostEqual(x/(2162-476)*100,float(pos.rstrip('%')),delta=0.01)
+    self.assertIn("square:{size:'454.202% auto',pos:'"+pos+" 100%'}",js)
+  self.assertIn("const squareBg=",js)
+  self.assertIn("const crop=(crops[lang]||crops.pt)[isWide?'horizontal':'square']",js)
+  self.assertIn("ucr-frame-square",js)
  def test_official_master_asset_immutable(self):
   builder=(P/'scripts/install_carhauler_photo1.py').read_text()
   workflow=(P/'.github/workflows/deploy.yml').read_text()
