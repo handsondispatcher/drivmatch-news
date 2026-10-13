@@ -40,7 +40,8 @@ assert.strictEqual(elements['newsroom-cta-title'].textContent,'Oportunidades no 
 assert(!elements.market.innerHTML.includes('FDX'),'Do not render unavailable securities');
 assert(!elements.market.innerHTML.includes('Class 8'),'Do not render unavailable Class 8 statistics');
 assert(!elements.market.innerHTML.includes('SIMULAÇÃO'));
-assert(elements.market.innerHTML.includes('Sem indicadores recentes e verificados'),'Empty market should have one honest message instead of blank rows');
+assert(elements.market.innerHTML.includes('market-live-row'),'Empty market keeps explicitly unavailable price slots without inventing numbers');
+assert(!elements.market.innerHTML.includes('NaN'),'Missing quotes must never become numeric prices');
 assert.strictEqual(elements['market-note'].textContent,'');
 assert.strictEqual(elements['market-mobile'].innerHTML,elements.market.innerHTML,'Mobile market must mirror same valid quotes below Road TV');
 data.market.indicators.diesel={value:3.72,observed_at:new Date().toISOString(),source:'EIA / FRED (semanal)',quote_status:'última observação disponível',change_pct:null};
