@@ -400,10 +400,18 @@ def cached_verified_market_reference(key):
     path=ROOT/'site/data/market.json'
     if not path.exists():raise ValueError('No previously verified public snapshot')
     record=read_json(path).get('indicators',{}).get(key,{})
-    expected={'diesel':'EIA / FRED (semanal)','brent':'EIA / FRED (diário)'}
-    series={'diesel':'GASDESW','brent':'DCOILBRENTEU'}
-    if record.get('source')!=expected[key] or record.get('source_url')!='https://fred.stlouisfed.org/series/'+series[key]:
-        raise ValueError('Previously served snapshot has wrong source')
+    approved_provenance={
+        'diesel':{
+            ('EIA / FRED (semanal)','https://fred.stlouisfed.org/series/GASDESW'),
+            ('EIA — diesel rodoviário EUA (semanal)',
+             'https://www.eia.gov/opendata/browser/petroleum/pri/gnd')},
+        'brent':{
+            ('EIA / FRED (diário)','https://fred.stlouisfed.org/series/DCOILBRENTEU'),
+            ('EIA — Brent Europe spot (diário)',
+             'https://www.eia.gov/opendata/browser/petroleum/pri/spt')}
+    }
+    if (record.get('source'),record.get('source_url')) not in approved_provenance[key]:
+        raise ValueError('Previously served snapshot has wrong official source')
     historic=key=='brent' and not market_reference_current(record,key)
     if historic:
         day=datetime.fromisoformat(record['observed_at']).date()
