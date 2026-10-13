@@ -290,6 +290,47 @@ jobs:
           if not d.get('fresh_12h'):
               print('::warning::NEWS FRESHNESS BLOCKER: no newly verified headline in previous 12h, despite successful feed polling.')
           PY
+          # Verify the actual news-source OG page and image, not only a static
+          # test fixture. Crawlers must get an HTML image card over a full HTTPS URL.
+          python - <<'PY'
+          import json,re,time
+          from urllib.request import Request,urlopen
+          from urllib.parse import urlsplit
+          d=json.load(open('/tmp/drivmatch-source-headlines.json',encoding='utf-8'))
+          candidates=[x for x in d.get('headlines',[]) if
+              x.get('geo_scope_verified') is True and
+              re.fullmatch(r'[a-z0-9][a-z0-9-]{0,99}',str(x.get('id') or '')) and
+              str(x.get('source_url') or '').startswith('https://') and
+              urlsplit(x['source_url']).hostname not in ('news.google.com','www.google.com')]
+          # Prefer the exact story reported by the owner if it is still current.
+          candidates.sort(key=lambda x:0 if x['id']=='source-4b971529a12a4211b8ac' else 1)
+          if not candidates:
+              print('::warning::WHATSAPP PREVIEW NOT EXERCISED: no eligible external news source')
+          for story in candidates[:1]:
+              url='https://handsondispatcher.github.io/drivmatch-news/share/'+story['id']+'/'
+              image=url+'social.jpg'
+              headers={'User-Agent':'facebookexternalhit/1.1','Accept':'text/html,image/jpeg,*/*'}
+              def fetch(uri):
+                  last=None
+                  for attempt in range(5):
+                      try:
+                          with urlopen(Request(uri,headers=headers),timeout=20) as r:
+                              return r.headers,r.read(3000000)
+                      except Exception as ex:
+                          last=ex
+                          time.sleep(3)
+                  raise AssertionError('Social preview unavailable: '+uri+' '+str(last))
+              h,content=fetch(url)
+              html=content.decode('utf-8')
+              assert 'property="og:title"' in html
+              assert 'property="og:image" content="'+image+'"' in html
+              assert 'property="og:url" content="'+url+'"' in html
+              assert 'content="1200"' in html and 'content="630"' in html
+              imgh,bytes_=fetch(image)
+              assert bytes_.startswith(b'\\xff\\xd8') and len(bytes_)>10000,(len(bytes_),image)
+              assert imgh.get_content_type()=='image/jpeg',imgh.get_content_type()
+              print('LIVE WHATSAPP SOCIAL CARD PASS:',story['id'],'JPEG bytes:',len(bytes_))
+          PY
           # A footer match does NOT prove the custom domain serves the same
           # version as GitHub Pages. Request the HTML and release contract via
           # fresh URLs, then report a version-specific, actionable diagnosis.
