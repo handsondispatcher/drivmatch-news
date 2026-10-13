@@ -296,7 +296,17 @@
     const reserved=new Set([hero,...related].filter(Boolean).map(a=>a.id));
     const shortlist=f.filter(a=>!reserved.has(a.id)).slice(0,5);
     shortlist.forEach(a=>reserved.add(a.id));
-    const feed=f.filter(a=>!reserved.has(a.id));
+    // REGRA EDITORIAL CANÔNICA: a lista Últimas Notícias é estritamente
+    // cronológica. Curadoria, diversidade de editorias/fontes e alertas
+    // só podem ordenar as seções de Destaques/Em foco.
+    // Uma matéria já exibida nessas seções não deve ser repetida na lista.
+    const publicationTime=a=>{
+      const timestamp=Date.parse(a.published_at||'');
+      return Number.isFinite(timestamp)?timestamp:Number.NEGATIVE_INFINITY;
+    };
+    const feed=pageStories().filter(a=>matches(a)&&!reserved.has(a.id))
+      .sort((a,b)=>publicationTime(b)-publicationTime(a)||
+        String(a.id||a.source_url||'').localeCompare(String(b.id||b.source_url||'')));
     const pages=Math.max(1,Math.ceil(feed.length/pageSize));page=Math.min(page,pages-1);
     $('list').innerHTML=feed.length?feed.slice(page*pageSize,(page+1)*pageSize).map(a=>storyCard(a,indexSet.get(a.id))).join(''):`<div class="empty">${labels[lang].noResults}</div>`;
     $('count').textContent='';
