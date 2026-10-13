@@ -101,44 +101,42 @@
     return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
   }
   const PHOTO_REUSE_GAP=20;
-  let visualCacheKey='',visualCache=new Map();
+  // Canonical editorial rhythm: never repeat the same archive photo in adjacent
+  // cards; a photo is eligible again only after at least 15 intervening stories.
+  // A real locally stored, licensed image always wins over a decorative SVG.
+  const PHOTO_REUSE_GAP=15;
+  let visualCacheKey='',visualCache=new Map(),visualPhotoCredits=new Map();
+  const validArchivePhoto=p=>p&&safeNewsPhotoUrl(p.image)&&safeUrl(p.image_source_url)&&
+    p.image_credit&&p.image_license;
   function storyVisuals(){
     const stories=pageStories();
-    const key=stories.map(a=>(a.id||a.source_url)+'|'+(licensedPhotoOf(a)?.image||a.image||'')).join('~')+'#'+photoLibrary.length;
+    const key=stories.map(a=>(a.id||a.source_url)+'|'+(licensedPhotoOf(a)?.image||a.image||'')).join('~')+
+      '|'+photoLibrary.map(p=>p.image).join('~');
     if(key===visualCacheKey)return visualCache;
-    const recent=new Map(),map=new Map();
-    const curated=photoLibrary.filter(validArchivePhoto);
-    for(const [index,a] of stories.entries()){
-      const direct=licensedPhotoOf(a);
-      const credited=a.kind!=='external_link'&&a.image_license&&a.image_credit&&
-        (safeNewsPhotoUrl(a.image)||safeUrl(a.image))&&safeUrl(a.image_source_url||a.image);
-      const primary=direct||(credited?{
+    const lastUsed=new Map(),map=new Map(),credits=new Map();
+    const library=photoLibrary.filter(validArchivePhoto);
+    for(let index=0;index<stories.length;index++){
+      const a=stories[index],cached=licensedPhotoOf(a);
+      const direct=a.kind!=='external_link'&&a.image_license&&a.image_credit&&safeUrl(a.image)?{
         image:a.image,image_credit:a.image_credit,image_license:a.image_license,
-        image_source_url:a.image_source_url||a.image,image_alt:a.image_alt||'Fotografia ilustrativa de arquivo'
-      }:null);
-      const allowed=p=>validArchivePhoto(p)&&
-        (recent.get(p.image)===undefined||index-recent.get(p.image)>PHOTO_REUSE_GAP);
-      let chosen=allowed(primary)?primary:null;
-      if(!chosen){
-        const candidates=a.editorial_type==='operational_bulletin'
-          ?curated.filter(p=>(p.keywords||[]).some(k=>/road|highway|interstate|rodovia|estrada/i.test(k)))
-          :curated;
-        const title=normPhotoText(
-          (photoTopics[a.category]||photoTopics.Transporte)+' '+
-          (localeOf(a,'pt')?.title||localeOf(a)?.title||''));
-        const ranked=candidates.filter(allowed).map((p,i)=>{
-          const keywords=(p.keywords||[]).filter(k=>normPhotoText(k).length>2);
-          const relevance=keywords.reduce((n,k)=>n+(title.includes(normPhotoText(k))?1:0),0);
-          return {p,relevance,i};
-        }).sort((x,y)=>y.relevance-x.relevance||x.i-y.i);
-        chosen=ranked[0]?.p||null;
-      }
-      if(chosen)recent.set(chosen.image,index);
-      map.set(a.id,chosen);
+        image_source_url:a.image_source_url,image_alt:a.image_alt
+      }:null;
+      const options=[cached,direct,...library].filter(validArchivePhoto);
+      const title=[localeOf(a,'pt')?.title,localeOf(a,'en')?.title,a.category].filter(Boolean).join(' ').toLowerCase();
+      const scored=options.map((p,i)=>{
+        const keywords=Array.isArray(p.keywords)?p.keywords:[];
+        const topical=keywords.reduce((v,k)=>v+(title.includes(String(k).toLowerCase())?1:0),0);
+        const previous=lastUsed.get(p.image);
+        return {p,score:(i===0&&cached?500:0)+(i===0&&direct?250:0)+topical*15,
+          gap:previous===undefined?Infinity:index-previous};
+      }).filter(x=>x.gap>PHOTO_REUSE_GAP);
+      scored.sort((x,y)=>y.score-x.score||y.gap-x.gap||x.p.image.localeCompare(y.p.image));
+      const selected=scored[0]?.p;
+      if(selected){lastUsed.set(selected.image,index);map.set(a.id,selected.image);credits.set(a.id,selected);}
+      else map.set(a.id,storyGraphic(a));
     }
-    visualCacheKey=key;visualCache=map;return map;
+    visualCacheKey=key;visualCache=map;visualPhotoCredits=credits;return map;
   }
-  function displayedPhotoOf(a){return storyVisuals().get(a.id)||null;}
   function imageOf(a){return displayedPhotoOf(a)?.image||storyGraphic(a);}
   function imageHTML(a,suffix=''){
     const url=imageOf(a),fallback=storyGraphic(a),graphic=url.startsWith('data:image/svg');
@@ -370,6 +368,9 @@
       a?.creative_id||a?.whatsapp_url||a?.url||'').trim().toLowerCase();
     const top=placements.find(a=>a.enabled===true&&a.slot==='news-top');
     const topIdentity=top&&adIdentity(top);
+    const primary=placements.find(a=>a.enabled===true&&a.slot==='news-top');
+    const sameCampaign=a=>primary&&a&&(a.campaign_id&&a.campaign_id===primary.campaign_id||
+      a.sponsor===primary.sponsor&&a.url===primary.url&&a.whatsapp_url===primary.whatsapp_url);
     for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner']]){
       const box=$(id);if(!box)continue;
       const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion'&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(a.url||'')&&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(a.whatsapp_url||'')&&/^https:\/\/cdn\.openart\.ai\/openart-uploads\/production\/attachment-transfers\/[a-f0-9]+\.png$/.test(a.image||''));
