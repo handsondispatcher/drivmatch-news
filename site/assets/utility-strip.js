@@ -30,10 +30,9 @@ function marketFresh(v,key){
 function initializeTradingViewMarket(){
  if(typeof window==='undefined'||!window.customElements||
     !window.customElements.whenDefined)return;
- const loader=window.customElements.whenDefined('tv-tickers');
- const cutoff=new Promise(resolve=>setTimeout(()=>resolve(false),10000));
- Promise.race([loader.then(()=>true),cutoff]).then(ready=>{
-  if(!ready)return;
+ // The 10-second race used to permanently suppress Brent even after the
+ // actual provider component arrived. Never time out provider activation.
+ window.customElements.whenDefined('tv-tickers').then(()=>{
   for(const key of ['usd','brent']){
    const host=el('top-'+key+'-tradingview');
    if(host)host.hidden=false;
