@@ -443,16 +443,20 @@
       const text={pt:'Português BR',en:'English',es:'Español LatAm'}[target];
       return '<button type="button" data-source-lang="'+target+'" class="article-source-button '+(primary?'primary':'secondary')+'" aria-pressed="'+String(target===articleLang)+'"><img src="'+flags[target]+'" alt="" width="19" height="13"><span class="source-label-full">'+text+'</span><span class="source-label-mobile">'+text+'</span></button>';
     };
-    const internalLanguages=langs.filter(l=>opened.locales?.[l]&&(!isExternal||opened.translated_langs?.includes(l)));
+    // Approved DrivMatch articles already have the in-page language bar; avoid
+    // a duplicate set that pushes Share off the mobile viewport.
+    const internalLanguages=isExternal?langs.filter(l=>opened.locales?.[l]&&opened.translated_langs?.includes(l)):[];
     const buttons=internalLanguages.map(l=>sourceLink(l,l===articleLang)).join('');
-    const heading=articleLang==='pt'?'LER NO DRIVMATCH NEWS':articleLang==='es'?'LEER EN DRIVMATCH NEWS':'READ ON DRIVMATCH NEWS';
+    const heading=isExternal
+      ?(articleLang==='pt'?'LER NO DRIVMATCH NEWS':articleLang==='es'?'LEER EN DRIVMATCH NEWS':'READ ON DRIVMATCH NEWS')
+      :(articleLang==='pt'?'FONTE ORIGINAL':articleLang==='es'?'FUENTE ORIGINAL':'ORIGINAL SOURCE');
     const sourceLabel=originalSourceLang==='pt'?'Português':originalSourceLang==='es'?'español':'English';
     const originalTitle=articleLang==='pt'?'Abrir reportagem original em '+sourceLabel+' ↗':articleLang==='es'?'Abrir noticia original en '+sourceLabel+' ↗':'Open original publisher report ('+sourceLabel+') ↗';
     const sourceWarning=isExternal
       ?(articleLang==='pt'?'A leitura acima usa somente a manchete disponível; não é tradução integral da fonte.':articleLang==='es'?'Este texto usa solo el titular disponible; no es una traducción íntegra.':'This is a headline-only brief, not a full translated publisher report.')
       :(articleLang==='pt'?'Texto editorial da DrivMatch News; a publicação original permanece disponível na fonte.':articleLang==='es'?'Texto editorial de DrivMatch News; la fuente original está disponible.':'DrivMatch News editorial text; the publisher source remains available.');
     const originalLink=src?'<a class="article-original-link" href="'+escapeHTML(src)+'" target="_blank" rel="noopener noreferrer">'+escapeHTML(originalTitle)+'</a>':'';
-    $('article-source').innerHTML='<div class="full-article-heading">'+heading+'</div><div class="source-translations">'+buttons+'</div>'+originalLink+'<p class="source-access-warning">'+sourceWarning+'</p><p class="source-access-short">'+sourceWarning+'</p>';
+    $('article-source').innerHTML='<div class="full-article-heading">'+heading+'</div>'+(buttons?'<div class="source-translations">'+buttons+'</div>':'')+originalLink+'<p class="source-access-warning">'+sourceWarning+'</p><p class="source-access-short">'+sourceWarning+'</p>';
     const attribution=storyPhoto||opened;
     const photoCredit=attribution.image_source_url && safeUrl(attribution.image_source_url)
       ? `<p class="image-credit"><span class="photo-credit-label">${articleLang==='en'?'Illustrative archive photo':articleLang==='es'?'Foto ilustrativa de archivo':'Foto ilustrativa de arquivo'} (não é imagem do acontecimento): </span><a href="${escapeHTML(attribution.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(attribution.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(attribution.image_license||'Licença na fonte')} <span class="photo-transform-note">· corte/redimensionamento</span></p>`:'';
