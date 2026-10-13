@@ -417,11 +417,13 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#share-story').isVisible(),true);
    const shareLink=await page.locator('[data-share-platform="whatsapp"]').getAttribute('href');
    const waText=new URL(shareLink).searchParams.get('text');
-   assert.match(waText,/^\*[^*]+\*\n\nhttps:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\//,
-     'WhatsApp message must use bold headline plus one absolute HTTPS OG preview link');
-   assert.ok(!waText.includes('Manchete e contexto no DrivMatch News'),'No generic summary should displace the WhatsApp photo/title');
+   assert.match(waText,/^https:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\/[a-zA-Z0-9-]+\/\?v=[a-zA-Z0-9-]+$/,
+     'WhatsApp must receive ONLY the absolute HTTPS rich preview link, not text or /news/share');
+   assert.ok(!waText.includes('Manchete e contexto no DrivMatch News'),'No placeholder message should displace the WhatsApp photo/title');
+   assert.ok(!waText.startsWith('/news/share/'),'Relative share routes must never be sent');
    assert.ok(!waText.includes('news.google.com/rss/'));
-   assert.equal((waText.match(/https:\/\//g)||[]).length,1,'One unambiguous clickable link per message');
+   assert.equal((waText.match(/https:\/\//g)||[]).length,1,'Single clickable image-card URL per WhatsApp message');
+   assert.ok(!waText.includes('\n'),'No freeform headline text before the preview URL');
    assert.ok(waText.endsWith('?v=og-photo-top-no-cta-20261013-r4'), 'New WhatsApp URL must invalidate previous image-less preview');
    if(width===1440){
     await page.locator('#share-story').click();
