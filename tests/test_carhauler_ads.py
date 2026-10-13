@@ -38,7 +38,7 @@ class AdvertisingCampaigns(unittest.TestCase):
   self.assertIn('ucr-native-banner',js)
   self.assertIn('ucr-native-hit',js)
   self.assertIn('ucr-2027-',js)
-  self.assertIn('1774x394.png',js)
+  self.assertIn('1774x394.webp',js)
   self.assertNotIn('ucr-approved-landscape',js)
   self.assertIn('ucr-native-mobile-actions',js)
   self.assertNotIn('ucr-compact-panel',js)
