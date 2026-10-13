@@ -176,10 +176,19 @@ def build(minimum=0):
     # News on the first page gets first claim on unique, relevant photographs.
     stories.sort(key=lambda s: str(s.get("published_at") or ""), reverse=True)
     assigned = choose_photos(stories, available)
+    # Curated, successfully downloaded local files also form an attributed
+    # visual fallback catalogue. The one-photo-per-story assignment remains
+    # preferred; when a long issue outnumbers available photos, browser cards
+    # may reuse clearly labelled archival photography rather than showing
+    # title-on-graphic tiles throughout the newspaper.
+    library = [
+        {**downloaded[entry["id"]], "keywords": entry.get("keywords", [])}
+        for entry in photos if entry["id"] in downloaded
+    ]
     manifest = {
         "schema_version": 1, "generated_at": datetime.now(timezone.utc).isoformat(),
         "image_context": "illustrative_archive", "license_policy": "curated_commons",
-        "images": assigned
+        "images": assigned, "library": library
     }
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
     MANIFEST.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
