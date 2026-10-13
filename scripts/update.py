@@ -635,29 +635,18 @@ def make_market(offline=False):
                 try:market['indicators'][key]=cached_verified_market_reference(key)
                 except Exception as cache_exc:market['errors'].append(f'{key}_cache:{type(cache_exc).__name__}')
             if key=='usdbrl':
-                # Commercial close and BCB PTAX are not interchangeable instruments.
-                # Prefer the newest observation, commercial if dates coincide.
-                fallback=[]
-                try:fallback.append(verified_previous_close())
+                # Fail over only to the verified commercial spot CLOSE; never
+                # overwrite the public dollar with a BCB PTAX reference.
+                try:market['indicators'][key]=verified_previous_close()
                 except Exception as exc2:market['errors'].append('usdbrl_previous_close:'+type(exc2).__name__)
-                try:fallback.append(official_bcb_ptax_odata())
-                except Exception as exc3:market['errors'].append('usdbrl_bcb_olinda:'+type(exc3).__name__)
-                try:fallback.append(official_bcb_usdbrl())
-                except Exception as exc4:market['errors'].append('usdbrl_bcb_sgs:'+type(exc4).__name__)
-                if fallback:
-                    fallback.sort(key=lambda q:(q['observed_at'][:10],q.get('instrument')=='spot',q['observed_at']),reverse=True)
-                    market['indicators'][key]=fallback[0]
-    # Protect against a configured FX provider that returns only Friday's
-    # close during Tuesday's active session. Newer BCB bulletins are preferred,
-    # explicitly reclassified as PTAX (never mislabeled as commercial spot).
-    fx=market['indicators'].get('usdbrl')
-    if fx and fx.get('instrument')=='spot' and fx.get('session_status')=='closed':
-        try:
-            latest_ptax=official_bcb_ptax_odata()
-            if latest_ptax['observed_at'][:10]>fx['observed_at'][:10]:
-                market['indicators']['usdbrl']=latest_ptax
-        except Exception as close_exc:
-            market['errors'].append('usdbrl_close_comparison:'+type(close_exc).__name__)
+                # Preserve PTAX separately for internal diagnostics/analytics.
+                try:market.setdefault('references',{})['usdbrl_ptax']=official_bcb_ptax_odata()
+                except Exception as exc3:
+                    market['errors'].append('usdbrl_bcb_olinda:'+type(exc3).__name__)
+                    try:market.setdefault('references',{})['usdbrl_ptax']=official_bcb_usdbrl()
+                    except Exception as exc4:market['errors'].append('usdbrl_bcb_sgs:'+type(exc4).__name__)
+    # PTAX must never supersede an actual commercial close, regardless of
+    # which publication has a later date; the instruments are different.
     # V34.1: unproven securities/Class 8 feeds no longer requested or rendered.
     # Retain authorized source adapters for future separately approved pilots.
     return market
