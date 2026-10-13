@@ -327,7 +327,7 @@ jobs:
               assert 'property="og:url" content="'+url+'"' in html
               assert 'content="1200"' in html and 'content="630"' in html
               imgh,bytes_=fetch(image)
-              assert bytes_.startswith(b'\\xff\\xd8') and len(bytes_)>10000,(len(bytes_),image)
+              assert bytes_.startswith(b'\xff\xd8') and len(bytes_)>10000,(len(bytes_),image)
               assert imgh.get_content_type()=='image/jpeg',imgh.get_content_type()
               print('LIVE WHATSAPP SOCIAL CARD PASS:',story['id'],'JPEG bytes:',len(bytes_))
           PY
