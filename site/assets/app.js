@@ -398,6 +398,42 @@
         const bg="background-image:url('"+source+"');background-size:"+crop.size+";background-position:"+crop.pos+";";
         const href=escapeHTML('https://wa.me/19082913386?text='+encodeURIComponent(copy.message));
         const ig='https://ig.me/m/fabriciodispatcher';
+        // The original UCR artwork is kept undistorted. The separate HTML
+        // contact panel fills the exact horizontal ratio of the vehicle ad.
+        if(slot==='news-carhauler'){
+          const edition=lang==='en'?'en':lang==='es'?'es':'pt';
+          const artWidth={pt:44.3,en:43.9,es:51.4}[edition];
+          const c={
+            pt:{price:'Serviço a partir de US$ 110',wa:'WhatsApp',ig:'Instagram Direct'},
+            en:{price:'Service from US$110',wa:'WhatsApp',ig:'Instagram Direct'},
+            es:{price:'Servicio desde US$110',wa:'WhatsApp',ig:'Instagram Direct'}
+          }[edition];
+          const sq=(crops[edition]||crops.pt).square;
+          const squareBg="background-image:url('"+source+"');background-size:"+sq.size+";background-position:"+sq.pos+";";
+          box.innerHTML='<div class="ucr-ad ucr-compact-ad">'+
+            '<div class="ucr-ad-disclosure">'+escapeHTML(copy.label)+'</div>'+
+            '<div class="ucr-compact-banner" data-aspect-ratio="1774/394">'+
+              '<div class="ucr-compact-art" style="width:'+artWidth+'%;'+bg+'">'+
+                '<a class="ucr-hit ucr-wa" href="'+href+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.wa)+'"></a>'+
+                '<a class="ucr-hit ucr-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.ig)+'"></a>'+
+              '</div>'+
+              '<div class="ucr-compact-panel"><strong>UCR 2027</strong>'+
+                '<span class="ucr-compact-price">'+escapeHTML(c.price)+'</span>'+
+                '<div class="ucr-compact-actions">'+
+                  '<a class="ucr-compact-whatsapp" href="'+href+'" target="_blank" rel="noopener noreferrer sponsored">'+escapeHTML(c.wa)+'</a>'+
+                  '<a class="ucr-compact-instagram" href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored">'+escapeHTML(c.ig)+'</a>'+
+                '</div>'+
+              '</div>'+
+            '</div>'+
+            '<div class="ucr-compact-mobile"><div class="ucr-frame ucr-frame-square">'+
+              '<div class="ucr-visual" role="group" aria-label="UCR 2027" style="'+squareBg+'">'+
+                '<a class="ucr-hit ucr-wa" href="'+href+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.wa)+'"></a>'+
+                '<a class="ucr-hit ucr-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.ig)+'"></a>'+
+              '</div>'+
+            '</div></div>'+
+            '<p class="ucr-ad-note">'+escapeHTML(copy.note)+'</p></div>';
+          continue;
+        }
         box.innerHTML='<div class="ucr-ad"><div class="ucr-ad-disclosure">'+escapeHTML(copy.label)+'</div>'+
           '<div class="ucr-frame '+(isWide?'ucr-frame-horizontal':'ucr-frame-square')+'"'+(isWide?' style="aspect-ratio:'+crop.ratio+'"':'')+'>'+
           '<div class="ucr-visual" role="group" aria-label="'+escapeHTML('UCR 2027 — '+copy.note)+'" style="'+bg+'">'+

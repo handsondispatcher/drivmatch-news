@@ -162,14 +162,18 @@
     "desktop": {
       "news-top": "carhauler-approved-photo1 / horizontal",
       "market-sidebar": "ucr-2027-official / square",
-      "news-carhauler": "ucr-2027-official / compact horizontal below article list"
+      "news-carhauler": "ucr-2027-official / horizontal 1774:394 with original artwork and external contact UI"
     },
     "restrictions": [
       "Car hauler occupies news-top; do not relocate",
       "UCR square remains in sidebar",
-      "UCR lower horizontal must be scaled compactly, without changing artwork or crop",
       "Do not publish an additional car-hauler horizontal beneath articles",
-      "Preserve contacts and approved imagery"
-    ]
+      "Preserve contacts and approved imagery",
+      "Lower UCR frame has exactly same aspect ratio as upper vehicle banner, with approved art undistorted"
+    ],
+    "mobile": {
+      "news-top": "carhauler-approved-photo1 / square",
+      "news-carhauler": "ucr-2027-official / square"
+    }
   }
 }

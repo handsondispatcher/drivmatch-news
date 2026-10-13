@@ -1039,13 +1039,30 @@ body{background:#f7f9fc;color:#14283c}
   .ad-placement-carhauler-home:not([hidden]){display:block!important}
 }
 
+/* Equal horizontal proportions: both homepage banners are 1774:394.
+   Original UCR artwork is preserved at left; HTML controls at right. */
+.ucr-compact-banner{display:flex;width:100%;aspect-ratio:1774/394;overflow:hidden;border-radius:5px;background:#06182e}
+.ucr-compact-art{flex:0 0 auto;position:relative;height:100%;background-repeat:no-repeat;background-color:#06182e}
+.ucr-compact-art .ucr-wa{left:2.3%;top:82%;width:35%;height:17.8%}
+.ucr-compact-art .ucr-ig{left:39.5%;top:82%;width:34%;height:17.8%}
+.ucr-compact-panel{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:clamp(3px,.7vw,10px);padding:clamp(6px,1.25vw,18px);background:linear-gradient(110deg,#06182e,#07345b);box-sizing:border-box}
+.ucr-compact-panel strong{font:900 clamp(17px,2.3vw,32px)/1 Arial,sans-serif;color:#fff}
+.ucr-compact-price{font:700 clamp(11px,1.4vw,21px)/1.15 Arial,sans-serif;color:#ffdb4d}
+.ucr-compact-actions{display:flex;gap:8px;margin-top:clamp(2px,.5vw,8px)}
+.ucr-compact-actions a{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;min-height:clamp(27px,3.5vw,45px);padding:5px 7px;border-radius:5px;text-decoration:none;color:white;font:700 clamp(10px,1.2vw,15px)/1.2 Arial,sans-serif;text-align:center}
+.ucr-compact-whatsapp{background:#138b4b}
+.ucr-compact-instagram{background:linear-gradient(105deg,#5931b8,#c72c8a)}
+.ucr-compact-actions a:hover,.ucr-compact-actions a:focus-visible{outline:2px solid #fff;outline-offset:1px}
+.ucr-compact-mobile{display:none}
+@media(max-width:740px){.ucr-compact-banner{display:none}.ucr-compact-mobile{display:block}.ucr-compact-mobile .ucr-frame-square{width:100%;max-width:420px;margin:auto}}
+
 /* FIXED EDITORIAL AD SCALE: approved art unchanged; compact UCR below the stories. */
-#news-carhauler-banner:has(.ucr-ad){display:block;box-sizing:border-box;width:min(100%,440px);max-width:440px;margin:16px auto 19px;padding:7px;min-height:0}
+#news-carhauler-banner:has(.ucr-ad){display:block;box-sizing:border-box;width:100%;max-width:100%;margin:16px auto 19px;padding:10px;min-height:0}
 #news-carhauler-banner .ucr-frame-horizontal{width:100%;overflow:hidden}
 #news-carhauler-banner .ucr-ad-disclosure{font-size:9px;letter-spacing:.6px}
 #news-carhauler-banner .ucr-ad-note{font-size:10px;line-height:1.35;margin:5px 0 0}
 #news-commercial-banner:has(.car-official-ad){width:100%;max-width:100%;box-sizing:border-box}
-@media(max-width:740px){#news-carhauler-banner:has(.ucr-ad){width:min(100%,400px);max-width:400px;margin:14px auto;padding:6px}}
+@media(max-width:740px){#news-carhauler-banner:has(.ucr-ad){width:100%;max-width:100%;margin:14px auto;padding:6px}}
 
 </style>
 </head>
@@ -1180,7 +1197,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/analytics-config.js" defer></script>
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-21-editorial-labels-photo1-local-20261013-r4" defer></script>
+<script src="assets/app.js?v=v34-21-editorial-labels-ucr-equalratio-20261013-r6" defer></script>
 <script src="assets/road-tv-live.js?v=v34-18-durable-live-first-20261011" defer></script>
 <script src="assets/utility-strip.js?v=v34-11-national-weather-20261010" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>
