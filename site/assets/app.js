@@ -392,7 +392,7 @@
         const contact=/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(ad.whatsapp_url||'');
         box.hidden=!(approved&&dm&&contact);
         if(box.hidden){box.innerHTML='';continue;}
-        const isWide=slot==='news-top';
+        const isWide=slot==='news-top'||slot==='news-carhauler';
         const crop=(crops[lang]||crops.pt)[isWide?'horizontal':'square'];
         const source=escapeHTML(ad.master_image);
         const bg="background-image:url('"+source+"');background-size:"+crop.size+";background-position:"+crop.pos+";";
