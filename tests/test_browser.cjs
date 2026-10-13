@@ -349,17 +349,19 @@ const {spawn}=require('node:child_process');
     assert.ok(fit.scrollHeight<=fit.clientHeight+2,`Article must fit without internal scroll at ${width}px: ${JSON.stringify(fit)}`);
     await page.screenshot({path:`test-results/mobile-compact-reader-${width}.png`});
    }
-   const sourceLinks=await page.locator('#article-source .article-source-button').evaluateAll(nodes=>nodes.map(n=>n.href));
-   assert.equal(sourceLinks.length,3,'Portuguese English and Spanish original-source buttons must remain available');
-   assert.ok(sourceLinks.some(url=>!url.includes('translate.google.com')&&!url.includes('.translate.goog')),'Direct original publisher must always remain available');
-   assert.equal(await page.locator('#article-source .article-source-button img').count(),3,'Each language source button must display its flag');
+   const sourceButtons=page.locator('#article-source button.article-source-button');
+   assert.equal(await sourceButtons.count(),3,'PT-BR, EN-US and ES-419 language controls must remain available');
+   assert.equal(await page.locator('#article-source .article-source-button img').count(),3,'Each language action must retain its flag');
+   const originalLink=page.locator('#article-source a.article-original-link');
+   assert.equal(await originalLink.count(),1,'The real publisher must remain directly accessible');
+   assert.ok(!(await originalLink.getAttribute('href')).includes('translate.google.com'),'Never open Google translate proxy');
    if(width<=390){
-    assert.match(await page.locator('#article-source .source-access-short').innerText(),/navegador/);
-    const sources=await page.locator('#article-source .article-source-button').evaluateAll(a=>a.map(e=>({height:e.getBoundingClientRect().height,top:e.getBoundingClientRect().top})));
-    assert.ok(sources.every(x=>x.height<=38),'Source language buttons must be 35px, not tall stacked cards');
-    assert.ok(Math.max(...sources.map(x=>x.top))-Math.min(...sources.map(x=>x.top))<=2,'Three source language buttons must fit on one row');
+    assert.match(await page.locator('#article-source .source-access-short').innerText(),/manchete|titular|headline/);
+    const sources=await sourceButtons.evaluateAll(a=>a.map(e=>({height:e.getBoundingClientRect().height,top:e.getBoundingClientRect().top})));
+    assert.ok(sources.every(x=>x.height<=38),'Locale actions stay compact on mobile');
+    assert.ok(Math.max(...sources.map(x=>x.top))-Math.min(...sources.map(x=>x.top))<=2,'Three source languages share one row');
    }else{
-    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/navegador/);
+    assert.match(await page.locator('#article-source .source-access-warning').innerText(),/manchete|titular|headline/);
    }
    // Switching the entire site to English must translate weather and publisher footer.
    await page.locator('#article-dialog .x').click();
