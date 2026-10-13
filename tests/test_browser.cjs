@@ -127,7 +127,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await driverPoster.count(),1,'Original Aileen JPG must exist in the static sidebar HTML');
    assert.equal(await page.locator('#market-driver-availability-banner .dm-driver-whatsapp-hotspot').getAttribute('href'),
      'https://wa.me/14072852874','Printed driver phone must open Aileen WhatsApp');
-   const driverLoaded=await driverPoster.evaluate(img=>img.complete&&img.naturalWidth===1229&&img.naturalHeight===1536);
+   const driverLoaded=await driverPoster.evaluate(async img=>{try{await img.decode();}catch(_){}return img.complete&&img.naturalWidth===1229&&img.naturalHeight===1536;});
    assert.equal(driverLoaded,true,'Exact original 1229x1536 classified should load successfully');
    assert.equal(await page.locator('#market-driver-availability-banner').isVisible(),width>=991,
      'Aileen classified is visible directly under UCR when desktop sidebar is visible');
