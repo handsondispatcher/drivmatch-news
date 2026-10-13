@@ -53,8 +53,9 @@ class MarketCadenceTests(unittest.TestCase):
         self.assertEqual(q['quote_status'],'last_official_publication')
         self.assertEqual(q['observed_at'],'2026-10-12')
         with patch.object(market,'fetch',return_value='DATE,DCOILBRENTEU\n2026-10-06,125.44\n'),patch.object(market,'NOW',return_value=datetime(2026,10,13,15,tzinfo=UTC)):
-            with self.assertRaisesRegex(ValueError,'Expired'):
-                market.fred_latest('DCOILBRENTEU','EIA / FRED (diário)')
+            stale=market.fred_latest('DCOILBRENTEU','EIA / FRED (diário)')
+        self.assertEqual(stale['quote_status'],'historical_reference')
+        self.assertEqual(stale['observed_at'],'2026-10-06')
 
 if __name__=='__main__':
     unittest.main()
