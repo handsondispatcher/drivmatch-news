@@ -114,9 +114,9 @@
       394
     ],
     "formats": {
-      "pt": "assets/ads/ucr-2027-pt-wide-1774x394.png",
-      "en": "assets/ads/ucr-2027-en-wide-1774x394.png",
-      "es": "assets/ads/ucr-2027-es-wide-1774x394.png"
+      "pt": "assets/ads/ucr-2027-pt-wide-1774x394.webp",
+      "en": "assets/ads/ucr-2027-en-wide-1774x394.webp",
+      "es": "assets/ads/ucr-2027-es-wide-1774x394.webp"
     },
     "builder": "scripts/build_ucr_exact_wide.py",
     "cta_hotspots": {
@@ -142,7 +142,31 @@
       "44px mobile contact controls",
       "UCR square untouched",
       "car-hauler untouched"
-    ]
+    ],
+    "source_generated_candidate": {
+      "dimensions": [
+        2170,
+        725
+      ],
+      "ratio": "2.9931:1",
+      "status": "REJECTED_WRONG_ASPECT",
+      "reason": "Generated art was not native 1774x394 and cannot be published unchanged"
+    },
+    "cinematic_native_webp": {
+      "status": "RECOMPOSED_AT_EXACT_SLOT_RATIO",
+      "dimensions": [
+        1774,
+        394
+      ],
+      "sha256": {
+        "pt": "7b2886382cee3ca22800ab6fd03893349499c9de3fbb20f12d9967c67cbbeeeb",
+        "en": "96882fa480f3cd2ef8fd9856f490329d4e468aa6f0e7f79caea3bb043afb9d20",
+        "es": "8a0ad1c4b6e7cd4ac8b50a13bef59874a471c592324ee7225d43ea3213325ca1"
+      },
+      "version": "2026-10-13-r10",
+      "source": "previous image-generation output recomposed using approved UCR visual language",
+      "qa": "Exact 1774x394 pixels, PT EN ES, no blank side bands, responsive CTA hotspots"
+    }
   },
   "immutable_scope": "Original approved UCR master and all square sidebar crops. The owner explicitly requested a separate new horizontal correction; the original master is preserved."
 }

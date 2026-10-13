@@ -26,6 +26,24 @@ class UCRNativeWideCreativeQA(unittest.TestCase):
     # Sample CTA backgrounds away from the intentionally white phone text.
     r,g,b=im.getpixel((500,330));self.assertGreater(g,r)
     r,g,b=im.getpixel((1100,330));self.assertGreater(b,g);self.assertGreater(r,g)
+
+ def test_published_cinematic_webp_is_exact_ratio_and_pixel_locked(self):
+  import hashlib
+  expected={"pt":"7b2886382cee3ca22800ab6fd03893349499c9de3fbb20f12d9967c67cbbeeeb","en":"96882fa480f3cd2ef8fd9856f490329d4e468aa6f0e7f79caea3bb043afb9d20","es":"8a0ad1c4b6e7cd4ac8b50a13bef59874a471c592324ee7225d43ea3213325ca1"}
+  self.assertEqual(len(expected),3)
+  for lang,sha in expected.items():
+   with self.subTest(language=lang):
+    p=OUT/f'ucr-2027-{lang}-wide-1774x394.webp'
+    self.assertTrue(p.exists(),'Owner-requested native artwork missing from published site')
+    self.assertEqual(hashlib.sha256(p.read_bytes()).hexdigest(),sha,'Artwork changed without QA approval')
+    im=Image.open(p).convert('RGB')
+    self.assertEqual(im.size,(1774,394),'Wrong native ratio; would letterbox or crop')
+    for x,y in ((0,140),(1773,140),(0,330),(1773,330)):
+     self.assertLess(sum(im.getpixel((x,y))),670,'White side bars or blank gutters')
+    r,g,b=im.getpixel((500,340))
+    self.assertGreater(g,r,'WhatsApp CTA must be visibly green')
+    r,g,b=im.getpixel((1100,340))
+    self.assertGreater(r,g,'Instagram CTA must be visibly magenta')
  def test_build_script_source_integrity_guard(self):
   script=(ROOT/'scripts/build_ucr_exact_wide.py').read_text()
   self.assertIn('MASTER_PIXEL_SHA256',script)

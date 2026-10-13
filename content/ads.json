@@ -109,9 +109,9 @@
         "en",
         "es"
       ],
-      "source_note": "Arte UCR 2027 reconstruída sob solicitação do proprietário em 1774x394 exatos, PT/EN/ES, sem barras laterais; UCR quadrado original e anúncio dos veículos intocados.",
+      "source_note": "Owner-requested cinematic UCR horizontal creative rebuilt natively at 1774x394 (4.5025:1), distinct PT/EN/ES images, no side bars. Approved square sidebar and car-hauler art unchanged.",
       "format": "horizontal",
-      "native_image_pattern": "assets/ads/ucr-2027-{lang}-wide-1774x394.png"
+      "native_image_pattern": "assets/ads/ucr-2027-{lang}-wide-1774x394.webp"
     }
   ],
   "approved_creative_rules": {
@@ -159,7 +159,7 @@
     }
   },
   "placement_policy": {
-    "version": "2026-10-13-ucr-native-exact-width-v3",
+    "version": "2026-10-13-ucr-cinematic-native-1774x394-v4",
     "desktop": {
       "news-top": "carhauler-approved-photo1 / horizontal",
       "market-sidebar": "ucr-2027-official / square",

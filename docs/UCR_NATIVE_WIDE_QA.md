@@ -30,3 +30,13 @@ would distort or remove approved content. The prior release was visually wrong.
 
 Files: scripts/build_ucr_exact_wide.py, tests/test_ucr_wide.py,
 content/ads-ucr2027-official.json, tests/test_browser.cjs.
+
+## 2026-10-13 — cinematic 4.5:1 corrective release (r10)
+
+A separately generated candidate measured 2170x725 (2.993:1) and is
+**REJECTED** for the 1774x394 (4.5025:1) lower UCR slot. Do not deploy it.
+The corrected cinematic source was recomposed to exactly 1774x394 in
+three separate WebP files (PT, EN, ES), pixel-hash locked by test_ucr_wide.py.
+The owner-approved UCR square sidebar and Foto 1 car-hauler stay unchanged.
+The visible WhatsApp and Instagram regions match the transparent clickable
+hotspots; mobile receives additional 44px accessible buttons.

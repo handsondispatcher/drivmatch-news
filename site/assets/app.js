@@ -413,7 +413,7 @@
         // The right-sidebar square remains the exact original approved master.
         if(slot==='news-carhauler'){
           const edition=lang==='en'?'en':lang==='es'?'es':'pt';
-          const img='assets/ads/ucr-2027-'+edition+'-wide-1774x394.png';
+          const img='assets/ads/ucr-2027-'+edition+'-wide-1774x394.webp';
           box.innerHTML='<div class="ucr-ad ucr-native-edition">'+
             '<div class="ucr-ad-disclosure">'+escapeHTML(copy.label)+'</div>'+
             '<div class="ucr-native-banner" data-native-ratio="1774/394">'+
