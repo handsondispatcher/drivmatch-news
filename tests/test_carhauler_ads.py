@@ -5,7 +5,7 @@ class AdvertisingCampaigns(unittest.TestCase):
  def test_slots_and_campaigns(self):
   ads=json.loads((P/'content/ads.json').read_text())
   self.assertTrue(ads['enabled'])
-  self.assertEqual({x['slot'] for x in ads['placements']},{'news-top','market-sidebar','article-inline','mobile-inline','news-carhauler'})
+  self.assertEqual({x['slot'] for x in ads['placements']},{'news-top','market-sidebar','article-inline','mobile-inline','news-carhauler','market-sidebar-driver'})
   ucr=[p for p in ads['placements'] if p.get('creative_type')=='ucr-2027-official']
   self.assertEqual({p['slot'] for p in ucr},{'market-sidebar','mobile-inline','news-carhauler'})
   self.assertEqual({p['slot'] for p in ucr if p['enabled']},{'market-sidebar','news-carhauler'})
@@ -14,7 +14,7 @@ class AdvertisingCampaigns(unittest.TestCase):
    self.assertEqual(p['url'],'https://ig.me/m/fabriciodispatcher')
    self.assertTrue(p['whatsapp_url'].startswith('https://wa.me/19082913386'))
    self.assertTrue(p['master_image'].startswith('https://cdn.openart.ai/'))
-  car=[p for p in ads['placements'] if p.get('creative_type')!='ucr-2027-official']
+  car=[p for p in ads['placements'] if p.get('creative_type')=='carhauler-approved-photo1']
   self.assertEqual({p['slot'] for p in car},{'news-top','article-inline'})
   self.assertEqual({p['slot'] for p in car if p['enabled']},{'news-top','article-inline'})
   self.assertEqual(ads['placement_policy']['desktop']['news-top'],'carhauler-approved-photo1 / horizontal')
@@ -22,6 +22,11 @@ class AdvertisingCampaigns(unittest.TestCase):
   self.assertTrue(all(p['creative_type']=='carhauler-approved-photo1' for p in car))
   self.assertTrue(all(p['approved_master_sha256']=='1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d' for p in car))
   self.assertTrue(all(p['approved_master']==ads['approved_creative_rules']['carhauler_photo1']['master_image'] for p in car))
+  driver=[p for p in ads['placements'] if p['slot']=='market-sidebar-driver']
+  self.assertEqual(len(driver),1)
+  self.assertEqual(driver[0]['relationship'],'third_party_classified')
+  self.assertEqual(driver[0]['creative_type'],'approved-driver-poster-original')
+  self.assertEqual(driver[0]['whatsapp_url'],'https://wa.me/14072852874')
  def test_html_slots_and_translations(self):
   html=(P/'site/index.html').read_text()
   js=(P/'site/assets/app.js').read_text()
