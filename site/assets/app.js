@@ -418,8 +418,6 @@
             en:{price:'Service from US$110',wa:'WhatsApp',ig:'Instagram Direct'},
             es:{price:'Servicio desde US$110',wa:'WhatsApp',ig:'Instagram Direct'}
           }[edition];
-          const sq=(crops[edition]||crops.pt).square;
-          const squareBg="background-image:url('"+source+"');background-size:"+sq.size+";background-position:"+sq.pos+";";
           box.innerHTML='<div class="ucr-ad ucr-compact-ad">'+
             '<div class="ucr-ad-disclosure">'+escapeHTML(copy.label)+'</div>'+
             '<div class="ucr-compact-banner" data-aspect-ratio="1774/394">'+
@@ -435,12 +433,6 @@
                 '</div>'+
               '</div>'+
             '</div>'+
-            '<div class="ucr-compact-mobile"><div class="ucr-frame ucr-frame-square">'+
-              '<div class="ucr-visual" role="group" aria-label="UCR 2027" style="'+squareBg+'">'+
-                '<a class="ucr-hit ucr-wa" href="'+href+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.wa)+'"></a>'+
-                '<a class="ucr-hit ucr-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.ig)+'"></a>'+
-              '</div>'+
-            '</div></div>'+
             '<p class="ucr-ad-note">'+escapeHTML(copy.note)+'</p></div>';
           continue;
         }
