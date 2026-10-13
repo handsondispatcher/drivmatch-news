@@ -181,7 +181,8 @@ def _write_page(directory, story, slug, title, description, locale="pt-BR"):
 <meta name="twitter:title" content="{esc(title)}">
 <meta name="twitter:description" content="{esc(description[:230])}">
 <meta name="twitter:image" content="{esc(image_url)}">
-<link rel="canonical" href="{esc(article_url)}">
+<link rel="canonical" href="{esc(share_url)}">
+<meta name="robots" content="index,follow,max-image-preview:large">
 </head><body>
 <p>Leia a notícia <a href="{esc(article_url)}">no DrivMatch News</a>.</p>
 <script>window.location.replace({json.dumps(article_url)});</script>
@@ -196,17 +197,31 @@ def build() -> int:
     directory=SITE/"share"
     directory.mkdir(parents=True,exist_ok=True)
     count=0
+    created_ids=set()
     gallery_path = SITE / "data" / "news-images.json"
     images = json.loads(gallery_path.read_text(encoding="utf-8")).get("images", {}) if gallery_path.is_file() else {}
     for story in feed.get("articles",[]):
-        if story.get("status")!="approved" or story.get("demo"):continue
+        if story.get("demo"):continue
         slug=story.get("id","")
         if not isinstance(slug,str) or not SAFE_ID.fullmatch(slug):continue
+        own=story.get("status")=="approved"
+        external=(story.get("kind")=="external_link" and story.get("status")=="external_source"
+                  and story.get("origin_type")!="aggregator-discovery")
+        if not own and not external:continue
+        if external:
+            original=str(story.get("source_url") or "")
+            parts=urlsplit(original)
+            if (parts.scheme!="https" or not parts.hostname or
+                parts.hostname in {"news.google.com","www.google.com"}):continue
         locale=story.get("locales",{}).get("pt") or {}
         title=str(locale.get("title","")).strip()
-        description=str(locale.get("summary","") or locale.get("body","")).strip()
+        if not title:continue
+        description=(str(locale.get("summary","") or locale.get("body","")).strip() if own else
+          "Notícia no DrivMatch News. Fonte original: "+str(story.get("source") or "veículo de origem")+".")
         combined={**story, **images.get(slug,{})}
-        if title and description and _write_page(directory,combined,slug,title,description):count+=1
+        if _write_page(directory,combined,slug,title,description):
+            count+=1
+            created_ids.add(slug)
     monitor=SITE/"data"/"source-headlines.json"
     if monitor.is_file():
         rows=json.loads(monitor.read_text(encoding="utf-8")).get("headlines",[])
@@ -215,7 +230,7 @@ def build() -> int:
             url=str(story.get("source_url") or "")
             if not url.startswith("https://") or "news.google.com" in url:continue
             slug=story.get("id") or ""
-            if not isinstance(slug,str) or not SAFE_ID.fullmatch(slug):continue
+            if not isinstance(slug,str) or not SAFE_ID.fullmatch(slug) or slug in created_ids:continue
             translations=story.get("titles") or {}
             title=str(translations.get("pt") or story.get("title") or "").strip()
             if not title:continue
@@ -225,7 +240,9 @@ def build() -> int:
             else:
                 description="DrivMatch News: US trucking headline and context. Source: "+str(story.get("source") or "original publisher")+". Read the context and source."
             combined={**story, **images.get(slug,{})}
-            if _write_page(directory,combined,slug,title,description,locale):count+=1
+            if _write_page(directory,combined,slug,title,description,locale):
+                count+=1
+                created_ids.add(slug)
     print(f"SHARE PAGES WITH BRANDED 1200x630 CARDS: {count} articles and external headlines")
     return count
 
