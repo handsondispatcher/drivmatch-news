@@ -383,7 +383,7 @@
       en:{horizontal:{ratio:'675 / 342',size:'320.3% auto',pos:'46.3% 0%'},square:{size:'454.2% auto',pos:'47.6% 100%'}},
       es:{horizontal:{ratio:'791 / 342',size:'273.3% auto',pos:'100% 0%'},square:{size:'454.2% auto',pos:'80.7% 100%'}}
     };
-    for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner']]){
+    for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner'],['news-carhauler','news-carhauler-banner']]){
       const box=$(id);if(!box)continue;
       const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion');
       if(ad?.creative_type==='ucr-2027-official'){
@@ -406,20 +406,38 @@
           '</div></div><p class="ucr-ad-note">'+escapeHTML(copy.note)+'</p></div>';
         continue;
       }
-      // Preserve previously approved car-hauler advertising inside articles.
-      const valid=ad&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(ad.url||'')
-        &&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(ad.whatsapp_url||'')
-        &&/^https:\/\/cdn\.openart\.ai\/openart-uploads\/production\/attachment-transfers\/[a-f0-9]+\.png$/.test(ad.image||'');
-      // Legacy campaign duplicate rule; UCR is explicitly booked for both home and right sidebar.
-      const repeatSide=slot==='market-sidebar'&&Boolean(valid&&topIdentity&&adIdentity(ad)===topIdentity);
-      box.hidden=!valid||repeatSide;
-      if(!valid||repeatSide){box.innerHTML='';continue;}
-      const ig=escapeHTML(ad.url),whatsapp=escapeHTML(ad.whatsapp_url),src=escapeHTML(ad.image);
-      box.innerHTML='<div class="car-ad"><div class="car-ad-disclosure">PUBLICIDADE · AVAILABLE LOAD / CAR HAULERS</div>'+
-        '<a class="car-ad-creative" href="'+ig+'" target="_blank" rel="noopener noreferrer" aria-label="Ver a oferta no Instagram fabriciodispatcher"><img src="'+src+'" loading="lazy" alt="Frete para transportar três veículos de Kissimmee FL para Miami FL."></a>'+
-        '<div class="car-ad-actions"><a class="car-ad-wa" href="'+whatsapp+'" target="_blank" rel="noopener noreferrer">WhatsApp / Text (908) 291-3386 ↗</a>'+
-        '<a class="car-ad-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer">Instagram @fabriciodispatcher ↗</a></div>'+
-        '<p class="car-ad-note">Confirm load availability and terms before booking. Vehicles are not for sale.</p></div>';
+      // PHOTO 1 — IMMUTABLE, advertiser-approved master. These are literal
+      // coordinate windows into the original 1774×887 image, not re-creations.
+      if(ad?.creative_type==='carhauler-approved-photo1'){
+        const expected='https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9d0e786f0c9e07c6d708a1759af5b9ea1734fb4a210330efaacc9dc317f2437a.png';
+        const valid=ad.approved_master===expected&&
+          ad.approved_master_sha256==='1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d'&&
+          /^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(ad.url||'')&&
+          /^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(ad.whatsapp_url||'');
+        box.hidden=!valid;
+        if(!valid){box.innerHTML='';continue;}
+        const cuts={
+          horizontal:{ratio:'1774 / 394',size:'100% auto',pos:'0% 0%',wa:'left:49.5%;top:79%;width:26.5%;height:20%',ig:'left:76%;top:79%;width:24%;height:20%'},
+          rectangle:{ratio:'1009 / 361',size:'175.82% auto',pos:'87.32% 85.36%',wa:'left:46%;top:78%;width:29%;height:22%',ig:'left:75%;top:78%;width:25%;height:22%'},
+          square:{ratio:'540 / 376',size:'328.52% auto',pos:'4.46% 87.08%',wa:'left:2%;top:86%;width:57%;height:14%',ig:'left:60%;top:86%;width:40%;height:14%'}
+        };
+        const renderCut=fmt=>{
+          const v=cuts[fmt];
+          const style="background-image:url('"+escapeHTML(expected)+"');background-size:"+v.size+";background-position:"+v.pos+";";
+          return '<div class="car-official-frame car-official-'+fmt+'" style="aspect-ratio:'+v.ratio+'">'+
+            '<div class="car-official-visual" role="group" aria-label="Arte original aprovada: Available Load for Car Haulers, 3 veículos, Kissimmee FL para Miami FL" style="'+style+'">'+
+            '<a class="car-official-hit car-official-wa" href="'+escapeHTML(ad.whatsapp_url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+v.wa+'" aria-label="Contato por WhatsApp ou texto (908) 291-3386"></a>'+
+            '<a class="car-official-hit car-official-ig" href="'+escapeHTML(ad.url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+v.ig+'" aria-label="Instagram @fabriciodispatcher"></a>'+
+            '</div></div>';
+        };
+        const fmt=slot==='article-inline'?'rectangle':'horizontal';
+        box.innerHTML='<div class="car-official-ad" data-approved-photo1-sha256="'+ad.approved_master_sha256+'">'+
+          '<div class="car-official-disclosure">PUBLICIDADE · AVAILABLE LOAD FOR CAR HAULERS</div>'+
+          renderCut(fmt)+renderCut('square')+'</div>';
+        continue;
+      }
+      box.hidden=true;box.innerHTML='';
+
     }
   }
   // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.

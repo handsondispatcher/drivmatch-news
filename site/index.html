@@ -1022,6 +1022,23 @@ body{background:#f7f9fc;color:#14283c}
 .ad-placement-mobile:has(.ucr-ad){max-width:390px;margin:12px auto!important;padding:10px;display:none}
 @media(max-width:740px){.ad-placement-mobile:has(.ucr-ad):not([hidden]){display:block!important;width:100%;box-sizing:border-box}.ad-placement-news:has(.ucr-ad){display:none!important}}
 
+
+/* PHOTO 1 / CAR HAULER — exact pixels of the approved original; no redesign. */
+.car-official-ad{width:100%;min-width:0;color:#d9e9f5}
+.car-official-disclosure{font:700 10px/1.5 Arial,sans-serif;letter-spacing:.9px;margin:0 0 6px;color:#cfe2ef}
+.car-official-frame{width:100%;position:relative;overflow:hidden;background:#031a31}
+.car-official-visual{position:absolute;inset:0;background-repeat:no-repeat;background-color:#031a31}
+.car-official-hit{position:absolute;z-index:2;display:block;cursor:pointer}
+.car-official-hit:focus-visible,.car-official-hit:hover{outline:3px solid #f9d54d;outline-offset:-3px}
+.car-official-square{display:none}
+.ad-placement-carhauler-home{margin:22px 0 19px;padding:10px;min-height:0;max-width:100%}
+.ad-placement-article:has(.car-official-ad){padding:8px;min-height:0}
+@media(max-width:740px){
+  .car-official-horizontal,.car-official-rectangle{display:none}
+  .car-official-square{display:block}
+  .ad-placement-carhauler-home:not([hidden]){display:block!important}
+}
+
 </style>
 </head>
 <body>
@@ -1088,6 +1105,7 @@ body{background:#f7f9fc;color:#14283c}
   <p class="news-freshness" id="news-freshness" hidden aria-hidden="true"></p>
   <div id="mobile-commercial-banner" class="ad-placement ad-placement-mobile" aria-label="Publicidade" hidden></div><div id="news-commercial-banner" class="ad-placement ad-placement-news" aria-label="Publicidade"></div>
   <div id="list"></div>
+  <div id="news-carhauler-banner" class="ad-placement ad-placement-carhauler-home" aria-label="Publicidade" hidden></div>
   <div class="pagination"><button class="btn secondary" id="prev">← Anterior</button><span class="sub" id="pagecount"></span><button class="btn" id="next">Próximas →</button></div>
 </section>
 
@@ -1154,7 +1172,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/analytics-config.js" defer></script>
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-21-editorial-labels-ucr2027-official-20261013-r2" defer></script>
+<script src="assets/app.js?v=v34-21-editorial-labels-photo1-locked-20261013-r3" defer></script>
 <script src="assets/road-tv-live.js?v=v34-18-durable-live-first-20261011" defer></script>
 <script src="assets/utility-strip.js?v=v34-11-national-weather-20261010" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>

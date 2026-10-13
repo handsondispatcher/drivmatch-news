@@ -1,0 +1,42 @@
+{
+  "campaign_id": "fabricio-carhauler-photo1-20261013",
+  "status": "APPROVED_LOCKED",
+  "source": "Image 1 explicitly supplied by advertiser on 2026-10-13",
+  "source_dimensions": {
+    "width": 1774,
+    "height": 887
+  },
+  "source_sha256": "1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d",
+  "master_image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9d0e786f0c9e07c6d708a1759af5b9ea1734fb4a210330efaacc9dc317f2437a.png",
+  "approved_artwork_crops_px": {
+    "horizontal": [
+      0,
+      0,
+      1774,
+      394
+    ],
+    "rectangle": [
+      668,
+      449,
+      1677,
+      810
+    ],
+    "square": [
+      55,
+      445,
+      595,
+      821
+    ]
+  },
+  "placement_policy": {
+    "home": "news-carhauler (after news feed)",
+    "article": "article-inline",
+    "sidebar": "UCR 2027 retained from earlier approved campaign",
+    "mobile": "approved Photo 1 square crop"
+  },
+  "ctas": {
+    "whatsapp": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami.",
+    "instagram": "https://instagram.com/fabriciodispatcher"
+  },
+  "rule": "NO CREATIVE REINTERPRETATION: use only source pixel crops, proportional scaling, transparent click areas, external PUBLICIDADE label. Changes require new explicit advertiser approval."
+}

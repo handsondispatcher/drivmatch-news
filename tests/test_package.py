@@ -193,7 +193,7 @@ class PublicationTests(unittest.TestCase):
   self.assertNotIn("document.querySelector('.newsroom-nav').addEventListener",app)
   ads=json.loads((BASE/'content/ads.json').read_text(encoding='utf-8'))
   self.assertTrue(ads['enabled'])
-  self.assertEqual({p['slot'] for p in ads['placements']},{'news-top','market-sidebar','article-inline','mobile-inline'})
+  self.assertEqual({p['slot'] for p in ads['placements']},{'news-top','market-sidebar','article-inline','mobile-inline','news-carhauler'})
   self.assertTrue(all(p['relationship']=='owner_promotion' and p['enabled'] for p in ads['placements']))
   self.assertEqual({p['url'] for p in ads['placements']},{'https://instagram.com/fabriciodispatcher','https://ig.me/m/fabriciodispatcher'})
   self.assertTrue(all(p['whatsapp_url'].startswith('https://wa.me/19082913386') for p in ads['placements']))

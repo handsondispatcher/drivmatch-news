@@ -67,10 +67,14 @@
       "enabled": true,
       "relationship": "owner_promotion",
       "sponsor": "Fabricio Dispatcher",
-      "image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/c1e5c494f6d9b92a893eccdb781e5b20d6eb812afb5d1fcbd8071dbfadae326f.png",
+      "creative_type": "carhauler-approved-photo1",
+      "campaign_id": "fabricio-carhauler-photo1-20261013",
+      "approved_master": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9d0e786f0c9e07c6d708a1759af5b9ea1734fb4a210330efaacc9dc317f2437a.png",
+      "approved_master_sha256": "1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d",
+      "format": "rectangle",
       "url": "https://instagram.com/fabriciodispatcher",
       "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami.",
-      "campaign_id": "fabricio-carhauler-20261013"
+      "source_note": "Foto 1 fornecida e aprovada pelo usuário. Exibir somente recortes geométricos das três artes presentes na foto original; proibição de redesenho, recoloração ou elementos gráficos adicionais."
     },
     {
       "slot": "mobile-inline",
@@ -91,6 +95,65 @@
         "es"
       ],
       "source_note": "Imagem oficial aprovada pelo anunciante; não é anúncio oficial do UCR Plan."
+    },
+    {
+      "slot": "news-carhauler",
+      "label": "Publicidade",
+      "enabled": true,
+      "relationship": "owner_promotion",
+      "sponsor": "Fabricio Dispatcher",
+      "creative_type": "carhauler-approved-photo1",
+      "campaign_id": "fabricio-carhauler-photo1-20261013",
+      "approved_master": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9d0e786f0c9e07c6d708a1759af5b9ea1734fb4a210330efaacc9dc317f2437a.png",
+      "approved_master_sha256": "1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d",
+      "format": "horizontal",
+      "url": "https://instagram.com/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami.",
+      "source_note": "Foto 1 fornecida e aprovada pelo usuário. Exibir somente recortes geométricos das três artes presentes na foto original; proibição de redesenho, recoloração ou elementos gráficos adicionais."
     }
-  ]
+  ],
+  "approved_creative_rules": {
+    "carhauler_photo1": {
+      "status": "APPROVED_LOCKED",
+      "sha256": "1bb40335eb3f058eaeae14a011e42f51e8c00194822b942e5c5628c19a88622d",
+      "master_image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9d0e786f0c9e07c6d708a1759af5b9ea1734fb4a210330efaacc9dc317f2437a.png",
+      "approved_on": "2026-10-13",
+      "crop_regions_px": {
+        "horizontal": [
+          0,
+          0,
+          1774,
+          394
+        ],
+        "rectangle": [
+          668,
+          449,
+          1677,
+          810
+        ],
+        "square": [
+          55,
+          445,
+          595,
+          821
+        ]
+      },
+      "prohibited": [
+        "redesign",
+        "recolor",
+        "retype",
+        "replace background",
+        "rearrange vehicles",
+        "add graphic CTA buttons",
+        "modify contact details",
+        "substitute similar images"
+      ],
+      "permitted": [
+        "proportional resizing",
+        "non-destructive cropping of approved panels",
+        "transparent link hit areas",
+        "small external sponsored disclosure"
+      ]
+    }
+  }
 }
