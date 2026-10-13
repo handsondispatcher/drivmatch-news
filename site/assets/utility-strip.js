@@ -363,7 +363,7 @@ function init(){
  document.addEventListener('drivmatch:language',()=>{showMarket();showCity();setSearchLocale()});
  if(location.protocol.startsWith('http')){
    weather();quotes();live();liveBrent();loadPlaces();
-   setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);setInterval(liveBrent,15000);
+   setInterval(weather,15*60000);setInterval(quotes,60*1000);setInterval(live,15000);setInterval(liveBrent,15000);
  }
  setInterval(()=>{if(weatherSelection==='auto'&&validCities().length){weatherRotateIndex++;showCity()}},10*1000);
  setInterval(()=>{
