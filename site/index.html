@@ -1039,6 +1039,14 @@ body{background:#f7f9fc;color:#14283c}
   .ad-placement-carhauler-home:not([hidden]){display:block!important}
 }
 
+/* FIXED EDITORIAL AD SCALE: approved art unchanged; compact UCR below the stories. */
+#news-carhauler-banner:has(.ucr-ad){display:block;box-sizing:border-box;width:min(100%,440px);max-width:440px;margin:16px auto 19px;padding:7px;min-height:0}
+#news-carhauler-banner .ucr-frame-horizontal{width:100%;overflow:hidden}
+#news-carhauler-banner .ucr-ad-disclosure{font-size:9px;letter-spacing:.6px}
+#news-carhauler-banner .ucr-ad-note{font-size:10px;line-height:1.35;margin:5px 0 0}
+#news-commercial-banner:has(.car-official-ad){width:100%;max-width:100%;box-sizing:border-box}
+@media(max-width:740px){#news-carhauler-banner:has(.ucr-ad){width:min(100%,400px);max-width:400px;margin:14px auto;padding:6px}}
+
 </style>
 </head>
 <body>
