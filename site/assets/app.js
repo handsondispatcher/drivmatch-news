@@ -356,7 +356,7 @@
 // MARKET_QUOTE_UI_RELEASE: compact-prices-only-20261013
   function marketValue(v,key){
     const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{
-      minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
+      minimumFractionDigits:2,maximumFractionDigits:2});
     const unit=key==='usdbrl'?'R$':'US$';
     const pct=v.change_pct===null||v.change_pct===undefined||v.change_pct===''||!Number.isFinite(Number(v.change_pct))
       ?'':percentBadge(Number(v.change_pct));
