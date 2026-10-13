@@ -177,5 +177,35 @@
       "news-top": "carhauler-approved-photo1 / square",
       "news-carhauler": "ucr-2027-official / native horizontal with accessible 44px contact links"
     }
+  },
+  "approved_localized_creatives": {
+    "policy": "CREATIVE_LOCK_AFTER_OWNER_APPROVAL",
+    "approved_on": "2026-10-13",
+    "activation_rule": "Only activate a locale when exact approved image bytes exist under site/assets/ads and SHA-256 matches; never fabricate/re-render missing assets.",
+    "en": {
+      "status": "published_locked",
+      "asset": "assets/ads/carhauler-photo1-horizontal.png",
+      "source": "existing approved Photo 1"
+    },
+    "pt": {
+      "status": "owner_approved_asset_pending_repo",
+      "asset": "assets/ads/carhauler-photo1-pt-approved-20261013.png",
+      "sha256": "949727deb1c5d37cb4e4b68c8162973fbde6362112937fca73eecb724fcd5dc0",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "approved_caption": "FRETE DISPONÍVEL PARA TRANSPORTE DE VEÍCULOS"
+    },
+    "es": {
+      "status": "owner_approved_asset_pending_repo",
+      "asset": "assets/ads/carhauler-photo1-es-approved-20261013.png",
+      "sha256": "f2e7c2b7527286d29ac0620df98ab2d61ba92ff8d030f66cf66a6a43ccad5806",
+      "source_dimensions": [
+        2172,
+        724
+      ],
+      "approved_caption": "CARGA DISPONIBLE PARA TRANSPORTISTAS DE VEHÍCULOS"
+    }
   }
 }
