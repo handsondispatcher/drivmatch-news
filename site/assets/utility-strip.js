@@ -11,37 +11,47 @@ const lang=()=>el('language')?.value||'pt';
 function number(v,d){return Number(v).toLocaleString(lang()==='pt'?'pt-BR':lang()==='es'?'es-ES':'en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
 // v34.7: identical reader-facing quote composition to the approved screenshot.
  // Only represent real verified observations; no sample values or invented arrows.
+function marketFresh(v,key){
+ if(!v||!Number.isFinite(Number(v.value))||Number(v.value)<=0)return false;
+ const date=Date.parse(v.observed_at||'');
+ if(!Number.isFinite(date))return false;
+ const age=Date.now()-date;
+ if(age< -86400000)return false;
+ // A real-time quote expires in 5 minutes; published references use their
+ // own official source cadence. A cached web page cannot prolong freshness.
+ if(v.session_status==='open')return age<=5*60000;
+ return age<=({usd:5,diesel:12,brent:5}[key]*86400000);
+}
 function showMarket(){
- const l=lang();
- el('top-usd-label').textContent=l==='en'?'USD / BRL':l==='es'?'Dólar':'Dólar';
- el('top-diesel-label').textContent='US Diesel';
- el('top-brent-label').textContent=l==='en'?'Brent Crude Oil':l==='es'?'Petróleo Brent':'Petróleo Brent';
- const usd=spot||market.usdbrl;
+ const l=lang(),localized=(pt,en,es)=>l==='en'?en:l==='es'?es:pt;
+ const spotCurrent=marketFresh(spot,'usd')&&spot?.session_status==='open';
+ const usd=spotCurrent?spot:market.usdbrl;
  el('top-usd-label').textContent=usd?.instrument==='ptax_reference'
-     ?(l==='en'?'USD PTAX':l==='es'?'Dólar PTAX':'Dólar PTAX')
-     :(l==='en'?'USD / BRL':l==='es'?'Dólar':'Dólar');
+  ?localized('Dólar PTAX','USD PTAX','Dólar PTAX')
+  :localized('Dólar comercial','USD / BRL','Dólar comercial');
+ el('top-diesel-label').textContent=localized('Diesel nos EUA','US Diesel','Diésel en EE. UU.');
+ el('top-brent-label').textContent=localized('Petróleo Brent','Brent Crude Oil','Petróleo Brent');
  const values=[
   {id:'usd',data:usd,decimals:4,prefix:'R$ ',suffix:''},
   {id:'diesel',data:market.diesel,decimals:3,prefix:'US$ ',suffix:'/gal'},
   {id:'brent',data:market.brent,decimals:2,prefix:'US$ ',suffix:l==='en'?'/barrel':'/barril'}
  ];
  for(const item of values){
-   const v=item.data;
-   const fresh=!!v&&Number.isFinite(Number(v.value))&&Number(v.value)>0
-      &&Number.isFinite(Date.parse(v.observed_at||''))
-      &&Date.now()-Date.parse(v.observed_at)>=-24*3600000
-      &&Date.now()-Date.parse(v.observed_at)<10*86400000;
+   const v=item.data,fresh=marketFresh(v,item.id);
    const value=el('top-'+item.id+'-value'),chg=el('top-'+item.id+'-change'),meta=el('top-'+item.id+'-date');
    value.textContent=fresh?item.prefix+number(v.value,item.decimals)+item.suffix:'—';
-   const pct=fresh&&Number.isFinite(Number(v.change_pct))&&v.change_pct!==null?Number(v.change_pct):null;
+   const pct=fresh&&v.change_pct!==null&&v.change_pct!==undefined&&Number.isFinite(Number(v.change_pct))?Number(v.change_pct):null;
    chg.hidden=pct===null;
    chg.classList.toggle('negative',pct!==null&&pct<0);
    chg.textContent=pct===null?'':(pct>0?'+':'')+number(pct,2)+'%';
-   const closeLabel=fresh&&v.instrument==='spot'&&v.session_status==='closed'
-     ?'Fechamento comercial ':fresh&&v.instrument==='ptax_reference'
-     ?'Taxa de referência PTAX venda ':'';
-   const source=fresh?closeLabel+(v.source||'')+' · '+v.observed_at
-      :'Cotação não verificada';
+   const kind=item.id==='usd'
+     ?v?.instrument==='ptax_reference'?localized('PTAX oficial de referência','Official PTAX reference','Referencia PTAX oficial')
+      :v?.session_status==='open'?localized('Cotação comercial','Commercial live snapshot','Cotización comercial')
+      :localized('Último fechamento comercial','Last commercial close','Último cierre comercial')
+     :item.id==='diesel'?localized('Último relatório semanal EIA','Latest weekly EIA release','Último informe semanal EIA')
+     :localized('Última referência diária EIA','Latest daily EIA observation','Última referencia diaria EIA');
+   const source=fresh?kind+' · '+(v.source||'')+' · '+v.observed_at
+     :localized('Cotação indisponível ou desatualizada','Quote unavailable or outdated','Cotización no disponible o desactualizada');
    meta.textContent=source;value.title=source;
  }
 }
@@ -294,7 +304,7 @@ async function live(){
   const q=await(await fetch(c.spot_url,{cache:'no-store'})).json();
   const a=Date.now()-Date.parse(q.observed_at);
   if(q.symbol!=='USD/BRL'||q.instrument!=='spot'||q.price_type!=='commercial'||!Number.isFinite(Number(q.value))||Number(q.value)<=0||!Number.isFinite(a)||a< -30000||a>300000||!q.source)return;
-  spot=q;showMarket();}catch(_){}
+  spot=q;showMarket();}catch(_){spot=null;showMarket();}
 }
 function init(){
  if(!el('top-city'))return;
