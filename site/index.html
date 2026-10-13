@@ -1092,10 +1092,16 @@ body{background:#f7f9fc;color:#14283c}
  #news-carhauler-banner .ucr-native-mobile-actions a:last-child{background:#a02ca2}
 }
 
-/* Market integrity: make original observation date visible (not hidden only in title). */
-.dm-util-quote{grid-template-rows:16px 23px auto!important;min-height:58px;align-content:center}
-.dm-util-quote .dm-util-provenance{position:static!important;display:block!important;grid-column:2!important;grid-row:3!important;width:auto!important;height:auto!important;overflow:visible!important;clip-path:none!important;white-space:normal!important;font:400 9px/1.25 Arial,sans-serif!important;color:#52677b!important;overflow-wrap:anywhere;margin-top:2px}
-@media(max-width:740px){.dm-util-quote{min-height:72px}.dm-util-quote .dm-util-provenance{font-size:10px!important;line-height:1.25!important}}
+/* CANONICAL COMPACT QUOTES: values and percentage only, no public prose footer. */
+.dm-util-quote{grid-template-rows:16px 23px!important;min-height:52px!important;align-content:center!important}
+.dm-util-quote .dm-util-provenance,
+.market-live-row .market-asof{
+  position:absolute!important;width:1px!important;height:1px!important;
+  padding:0!important;margin:0!important;border:0!important;overflow:hidden!important;
+  clip-path:inset(50%)!important;white-space:nowrap!important
+}
+#market-note,#market-note-mobile{display:none!important}
+@media(max-width:740px){.dm-util-quote{min-height:58px!important}}
 
 </style>
 </head>
