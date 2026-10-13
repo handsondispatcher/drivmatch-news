@@ -27,9 +27,11 @@ function marketFresh(v,key){
 }
 function showMarket(){
  const l=lang(),localized=(pt,en,es)=>l==='en'?en:l==='es'?es:pt;
- const spotCurrent=marketFresh(spot,'usd')&&spot?.session_status==='open';
- const usd=spotCurrent?spot:market.usdbrl;
- const brent=(marketFresh(brentSpot,'brent')&&brentSpot?.instrument==='brent_spot')?brentSpot:market.brent;
+ const freshSpot=marketFresh(spot,'usd')&&spot?.session_status==='open';
+ const usd=freshSpot?spot:market.usdbrl;
+ const liveBrent=marketFresh(brentSpot,'brent')&&brentSpot?.instrument==='brent_spot';
+ const brent=liveBrent?brentSpot:market.brent;
+ // Never relabel an official PTAX reference as a traded commercial quote.
  el('top-usd-label').textContent=usd?.instrument==='ptax_reference'
   ?localized('Dólar PTAX','USD PTAX','Dólar PTAX')
   :localized('Dólar comercial','USD / BRL','Dólar comercial');
@@ -41,59 +43,36 @@ function showMarket(){
   {id:'brent',data:brent,decimals:2,prefix:'US$ ',suffix:l==='en'?'/barrel':'/barril'}
  ];
  for(const item of values){
-   const v=item.data,fresh=marketFresh(v,item.id);
-   const value=el('top-'+item.id+'-value'),chg=el('top-'+item.id+'-change'),meta=el('top-'+item.id+'-date');
-   value.textContent=fresh?item.prefix+number(v.value,item.decimals)+item.suffix:'—';
+   const v=item.data;
+   // An old EIA reference cannot be shown as today's Brent price.
    const historical=item.id==='brent'&&v?.quote_status==='historical_reference';
-   const pct=fresh&&!historical&&v.change_pct!==null&&v.change_pct!==undefined&&Number.isFinite(Number(v.change_pct))?Number(v.change_pct):null;
+   const current=marketFresh(v,item.id)&&!historical;
+   const value=el('top-'+item.id+'-value');
+   const chg=el('top-'+item.id+'-change');
+   const meta=el('top-'+item.id+'-date');
+   value.textContent=current?item.prefix+number(v.value,item.decimals)+item.suffix:'—';
+   const pct=current&&v.change_pct!==null&&v.change_pct!==undefined&&Number.isFinite(Number(v.change_pct))?Number(v.change_pct):null;
    chg.hidden=pct===null;
    chg.classList.toggle('negative',pct!==null&&pct<0);
    chg.textContent=pct===null?'':(pct>0?'+':'')+number(pct,2)+'%';
-   const kind=item.id==='usd'
-     ?v?.instrument==='ptax_reference'?(v?.session_status==='reference_intraday'?localized('PTAX — boletim parcial de hoje','PTAX — latest intraday bulletin','PTAX — boletín parcial de hoy'):localized('PTAX oficial de referência','Official PTAX reference','Referencia PTAX oficial'))
-      :v?.session_status==='open'?localized('Cotação comercial','Commercial live snapshot','Cotización comercial')
-      :localized('Último fechamento comercial','Last commercial close','Último cierre comercial')
-     :item.id==='diesel'?localized('Último relatório semanal EIA','Latest weekly EIA release','Último informe semanal EIA')
-     :v?.instrument==='brent_spot'
-       ?v.session_status==='open'
-         ?localized('Cotação Brent spot recente','Recent Brent spot quote','Cotización Brent spot reciente')
-         :localized('Último fechamento Brent spot','Last Brent spot close','Último cierre Brent spot')
-       :localized('Última referência diária EIA','Latest daily EIA observation','Última referencia diaria EIA');
-   const source=fresh?kind+' · '+(v.source||'')+' · '+v.observed_at
-     :localized('Cotação indisponível ou desatualizada','Quote unavailable or outdated','Cotización no disponible o desactualizada');
-   meta.textContent=historical&&fresh
-     ?localized('REFERÊNCIA EIA ANTIGA — não é preço atual','OLD EIA REFERENCE — not current','REFERENCIA EIA ANTIGUA — no es actual')+' · '+String(v.observed_at||'').slice(0,10)
-     :fresh?kind+' · '+String(v.observed_at||'').slice(0,10):source;
-   if(historical&&fresh){
-     const a=document.createElement('a');
-     a.href='https://www.ice.com/products/219/Brent-Crude-Futures/data';
-     a.target='_blank';a.rel='noopener noreferrer';
-     a.textContent=localized(' · Ver Brent negociado (futuros)',' · View traded Brent (futures)',' · Ver Brent negociado (futuros)');
-     meta.appendChild(a);
-   }
-   // Publisher-hosted cross-checks, NEVER scraped as website market data.
-   // FRED:GASDESW is the same weekly US retail diesel series as our EIA quote.
-   // Investing.com's Brent Futures is a DIFFERENT instrument from EIA spot.
-   if(item.id==='diesel'||item.id==='brent'){
-     const link=document.createElement('a');
-     link.href=item.id==='diesel'
-       ?'https://www.tradingview.com/symbols/FRED-GASDESW/'
-       :'https://br.investing.com/commodities/brent-oil';
-     link.target='_blank';link.rel='noopener noreferrer';
-     link.textContent=item.id==='diesel'
-       ?localized(' · Conferir na TradingView',' · Verify at TradingView',' · Verificar en TradingView')
-       :localized(' · Ver Brent futuro no Investing',' · View Brent futures at Investing',' · Ver futuros Brent en Investing');
-     meta.appendChild(link);
-   }
-   if(item.id==='usd'){
-     // UOL is an independent reader cross-check, NOT an unlicensed quote feed.
-     const verify=document.createElement('a');
-     verify.href='https://economia.uol.com.br/cotacoes/cambio/';
-     verify.target='_blank';verify.rel='noopener noreferrer';
-     verify.textContent=localized(' · Conferir dólar na UOL',' · Cross-check at UOL',' · Comprobar dólar en UOL');
-     meta.appendChild(verify);
-   }
-   meta.title=source;value.title=source;
+   // Metadata remains machine-readable and screen-reader accessible, never
+   // a visible paragraph beneath the quote (the approved UOL-like UI).
+   const label=item.id==='usd'&&v?.instrument==='ptax_reference'?
+      localized('Referência PTAX do Banco Central','Central Bank PTAX reference','Referencia PTAX del Banco Central'):
+      item.id==='diesel'?
+      localized('Diesel médio semanal da EIA','Weekly EIA average diesel','Diésel promedio semanal EIA'):
+      item.id==='brent'?
+      localized('Referência física Brent','Brent physical spot reference','Referencia física Brent'):
+      localized('Dólar comercial','Commercial USD/BRL','Dólar comercial');
+   const source=current?
+      label+' · '+String(v.source||'')+' · '+String(v.observed_at||''):
+      historical?
+      localized('Preço histórico Brent indisponível como cotação atual','Historical Brent is not a current quote','El Brent histórico no es cotización actual')+' · '+String(v.observed_at||''):
+      localized('Cotação atual indisponível','Current quote unavailable','Cotización actual no disponible');
+   meta.textContent=source;
+   meta.title=source;
+   value.title=source;
+   el('top-'+item.id+'-label').title=source;
  }
 }
 function icon(d){
