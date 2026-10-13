@@ -31,7 +31,7 @@ class PtaxOdataAdapter(unittest.TestCase):
                 {'cotacaoVenda':5.50,'dataHoraCotacao':'2026-10-14 15:00:00'}]})):
                 with self.assertRaises(ValueError):up.official_bcb_ptax_odata()
 
-    def test_selected_newest_reference_does_not_masquerade_as_commercial_spot(self):
+    def test_newer_ptax_remains_reference_and_does_not_replace_commercial_close(self):
         older=dict(value=4.985,source='UOL Economia',source_url='https://example.org/fri',
                    instrument='spot',session_status='closed',observed_at='2026-10-09',
                    price_type='commercial')
@@ -44,8 +44,10 @@ class PtaxOdataAdapter(unittest.TestCase):
              patch.object(up,'official_bcb_ptax_odata',return_value=newer),\
              patch.object(up,'official_bcb_usdbrl',return_value=older),\
              patch.object(up,'fred_latest',side_effect=ValueError('no feed')):
-            got=up.make_market()['indicators']['usdbrl']
-        self.assertEqual(got['value'],5.0133)
-        self.assertEqual(got['instrument'],'ptax_reference')
+            market=up.make_market()
+        got=market['indicators']['usdbrl']
+        self.assertEqual(got['value'],4.985)
+        self.assertEqual(got['instrument'],'spot')
+        self.assertEqual(market['references']['usdbrl_ptax']['value'],5.0133)
 
 if __name__=='__main__':unittest.main()
