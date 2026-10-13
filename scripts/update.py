@@ -353,7 +353,9 @@ def cached_verified_market_reference(key):
         raise ValueError('Previously served snapshot has wrong source')
     if not market_reference_current(record,key):
         raise ValueError('Cached market snapshot expired')
-    record={**record,'quote_status':'previous_verified_publication','session_status':'published_reference'}
+    record={**record,'quote_status':'previous_verified_publication','session_status':'published_reference',
+            'instrument':key+'_eia_reference','cadence':'weekly' if key=='diesel' else 'daily',
+            'checked_at':NOW().isoformat(timespec='seconds')}
     return record
 
 
