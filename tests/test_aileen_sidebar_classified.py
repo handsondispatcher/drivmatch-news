@@ -28,10 +28,13 @@ class AileenSidebarClassified(unittest.TestCase):
         self.assertIn('width:100%;max-width:100%',HTML)
         self.assertIn('dm-driver-whatsapp-hotspot',HTML)
         self.assertIn('left:23.5%;top:85%;width:75.5%;height:12.5%',HTML)
-        self.assertIn("const wa='https://wa.me/14072852874'",JS)
-        self.assertIn("driverBox.hidden=!(img.naturalWidth>0&&img.naturalHeight>0)",JS)
-        self.assertIn("driver.whatsapp_url===wa",JS)
-        self.assertIn("driver.approved_original_sha256==='191ab228dd8bf894e8ab4ff3585fd372eca9fff83c38cb8901a754afa66d1bc5'",JS)
+        self.assertIn('href="https://wa.me/14072852874"',HTML)
+        self.assertIn('src="assets/ads/aileen-souza-motorista-disponivel-original.jpg"',HTML)
+        self.assertIn('width="1229" height="1536"',HTML)
+        self.assertIn("img.onerror=()=>{driverBox.hidden=true;}",JS)
+        self.assertNotIn("driverBox.hidden=true;driverBox.innerHTML='';",JS)
+        self.assertNotIn("const driver=(data.ads?.placements||[]).find",JS)
+        self.assertNotIn('aria-label="Classificado: motorista disponível" hidden',HTML)
 
     def test_no_unapproved_binary_will_be_published(self):
         report=verify()
