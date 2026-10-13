@@ -3,7 +3,7 @@
 const el=id=>document.getElementById(id);
 const fixed=[['Orlando','FL'],['Houston','TX'],['New York City','NY'],['Newark','NJ'],['San Francisco','CA'],['Atlanta','GA'],['El Paso','TX'],['Buffalo','NY'],['Salt Lake City','UT'],['Las Vegas','NV'],['Chattanooga','TN'],['Nashville','TN'],['Chicago','IL'],['Los Angeles','CA'],['Dallas','TX'],['Miami','FL'],['Tampa','FL'],['Jacksonville','FL'],['Memphis','TN'],['Indianapolis','IN'],['Columbus','OH'],['Cincinnati','OH'],['Louisville','KY'],['Kansas City','MO'],['St. Louis','MO'],['Denver','CO'],['Phoenix','AZ'],['Albuquerque','NM'],['Seattle','WA'],['Portland','OR'],['Detroit','MI'],['Laredo','TX'],['San Diego','CA'],['Charlotte','NC'],['Birmingham','AL'],['Oklahoma City','OK'],['Harrisburg','PA'],['Sacramento','CA'],['Cleveland','OH'],['Boston','MA'],['McAllen','TX'],['Ontario','CA'],['Savannah','GA'],['Reno','NV'],['Philadelphia','PA'],['Fresno','CA'],['Austin','TX'],['Washington','DC'],['Fort Lauderdale','FL'],['Kissimmee','FL'],['Boca Raton','FL'],['Pompano Beach','FL'],['Framingham','MA'],['Worcester','MA'],['Danbury','CT'],['Edison','NJ'],['San Antonio','TX'],['Norfolk','VA'],['Tacoma','WA'],['Bellingham','WA'],['Spokane','WA'],['Eugene','OR'],['Medford','OR'],['Redding','CA'],['Stockton','CA'],['Bakersfield','CA'],['San Bernardino','CA'],['Barstow','CA'],['Long Beach','CA'],['Oakland','CA'],['Tucson','AZ'],['Nogales','AZ'],['Flagstaff','AZ'],['Yuma','AZ'],['Kingman','AZ'],['Las Cruces','NM'],['Amarillo','TX'],['Waco','TX'],['Fort Worth','TX'],['Beaumont','TX'],['Lubbock','TX'],['Eagle Pass','TX'],['Brownsville','TX'],['Midland','TX'],['Corpus Christi','TX'],['Tulsa','OK'],['Wichita','KS'],['Topeka','KS'],['Salina','KS'],['Lincoln','NE'],['Omaha','NE'],['North Platte','NE'],['Cheyenne','WY'],['Rock Springs','WY'],['Ogden','UT'],['St. George','UT'],['Colorado Springs','CO'],['Grand Junction','CO'],['Des Moines','IA'],['Cedar Rapids','IA'],['Minneapolis','MN'],['Duluth','MN'],['Fargo','ND'],['Pembina','ND'],['Sioux Falls','SD'],['Little Rock','AR'],['Jackson','MS'],['Baton Rouge','LA'],['New Orleans','LA'],['Lafayette','LA'],['Shreveport','LA'],['Mobile','AL'],['Montgomery','AL'],['Huntsville','AL'],['Pensacola','FL'],['Tallahassee','FL'],['Ocala','FL'],['Gainesville','FL'],['Valdosta','GA'],['Macon','GA'],['Augusta','GA'],['Charleston','SC'],['Columbia','SC'],['Greenville','SC'],['Florence','SC'],['Fayetteville','NC'],['Greensboro','NC'],['Raleigh','NC'],['Asheville','NC'],['Richmond','VA'],['Fredericksburg','VA'],['Roanoke','VA'],['Winchester','VA'],['Lexington','KY'],['Bowling Green','KY'],['Knoxville','TN'],['Jackson','TN'],['Gary','IN'],['South Bend','IN'],['Toledo','OH'],['Dayton','OH'],['Youngstown','OH'],['Pittsburgh','PA'],['Carlisle','PA'],['Allentown','PA'],['Scranton','PA'],['Baltimore','MD'],['Hagerstown','MD'],['Wilmington','DE'],['Trenton','NJ'],['Elizabeth','NJ'],['New Haven','CT'],['Hartford','CT'],['Providence','RI'],['Portland','ME'],['Albany','NY'],['Syracuse','NY'],['Binghamton','NY'],['Rochester','NY'],['Niagara Falls','NY'],['Port Huron','MI'],['Grand Rapids','MI'],['Milwaukee','WI'],['Madison','WI'],['Green Bay','WI'],['Joliet','IL'],['Rockford','IL'],['Springfield','IL']];
 // Deterministic NWS-backed city rotation is requested at 10-second intervals. No 10-second external API polling.
-let cities=fixed.map(([city,state])=>({city,state,status:'unavailable'})),market={},spot=null;
+let cities=fixed.map(([city,state])=>({city,state,status:'unavailable'})),market={},spot=null,brentSpot=null;
 let weatherSelection='auto',weatherRotateIndex=0,userForecast=null,places=[],placesReady=false,placesError=false,weatherRequestId=0;
 let localForecastCache=new Map(),suggestionTimer=null;
 try{const stored=localStorage.getItem('drivmatch_weather_city_v1');if(stored&&/^.{1,80}\|[A-Z]{2}$/.test(stored))weatherSelection=stored;}catch(_){}
@@ -26,6 +26,7 @@ function showMarket(){
  const l=lang(),localized=(pt,en,es)=>l==='en'?en:l==='es'?es:pt;
  const spotCurrent=marketFresh(spot,'usd')&&spot?.session_status==='open';
  const usd=spotCurrent?spot:market.usdbrl;
+ const brent=(marketFresh(brentSpot,'brent')&&brentSpot?.instrument==='brent_spot')?brentSpot:market.brent;
  el('top-usd-label').textContent=usd?.instrument==='ptax_reference'
   ?localized('Dólar PTAX','USD PTAX','Dólar PTAX')
   :localized('Dólar comercial','USD / BRL','Dólar comercial');
@@ -34,7 +35,7 @@ function showMarket(){
  const values=[
   {id:'usd',data:usd,decimals:4,prefix:'R$ ',suffix:''},
   {id:'diesel',data:market.diesel,decimals:3,prefix:'US$ ',suffix:'/gal'},
-  {id:'brent',data:market.brent,decimals:2,prefix:'US$ ',suffix:l==='en'?'/barrel':'/barril'}
+  {id:'brent',data:brent,decimals:2,prefix:'US$ ',suffix:l==='en'?'/barrel':'/barril'}
  ];
  for(const item of values){
    const v=item.data,fresh=marketFresh(v,item.id);
@@ -49,7 +50,11 @@ function showMarket(){
       :v?.session_status==='open'?localized('Cotação comercial','Commercial live snapshot','Cotización comercial')
       :localized('Último fechamento comercial','Last commercial close','Último cierre comercial')
      :item.id==='diesel'?localized('Último relatório semanal EIA','Latest weekly EIA release','Último informe semanal EIA')
-     :localized('Última referência diária EIA','Latest daily EIA observation','Última referencia diaria EIA');
+     :v?.instrument==='brent_spot'
+       ?v.session_status==='open'
+         ?localized('Cotação Brent spot recente','Recent Brent spot quote','Cotización Brent spot reciente')
+         :localized('Último fechamento Brent spot','Last Brent spot close','Último cierre Brent spot')
+       :localized('Última referência diária EIA','Latest daily EIA observation','Última referencia diaria EIA');
    const source=fresh?kind+' · '+(v.source||'')+' · '+v.observed_at
      :localized('Cotação indisponível ou desatualizada','Quote unavailable or outdated','Cotización no disponible o desactualizada');
    meta.textContent=source;value.title=source;
@@ -306,6 +311,28 @@ async function live(){
   if(q.symbol!=='USD/BRL'||q.instrument!=='spot'||q.price_type!=='commercial'||!Number.isFinite(Number(q.value))||Number(q.value)<=0||!Number.isFinite(a)||a< -30000||a>300000||!q.source)return;
   spot=q;showMarket();}catch(_){spot=null;showMarket();}
 }
+async function liveBrent(){
+ try{
+  const c=await(await fetch('data/runtime.json',{cache:'no-store'})).json();
+  if(!/^https:\/\//.test(c.brent_spot_url||''))return;
+  const q=await(await fetch(c.brent_spot_url,{cache:'no-store'})).json();
+  if(q.instrument!=='brent_spot'||q.unit!=='USD/bbl'||!q.source||
+     !/^https:\/\//.test(q.source_url||''))throw Error('Unverified Brent feed');
+  const isClosed=q.session_status==='closed';
+  const value=Number(isClosed?q.close_value:q.value);
+  const observation=isClosed?q.close_date:q.observed_at;
+  const age=Date.now()-Date.parse(observation||'');
+  if(!Number.isFinite(value)||value<=0||value>=100000||!Number.isFinite(age)||
+     age< -30000||age>(isClosed?5*86400000:5*60000))throw Error('Expired Brent');
+  brentSpot={...q,value,observed_at:observation};
+  document.dispatchEvent(new CustomEvent('drivmatch:brent-spot',{detail:brentSpot}));
+  showMarket();
+ }catch(_){
+  brentSpot=null;
+  document.dispatchEvent(new CustomEvent('drivmatch:brent-spot',{detail:null}));
+  showMarket();
+ }
+}
 function init(){
  if(!el('top-city'))return;
  showMarket();showCity();setSearchLocale();
@@ -319,8 +346,8 @@ function init(){
  el('language')?.addEventListener('change',()=>{showMarket();showCity();setSearchLocale()});
  document.addEventListener('drivmatch:language',()=>{showMarket();showCity();setSearchLocale()});
  if(location.protocol.startsWith('http')){
-   weather();quotes();live();loadPlaces();
-   setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);
+   weather();quotes();live();liveBrent();loadPlaces();
+   setInterval(weather,15*60000);setInterval(quotes,5*60000);setInterval(live,15000);setInterval(liveBrent,15000);
  }
  setInterval(()=>{if(weatherSelection==='auto'&&validCities().length){weatherRotateIndex++;showCity()}},10*1000);
  setInterval(()=>{
