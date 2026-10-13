@@ -217,7 +217,7 @@ def build() -> int:
         title=str(locale.get("title","")).strip()
         if not title:continue
         description=(str(locale.get("summary","") or locale.get("body","")).strip() if own else
-          "Notícia no DrivMatch News. Fonte original: "+str(story.get("source") or "veículo de origem")+".")
+          str(story.get("source") or "veículo de origem")+" · DrivMatch News")
         combined={**story, **images.get(slug,{})}
         if _write_page(directory,combined,slug,title,description):
             count+=1
@@ -235,10 +235,8 @@ def build() -> int:
             title=str(translations.get("pt") or story.get("title") or "").strip()
             if not title:continue
             locale="pt-BR" if translations.get("pt") else "en-US"
-            if locale=="pt-BR":
-                description="DrivMatch News: manchete e contexto sobre transporte rodoviário nos EUA. Fonte: "+str(story.get("source") or "veículo original")+". Consulte o resumo e a fonte."
-            else:
-                description="DrivMatch News: US trucking headline and context. Source: "+str(story.get("source") or "original publisher")+". Read the context and source."
+            publisher=str(story.get("source") or "veículo de origem")
+            description=publisher+" · DrivMatch News"
             combined={**story, **images.get(slug,{})}
             if _write_page(directory,combined,slug,title,description,locale):
                 count+=1
