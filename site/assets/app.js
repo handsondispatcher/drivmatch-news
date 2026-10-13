@@ -326,26 +326,16 @@
   }
   function renderAds(){
     const placements=(data.ads?.enabled&&Array.isArray(data.ads.placements))?data.ads.placements:[];
-    const text={
-      pt:{action:'Conheça a plataforma ↗',
-          'news-top':['Conecte seu negócio ao transporte americano','Motoristas, frotas e empresas em movimento. Conheça o ecossistema DrivMatch.'],
-          'market-sidebar':['O transporte move oportunidades','Uma vitrine para empresas e profissionais que fazem a logística acontecer.']},
-      en:{action:'Explore the platform ↗',
-          'news-top':['Connect your business to American trucking','Drivers, fleets and businesses in motion. Explore the DrivMatch ecosystem.'],
-          'market-sidebar':['Trucking moves opportunities','Connecting carriers and professionals in American logistics.']},
-      es:{action:'Conoce la plataforma ↗',
-          'news-top':['Conecta tu empresa con el transporte de EE. UU.','Conductores, flotas y empresas en movimiento. Descubre el ecosistema DrivMatch.'],
-          'market-sidebar':['El transporte mueve oportunidades','Una vitrina para empresas y profesionales de la logística.']}
-    }[lang];
-    const previous=$('ad-slot');if(previous){previous.hidden=true;previous.innerHTML='';}
-    for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner']]){
-      const container=$(id);if(!container)continue;
-      const ad=placements.find(x=>x.enabled===true&&x.relationship==='house'&&x.slot===slot
-             &&/^https:\/\/drivmatch\.com\//i.test(x.url||''));
-      container.hidden=!ad;if(!ad){container.innerHTML='';continue;}
-      const [title,description]=text[slot];
-      container.innerHTML=`<div class="ad-copy"><h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p></div>
-        <a class="ad-link" href="${escapeHTML(ad.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(text.action)}</a>`;
+    const unused=$('ad-slot');if(unused){unused.hidden=true;unused.innerHTML='';}
+    for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner']]){
+      const box=$(id);if(!box)continue;
+      const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion'&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(a.url||'')&&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(a.whatsapp_url||'')&&/^assets\/ads\/carhauler-(?:horizontal|rectangle|square)\.svg$/.test(a.image||''));
+      box.hidden=!ad;if(!ad){box.innerHTML='';continue;}
+      const ig=escapeHTML(ad.url),wa=escapeHTML(ad.whatsapp_url),src=escapeHTML(ad.image);
+      box.innerHTML=`<div class="car-ad"><div class="car-ad-disclosure">PUBLICIDADE · AVAILABLE LOAD / CAR HAULERS</div>
+        <a class="car-ad-creative" href="${ig}" target="_blank" rel="noopener noreferrer" aria-label="Ver a oferta no Instagram fabriciodispatcher"><img src="${src}" loading="lazy" alt="Frete para transportar 1991 Ferrari 348 TS, 2027 Chevrolet Corvette e 2023 Dodge Challenger de Kissimmee FL 34741 para Miami FL 33126."></a>
+        <div class="car-ad-actions"><a class="car-ad-wa" href="${wa}" target="_blank" rel="noopener noreferrer">WhatsApp / Text (908) 291-3386 ↗</a><a class="car-ad-ig" href="${ig}" target="_blank" rel="noopener noreferrer">Instagram @fabriciodispatcher ↗</a></div>
+        <p class="car-ad-note">Confirm load availability and terms before booking. Vehicles are not for sale.</p></div>`;
     }
   }
   // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.

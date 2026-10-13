@@ -1,26 +1,54 @@
 {
   "enabled": true,
-  "commercial_policy": "Owned-media promotional inventory; no paid sponsor without contracted creative approval",
+  "commercial_policy": "Publicidade: oferta de frete para car haulers, não venda de veículos; confirmar disponibilidade antes de contratar.",
+  "campaign_id": "fabricio-carhauler-20261013",
+  "vehicles": [
+    "1991 FERRARI 348 TS",
+    "2027 CHEVROLET CORVETTE",
+    "2023 DODGE CHALLENGER"
+  ],
+  "pickup": "Kissimmee, FL 34741",
+  "dropoff": "Miami, FL 33126",
   "placements": [
     {
       "slot": "news-top",
       "label": "Publicidade",
-      "title": "Conecte seu negócio ao transporte americano",
-      "text": "Motoristas, frotas e empresas em movimento. Conheça o ecossistema DrivMatch.",
-      "url": "https://drivmatch.com/?utm_source=drivmatch_news&utm_medium=owned_banner&utm_campaign=news_top_2026",
       "enabled": true,
-      "relationship": "house",
-      "sponsor": "DrivMatch"
+      "relationship": "owner_promotion",
+      "sponsor": "Fabricio Dispatcher",
+      "image": "assets/ads/carhauler-horizontal.svg",
+      "url": "https://instagram.com/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami."
     },
     {
       "slot": "market-sidebar",
       "label": "Publicidade",
-      "title": "O transporte move oportunidades",
-      "text": "Uma vitrine para empresas e profissionais que fazem a logística acontecer.",
-      "url": "https://drivmatch.com/?utm_source=drivmatch_news&utm_medium=owned_banner&utm_campaign=sidebar_2026",
       "enabled": true,
-      "relationship": "house",
-      "sponsor": "DrivMatch"
+      "relationship": "owner_promotion",
+      "sponsor": "Fabricio Dispatcher",
+      "image": "assets/ads/carhauler-square.svg",
+      "url": "https://instagram.com/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami."
+    },
+    {
+      "slot": "article-inline",
+      "label": "Publicidade",
+      "enabled": true,
+      "relationship": "owner_promotion",
+      "sponsor": "Fabricio Dispatcher",
+      "image": "assets/ads/carhauler-rectangle.svg",
+      "url": "https://instagram.com/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami."
+    },
+    {
+      "slot": "mobile-inline",
+      "label": "Publicidade",
+      "enabled": true,
+      "relationship": "owner_promotion",
+      "sponsor": "Fabricio Dispatcher",
+      "image": "assets/ads/carhauler-square.svg",
+      "url": "https://instagram.com/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami."
     }
   ]
 }
