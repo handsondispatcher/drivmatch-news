@@ -57,7 +57,8 @@ function showMarket(){
        :localized('Última referência diária EIA','Latest daily EIA observation','Última referencia diaria EIA');
    const source=fresh?kind+' · '+(v.source||'')+' · '+v.observed_at
      :localized('Cotação indisponível ou desatualizada','Quote unavailable or outdated','Cotización no disponible o desactualizada');
-   meta.textContent=source;value.title=source;
+   meta.textContent=fresh?kind+' · '+String(v.observed_at||'').slice(0,10):source;
+   meta.title=source;value.title=source;
  }
 }
 function icon(d){
