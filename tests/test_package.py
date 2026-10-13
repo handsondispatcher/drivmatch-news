@@ -469,7 +469,8 @@ class PublicationTests(unittest.TestCase):
     lower=card.convert('RGB').getpixel((600,345))
     self.assertTrue(lower[2]>lower[0]*2,'Bold headline should sit on dark readable panel')
     clear=card.convert('RGB').getpixel((924,568))
-    self.assertEqual(clear,(6,26,49),'Former CTA position must be clean dark background')
+    self.assertTrue(all(abs(actual-expected)<=4 for actual,expected in zip(clear,(6,26,49))),
+                    'Former CTA position must be clean dark background (JPEG tolerance)')
   self.assertNotIn('CLIQUE E LEIA', (BASE/'scripts/build_share_pages.py').read_text(encoding='utf-8'))
  def test_whatsapp_source_share_preview_is_generated_from_live_article(self):
   """External stories visible in the reader must receive a crawlable social card."""
