@@ -347,7 +347,9 @@
     const value=Number(v.value),observed=Date.parse(v.observed_at||'');
     if(!Number.isFinite(value)||value<=0||!Number.isFinite(observed)||!String(v.source||'').trim())return false;
     const age=Date.now()-observed;
-    const maxAge={usdbrl:5,diesel:12,brent:5}[key]*86400000;
+    const historical=key==='brent'&&v.instrument==='brent_eia_reference'&&
+      v.session_status==='historical_reference'&&v.quote_status==='historical_reference';
+    const maxAge=(historical?21:{usdbrl:5,diesel:12,brent:5}[key])*86400000;
     return age>=-5*60000 && age<=(v.session_status==='open'?5*60000:maxAge);
   }
   function marketValue(v,key){
@@ -363,12 +365,16 @@
           ?v.session_status==='open'
             ?(lang==='pt'?'Brent spot recente':lang==='es'?'Brent spot reciente':'Recent Brent spot snapshot')
             :(lang==='pt'?'Último fechamento Brent spot':lang==='es'?'Último cierre Brent spot':'Last Brent spot close')
-          :(lang==='pt'?'Última referência diária EIA':lang==='es'?'Última referencia diaria EIA':'Latest daily EIA observation');
+          :v.quote_status==='historical_reference'
+            ?(lang==='pt'?'REFERÊNCIA ANTIGA DA EIA — NÃO É PREÇO ATUAL':lang==='es'?'REFERENCIA ANTIGUA EIA — NO ES PRECIO ACTUAL':'OLD EIA REFERENCE — NOT CURRENT')
+            :(lang==='pt'?'Última referência diária EIA':lang==='es'?'Última referencia diaria EIA':'Latest daily EIA observation');
     const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
     const unit=key==='usdbrl'?'R$': 'US$';
     const observed=String(v.observed_at||'').slice(0,16).replace('T',' ');
-    const change=v.change_pct===null||v.change_pct===undefined||v.change_pct===''?'':percentBadge(Number(v.change_pct));
-    return `<b>${unit} ${n}</b>${change}<small class="market-asof">${escapeHTML(observed)} · ${escapeHTML(v.source||'')} · ${escapeHTML(status)}</small>`;
+    const change=v.quote_status==='historical_reference'||v.change_pct===null||v.change_pct===undefined||v.change_pct===''?'':percentBadge(Number(v.change_pct));
+    const link=v.quote_status==='historical_reference'
+      ?'<a href="https://www.ice.com/products/219/Brent-Crude-Futures/data" target="_blank" rel="noopener noreferrer" class="market-source-link">'+(lang==='pt'?'Ver Brent negociado (futuros)':lang==='es'?'Ver Brent negociado (futuros)':'View traded Brent futures')+'</a>':'';
+    return `<b>${unit} ${n}</b>${change}<small class="market-asof">${escapeHTML(observed)} · ${escapeHTML(v.source||'')} · ${escapeHTML(status)} ${link}</small>`;
   }
   function mrow(name,ticker,v,key){
     if(!verifiedMarketQuote(v,key))return '';
