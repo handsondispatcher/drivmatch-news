@@ -11,6 +11,12 @@ const {spawn}=require('node:child_process');
   for(const width of [360,390,768,944,1280,1440]) {
    const page=await browser.newPage({viewport:{width,height:width<=390?680:900}});const errors=[];
    page.on('pageerror',e=>errors.push(e.message));
+   // Never depend on a third-party market server during CI. Verify the
+   // official widget DOM contract here; real price delivery is provider-owned.
+   await page.route('https://widgets.tradingview-widget.com/**',route=>
+     route.fulfill({status:200,contentType:'application/javascript',
+       body:'customElements.define("tv-tickers",class extends HTMLElement {});'}));
+
    // YouTube content is owned by the creator; do not depend on its network in CI.
    await page.route('https://www.youtube-nocookie.com/**',route=>route.fulfill({status:200,body:'<!doctype html><title>Official player test stub</title>'}));
    // Stub CamStreamer only inside CI; iframe insertion does not certify real-world playback.
