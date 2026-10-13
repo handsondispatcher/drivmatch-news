@@ -336,8 +336,9 @@ def market_reference_current(quote, key, now=None):
         day=datetime.fromisoformat(observed.replace('Z','+00:00'))
         if day.tzinfo is None:
             day=day.replace(tzinfo=UTC)
+        if day>now+timedelta(seconds=30):return False
         delta=now-day.astimezone(UTC)
-        return timedelta(days=-1)<=delta<=timedelta(days=limits[key])
+        return timedelta(seconds=-30)<=delta<=timedelta(days=limits[key])
     except (ValueError,TypeError,KeyError,OverflowError):
         return False
 
