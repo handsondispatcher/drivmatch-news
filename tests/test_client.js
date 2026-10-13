@@ -119,27 +119,22 @@ elements.language.value='pt';
 elements.language.dispatch('change',{target:{value:'pt'}});
 elements.features.dispatch('click',{target:{closest:key=>({dataset:{story:'0'}})}});
 const publisherLinks=elements['article-source'].innerHTML;
-assert(publisherLinks.includes('data-source-lang="pt"')&&publisherLinks.includes('data-source-lang="es"'),
- 'Every reader language must switch in-app instead of opening Google Translate');
-assert(!publisherLinks.includes('translate.google.com')&&!publisherLinks.includes('.translate.goog'),
- 'Do not open broken Google Translate proxy pages');
+assert(publisherLinks.includes('REPORTAGEM COMPLETA NA FONTE'),
+ 'Restore approved source report section; do not invent new heading');
+for(const language of ['Português','English','Español']){
+ assert(publisherLinks.includes('>'+language+'</span>'), 'Original-source language button: '+language);
+}
+assert(publisherLinks.includes('tl=pt&amp;hl=pt-BR'), 'Brazilian Portuguese requests a supported webpage translation code');
+assert(publisherLinks.includes('tl=es&amp;hl=es-419'), 'Latin American Spanish identifies the intended region');
 assert(publisherLinks.includes('href="https://example.org/trucking-story"'),
- 'The original reporting must remain available as a direct outbound link');
-assert(elements.modalbodytext.textContent.includes('Transporte americano tem novidades'),
- 'The reader must display a Portuguese headline-based brief locally');
-assert(elements.modalbodytext.textContent.includes('não a tradução integral'),
- 'An external headline must not masquerade as the full publisher report');
-elements['article-source'].dispatch('click',{target:{closest:key=>key==='[data-source-lang]'?{dataset:{sourceLang:'es'}}:null}});
-assert(elements.modaltitle.textContent.includes('estadounidense'),
- 'Spanish-LatAm reader must update the visible article in DrivMatch News');
-assert(elements.modalbodytext.textContent.includes('El transporte estadounidense'),
- 'Spanish-LatAm reader must update the local brief too');
-assert.strictEqual(elements.language.value,'pt','Source language must not change the whole-site edition');
-elements['article-source'].dispatch('click',{target:{closest:key=>key==='[data-source-lang]'?{dataset:{sourceLang:'pt'}}:null}});
+ 'Keep direct original-source access');
+assert.strictEqual(elements.modalbodytext.textContent,'',
+ 'No unsolicited article summary or repeated headline in external reporting');
+assert(!publisherLinks.includes('LER NO DRIVMATCH NEWS'),'Remove invented heading');
+assert(elements.articleLanguageButtons.innerHTML.includes(' Português</button>'));
+assert(elements.articleLanguageButtons.innerHTML.includes(' Español</button>'));
 elements['article-impact-actions'].dispatch('click',{target:{closest:key=>({dataset:{impactRole:'driver'}})}});
 assert(elements['article-impact-text'].textContent.includes('Transporte americano tem novidades'),
- 'Professional impact must mention the exact article, not a generic category-only warning');
-assert(elements['article-impact-note'].textContent.includes('manchete'),
- 'Professional impact must say when only headline evidence is available');
-console.log('NATIVE READER PASS: local pt-BR/es-419, direct original source, contextual and disclosed professional impact');
+ 'Professional impact must be grounded in the selected article');
+console.log('RESTORED READER PASS: approved source section, PT-BR/EN/ES-419, no made-up brief, professional impact tied to story');
 console.log('CLIENT SMOKE PASS: panorama/mirrored mobile market/modal/Spanish full text; global language unchanged');
