@@ -326,6 +326,8 @@ jobs:
               core.warning('Public market mismatch registered in GitHub issues.');
             }
 
+      - name: Market UI — confirmar que o domínio usa a apresentação compacta aprovada
+        run: python scripts/check_quote_ui_release.py
       - name: Verificar cartão social público após publicação
         run: |
           set -e
