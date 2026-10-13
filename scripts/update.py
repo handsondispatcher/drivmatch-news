@@ -215,6 +215,7 @@ def normalize_spot_quote(d):
         close_date=d.get('close_date')
         close_dt=datetime.strptime(close_date,'%Y-%m-%d').date()
         if close_dt>NOW().date():raise ValueError('Future closing date')
+        if (NOW().date()-close_dt).days>5:raise ValueError('Commercial close is too old')
         price=float(d.get('close_value'))
         q=dated_quote(price,d['source'],close_date,d.get('change_pct'),d['source_url'])
         q.update(symbol='USD/BRL',instrument='spot',price_type='commercial',session_status='closed',
@@ -284,6 +285,41 @@ def official_bcb_usdbrl():
     return quote
 
 
+def market_reference_current(quote, key, now=None):
+    """Bound age by actual source cadence, never by website polling frequency.
+
+    FRED/EIA Brent is a daily *observation* (not live Brent futures);
+    EIA US highway diesel is weekly and typically released Monday ~17 ET.
+    Late/outage releases must not be presented as fresh indefinitely.
+    """
+    now=now or NOW()
+    limits={'diesel':12,'brent':5,'usdbrl':5}
+    try:
+        observed=str(quote.get('observed_at') or '')
+        day=datetime.fromisoformat(observed.replace('Z','+00:00'))
+        if day.tzinfo is None:
+            day=day.replace(tzinfo=UTC)
+        delta=now-day.astimezone(UTC)
+        return timedelta(days=-1)<=delta<=timedelta(days=limits[key])
+    except (ValueError,TypeError,KeyError,OverflowError):
+        return False
+
+
+def cached_verified_market_reference(key):
+    """Short outage fallback: only a known, attributed SAME instrument."""
+    path=ROOT/'site/data/market.json'
+    if not path.exists():raise ValueError('No previously verified public snapshot')
+    record=read_json(path).get('indicators',{}).get(key,{})
+    expected={'diesel':'EIA / FRED (semanal)','brent':'EIA / FRED (diário)'}
+    series={'diesel':'GASDESW','brent':'DCOILBRENTEU'}
+    if record.get('source')!=expected[key] or record.get('source_url')!='https://fred.stlouisfed.org/series/'+series[key]:
+        raise ValueError('Previously served snapshot has wrong source')
+    if not market_reference_current(record,key):
+        raise ValueError('Cached market snapshot expired')
+    record={**record,'quote_status':'previous_verified_publication','session_status':'published_reference'}
+    return record
+
+
 def fred_latest(series, source):
     # Series are US EIA data republished via FRED; not real-time, and subject
     # to source licensing/attribution review prior to monetized launch.
@@ -298,7 +334,14 @@ def fred_latest(series, source):
     if not observations:raise ValueError(f'No valid observations for {series}')
     current=observations[-1];previous=observations[-2] if len(observations)>1 else None
     change=((current[1]/previous[1])-1)*100 if previous else None
-    return dated_quote(current[1],source,current[0],change,'https://fred.stlouisfed.org/series/'+series)
+    key={'GASDESW':'diesel','DCOILBRENTEU':'brent'}.get(series)
+    quote=dated_quote(current[1],source,current[0],change,'https://fred.stlouisfed.org/series/'+series)
+    if key and not market_reference_current(quote,key):
+        raise ValueError('Expired '+key+' reference; wait for actual EIA publication')
+    quote.update(session_status='published_reference',quote_status='last_official_publication',
+                 cadence='weekly' if key=='diesel' else 'daily',instrument=key+'_eia_reference',
+                 checked_at=NOW().isoformat(timespec='seconds'))
+    return quote
 
 
 def finnhub_quotes(errors):
@@ -345,6 +388,9 @@ def make_market(offline=False):
         try:market['indicators'][key]=fn()
         except Exception as exc:
             market['errors'].append(f'{key}:{type(exc).__name__}')
+            if key in ('diesel','brent'):
+                try:market['indicators'][key]=cached_verified_market_reference(key)
+                except Exception as cache_exc:market['errors'].append(f'{key}_cache:{type(cache_exc).__name__}')
             if key=='usdbrl':
                 # Commercial close and BCB PTAX are not interchangeable instruments.
                 # Prefer the newest observation, commercial if dates coincide.
