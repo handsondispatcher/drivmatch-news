@@ -285,6 +285,58 @@ def official_bcb_usdbrl():
     return quote
 
 
+def official_bcb_ptax_odata():
+    """BCB Olinda PTAX bulletins: latest dated USD sell *reference*, not FX spot.
+
+    OData period endpoint includes intermediate intraday bulletins. Preserve
+    the actual quote timestamp and identify them explicitly as a PTAX quote.
+    """
+    from zoneinfo import ZoneInfo
+    zone=ZoneInfo('America/Sao_Paulo')
+    local_now=NOW().astimezone(zone)
+    first=(local_now.date()-timedelta(days=10)).strftime('%m-%d-%Y')
+    last=local_now.date().strftime('%m-%d-%Y')
+    url=('https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/'
+         'CotacaoDolarPeriodo(dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)'
+         '?%40dataInicial=%27'+first+'%27&%40dataFinalCotacao=%27'+last+
+         '%27&%24format=json&%24top=200')
+    rows=json.loads(fetch(url,timeout=16)).get('value',[])
+    if not isinstance(rows,list):raise ValueError('Invalid Olinda response')
+    records=[]
+    for row in rows:
+        if not isinstance(row,dict):continue
+        try:
+            price=float(row['cotacaoVenda'])
+            raw=str(row['dataHoraCotacao'])
+            local_dt=datetime.fromisoformat(raw.replace(' ','T'))
+            if local_dt.tzinfo is None:
+                local_dt=local_dt.replace(tzinfo=zone)
+            observation=local_dt.astimezone(UTC)
+            if not 0<price<50 or observation>NOW()+timedelta(seconds=30):
+                continue
+            records.append((observation,price))
+        except (KeyError,ValueError,TypeError,OverflowError):continue
+    if not records:raise ValueError('No recent PTAX bulletin in BCB Olinda')
+    records.sort(key=lambda x:x[0])
+    observation,price=records[-1]
+    if NOW()-observation>timedelta(days=5):
+        raise ValueError('Expired PTAX bulletin')
+    previous=next((v for dt,v in reversed(records[:-1])
+                   if dt.astimezone(zone).date()<observation.astimezone(zone).date()),None)
+    percent=((price/previous)-1)*100 if previous else None
+    observed_date=observation.astimezone(zone).date()
+    # A same-day intraday bulletin is not a verified final close.
+    intraday=observed_date==local_now.date() and local_now.hour<14
+    quote=dated_quote(price,'Banco Central do Brasil — PTAX OData',
+                      observation.isoformat(timespec='seconds'),percent,
+                      'https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/')
+    quote.update(symbol='USD/BRL',instrument='ptax_reference',price_type='ptax_venda',
+                 session_status='reference_intraday' if intraday else 'closed',
+                 quote_status='official_bcb_ptax_intraday' if intraday else 'official_bcb_ptax_last',
+                 cadence='daily',checked_at=NOW().isoformat(timespec='seconds'))
+    return quote
+
+
 def normalize_brent_spot_quote(d):
     """Authorized Brent physical spot USD/bbl, not a futures contract or CFD."""
     if d.get('instrument')!='brent_spot' or d.get('unit')!='USD/bbl':
@@ -443,10 +495,12 @@ def make_market(offline=False):
                 fallback=[]
                 try:fallback.append(verified_previous_close())
                 except Exception as exc2:market['errors'].append('usdbrl_previous_close:'+type(exc2).__name__)
+                try:fallback.append(official_bcb_ptax_odata())
+                except Exception as exc3:market['errors'].append('usdbrl_bcb_olinda:'+type(exc3).__name__)
                 try:fallback.append(official_bcb_usdbrl())
-                except Exception as exc3:market['errors'].append('usdbrl_bcb_ptax:'+type(exc3).__name__)
+                except Exception as exc4:market['errors'].append('usdbrl_bcb_sgs:'+type(exc4).__name__)
                 if fallback:
-                    fallback.sort(key=lambda q:(q['observed_at'][:10],q.get('instrument')=='spot'),reverse=True)
+                    fallback.sort(key=lambda q:(q['observed_at'][:10],q.get('instrument')=='spot',q['observed_at']),reverse=True)
                     market['indicators'][key]=fallback[0]
     # V34.1: unproven securities/Class 8 feeds no longer requested or rendered.
     # Retain authorized source adapters for future separately approved pilots.
