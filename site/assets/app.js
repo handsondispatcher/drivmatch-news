@@ -559,6 +559,9 @@
         }
       }
       renderStories();
+      // The initial static bootstrap may precede the latest content.json issue.
+      // Keep owner-approved placements consistent after the live issue refresh.
+      renderAds();
       if(opened)renderArticle();
       openSharedStory();
     }catch(e){/* Keep last successfully loaded issue when offline. */}
