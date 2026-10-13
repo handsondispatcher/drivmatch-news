@@ -503,6 +503,26 @@ def build(offline=False):
     from weather_brief import collect_weather
     weather=collect_weather(fetch,offline=offline)
     ads=read_json(ROOT/'content/ads.json')
+    # Locale-specific raster art can only go live after explicit owner
+    # approval AND an exact SHA-256 match against the approved source bytes.
+    # A missing file never causes a broken advertisement: English stays active.
+    for locale in ('pt','es'):
+        approved=ads.get('approved_localized_creatives',{}).get(locale,{})
+        if approved.get('status')!='owner_approved_asset_pending_repo':
+            continue
+        rel=approved.get('asset','')
+        if not re.fullmatch(r'assets/ads/carhauler-photo1-(?:pt|es)-approved-20261013\\.png',rel):
+            raise ValueError('Invalid localized artwork path')
+        target=ROOT/'site'/rel
+        if target.exists():
+            digest=hashlib.sha256(target.read_bytes()).hexdigest()
+            if digest!=approved['sha256']:
+                raise ValueError('Localized artwork checksum mismatch: '+locale)
+            approved['status']='published_locked'
+            print('APPROVED LOCALIZED AD ASSET VERIFIED:',locale,digest)
+        else:
+            print('APPROVED LOCALIZED AD ASSET PENDING UPLOAD:',locale)
+
     release=read_json(ROOT/'content/release.json')
     if release.get('version')!='v34.11' or release.get('public_launch_approved') is not False:
         raise ValueError('Invalid release contract: v34.11 must remain prelaunch')
