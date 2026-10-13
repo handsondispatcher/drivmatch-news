@@ -20,6 +20,9 @@ function marketFresh(v,key){
  // A real-time quote expires in 5 minutes; published references use their
  // own official source cadence. A cached web page cannot prolong freshness.
  if(v.session_status==='open')return age<=5*60000;
+ if(key==='brent'&&v.instrument==='brent_eia_reference'&&
+    v.quote_status==='historical_reference'&&v.session_status==='historical_reference')
+   return age<=21*86400000;
  return age<=({usd:5,diesel:12,brent:5}[key]*86400000);
 }
 function showMarket(){
@@ -41,7 +44,8 @@ function showMarket(){
    const v=item.data,fresh=marketFresh(v,item.id);
    const value=el('top-'+item.id+'-value'),chg=el('top-'+item.id+'-change'),meta=el('top-'+item.id+'-date');
    value.textContent=fresh?item.prefix+number(v.value,item.decimals)+item.suffix:'—';
-   const pct=fresh&&v.change_pct!==null&&v.change_pct!==undefined&&Number.isFinite(Number(v.change_pct))?Number(v.change_pct):null;
+   const historical=item.id==='brent'&&v?.quote_status==='historical_reference';
+   const pct=fresh&&!historical&&v.change_pct!==null&&v.change_pct!==undefined&&Number.isFinite(Number(v.change_pct))?Number(v.change_pct):null;
    chg.hidden=pct===null;
    chg.classList.toggle('negative',pct!==null&&pct<0);
    chg.textContent=pct===null?'':(pct>0?'+':'')+number(pct,2)+'%';
@@ -57,7 +61,16 @@ function showMarket(){
        :localized('Última referência diária EIA','Latest daily EIA observation','Última referencia diaria EIA');
    const source=fresh?kind+' · '+(v.source||'')+' · '+v.observed_at
      :localized('Cotação indisponível ou desatualizada','Quote unavailable or outdated','Cotización no disponible o desactualizada');
-   meta.textContent=fresh?kind+' · '+String(v.observed_at||'').slice(0,10):source;
+   meta.textContent=historical&&fresh
+     ?localized('REFERÊNCIA EIA ANTIGA — não é preço atual','OLD EIA REFERENCE — not current','REFERENCIA EIA ANTIGUA — no es actual')+' · '+String(v.observed_at||'').slice(0,10)
+     :fresh?kind+' · '+String(v.observed_at||'').slice(0,10):source;
+   if(historical&&fresh){
+     const a=document.createElement('a');
+     a.href='https://www.ice.com/products/219/Brent-Crude-Futures/data';
+     a.target='_blank';a.rel='noopener noreferrer';
+     a.textContent=localized(' · Ver Brent negociado (futuros)',' · View traded Brent (futures)',' · Ver Brent negociado (futuros)');
+     meta.appendChild(a);
+   }
    meta.title=source;value.title=source;
  }
 }
