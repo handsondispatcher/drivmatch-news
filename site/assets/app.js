@@ -329,7 +329,7 @@
     const unused=$('ad-slot');if(unused){unused.hidden=true;unused.innerHTML='';}
     for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner']]){
       const box=$(id);if(!box)continue;
-      const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion'&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(a.url||'')&&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(a.whatsapp_url||'')&&/^assets\/ads\/carhauler-(?:horizontal|rectangle|square)\.svg$/.test(a.image||''));
+      const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion'&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(a.url||'')&&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(a.whatsapp_url||'')&&/^https:\/\/cdn\.openart\.ai\/openart-uploads\/production\/attachment-transfers\/[a-f0-9]+\.png$/.test(a.image||''));
       box.hidden=!ad;if(!ad){box.innerHTML='';continue;}
       const ig=escapeHTML(ad.url),wa=escapeHTML(ad.whatsapp_url),src=escapeHTML(ad.image);
       box.innerHTML=`<div class="car-ad"><div class="car-ad-disclosure">PUBLICIDADE · AVAILABLE LOAD / CAR HAULERS</div>

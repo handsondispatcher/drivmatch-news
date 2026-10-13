@@ -7,7 +7,7 @@ class CarHaulerAds(unittest.TestCase):
   self.assertEqual(len(ads['placements']),4)
   self.assertEqual({x['slot'] for x in ads['placements']},{'news-top','market-sidebar','article-inline','mobile-inline'})
   for a in ads['placements']:
-   self.assertTrue((P/'site'/a['image']).is_file())
+   self.assertTrue(a['image'].startswith('https://cdn.openart.ai/openart-uploads/production/attachment-transfers/'))
    self.assertIn('fabriciodispatcher',a['url'])
    self.assertIn('19082913386',a['whatsapp_url'])
  def test_markup(self):
