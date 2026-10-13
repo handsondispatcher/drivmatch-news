@@ -8,8 +8,9 @@ const headline=s=>clean(s).replace(/https?:\/\/\S+/gi,'').replace(/\s+-\s+[^-]{2
 const blockedPublisher=url=>/^https:\/\/(?:[a-z0-9-]+\.)*thetrucker\.com(?:[\/:?#]|$)/i.test(String(url||''));
 // A ticker click in Portuguese or Spanish should not silently open English source text.
 // The original publisher link is retained whenever it already matches the reader language.
+const readerLocales={pt:'pt-BR',en:'en-US',es:'es-419'};
 const sourceReadingUrl=(url,original,target)=>target===(['pt','en','es'].includes(original)?original:'en')?url:
-  'https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(target)+'&u='+encodeURIComponent(url);
+  'https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(readerLocales[target])+'&u='+encodeURIComponent(url);
 /* The crawler is a latest-headlines ticker, not the historical article archive.
    Fail closed when GitHub's scheduled source snapshot stops updating. */
 const MAX_HEADLINE_AGE_MS=48*60*60*1000;
