@@ -12,6 +12,9 @@ from io import BytesIO
 from pathlib import Path
 from urllib.parse import quote, urlsplit
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
+import threading
+import time
 import json
 import re
 import sys
@@ -26,6 +29,19 @@ DEST = SITE / "assets" / "news-photos"
 MANIFEST = SITE / "data" / "news-images.json"
 SAFE_ID = re.compile(r"^[a-z0-9][a-z0-9-]{2,85}$")
 USER_AGENT = "DrivMatchNews/1.0 (licensed Wikimedia photography; mail contact on website)"
+PHOTO_REQUEST_DELAY_SECONDS = 0.45
+_photo_request_lock = threading.Lock()
+_last_photo_request = [0.0]
+
+def _polite_photo_request():
+    """Bound aggregate Commons downloads; repeated 429s must not be amplified."""
+    with _photo_request_lock:
+        now=time.monotonic()
+        delay=PHOTO_REQUEST_DELAY_SECONDS-(now-_last_photo_request[0])
+        if delay>0:
+            time.sleep(delay)
+        _last_photo_request[0]=time.monotonic()
+
 
 
 def read_json(path: Path):
@@ -73,6 +89,7 @@ def _download_photo(photo: dict):
     diagnostics=[]
     for url in _candidate_urls(photo):
         try:
+            _polite_photo_request()
             req = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "image/jpeg,image/png,image/webp,image/*;q=0.5"})
             with urlopen(req, timeout=9) as resp:
                 if not resp.headers.get("Content-Type", "").lower().startswith("image/"):
@@ -108,6 +125,13 @@ def _download_photo(photo: dict):
                         "image_alt": photo.get("description") or "Fotografia de arquivo ilustrativa",
                         "image_context": "illustrative_archive",
                         "source_library_id": ident}
+        except HTTPError as exc:
+            diagnostics.append(f"HTTP:{exc.code}")
+            if exc.code==429:
+                # Stop this candidate immediately; no extra URL retries when
+                # Wikimedia explicitly says to slow down.
+                break
+            continue
         except (OSError, TimeoutError, ValueError, UnidentifiedImageError) as exc:
             diagnostics.append(f"{type(exc).__name__}:{getattr(exc,'code','')}")
             continue
@@ -178,7 +202,7 @@ def build(minimum=0):
     # Cache only after validation against CURRENT metadata. Reuse verified
     # local JPEGs across frequent news deploys; preserve open-license credits.
     downloaded = {}
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=3) as pool:
         pending = {pool.submit(_download_photo, p): p for p in photos}
         for future in as_completed(pending):
             photo = pending[future]
