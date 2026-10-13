@@ -102,7 +102,13 @@ jobs:
             const open = await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
             const existing = open.find(x => x.title===title && !x.pull_request);
             if (!fs.existsSync('build/market-health.json')) {
-              core.warning('Market health report missing; check earlier build/audit steps.');
+              const message='Market audit report missing: generation or test steps failed before the market watchdog. Review this GitHub Actions run before assuming quotes were updated.';
+              if (!existing) {
+                await github.rest.issues.create({owner,repo,title,body:message});
+              } else if (existing.body!==message) {
+                await github.rest.issues.update({owner,repo,issue_number:existing.number,body:message});
+              }
+              core.warning(message);
               return;
             }
             const r=JSON.parse(fs.readFileSync('build/market-health.json','utf8'));
