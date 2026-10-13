@@ -428,9 +428,16 @@ def fred_latest(series, source):
     change=((current[1]/previous[1])-1)*100 if previous else None
     key={'GASDESW':'diesel','DCOILBRENTEU':'brent'}.get(series)
     quote=dated_quote(current[1],source,current[0],change,'https://fred.stlouisfed.org/series/'+series)
-    if key and not market_reference_current(quote,key):
-        raise ValueError('Expired '+key+' reference; wait for actual EIA publication')
-    quote.update(session_status='published_reference',quote_status='last_official_publication',
+    historical=bool(key=='brent' and not market_reference_current(quote,key))
+    if key=='diesel' and not market_reference_current(quote,key):
+        raise ValueError('Expired weekly EIA diesel quote')
+    if historical:
+        # Keep the exact last EIA reference when FRED has stopped updating,
+        # but mark it prominently as historical, NEVER live/last close.
+        if (NOW().date()-datetime.fromisoformat(current[0]).date()).days>21:
+            raise ValueError('EIA Brent publication is older than 21 days')
+    quote.update(session_status='historical_reference' if historical else 'published_reference',
+                 quote_status='historical_reference' if historical else 'last_official_publication',
                  cadence='weekly' if key=='diesel' else 'daily',instrument=key+'_eia_reference',
                  checked_at=NOW().isoformat(timespec='seconds'))
     return quote
