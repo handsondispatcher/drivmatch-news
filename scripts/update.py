@@ -419,6 +419,78 @@ def cached_verified_market_reference(key):
     return record
 
 
+
+def eia_direct_latest(key):
+    """Use EIA's own registered APIv2, not scraped news pages or FRED mirroring.
+
+    Diesel: nationwide weekly No.2 retail diesel USD/gal.
+    Brent: Europe Brent daily physical spot reference USD/bbl.
+    API registration and an EIA_API_KEY secret are required by EIA.
+    """
+    api_key=os.getenv('EIA_API_KEY','')
+    if not api_key:raise ValueError('EIA_API_KEY not configured')
+    instruments={
+        'diesel':('petroleum/pri/gnd','weekly','EMD_EPD2D_PTE_NUS_DPG','EIA — diesel rodoviário EUA (semanal)','USD/gal'),
+        'brent':('petroleum/pri/spt','daily','RBRTE','EIA — Brent Europe spot (diário)','USD/bbl'),
+    }
+    if key not in instruments:raise ValueError('Unsupported EIA market instrument')
+    route,frequency,series,source,unit=instruments[key]
+    params=urllib.parse.urlencode([
+        ('api_key',api_key),('frequency',frequency),('data[0]','value'),
+        ('facets[series][]',series),('sort[0][column]','period'),
+        ('sort[0][direction]','desc'),('offset','0'),('length','8')
+    ])
+    response=json.loads(fetch('https://api.eia.gov/v2/'+route+'/data/?'+params,timeout=18))
+    records=response.get('response',{}).get('data',[])
+    if not isinstance(records,list):raise ValueError('Invalid EIA API response')
+    observations=[]
+    for row in records:
+        try:
+            if row.get('series')!=series:continue
+            day=str(row['period'])
+            datetime.strptime(day,'%Y-%m-%d')
+            value=float(row['value'])
+            if not 0<value<10000:continue
+            observations.append((day,value))
+        except (KeyError,ValueError,TypeError):continue
+    if not observations:raise ValueError('No valid official EIA observations for '+series)
+    observations.sort(key=lambda record:record[0])
+    current=observations[-1]
+    older=next((rec for rec in reversed(observations[:-1]) if rec[0]<current[0]),None)
+    change=(current[1]/older[1]-1)*100 if older else None
+    quote=dated_quote(current[1],source,current[0],change,
+                      'https://www.eia.gov/opendata/browser/'+route)
+    historical=key=='brent' and not market_reference_current(quote,key)
+    if key=='diesel' and not market_reference_current(quote,key):
+        raise ValueError('Expired official EIA diesel data')
+    if historical and (NOW().date()-datetime.fromisoformat(current[0]).date()).days>21:
+        raise ValueError('Official EIA Brent data older than 21 days')
+    quote.update(
+        session_status='historical_reference' if historical else 'published_reference',
+        quote_status='historical_reference' if historical else 'last_official_publication',
+        cadence=frequency,instrument=key+'_eia_reference',
+        unit=unit,checked_at=NOW().isoformat(timespec='seconds'))
+    return quote
+
+
+def eia_reference_with_fred_fallback(key):
+    """Prefer official EIA API when a registered key is available.
+
+    Preserve existing FRED/EIA fallback during migration. It remains a dated
+    official publication, never intraday market data.
+    """
+    if os.getenv('EIA_API_KEY'):
+        try:return eia_direct_latest(key)
+        except Exception:
+            # Provenance remains that of the actual fallback, not of EIA API.
+            pass
+    config={
+        'diesel':('GASDESW','EIA / FRED (semanal)'),
+        'brent':('DCOILBRENTEU','EIA / FRED (diário)'),
+    }
+    return fred_latest(*config[key])
+
+
 def fred_latest(series, source):
     # Series are US EIA data republished via FRED; not real-time, and subject
     # to source licensing/attribution review prior to monetized launch.
@@ -489,8 +561,8 @@ def make_market(offline=False):
     market={'generated_at':NOW().isoformat(timespec='seconds'),'mode':'verified-or-unavailable','indicators':{},'stocks':{},'errors':[]}
     if offline:
         market['mode']='offline-test';return market
-    for key,fn in [('usdbrl',authorized_spot),('diesel',lambda:fred_latest('GASDESW','EIA / FRED (semanal)')),
-                   ('brent',lambda:fred_latest('DCOILBRENTEU','EIA / FRED (diário)'))]:
+    for key,fn in [('usdbrl',authorized_spot),('diesel',lambda:eia_reference_with_fred_fallback('diesel')),
+                   ('brent',lambda:eia_reference_with_fred_fallback('brent'))]:
         try:
             if key=='brent' and os.getenv('BRENT_REDISTRIBUTION_AUTHORIZED')=='true' and os.getenv('BRENT_SPOT_URL'):
                 try:market['indicators'][key]=authorized_brent_spot()
