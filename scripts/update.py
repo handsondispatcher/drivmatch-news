@@ -44,7 +44,7 @@ def google_translate(text, target):
     if not key or not text:return None
     # Locale style requires editorial review: Basic Translation may not guarantee
     # idiomatic Brazilian Portuguese / US English / Latin American Spanish.
-    target_tag = {'pt':'pt','en':'en','es':'es'}[target]
+    target_tag = {'pt':'pt-BR','en':'en-US','es':'es-419'}[target]
     url='https://translation.googleapis.com/language/translate/v2?key='+urllib.parse.quote(key)
     result=json.loads(fetch(url,'POST',{'q':text,'target':target_tag,'format':'text'},
                             {'Content-Type':'application/json; charset=utf-8'}))
