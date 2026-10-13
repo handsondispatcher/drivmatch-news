@@ -5,6 +5,7 @@
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
   let externalHeadlines = [], photoByStory = {}, photoLibrary = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
   let brentRealtime=null;
+  let tradingViewReady=false;
   let sourceCheckedAt=source.source_monitor?.checked_at||'', newestSourceAt=source.source_monitor?.latest_original_published_at||'', currentSourceCount=(source.articles||[]).filter(x=>x.kind==='external_link').length;
   const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
@@ -362,27 +363,32 @@
     return '<b>'+unit+' '+n+'</b>'+pct;
   }
   function mrow(name,ticker,v,key){
-    // Keep all three compact rows, without misleading historical prices.
-    const valid=verifiedMarketQuote(v,key)&&!(
-      key==='brent'&&v?.quote_status==='historical_reference');
+    const providerWidget=tradingViewReady&&(key==='usdbrl'||key==='brent');
+    const symbol=key==='usdbrl'?'FX_IDC:USDBRL':'ICEEUR:BRN1!';
+    // Official TradingView widget is intact, no extraction or rebranding.
+    // Brent is ICE futures here, distinct from EIA spot and may be delayed.
+    const valid=verifiedMarketQuote(v,key)&&
+      !(key==='brent'&&v?.quote_status==='historical_reference')&&
+      !(key==='usdbrl'&&v?.instrument==='ptax_reference');
     const detail=valid?
       String(v.source||'')+' · '+String(v.observed_at||'')+' · '+String(v.quote_status||v.session_status||''):
-      (lang==='pt'?'Cotação atual não disponível':lang==='es'?'Cotización actual no disponible':'Current quote unavailable');
-    const value=valid?marketValue(v,key):'<b>—</b>';
+      (lang==='pt'?'Cotação comercial atual indisponível':lang==='es'?'Cotización comercial actual no disponible':'Current commercial quote unavailable');
+    const value=providerWidget?
+      '<div class="dm-market-side-widget"><tv-tickers symbols="'+symbol+'" hide-chart item-size="compact"></tv-tickers></div>':
+      valid?marketValue(v,key):'<b>—</b>';
     return '<div class="sideitem market-live-row" data-market-key="'+key+
       '" title="'+escapeHTML(detail)+'"><div><strong>'+escapeHTML(name)+
       '</strong><small>'+escapeHTML(ticker)+'</small></div><div class="value">'+value+
-      '<small class="market-asof">'+escapeHTML(detail)+'</small></div></div>';
+      '</div></div>';
   }
   function renderMarket(){
     const market=data.market||{},inds={...(market.indicators||{})};
     if(brentRealtime?.instrument==='brent_spot'&&verifiedMarketQuote(brentRealtime,'brent'))
       inds.brent=brentRealtime;
     const body=[
-      mrow(inds.usdbrl?.instrument==='ptax_reference'?(lang==='en'?'USD PTAX (BCB)':lang==='es'?'Dólar PTAX (BCB)':'Dólar PTAX (BCB)'):
-        (lang==='pt'?'Dólar comercial':lang==='es'?'Dólar comercial':'USD / BRL'),'USD/BRL',inds.usdbrl,'usdbrl'),
+      mrow(lang==='en'?'US Dollar':'Dólar','USD/BRL',inds.usdbrl,'usdbrl'),
       mrow(lang==='en'?'US Diesel':lang==='es'?'Diésel en EE. UU.':'Diesel nos EUA','EIA · US$/gal',inds.diesel,'diesel'),
-      mrow(lang==='en'?'Brent crude':lang==='es'?'Petróleo Brent':'Petróleo Brent','BRENT · US$/bbl',inds.brent,'brent')
+      mrow(tradingViewReady?(lang==='en'?'Brent Futures':'Brent (futuros)'):(lang==='en'?'Brent crude':'Petróleo Brent'),'US$/bbl',inds.brent,'brent')
     ].filter(Boolean);
     // Securities and Class 8 data were never reliably available on the public
     // News site. They are deliberately not shown, even as placeholders.
@@ -397,6 +403,10 @@
     $('market-note').textContent='';
     $('market-note-mobile').textContent='';
   }
+  document.addEventListener('drivmatch:tradingview-ready',()=>{
+    tradingViewReady=true;
+    if($('market')&&$('market-mobile'))renderMarket();
+  });
   document.addEventListener('drivmatch:brent-spot',event=>{
     const quote=event.detail;
     brentRealtime=quote?.instrument==='brent_spot'?quote:null;
