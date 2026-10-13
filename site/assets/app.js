@@ -4,6 +4,7 @@
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
   let externalHeadlines = [], photoByStory = {}, photoLibrary = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
+  let brentRealtime=null;
   let sourceCheckedAt=source.source_monitor?.checked_at||'', newestSourceAt=source.source_monitor?.latest_original_published_at||'', currentSourceCount=(source.articles||[]).filter(x=>x.kind==='external_link').length;
   const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
@@ -374,7 +375,9 @@
     return `<div class="sideitem market-live-row" data-market-key="${key}"><div><strong>${escapeHTML(name)}</strong><small>${escapeHTML(ticker)}</small></div><div class="value">${marketValue(v,key)}</div></div>`;
   }
   function renderMarket(){
-    const market=data.market||{},inds=market.indicators||{};
+    const market=data.market||{},inds={...(market.indicators||{})};
+    if(brentRealtime?.instrument==='brent_spot'&&verifiedMarketQuote(brentRealtime,'brent'))
+      inds.brent=brentRealtime;
     const body=[
       mrow(inds.usdbrl?.instrument==='ptax_reference'?(lang==='en'?'USD PTAX (BCB)':lang==='es'?'Dólar PTAX (BCB)':'Dólar PTAX (BCB)'):
         (lang==='pt'?'Dólar comercial':lang==='es'?'Dólar comercial':'USD / BRL'),'USD/BRL',inds.usdbrl,'usdbrl'),
@@ -396,6 +399,11 @@
     $('market-note').textContent=body.length?note:'';
     $('market-note-mobile').textContent=body.length?note:'';
   }
+  document.addEventListener('drivmatch:brent-spot',event=>{
+    const quote=event.detail;
+    brentRealtime=quote?.instrument==='brent_spot'?quote:null;
+    if($('market')&&$('market-mobile'))renderMarket();
+  });
   function renderAds(){
     const placements=(data.ads?.enabled&&Array.isArray(data.ads.placements))?data.ads.placements:[];
     const unused=$('ad-slot');if(unused){unused.hidden=true;unused.innerHTML='';}
