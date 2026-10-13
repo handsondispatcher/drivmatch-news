@@ -353,32 +353,25 @@
     return age>=-5*60000 && age<=(v.session_status==='open'?5*60000:maxAge);
   }
   function marketValue(v,key){
-    const status=key==='usdbrl'
-      ?(v.instrument==='ptax_reference'
-         ?(v.session_status==='reference_intraday'?(lang==='pt'?'PTAX parcial de hoje — não é dólar comercial':lang==='es'?'PTAX parcial de hoy — no es dólar comercial':'Intraday PTAX reference — not commercial spot'):(lang==='pt'?'Última PTAX oficial de venda':lang==='es'?'Última PTAX oficial de venta':'Last official PTAX sell reference'))
-         :v.session_status==='open'
-           ?(lang==='pt'?'Cotação comercial recente':lang==='es'?'Cotización comercial reciente':'Recent commercial spot quote')
-           :(lang==='pt'?'Último fechamento comercial verificado':lang==='es'?'Último cierre comercial verificado':'Last verified commercial close'))
-      :key==='diesel'
-        ?(lang==='pt'?'Última publicação semanal EIA':lang==='es'?'Última publicación semanal EIA':'Latest weekly EIA release')
-        :v.instrument==='brent_spot'
-          ?v.session_status==='open'
-            ?(lang==='pt'?'Brent spot recente':lang==='es'?'Brent spot reciente':'Recent Brent spot snapshot')
-            :(lang==='pt'?'Último fechamento Brent spot':lang==='es'?'Último cierre Brent spot':'Last Brent spot close')
-          :v.quote_status==='historical_reference'
-            ?(lang==='pt'?'REFERÊNCIA ANTIGA DA EIA — NÃO É PREÇO ATUAL':lang==='es'?'REFERENCIA ANTIGUA EIA — NO ES PRECIO ACTUAL':'OLD EIA REFERENCE — NOT CURRENT')
-            :(lang==='pt'?'Última referência diária EIA':lang==='es'?'Última referencia diaria EIA':'Latest daily EIA observation');
-    const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
-    const unit=key==='usdbrl'?'R$': 'US$';
-    const observed=String(v.observed_at||'').slice(0,16).replace('T',' ');
-    const change=v.quote_status==='historical_reference'||v.change_pct===null||v.change_pct===undefined||v.change_pct===''?'':percentBadge(Number(v.change_pct));
-    const link=v.quote_status==='historical_reference'
-      ?'<a href="https://www.ice.com/products/219/Brent-Crude-Futures/data" target="_blank" rel="noopener noreferrer" class="market-source-link">'+(lang==='pt'?'Ver Brent negociado (futuros)':lang==='es'?'Ver Brent negociado (futuros)':'View traded Brent futures')+'</a>':'';
-    return `<b>${unit} ${n}</b>${change}<small class="market-asof">${escapeHTML(observed)} · ${escapeHTML(v.source||'')} · ${escapeHTML(status)} ${link}</small>`;
+    const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{
+      minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
+    const unit=key==='usdbrl'?'R$':'US$';
+    const pct=v.change_pct===null||v.change_pct===undefined||v.change_pct===''||!Number.isFinite(Number(v.change_pct))
+      ?'':percentBadge(Number(v.change_pct));
+    return '<b>'+unit+' '+n+'</b>'+pct;
   }
   function mrow(name,ticker,v,key){
-    if(!verifiedMarketQuote(v,key))return '';
-    return `<div class="sideitem market-live-row" data-market-key="${key}"><div><strong>${escapeHTML(name)}</strong><small>${escapeHTML(ticker)}</small></div><div class="value">${marketValue(v,key)}</div></div>`;
+    // Keep all three compact rows, without misleading historical prices.
+    const valid=verifiedMarketQuote(v,key)&&!(
+      key==='brent'&&v?.quote_status==='historical_reference');
+    const detail=valid?
+      String(v.source||'')+' · '+String(v.observed_at||'')+' · '+String(v.quote_status||v.session_status||''):
+      (lang==='pt'?'Cotação atual não disponível':lang==='es'?'Cotización actual no disponible':'Current quote unavailable');
+    const value=valid?marketValue(v,key):'<b>—</b>';
+    return '<div class="sideitem market-live-row" data-market-key="'+key+
+      '" title="'+escapeHTML(detail)+'"><div><strong>'+escapeHTML(name)+
+      '</strong><small>'+escapeHTML(ticker)+'</small></div><div class="value">'+value+
+      '<small class="market-asof">'+escapeHTML(detail)+'</small></div></div>';
   }
   function renderMarket(){
     const market=data.market||{},inds={...(market.indicators||{})};
@@ -399,11 +392,9 @@
     const marketHTML=body.length?body.join(''):`<p class="market-unavailable">${empty}</p>`;
     $('market').innerHTML=marketHTML;
     $('market-mobile').innerHTML=marketHTML;
-    const note=lang==='pt'?'Dados de referência, não cotações em tempo real.':
-      lang==='es'?'Datos de referencia, no cotizaciones en tiempo real.':
-      'Reference data, not real-time prices.';
-    $('market-note').textContent=body.length?note:'';
-    $('market-note-mobile').textContent=body.length?note:'';
+    // Provider audit runs behind the UI. Keep the public panel compact.
+    $('market-note').textContent='';
+    $('market-note-mobile').textContent='';
   }
   document.addEventListener('drivmatch:brent-spot',event=>{
     const quote=event.detail;
