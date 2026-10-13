@@ -27,7 +27,7 @@ def validate(data, now=None):
             if instant.tzinfo is None:instant=instant.replace(tzinfo=UTC)
             age=now-instant.astimezone(UTC)
             limit=timedelta(minutes=5) if q.get('session_status')=='open' else timedelta(days=MAX_DAYS[key])
-            if not timedelta(days=-1)<=age<=limit:
+            if not timedelta(minutes=-5)<=age<=limit:
                 raise ValueError('expired observation')
             if key=='usdbrl' and q.get('instrument') not in ('spot','ptax_reference'):
                 raise ValueError('unknown USD/BRL instrument')
