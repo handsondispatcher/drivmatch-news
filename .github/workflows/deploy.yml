@@ -85,6 +85,8 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
         run: python scripts/update.py
+      - name: Auditar atualização real de dólar, diesel e Brent
+        run: python scripts/audit_market.py
       # Keep the exact, checksum-verified advertiser-approved PNG in Pages,
       # so the browser never depends on third-party hotlinking or image changes.
       - name: Cache da arte oficial Foto 1 (SHA-256 fixo)
@@ -147,6 +149,7 @@ jobs:
           path: |
             build/newsroom-health.json
             build/source-health.json
+            build/market-health.json
       - name: Preservar histórico verificado por até 48 horas
         uses: actions/cache/save@v4
         with:
