@@ -61,8 +61,8 @@ function showMarket(){
    ?localized('Brent (futuros)','Brent Futures','Brent (futuros)')
    :localized('Petróleo Brent','Brent Crude Oil','Petróleo Brent');
  const values=[
-  {id:'usd',data:usd,decimals:4,prefix:'R$ ',suffix:''},
-  {id:'diesel',data:market.diesel,decimals:3,prefix:'US$ ',suffix:'/gal'},
+  {id:'usd',data:usd,decimals:2,prefix:'R$ ',suffix:''},
+  {id:'diesel',data:market.diesel,decimals:2,prefix:'US$ ',suffix:'/gal'},
   {id:'brent',data:brent,decimals:2,prefix:'US$ ',suffix:l==='en'?'/barrel':'/barril'}
  ];
  for(const item of values){
