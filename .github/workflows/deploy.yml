@@ -38,7 +38,7 @@ jobs:
       # Road TV discovery queries are cached by UTC hour across 10-minute
       # publication runs (3 rotating YouTube searches/hour max).
       - name: Janela de descoberta Road TV
-        run: echo "ROADTV_CACHE_HOUR=$(date -u +%Y%m%d%H)" >> "$GITHUB_ENV"
+        run: echo "ROADTV_CACHE_HOUR=$(date -u +%Y%m%d%H%H)" >> "$GITHUB_ENV"
       - uses: actions/cache@v4
         with:
           path: build/roadtv-discovery.json
@@ -137,13 +137,13 @@ jobs:
         run: python scripts/build_us_places.py
       # Keep independently license-verified JPEGs across frequent (10m) updates,
       # without re-downloading hundreds of Commons photos on every publication.
-      - name: Identificador diário de cache fotográfico licenciado
-        run: echo "NEWS_PHOTO_CACHE_DAY=$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
+      - name: Identificador horário de cache fotográfico licenciado
+        run: echo "NEWS_PHOTO_CACHE_HOUR=$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
       - name: Reaproveitar fotografias verificadas
         uses: actions/cache@v4
         with:
           path: site/assets/news-photos
-          key: licensed-news-archive-v1-${{ env.NEWS_PHOTO_CACHE_DAY }}
+          key: licensed-news-archive-v1-${{ env.NEWS_PHOTO_CACHE_HOUR }}
           restore-keys: |
             licensed-news-archive-v1-
       - name: Verificar, baixar e servir fotos editoriais licenciadas
