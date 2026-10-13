@@ -314,19 +314,21 @@ def official_bcb_ptax_odata():
             observation=local_dt.astimezone(UTC)
             if not 0<price<50 or observation>NOW()+timedelta(seconds=30):
                 continue
-            records.append((observation,price))
+            bulletin=str(row.get('tipoBoletim') or '').strip()
+            records.append((observation,price,bulletin))
         except (KeyError,ValueError,TypeError,OverflowError):continue
     if not records:raise ValueError('No recent PTAX bulletin in BCB Olinda')
     records.sort(key=lambda x:x[0])
-    observation,price=records[-1]
+    observation,price,bulletin=records[-1]
     if NOW()-observation>timedelta(days=5):
         raise ValueError('Expired PTAX bulletin')
-    previous=next((v for dt,v in reversed(records[:-1])
+    previous=next((v for dt,v,_ in reversed(records[:-1])
                    if dt.astimezone(zone).date()<observation.astimezone(zone).date()),None)
     percent=((price/previous)-1)*100 if previous else None
     observed_date=observation.astimezone(zone).date()
-    # A same-day intraday bulletin is not a verified final close.
-    intraday=observed_date==local_now.date() and local_now.hour<14
+    # Never infer a final close from time of day alone.
+    # Olinda has an explicit "tipoBoletim" value for Fechamento.
+    intraday=bulletin.casefold()!='fechamento'
     quote=dated_quote(price,'Banco Central do Brasil — PTAX OData',
                       observation.isoformat(timespec='seconds'),percent,
                       'https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/')
