@@ -46,13 +46,13 @@ class MarketCadenceTests(unittest.TestCase):
                 (market.NOW()-timedelta(minutes=7)).isoformat()})
 
     def test_fred_source_is_a_published_reference_not_live(self):
-        csv='DATE,DCOILBRENTEU\\n2026-10-12,81.12\\n'
+        csv='DATE,DCOILBRENTEU\n2026-10-12,81.12\n'
         with patch.object(market,'fetch',return_value=csv),patch.object(market,'NOW',return_value=datetime(2026,10,13,15,tzinfo=UTC)):
             q=market.fred_latest('DCOILBRENTEU','EIA / FRED (diário)')
         self.assertEqual(q['session_status'],'published_reference')
         self.assertEqual(q['quote_status'],'last_official_publication')
         self.assertEqual(q['observed_at'],'2026-10-12')
-        with patch.object(market,'fetch',return_value='DATE,DCOILBRENTEU\\n2026-10-06,125.44\\n'),patch.object(market,'NOW',return_value=datetime(2026,10,13,15,tzinfo=UTC)):
+        with patch.object(market,'fetch',return_value='DATE,DCOILBRENTEU\n2026-10-06,125.44\n'),patch.object(market,'NOW',return_value=datetime(2026,10,13,15,tzinfo=UTC)):
             with self.assertRaisesRegex(ValueError,'Expired'):
                 market.fred_latest('DCOILBRENTEU','EIA / FRED (diário)')
 
