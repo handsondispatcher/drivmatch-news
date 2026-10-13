@@ -103,8 +103,23 @@
   const PHOTO_REUSE_GAP=20;
   let visualCacheKey='',visualCache=new Map();
   function storyVisuals(){
-    const stories=pageStories();
-    const key=stories.map(a=>(a.id||a.source_url)+'|'+(licensedPhotoOf(a)?.image||a.image||'')).join('~')+'#'+photoLibrary.length;
+    // Assign archive photos in the ACTUAL DOM card order, not publication order.
+    // Hero + related render first, followed by latest-news feed, then focus list.
+    // The previous assignment followed pageStories() but the feed is separately
+    // chronological; that allowed photo reuse inside 20 visibly adjacent cards.
+    const all=pageStories(),featured=articlesFiltered();
+    const hero=featured[featurePage*featureSize]||featured[0];
+    const related=featured.slice(featurePage*featureSize+1,featurePage*featureSize+4);
+    const reserved=new Set([hero,...related].filter(Boolean).map(a=>a.id));
+    const shortlist=featured.filter(a=>!reserved.has(a.id)).slice(0,5);
+    shortlist.forEach(a=>reserved.add(a.id));
+    const time=a=>{const t=Date.parse(a.published_at||'');return Number.isFinite(t)?t:Number.NEGATIVE_INFINITY;};
+    const feed=all.filter(a=>matches(a)&&!reserved.has(a.id)).sort((a,b)=>time(b)-time(a)||String(a.id||a.source_url||'').localeCompare(String(b.id||b.source_url||'')));
+    const pageIndex=Math.min(page,Math.max(0,Math.ceil(feed.length/pageSize)-1));
+    const visible=[hero,...related,...feed.slice(pageIndex*pageSize,(pageIndex+1)*pageSize),...shortlist].filter(Boolean);
+    const visibleIds=new Set(visible.map(a=>a.id));
+    const stories=[...visible,...all.filter(a=>!visibleIds.has(a.id))];
+    const key=stories.map(a=>(a.id||a.source_url)+'|'+(licensedPhotoOf(a)?.image||a.image||'')).join('~')+'#'+photoLibrary.length+'#'+lang;
     if(key===visualCacheKey)return visualCache;
     const recent=new Map(),map=new Map();
     const curated=photoLibrary.filter(validArchivePhoto);
