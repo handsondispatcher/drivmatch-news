@@ -118,9 +118,9 @@ elements.language.value='pt';
 elements.language.dispatch('change',{target:{value:'pt'}});
 elements.features.dispatch('click',{target:{closest:key=>({dataset:{story:'0'}})}});
 const publisherLinks=elements['article-source'].innerHTML;
-assert(publisherLinks.includes('translate.google.com/translate?sl=auto&amp;tl=pt&amp;u=https%3A%2F%2Fexample.org%2Ftrucking-story'),
+assert(publisherLinks.includes('translate.google.com/translate?sl=auto&amp;tl=pt-BR&amp;u=https%3A%2F%2Fexample.org%2Ftrucking-story'),
  'Portuguese source button must use translation for every English-language publisher');
-assert(publisherLinks.includes('translate.google.com/translate?sl=auto&amp;tl=es&amp;u=https%3A%2F%2Fexample.org%2Ftrucking-story'),
+assert(publisherLinks.includes('translate.google.com/translate?sl=auto&amp;tl=es-419&amp;u=https%3A%2F%2Fexample.org%2Ftrucking-story'),
  'Spanish source button must use translation for every English-language publisher');
 assert(publisherLinks.includes('href="https://example.org/trucking-story"'),
  'English original must remain directly accessible');
@@ -131,7 +131,11 @@ elements.language.dispatch('change',{target:{value:'pt'}});
 elements.features.dispatch('click',{target:{closest:key=>({dataset:{story:'0'}})}});
 assert(elements['article-source'].innerHTML.includes('href="https://example.org/trucking-story"'),
  'When the original is already Portuguese, Portuguese must open the original');
-assert(elements['article-source'].innerHTML.includes('translate.google.com/translate?sl=auto&amp;tl=en'),
+assert(elements['article-source'].innerHTML.includes('translate.google.com/translate?sl=auto&amp;tl=en-US'),
  'A Portuguese original must still offer English automatic translation');
+assert(publisherLinks.includes('Português (Brasil) · tradução automática'),
+ 'Full source label must explicitly mean Brazilian Portuguese');
+assert(publisherLinks.includes('Español (Latinoamérica) · traducción automática'),
+ 'Full source label must explicitly mean Latin American Spanish');
 console.log('SOURCE TRANSLATION PASS: Portuguese/Spanish publisher links, original retained, fallback disclosed');
 console.log('CLIENT SMOKE PASS: panorama/mirrored mobile market/modal/Spanish full text; global language unchanged');
