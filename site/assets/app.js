@@ -358,7 +358,11 @@
            :(lang==='pt'?'Último fechamento comercial verificado':lang==='es'?'Último cierre comercial verificado':'Last verified commercial close'))
       :key==='diesel'
         ?(lang==='pt'?'Última publicação semanal EIA':lang==='es'?'Última publicación semanal EIA':'Latest weekly EIA release')
-        :(lang==='pt'?'Última referência diária EIA':lang==='es'?'Última referencia diaria EIA':'Latest daily EIA observation');
+        :v.instrument==='brent_spot'
+          ?v.session_status==='open'
+            ?(lang==='pt'?'Brent spot recente':lang==='es'?'Brent spot reciente':'Recent Brent spot snapshot')
+            :(lang==='pt'?'Último fechamento Brent spot':lang==='es'?'Último cierre Brent spot':'Last Brent spot close')
+          :(lang==='pt'?'Última referência diária EIA':lang==='es'?'Última referencia diaria EIA':'Latest daily EIA observation');
     const n=Number(v.value).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-US':'en-US',{minimumFractionDigits:2,maximumFractionDigits:key==='usdbrl'?4:3});
     const unit=key==='usdbrl'?'R$': 'US$';
     const observed=String(v.observed_at||'').slice(0,16).replace('T',' ');
