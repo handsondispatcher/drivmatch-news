@@ -122,14 +122,16 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#market-commercial-banner .ucr-frame-square').count(),1,'UCR square creative stays in the right sidebar');
    assert.equal(await page.locator('#market-commercial-banner').isVisible(),width>=991,'Right sidebar UCR is visible only on desktop');
    assert.equal(await page.locator('#news-carhauler-banner .car-official-ad').count(),0,'No duplicate vehicle creative below the stories');
-   assert.equal(await page.locator('#news-carhauler-banner .ucr-compact-banner').count(),1,'Undistorted UCR horizontal and contact panel live below the stories');
-   assert.equal(await page.locator('#news-carhauler-banner .ucr-compact-mobile').count(),0,'Lower UCR must never render a square mobile panel');
-   const lowerRatio=await page.locator('#news-carhauler-banner .ucr-compact-banner').evaluate(el=>{const r=el.getBoundingClientRect();return r.width/r.height});
+   assert.equal(await page.locator('#news-carhauler-banner .ucr-approved-landscape').count(),1,'Approved unchanged horizontal UCR artwork lives below the stories');
+   assert.equal(await page.locator('#news-carhauler-banner .ucr-compact-mobile').count(),0,'Lower UCR must not render a square mobile panel');
+   assert.equal(await page.locator('#news-carhauler-banner .ucr-compact-panel').count(),0,'No invented UCR panel permitted');
+   assert.equal(await page.locator('#news-carhauler-banner .ucr-approved-art').count(),1,'Exact approved horizontal crop only');
+   const lowerRatio=await page.locator('#news-carhauler-banner .ucr-approved-landscape').evaluate(el=>{const r=el.getBoundingClientRect();return r.width/r.height});
    assert.ok(Math.abs(lowerRatio-(1774/394))<0.08,'Lower UCR must have the same landscape ratio as the vehicle banner at all responsive widths');
-   assert.equal(await page.locator('#news-carhauler-banner .ucr-compact-instagram').getAttribute('href'),'https://ig.me/m/fabriciodispatcher','Lower UCR Instagram direct preserved');
-   assert.equal(await page.locator('#news-carhauler-banner .ucr-compact-whatsapp').getAttribute('href').then(x=>x.startsWith('https://wa.me/19082913386')),true,'Lower UCR WhatsApp direct preserved');
+   assert.equal(await page.locator('#news-carhauler-banner .ucr-approved-art .ucr-ig').getAttribute('href'),'https://ig.me/m/fabriciodispatcher','Lower UCR Instagram direct preserved');
+   assert.equal(await page.locator('#news-carhauler-banner .ucr-approved-art .ucr-wa').getAttribute('href').then(x=>x.startsWith('https://wa.me/19082913386')),true,'Lower UCR WhatsApp direct preserved');
    const vehicleRatio=await page.locator('#news-commercial-banner .car-official-horizontal').evaluate(e=>getComputedStyle(e).aspectRatio);
-   const ucrRatio=await page.locator('#news-carhauler-banner .ucr-compact-banner').evaluate(e=>getComputedStyle(e).aspectRatio);
+   const ucrRatio=await page.locator('#news-carhauler-banner .ucr-approved-landscape').evaluate(e=>getComputedStyle(e).aspectRatio);
    assert.equal(ucrRatio,vehicleRatio,'Lower UCR frame must match upper vehicle frame ratio exactly');
    assert.equal(await page.locator('#news-carhauler-banner').isVisible(),true,'Lower UCR must be visible');
    assert.equal(await page.locator('#mobile-commercial-banner .ucr-frame').count(),0,'UCR is restricted to the right sidebar');
@@ -143,7 +145,7 @@ const {spawn}=require('node:child_process');
    // Source master has three lower-row images separated by white gutters.
    // Lock the crop positions in BOTH square UCR renderers (desktop and mobile).
    const checkUcrSquareCrop=async (language,position)=>{
-     for(const selector of ['#market-commercial-banner .ucr-frame-square .ucr-visual','#news-carhauler-banner .ucr-compact-mobile .ucr-frame-square .ucr-visual']){
+     for(const selector of ['#market-commercial-banner .ucr-frame-square .ucr-visual','#news-carhauler-banner .ucr-approved-art']){
        const style=await page.locator(selector).getAttribute('style');
        assert.ok(style.includes('background-size:454.202% auto'),language+' square art has original aspect ratio');
        assert.ok(style.includes('background-position:'+position+' 100%'),language+' square UCR art excludes the white source gutter at '+selector);
