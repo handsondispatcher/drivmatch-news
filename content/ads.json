@@ -109,8 +109,9 @@
         "en",
         "es"
       ],
-      "source_note": "Arte UCR 2027 oficial, versão horizontal abaixo da lista de notícias; escala editorial compacta.",
-      "format": "horizontal"
+      "source_note": "Arte UCR 2027 reconstruída sob solicitação do proprietário em 1774x394 exatos, PT/EN/ES, sem barras laterais; UCR quadrado original e anúncio dos veículos intocados.",
+      "format": "horizontal",
+      "native_image_pattern": "assets/ads/ucr-2027-{lang}-wide-1774x394.png"
     }
   ],
   "approved_creative_rules": {
@@ -158,22 +159,23 @@
     }
   },
   "placement_policy": {
-    "version": "2026-10-13-fixed-layout-v2",
+    "version": "2026-10-13-ucr-native-exact-width-v3",
     "desktop": {
       "news-top": "carhauler-approved-photo1 / horizontal",
       "market-sidebar": "ucr-2027-official / square",
-      "news-carhauler": "ucr-2027-official / horizontal 1774:394 with original artwork and external contact UI"
+      "news-carhauler": "ucr-2027-official / horizontal 1774:394 native exact fit, PT EN ES, no side letterboxing"
     },
     "restrictions": [
       "Car hauler occupies news-top; do not relocate",
       "UCR square remains in sidebar",
       "Do not publish an additional car-hauler horizontal beneath articles",
       "Preserve contacts and approved imagery",
-      "Lower UCR frame has exactly same aspect ratio as upper vehicle banner, with approved art undistorted"
+      "New UCR wide artwork must be natively composed at 1774x394; no 2:1 crop with letterboxing",
+      "Original UCR square sidebar and approved car-hauler Foto 1 must remain unchanged"
     ],
     "mobile": {
       "news-top": "carhauler-approved-photo1 / square",
-      "news-carhauler": "ucr-2027-official / square"
+      "news-carhauler": "ucr-2027-official / native horizontal with accessible 44px contact links"
     }
   }
 }

@@ -77,7 +77,7 @@
     "instagram_direct": "https://ig.me/m/fabriciodispatcher"
   },
   "commercial_disclosure": "Independent private service advertisement. Not affiliated with the UCR Plan. $110 is the advertiser's starting service price, not a government fee.",
-  "production_rule": "IMMUTABLE CREATIVE: use only exact approved UCR master and its documented rectangular/square crop windows. Never redraw, recolor, retype, recomposite, generate replacement elements, add CTA graphics, resize non-proportionally, or substitute square creative into horizontal placement. Fit the original horizontal crop proportionally inside 1774:394 horizontal slot with neutral letterboxing if necessary. Only invisible HTML link hotspots and separate small sponsorship disclosure are allowed.",
+  "production_rule": "Owner-authorized 2026-10-13 exception ONLY for the lower horizontal UCR ad: compose a NEW native 1774x394 version in PT/EN/ES using approved original source pixels for truck and circular badge, with native readable typography and correct CTA buttons. No side letterboxing or CSS stretching. The square sidebar creative and car-hauler Foto 1 remain immutable. Verify all three languages, WhatsApp and Instagram Direct hotspots, responsive layout and private-service disclaimer before deployment.",
   "square_crop_quality_gate": {
     "source": "advertiser-approved six-panel master, 2162x727",
     "finding": "The old x coordinates included white gutters of 13px (pt), 45px (en) and 75px (es), cutting off the right edge of the approved artwork.",
@@ -104,5 +104,45 @@
     "validation": "All three 476x364 square crops exclude white separator gutters and retain approved artwork and CTA hotspots. Verify PT, EN and ES in the sidebar; reuse the same coordinates if a square mobile slot is enabled in the future."
   },
   "immutable_creative": true,
-  "creative_drift_prohibited": true
+  "creative_drift_prohibited": true,
+  "horizontal_native": {
+    "status": "OWNER_REQUESTED_CORRECTIVE_EDITION",
+    "request_date": "2026-10-13",
+    "source_master_pixel_sha256": "0721e8bfc5afe7d871508f648238c128f50bc27b79abaae5dbd77c75a0e53df8",
+    "dimensions": [
+      1774,
+      394
+    ],
+    "formats": {
+      "pt": "assets/ads/ucr-2027-pt-wide-1774x394.png",
+      "en": "assets/ads/ucr-2027-en-wide-1774x394.png",
+      "es": "assets/ads/ucr-2027-es-wide-1774x394.png"
+    },
+    "builder": "scripts/build_ucr_exact_wide.py",
+    "cta_hotspots": {
+      "whatsapp": [
+        0.013,
+        0.818,
+        0.332,
+        0.175
+      ],
+      "instagram_direct": [
+        0.355,
+        0.818,
+        0.325,
+        0.175
+      ]
+    },
+    "qa": [
+      "native 1774x394 pixels",
+      "zero side letterboxing",
+      "three languages",
+      "WhatsApp deep link",
+      "Instagram Direct deep link",
+      "44px mobile contact controls",
+      "UCR square untouched",
+      "car-hauler untouched"
+    ]
+  },
+  "immutable_scope": "Original approved UCR master and all square sidebar crops. The owner explicitly requested a separate new horizontal correction; the original master is preserved."
 }

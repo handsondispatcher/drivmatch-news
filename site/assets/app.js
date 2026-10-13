@@ -408,18 +408,22 @@
         const bg="background-image:url('"+source+"');background-size:"+crop.size+";background-position:"+crop.pos+";";
         const href=escapeHTML('https://wa.me/19082913386?text='+encodeURIComponent(copy.message));
         const ig='https://ig.me/m/fabriciodispatcher';
-        // The original UCR artwork is kept undistorted. The separate HTML
-        // contact panel fills the exact horizontal ratio of the vehicle ad.
+        // 2026-10-13 owner-requested correction: native 1774x394 images.
+        // No letterboxing, CSS stretching or 2:1 crop in the 4.5:1 placement.
+        // The right-sidebar square remains the exact original approved master.
         if(slot==='news-carhauler'){
-          // IMMUTABLE APPROVED ART: exact horizontal master crop only.
-          // Neutral side letterboxing preserves its source proportions.
-          box.innerHTML='<div class="ucr-ad ucr-original-only">'+
+          const edition=lang==='en'?'en':lang==='es'?'es':'pt';
+          const img='assets/ads/ucr-2027-'+edition+'-wide-1774x394.png';
+          box.innerHTML='<div class="ucr-ad ucr-native-edition">'+
             '<div class="ucr-ad-disclosure">'+escapeHTML(copy.label)+'</div>'+
-            '<div class="ucr-approved-landscape" data-approved-only="true">'+
-              '<div class="ucr-approved-art" style="aspect-ratio:'+crop.ratio+';'+bg+'">'+
-                '<a class="ucr-hit ucr-wa" href="'+href+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.wa)+'"></a>'+
-                '<a class="ucr-hit ucr-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.ig)+'"></a>'+
-              '</div>'+
+            '<div class="ucr-native-banner" data-native-ratio="1774/394">'+
+              '<img src="'+img+'" width="1774" height="394" loading="eager" decoding="async" alt="'+escapeHTML('UCR 2027. '+copy.note)+'">'+
+              '<a class="ucr-native-hit ucr-native-wa" href="'+href+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.wa)+'"></a>'+
+              '<a class="ucr-native-hit ucr-native-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.ig)+'"></a>'+
+            '</div>'+
+            '<div class="ucr-native-mobile-actions">'+
+              '<a href="'+href+'" target="_blank" rel="noopener noreferrer sponsored">'+escapeHTML(copy.wa)+'</a>'+
+              '<a href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored">'+escapeHTML(copy.ig)+'</a>'+
             '</div>'+
             '<p class="ucr-ad-note">'+escapeHTML(copy.note)+'</p></div>';
           continue;
