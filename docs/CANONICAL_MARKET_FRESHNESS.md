@@ -30,3 +30,9 @@ Status: ACTIVE — 2026-10-13. Applies to the top utility strip, sidebar, mobile
 US EIA diesel: https://www.eia.gov/petroleum/gasdiesel/learnmore.php ; FRED: https://fred.stlouisfed.org/series/GASDESW
 EIA Brent daily on FRED: https://fred.stlouisfed.org/series/DCOILBRENTEU
 BCB PTAX: https://dadosabertos.bcb.gov.br/dataset/dolar-americano-usd-todos-os-boletins-diarios
+
+## Reader reference links
+- US diesel weekly EIA retail survey: TradingView FRED:GASDESW (https://www.tradingview.com/symbols/FRED-GASDESW/). Keep units USD/gal and frequency weekly.
+- Distinct traded diesel futures: TradingView NYMEX:HO1! (https://br.tradingview.com/symbols/NYMEX-HO1%21/). Do not substitute for retail diesel.
+- Brent futures: Investing.com (https://br.investing.com/commodities/brent-oil). Do not substitute for EIA physical Brent daily spot; identify contract and possible delay.
+- These references are clickable external sources, not automated price APIs. Display data inside official attributed vendor widgets only after separate site-layout review, respecting vendor terms and feed delays.
