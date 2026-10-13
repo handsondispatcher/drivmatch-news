@@ -442,6 +442,14 @@
           /^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(ad.whatsapp_url||'');
         box.hidden=!valid;
         if(!valid){box.innerHTML='';continue;}
+        // Outside-image localization only. Original English raster pixels stay
+        // untouched until the owner approves PT and ES localized new artwork.
+        const carLabels={
+          pt:{disclosure:'PUBLICIDADE · FRETE DISPONÍVEL PARA TRANSPORTE DE VEÍCULOS',visual:'Arte aprovada: transporte de 3 veículos de Kissimmee, FL, para Miami, FL',wa:'Contato pelo WhatsApp ou mensagem de texto (908) 291-3386'},
+          en:{disclosure:'ADVERTISEMENT · AVAILABLE LOAD FOR CAR HAULERS',visual:'Approved artwork: 3 vehicles for transport from Kissimmee, FL, to Miami, FL',wa:'Contact via WhatsApp or text (908) 291-3386'},
+          es:{disclosure:'PUBLICIDAD · CARGA DISPONIBLE PARA TRANSPORTISTAS DE VEHÍCULOS',visual:'Arte aprobada: transporte de 3 vehículos de Kissimmee, FL, a Miami, FL',wa:'Contacto por WhatsApp o mensaje de texto (908) 291-3386'}
+        };
+        const carCopy=carLabels[lang]||carLabels.pt;
         const cuts={
           horizontal:{ratio:'1774 / 394',size:'100% auto',pos:'0% 0%',wa:'left:49.5%;top:79%;width:26.5%;height:20%',ig:'left:76%;top:79%;width:24%;height:20%'},
           rectangle:{ratio:'1009 / 361',size:'175.82% auto',pos:'87.32% 85.36%',wa:'left:46%;top:78%;width:29%;height:22%',ig:'left:75%;top:78%;width:25%;height:22%'},
@@ -454,14 +462,14 @@
           const localArt='assets/ads/carhauler-photo1-'+fmt+'.png';
           const style="background-image:url('"+localArt+"');background-size:100% 100%;background-position:0 0;";
           return '<div class="car-official-frame car-official-'+fmt+'" style="aspect-ratio:'+v.ratio+'">'+
-            '<div class="car-official-visual" role="group" aria-label="Arte original aprovada: Available Load for Car Haulers, 3 veículos, Kissimmee FL para Miami FL" style="'+style+'">'+
-            '<a class="car-official-hit car-official-wa" href="'+escapeHTML(ad.whatsapp_url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+v.wa+'" aria-label="Contato por WhatsApp ou texto (908) 291-3386"></a>'+
+            '<div class="car-official-visual" role="group" aria-label="'+escapeHTML(carCopy.visual)+'" style="'+style+'">'+
+            '<a class="car-official-hit car-official-wa" href="'+escapeHTML(ad.whatsapp_url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+v.wa+'" aria-label="'+escapeHTML(carCopy.wa)+'"></a>'+
             '<a class="car-official-hit car-official-ig" href="'+escapeHTML(ad.url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+v.ig+'" aria-label="Instagram @fabriciodispatcher"></a>'+
             '</div></div>';
         };
         const fmt=slot==='article-inline'?'rectangle':'horizontal';
         box.innerHTML='<div class="car-official-ad" data-approved-photo1-sha256="'+ad.approved_master_sha256+'">'+
-          '<div class="car-official-disclosure">PUBLICIDADE · AVAILABLE LOAD FOR CAR HAULERS</div>'+
+          '<div class="car-official-disclosure">'+escapeHTML(carCopy.disclosure)+'</div>'+
           renderCut(fmt)+renderCut('square')+'</div>';
         continue;
       }
