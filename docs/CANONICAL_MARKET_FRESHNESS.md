@@ -18,6 +18,14 @@ Status: ACTIVE — 2026-10-13. Applies to the top utility strip, sidebar, mobile
 - Commercial USD/BRL or Brent spot can only be displayed as live when the matching provider and redistribution authorization are configured.
 - No changes to advertising art, ads placement, editorial chronology, languages or layout are authorized by this rule.
 
+## Reliable acquisition and cross-check — 2026-10-13
+- USD/BRL commercial: approved licensed commercial spot feed ONLY when authorized; an unavailable feed cannot be silently replaced by UOL scraping. Prioritize Banco Central Olinda PTAX OData bulletins for a separate official USD/BRL reference. Mark the boletim as "intraday/partial" unless tipoBoletim explicitly equals "Fechamento". Never advertise PTAX as traded commercial spot.
+- Reader's FX cross-check: https://economia.uol.com.br/cotacoes/cambio/ . This is a **LINK**, not a data provider. UOL website terms restrict unauthorized automated extraction and redistribution. If the UOL page itself is unavailable, it must never suppress verified official reference data.
+- US diesel primary official API: https://api.eia.gov/v2/petroleum/pri/gnd/data/ , series EMD_EPD2D_PTE_NUS_DPG, frequency weekly, metric USD/gal. EIA_API_KEY registered with https://www.eia.gov/opendata/register.php and stored ONLY as GitHub Actions secret. When unconfigured, maintain existing dated, separately attributed EIA/FRED publication adapter pending rights review.
+- Brent primary official API: https://api.eia.gov/v2/petroleum/pri/spt/data/ , series RBRTE, frequency daily, USD/barrel. Same EIA_API_KEY secret. The EIA publication is a historical Brent Europe spot observation, **not live ICE traded futures**. A separate licensed Brent commercial feed is required for true intraday trading indication.
+- Before publishing a number, validate provider, instrument, observed_at, units, cadence, publication age and whether it is an observed quote, last close, historical reference or unavailable. No unsourced HTML scraping or copied numbers from news headlines.
+- Source adapter changes are limited to market quotes; existing adverts, route/weather modules and editorial ordering must remain unchanged.
+
 ## Sources
 US EIA diesel: https://www.eia.gov/petroleum/gasdiesel/learnmore.php ; FRED: https://fred.stlouisfed.org/series/GASDESW
 EIA Brent daily on FRED: https://fred.stlouisfed.org/series/DCOILBRENTEU
