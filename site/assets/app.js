@@ -113,7 +113,7 @@
   function pageStories(){const pool=[...(data.articles||[]),...externalHeadlines].filter(s=>(s.kind!=='external_link'||s.original_lang===lang||(s.translated_langs?.includes(lang)&&eventFingerprint(s.locales?.[lang]?.title)!==eventFingerprint(s.locales?.[s.original_lang]?.title))) && (s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
     return score(b)-score(a) || (Date.parse(b.published_at||'2000-01-01')-Date.parse(a.published_at||'2000-01-01'));
-  });
+  }).filter(a=>a.origin_type!=='aggregator-discovery');
     const unique=[];const seenUrls=new Set(),seenIds=new Set();
     for(const article of pool){
       const title=localeOf(article)?.title||article.locales?.en?.title||'';
@@ -414,6 +414,11 @@
     const storyPhoto=licensedPhotoOf(opened);
     $('modalimg').src=imageOf(opened);$('modalimg').onerror=()=>{$('modalimg').onerror=null;$('modalimg').src=storyGraphic(opened);};$('modalimg').alt=storyPhoto?.image_alt||opened.image_alt||txt.title;$('modalkicker').textContent=cat+(opened.kind==='opportunity'?' · DrivMatch':'');
     $('modaltitle').textContent=cleanHeadline(txt.title);
+    $('modaltitle').classList.remove('headline-expanded');
+    $('modaltitle').setAttribute('title',cleanHeadline(txt.title));
+    $('modaltitle').setAttribute('tabindex','0');
+    $('modaltitle').setAttribute('aria-label',cleanHeadline(txt.title)+
+      (articleLang==='pt'?'. Toque para ler o título completo.':articleLang==='es'?'. Toca para expandir el título.':'. Tap to expand the headline.'));
     const publishTime=Date.parse(opened.published_at||'');
     const shownDate=Number.isFinite(publishTime)
       ? new Date(publishTime).toLocaleString(lang==='pt'?'pt-BR':lang==='es'?'es-MX':'en-US',{dateStyle:'short',timeStyle:'short'})
@@ -772,6 +777,17 @@
     $('article-impact-actions').addEventListener('click',e=>{const button=e.target.closest('[data-impact-role]');if(!button)return;impactAudience=button.dataset.impactRole;renderImpact();$('newsdesk-impact-shade').hidden=false;$('newsdesk-impact-close').focus();track('news_impact_view',{...storyInfo(opened),audience:impactAudience});});
     $('newsdesk-impact-close').addEventListener('click',dismissImpact);
     $('newsdesk-impact-shade').addEventListener('click',e=>{if(e.target===$('newsdesk-impact-shade'))dismissImpact();});
+    // Long source RSS headlines can be expanded on demand without pushing
+    // the translation/share/role actions below the Android viewport.
+    const expandHeadline=()=>{
+      const title=$('modaltitle');
+      title.classList.toggle('headline-expanded');
+      title.setAttribute('aria-expanded',String(title.classList.contains('headline-expanded')));
+    };
+    $('modaltitle').addEventListener('click',expandHeadline);
+    $('modaltitle').addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();expandHeadline();}
+    });
     $('articleLanguageButtons').addEventListener('click',e=>{const b=e.target.closest('[data-article-lang]');if(!b)return;articleLang=b.dataset.articleLang;renderArticle();});
     $('shade').addEventListener('click',e=>{if(e.target===$('shade'))closeModal();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('newsdesk-impact-shade').hidden)dismissImpact();else closeModal();}else if(e.key==='Tab'&&!$('newsdesk-impact-shade').hidden){e.preventDefault();$('newsdesk-impact-close').focus();}});
