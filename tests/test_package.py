@@ -195,7 +195,7 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(ads['enabled'])
   self.assertEqual({p['slot'] for p in ads['placements']},{'news-top','market-sidebar','article-inline','mobile-inline'})
   self.assertTrue(all(p['relationship']=='owner_promotion' and p['enabled'] for p in ads['placements']))
-  self.assertTrue(all(p['url']=='https://instagram.com/fabriciodispatcher' for p in ads['placements']))
+  self.assertEqual({p['url'] for p in ads['placements']},{'https://instagram.com/fabriciodispatcher','https://ig.me/m/fabriciodispatcher'})
   self.assertTrue(all(p['whatsapp_url'].startswith('https://wa.me/19082913386') for p in ads['placements']))
   self.assertEqual(version['weather_policy']['rotation_seconds'],10)
   self.assertEqual(version['editorial_policy']['cache_ttl_hours'],48)

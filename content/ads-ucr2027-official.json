@@ -1,0 +1,82 @@
+{
+  "campaign_id": "ucr-2027-fabriciodispatcher",
+  "creative_status": "APPROVED_OFFICIAL",
+  "approved_date": "2026-10-13",
+  "approved_master": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/4b041d683a7a9321c7264a6a45db2ab572285dfcb901699caf3c363086f75174.png",
+  "source_dimensions": {
+    "width": 2162,
+    "height": 727
+  },
+  "languages": [
+    "pt",
+    "en",
+    "es"
+  ],
+  "placements": [
+    "news-top",
+    "market-sidebar",
+    "mobile-inline"
+  ],
+  "crops": {
+    "pt": {
+      "horizontal": {
+        "source_rect": [
+          0,
+          0,
+          681,
+          342
+        ]
+      },
+      "square": {
+        "source_rect": [
+          248,
+          363,
+          724,
+          727
+        ]
+      }
+    },
+    "en": {
+      "horizontal": {
+        "source_rect": [
+          688,
+          0,
+          1363,
+          342
+        ]
+      },
+      "square": {
+        "source_rect": [
+          803,
+          363,
+          1279,
+          727
+        ]
+      }
+    },
+    "es": {
+      "horizontal": {
+        "source_rect": [
+          1371,
+          0,
+          2162,
+          342
+        ]
+      },
+      "square": {
+        "source_rect": [
+          1360,
+          363,
+          1836,
+          727
+        ]
+      }
+    }
+  },
+  "ctas": {
+    "whatsapp": "https://wa.me/19082913386",
+    "instagram_direct": "https://ig.me/m/fabriciodispatcher"
+  },
+  "commercial_disclosure": "Independent private service advertisement. Not affiliated with the UCR Plan. $110 is the advertiser's starting service price, not a government fee.",
+  "production_rule": "Do not replace approved imagery with generic drawings. Preserve round UCR seal and original trucks. Each language changes the entire visual crop."
+}

@@ -370,19 +370,56 @@
       a?.creative_id||a?.whatsapp_url||a?.url||'').trim().toLowerCase();
     const top=placements.find(a=>a.enabled===true&&a.slot==='news-top');
     const topIdentity=top&&adIdentity(top);
+    const translations={
+      pt:{label:'PUBLICIDADE · SERVIÇO PRIVADO UCR 2027',wa:'Abrir conversa no WhatsApp',ig:'Enviar mensagem no Instagram',note:'Serviço privado, sem vínculo com o UCR Plan. A partir de US$ 110: confirme taxas oficiais, escopo e condições.',message:'Olá, gostaria de informações sobre o serviço UCR 2027.'},
+      en:{label:'ADVERTISEMENT · PRIVATE UCR 2027 SERVICE',wa:'Message us on WhatsApp',ig:'Send an Instagram message',note:'Private service, not affiliated with the UCR Plan. From US$110: verify official fees, scope and terms.',message:"Hello, I'd like information about the UCR 2027 service."},
+      es:{label:'PUBLICIDAD · SERVICIO PRIVADO UCR 2027',wa:'Enviar mensaje por WhatsApp',ig:'Enviar mensaje por Instagram',note:'Servicio privado, no afiliado al UCR Plan. Desde US$110: confirme tarifas oficiales, alcance y condiciones.',message:'Hola, quisiera información sobre el servicio UCR 2027.'}
+    };
+    const copy=translations[lang]||translations.pt;
+    // Exact crop windows of the advertiser-approved six-panel master. All
+    // language editions share the SAME photo, round UCR seal and artwork.
+    const crops={
+      pt:{horizontal:{ratio:'681 / 342',size:'317.5% auto',pos:'0% 0%'},square:{size:'454.2% auto',pos:'14.7% 100%'}},
+      en:{horizontal:{ratio:'675 / 342',size:'320.3% auto',pos:'46.3% 0%'},square:{size:'454.2% auto',pos:'47.6% 100%'}},
+      es:{horizontal:{ratio:'791 / 342',size:'273.3% auto',pos:'100% 0%'},square:{size:'454.2% auto',pos:'80.7% 100%'}}
+    };
     for(const [slot,id] of [['news-top','news-commercial-banner'],['market-sidebar','market-commercial-banner'],['article-inline','article-commercial-banner'],['mobile-inline','mobile-commercial-banner']]){
       const box=$(id);if(!box)continue;
-      const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion'&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(a.url||'')&&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(a.whatsapp_url||'')&&/^https:\/\/cdn\.openart\.ai\/openart-uploads\/production\/attachment-transfers\/[a-f0-9]+\.png$/.test(a.image||''));
-      // One campaign can have separate responsive creatives, but must not
-      // occupy both the main news banner and sidebar simultaneously.
-      const repeatSide=slot==='market-sidebar'&&Boolean(ad&&topIdentity&&adIdentity(ad)===topIdentity);
-      box.hidden=!ad||repeatSide;
-      if(!ad||repeatSide){box.innerHTML='';continue;}
-      const ig=escapeHTML(ad.url),wa=escapeHTML(ad.whatsapp_url),src=escapeHTML(ad.image);
-      box.innerHTML=`<div class="car-ad"><div class="car-ad-disclosure">PUBLICIDADE · AVAILABLE LOAD / CAR HAULERS</div>
-        <a class="car-ad-creative" href="${ig}" target="_blank" rel="noopener noreferrer" aria-label="Ver a oferta no Instagram fabriciodispatcher"><img src="${src}" loading="lazy" alt="Frete para transportar 1991 Ferrari 348 TS, 2027 Chevrolet Corvette e 2023 Dodge Challenger de Kissimmee FL 34741 para Miami FL 33126."></a>
-        <div class="car-ad-actions"><a class="car-ad-wa" href="${wa}" target="_blank" rel="noopener noreferrer">WhatsApp / Text (908) 291-3386 ↗</a><a class="car-ad-ig" href="${ig}" target="_blank" rel="noopener noreferrer">Instagram @fabriciodispatcher ↗</a></div>
-        <p class="car-ad-note">Confirm load availability and terms before booking. Vehicles are not for sale.</p></div>`;
+      const ad=placements.find(a=>a.enabled===true&&a.slot===slot&&a.relationship==='owner_promotion');
+      if(ad?.creative_type==='ucr-2027-official'){
+        const approved=/^https:\/\/cdn\.openart\.ai\/openart-uploads\/production\/attachment-transfers\/[a-f0-9]+\.png$/i.test(ad.master_image||'');
+        const dm=ad.url==='https://ig.me/m/fabriciodispatcher';
+        const contact=/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(ad.whatsapp_url||'');
+        box.hidden=!(approved&&dm&&contact);
+        if(box.hidden){box.innerHTML='';continue;}
+        const isWide=slot==='news-top';
+        const crop=(crops[lang]||crops.pt)[isWide?'horizontal':'square'];
+        const source=escapeHTML(ad.master_image);
+        const bg="background-image:url('"+source+"');background-size:"+crop.size+";background-position:"+crop.pos+";";
+        const href=escapeHTML('https://wa.me/19082913386?text='+encodeURIComponent(copy.message));
+        const ig='https://ig.me/m/fabriciodispatcher';
+        box.innerHTML='<div class="ucr-ad"><div class="ucr-ad-disclosure">'+escapeHTML(copy.label)+'</div>'+
+          '<div class="ucr-frame '+(isWide?'ucr-frame-horizontal':'ucr-frame-square')+'"'+(isWide?' style="aspect-ratio:'+crop.ratio+'"':'')+'>'+
+          '<div class="ucr-visual" role="img" aria-label="'+escapeHTML('UCR 2027 — '+copy.note)+'" style="'+bg+'">'+
+          '<a class="ucr-hit ucr-wa" href="'+href+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.wa)+'"></a>'+
+          '<a class="ucr-hit ucr-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+escapeHTML(copy.ig)+'"></a>'+
+          '</div></div><p class="ucr-ad-note">'+escapeHTML(copy.note)+'</p></div>';
+        continue;
+      }
+      // Preserve previously approved car-hauler advertising inside articles.
+      const valid=ad&&/^https:\/\/instagram\.com\/fabriciodispatcher\/?$/i.test(ad.url||'')
+        &&/^https:\/\/wa\.me\/19082913386(?:\?|$)/.test(ad.whatsapp_url||'')
+        &&/^https:\/\/cdn\.openart\.ai\/openart-uploads\/production\/attachment-transfers\/[a-f0-9]+\.png$/.test(ad.image||'');
+      // Legacy campaign duplicate rule; UCR is explicitly booked for both home and right sidebar.
+      const repeatSide=slot==='market-sidebar'&&Boolean(valid&&topIdentity&&adIdentity(ad)===topIdentity);
+      box.hidden=!valid||repeatSide;
+      if(!valid||repeatSide){box.innerHTML='';continue;}
+      const ig=escapeHTML(ad.url),whatsapp=escapeHTML(ad.whatsapp_url),src=escapeHTML(ad.image);
+      box.innerHTML='<div class="car-ad"><div class="car-ad-disclosure">PUBLICIDADE · AVAILABLE LOAD / CAR HAULERS</div>'+
+        '<a class="car-ad-creative" href="'+ig+'" target="_blank" rel="noopener noreferrer" aria-label="Ver a oferta no Instagram fabriciodispatcher"><img src="'+src+'" loading="lazy" alt="Frete para transportar três veículos de Kissimmee FL para Miami FL."></a>'+
+        '<div class="car-ad-actions"><a class="car-ad-wa" href="'+whatsapp+'" target="_blank" rel="noopener noreferrer">WhatsApp / Text (908) 291-3386 ↗</a>'+
+        '<a class="car-ad-ig" href="'+ig+'" target="_blank" rel="noopener noreferrer">Instagram @fabriciodispatcher ↗</a></div>'+
+        '<p class="car-ad-note">Confirm load availability and terms before booking. Vehicles are not for sale.</p></div>';
     }
   }
   // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.

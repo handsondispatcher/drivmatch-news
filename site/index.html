@@ -1001,6 +1001,27 @@ body{background:#f7f9fc;color:#14283c}
 .ad-placement-mobile{max-width:420px;margin:14px auto!important}
 .ad-placement-mobile .car-ad-creative img{aspect-ratio:1/1;object-fit:contain}
 @media(max-width:740px){.ad-placement-mobile{width:100%;max-width:390px;box-sizing:border-box}.car-ad-actions a{min-height:40px}.ad-placement-mobile .car-ad-note{font-size:10px}}
+
+/* UCR 2027 — official advertiser-approved artwork, one source and six language/format crops. */
+.ucr-ad{width:100%;min-width:0;font-family:Arial,Helvetica,sans-serif;color:#e8f4ff}
+.ucr-ad-disclosure{font:700 10px/1.5 Arial,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#d4e7f6;margin:0 0 7px}
+.ucr-frame{position:relative;width:100%;background:#06182e;overflow:hidden;border-radius:6px}
+.ucr-frame-horizontal .ucr-visual{position:relative;width:100%;height:100%;aspect-ratio:inherit}
+.ucr-frame-square{aspect-ratio:1/1}
+.ucr-frame-square .ucr-visual{position:absolute;top:11.8%;left:0;width:100%;height:76.4%}
+.ucr-visual{background-repeat:no-repeat;background-color:#06182e}
+.ucr-hit{position:absolute;display:block;z-index:2;border-radius:5px;cursor:pointer}
+.ucr-hit:focus-visible,.ucr-hit:hover{outline:3px solid #ffe55c;outline-offset:-3px}
+.ucr-frame-horizontal .ucr-wa{left:2.3%;top:82%;width:35%;height:17.8%}
+.ucr-frame-horizontal .ucr-ig{left:39.5%;top:82%;width:34%;height:17.8%}
+.ucr-frame-square .ucr-wa{left:2.7%;top:75%;width:49%;height:17.7%}
+.ucr-frame-square .ucr-ig{left:53.3%;top:75%;width:45%;height:17.7%}
+.ucr-ad-note{margin:7px 0 0;font:11px/1.4 Arial,sans-serif;color:#d6e5f2}
+.ad-placement-news:has(.ucr-ad){max-width:1440px;margin:12px auto 19px;padding:10px;display:block}
+.ad-placement-side:has(.ucr-ad){max-width:390px;margin:16px auto;padding:10px;display:block;min-height:0}
+.ad-placement-mobile:has(.ucr-ad){max-width:390px;margin:12px auto!important;padding:10px;display:none}
+@media(max-width:740px){.ad-placement-mobile:has(.ucr-ad):not([hidden]){display:block!important;width:100%;box-sizing:border-box}.ad-placement-news:has(.ucr-ad){display:none!important}}
+
 </style>
 </head>
 <body>
@@ -1133,7 +1154,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/analytics-config.js" defer></script>
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=v34-21-editorial-labels-photo-20gap-no-duplicate-ads-20261013" defer></script>
+<script src="assets/app.js?v=v34-21-ucr2027-official-multilingual-20261013" defer></script>
 <script src="assets/road-tv-live.js?v=v34-18-durable-live-first-20261011" defer></script>
 <script src="assets/utility-strip.js?v=v34-11-national-weather-20261010" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>

@@ -1,14 +1,25 @@
 {
   "enabled": true,
-  "commercial_policy": "Publicidade: oferta de frete para car haulers, não venda de veículos; confirmar disponibilidade antes de contratar.",
-  "campaign_id": "fabricio-carhauler-20261013",
-  "vehicles": [
-    "1991 FERRARI 348 TS",
-    "2027 CHEVROLET CORVETTE",
-    "2023 DODGE CHALLENGER"
-  ],
-  "pickup": "Kissimmee, FL 34741",
-  "dropoff": "Miami, FL 33126",
+  "commercial_policy": "Anúncios de serviços privados claramente identificados; não representar UCR.gov nem agência governamental. Preço a partir de US$110 é oferta do anunciante, não taxa oficial. Confirmar escopo, disponibilidade e valores.",
+  "campaign_id": "ucr-2027-fabriciodispatcher",
+  "official_campaign": {
+    "id": "ucr-2027-fabriciodispatcher",
+    "name": "UCR 2027",
+    "status": "approved",
+    "master_image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/4b041d683a7a9321c7264a6a45db2ab572285dfcb901699caf3c363086f75174.png",
+    "language_variants": [
+      "pt",
+      "en",
+      "es"
+    ],
+    "formats": [
+      "horizontal",
+      "square"
+    ],
+    "instagram_direct": "https://ig.me/m/fabriciodispatcher",
+    "whatsapp": "https://wa.me/19082913386",
+    "approved_at": "2026-10-13"
+  },
   "placements": [
     {
       "slot": "news-top",
@@ -16,9 +27,19 @@
       "enabled": true,
       "relationship": "owner_promotion",
       "sponsor": "Fabricio Dispatcher",
-      "image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9feef215a7da07dd4d2b73229afa86d1bf27babc177bf08d518d5a5dff50faa7.png",
-      "url": "https://instagram.com/fabriciodispatcher",
-      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami."
+      "creative_type": "ucr-2027-official",
+      "campaign_id": "ucr-2027-fabriciodispatcher",
+      "master_image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/4b041d683a7a9321c7264a6a45db2ab572285dfcb901699caf3c363086f75174.png",
+      "url": "https://ig.me/m/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Ol%C3%A1%2C%20gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20o%20servi%C3%A7o%20UCR%202027.",
+      "price_from_usd": 110,
+      "service_type": "private_ucr_assistance",
+      "artwork_language_variants": [
+        "pt",
+        "en",
+        "es"
+      ],
+      "source_note": "Imagem oficial aprovada pelo anunciante; não é anúncio oficial do UCR Plan."
     },
     {
       "slot": "market-sidebar",
@@ -26,9 +47,19 @@
       "enabled": true,
       "relationship": "owner_promotion",
       "sponsor": "Fabricio Dispatcher",
-      "image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/85d9f6ede5bcac852083be9f5c859ba80ec86fc6c145c700cdb70206307b30a3.png",
-      "url": "https://instagram.com/fabriciodispatcher",
-      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami."
+      "creative_type": "ucr-2027-official",
+      "campaign_id": "ucr-2027-fabriciodispatcher",
+      "master_image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/4b041d683a7a9321c7264a6a45db2ab572285dfcb901699caf3c363086f75174.png",
+      "url": "https://ig.me/m/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Ol%C3%A1%2C%20gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20o%20servi%C3%A7o%20UCR%202027.",
+      "price_from_usd": 110,
+      "service_type": "private_ucr_assistance",
+      "artwork_language_variants": [
+        "pt",
+        "en",
+        "es"
+      ],
+      "source_note": "Imagem oficial aprovada pelo anunciante; não é anúncio oficial do UCR Plan."
     },
     {
       "slot": "article-inline",
@@ -38,7 +69,8 @@
       "sponsor": "Fabricio Dispatcher",
       "image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/c1e5c494f6d9b92a893eccdb781e5b20d6eb812afb5d1fcbd8071dbfadae326f.png",
       "url": "https://instagram.com/fabriciodispatcher",
-      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami."
+      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami.",
+      "campaign_id": "fabricio-carhauler-20261013"
     },
     {
       "slot": "mobile-inline",
@@ -46,9 +78,19 @@
       "enabled": true,
       "relationship": "owner_promotion",
       "sponsor": "Fabricio Dispatcher",
-      "image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/85d9f6ede5bcac852083be9f5c859ba80ec86fc6c145c700cdb70206307b30a3.png",
-      "url": "https://instagram.com/fabriciodispatcher",
-      "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami."
+      "creative_type": "ucr-2027-official",
+      "campaign_id": "ucr-2027-fabriciodispatcher",
+      "master_image": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/4b041d683a7a9321c7264a6a45db2ab572285dfcb901699caf3c363086f75174.png",
+      "url": "https://ig.me/m/fabriciodispatcher",
+      "whatsapp_url": "https://wa.me/19082913386?text=Ol%C3%A1%2C%20gostaria%20de%20informa%C3%A7%C3%B5es%20sobre%20o%20servi%C3%A7o%20UCR%202027.",
+      "price_from_usd": 110,
+      "service_type": "private_ucr_assistance",
+      "artwork_language_variants": [
+        "pt",
+        "en",
+        "es"
+      ],
+      "source_note": "Imagem oficial aprovada pelo anunciante; não é anúncio oficial do UCR Plan."
     }
   ]
 }
