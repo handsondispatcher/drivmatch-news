@@ -166,7 +166,7 @@ const {spawn}=require('node:child_process');
      await page.waitForTimeout(10300);
      assert.equal((await page.locator('#top-city').innerText()).trim(),'St. Charles, IL',
        'Pinned NWS forecast must stay fixed through 10-second automatic rotation');
-     await page.reload({waitUntil:'networkidle'});
+     await page.reload({waitUntil:'domcontentloaded'});
      await page.waitForFunction(()=>document.getElementById('top-city')?.textContent==='St. Charles, IL',{timeout:8000});
      assert.equal(await page.locator('#top-city-query').inputValue(),'St. Charles, IL',
        'Pinned place restored after reload from local preference');
@@ -479,7 +479,7 @@ const {spawn}=require('node:child_process');
      await page.locator('#roadtv-desktop .tv-auto input').evaluate(el=>{
        if(!el.checked){el.checked=true;el.dispatchEvent(new Event('change',{bubbles:true}))}
      });
-     await page.reload({waitUntil:'networkidle'});
+     await page.reload({waitUntil:'domcontentloaded'});
      await page.locator('#roadtv-desktop iframe').first().waitFor({state:'attached',timeout:9000});
      assert.ok((await page.locator('#roadtv-desktop iframe').getAttribute('src')).includes(first),'First validated stream plays');
      await page.evaluate(()=>window.__ytOptions.events.onError({data:100}));
