@@ -1103,6 +1103,38 @@ body{background:#f7f9fc;color:#14283c}
 #market-note,#market-note-mobile{display:none!important}
 @media(max-width:740px){.dm-util-quote{min-height:58px!important}}
 
+/* Side classified: original Aileen Souza poster, exact content and aspect. */
+#market-driver-availability-banner[hidden]{display:none!important}
+#market-driver-availability-banner{
+  display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0;
+  margin:12px 0 18px;padding:7px;border:1px solid #286a9c;
+  border-radius:6px;background:#062c4d;overflow:hidden;
+}
+#market-driver-availability-banner .dm-driver-ad-label{
+  font:700 9px/1.35 Arial,sans-serif;letter-spacing:.4px;color:#ecf5ff;
+  padding:2px 2px 8px;text-transform:uppercase;
+}
+#market-driver-availability-banner .dm-driver-visual{
+  display:block;position:relative;width:100%;max-width:100%;aspect-ratio:1229/1536;
+  overflow:hidden;border-radius:3px;background:#0a2740;
+}
+#market-driver-availability-banner .dm-driver-poster-open,
+#market-driver-availability-banner .dm-driver-poster-open img{
+  display:block;width:100%;height:100%;
+}
+#market-driver-availability-banner .dm-driver-poster-open img{
+  object-fit:contain;object-position:center;
+}
+#market-driver-availability-banner .dm-driver-whatsapp-hotspot{
+  position:absolute;z-index:2;left:23.5%;top:85%;width:75.5%;height:12.5%;
+  display:block;background:transparent;border:0;cursor:pointer;
+}
+#market-driver-availability-banner .dm-driver-whatsapp-hotspot:focus-visible,
+#market-driver-availability-banner .dm-driver-poster-open:focus-visible{
+  outline:3px solid #ffda38;outline-offset:-3px;
+}
+@media(max-width:990px){#market-driver-availability-banner{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -1179,7 +1211,8 @@ body{background:#f7f9fc;color:#14283c}
   <div class="roadtv-screen" aria-label="Transmissão em vídeo" aria-live="off"></div>
 </section><h2 id="market-title">Cotações e Mercado</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p>
-<section id="market-commercial-banner" class="ad-placement ad-placement-side" aria-label="Publicidade"></section></aside>
+<section id="market-commercial-banner" class="ad-placement ad-placement-side" aria-label="Publicidade"></section>
+<section id="market-driver-availability-banner" class="dm-driver-sidebar-placement" aria-label="Classificado: motorista disponível" hidden></section></aside>
 </div>
 <aside class="newsroom-partner-cta" aria-label="Acesso às oportunidades da DrivMatch">
   <div class="newsroom-cta-copy"><span class="newsroom-cta-eyebrow" id="newsroom-cta-eyebrow">SERVIÇOS DRIVMATCH · ACESSO EXTERNO AO JORNAL</span>
