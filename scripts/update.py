@@ -515,9 +515,13 @@ def cached_verified_market_reference(key):
     # disaster-recovery input; never silently extend its expiry.
     path=ROOT/'site/data/market.json'
     primary=read_json(path).get('indicators',{}).get(key,{}) if path.exists() else {}
-    if key=='brent' and not primary:
+    if key=='brent':
+        # Prefer the freshest attributed official observation, never an archived
+        # observation if the active cache has a newer timestamp.
         archive=ROOT/'content/verified-brent-reference.json'
-        primary=read_json(archive) if archive.exists() else {}
+        archived=read_json(archive) if archive.exists() else {}
+        if archived and (not primary or str(archived.get('observed_at',''))>str(primary.get('observed_at',''))):
+            primary=archived
     record=primary
     if not record:raise ValueError('No previously verified public snapshot')
     approved_provenance={
