@@ -3,9 +3,9 @@
   "instrument": "spot",
   "price_type": "commercial",
   "session_status": "closed",
-  "close_value": 4.985,
-  "close_date": "2026-10-09",
-  "source": "UOL Economia — fechamento do dólar comercial em 09/10/2026",
-  "source_url": "https://economia.uol.com.br/cotacoes/noticias/redacao/2026/10/09/dolar-fecha-abaixo-de-r-5-e-cai-443-na-semana-bolsa-sobe.htm",
-  "change_pct": -0.79
+  "close_value": 5.0289,
+  "close_date": "2026-10-14",
+  "source": "Estadão Conteúdo / UOL Economia — dólar comercial no balcão, venda, fechamento 14/10/2026",
+  "source_url": "https://economia.uol.com.br/noticias/estadao-conteudo/2026/10/14/fechamento-do-mercado-financeiro.amp.htm",
+  "change_pct": 0.17
 }
