@@ -633,7 +633,18 @@
     paragraphs.push(road?roadCheck:(professional||lack));
     if(road)paragraphs.push(uncertainty);
     if(isExternal)paragraphs.push(lack);
-    $('article-impact-text').textContent=verifiedText||paragraphs.filter(Boolean).join('\n\n');
+    // Approved editorial analysis may be identical for both audiences. Add a
+    // clearly labeled, role-specific action checklist without inventing facts.
+    const roleFallback=language==='en'
+      ?(persona==='driver'?'Driver: check your own route, safety and documents before acting.':'Dispatcher: confirm carrier instructions, ETA and broker communication before acting.')
+      :language==='es'
+      ?(persona==='driver'?'Conductor: revise su ruta, seguridad y documentos antes de actuar.':'Dispatcher: confirme instrucciones, ETA y comunicación con el broker antes de actuar.')
+      :(persona==='driver'?'Motorista: confira a rota, segurança e documentação antes de agir.':'Dispatcher: confirme instruções, ETA e comunicação com broker e motorista antes de agir.');
+    const roleCheck=professional||roleFallback;
+    const roleLabel=language==='en'?'Professional checklist:':language==='es'?'Lista de verificación profesional:':'Checklist profissional:';
+    $('article-impact-text').textContent=verifiedText
+      ?[verifiedText,roleLabel+' '+roleCheck].join('\n\n')
+      :paragraphs.filter(Boolean).join('\n\n');
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
     const storyPhoto=displayedPhotoOf(opened);
