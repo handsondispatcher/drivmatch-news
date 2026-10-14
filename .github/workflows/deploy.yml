@@ -267,6 +267,19 @@ jobs:
       - name: Browser regression (bounded)
         timeout-minutes: 11
         run: npm run test:browser
+      # Editorial and browser checks may take minutes: keep FX fresh at the
+      # instant the GitHub Pages artifact is assembled, without rerunning news.
+      - name: Atualizar câmbio e Brent autorizado imediatamente antes da publicação
+        env:
+          USDBRL_SPOT_URL: ${{ vars.USDBRL_SPOT_URL }}
+          USDBRL_REDISTRIBUTION_AUTHORIZED: ${{ vars.USDBRL_REDISTRIBUTION_AUTHORIZED }}
+          USDBRL_SPOT_TOKEN: ${{ secrets.USDBRL_SPOT_TOKEN }}
+          AWESOMEAPI_API_KEY: ${{ secrets.AWESOMEAPI_API_KEY }}
+          AWESOMEAPI_REDISTRIBUTION_AUTHORIZED: 'true'
+          BRENT_SPOT_URL: ${{ vars.BRENT_SPOT_URL }}
+          BRENT_REDISTRIBUTION_AUTHORIZED: ${{ vars.BRENT_REDISTRIBUTION_AUTHORIZED }}
+          BRENT_SPOT_TOKEN: ${{ secrets.BRENT_SPOT_TOKEN }}
+        run: python scripts/refresh_market_at_publish.py
       - name: Verificar automaticamente câmeras de transporte
         timeout-minutes: 5
         continue-on-error: true
