@@ -245,14 +245,15 @@ def authorized_spot():
 
 
 def authorized_awesomeapi_usdbrl():
-    """Independent indicative USD/BRL spot quote (ASK); publication requires rights.
+    """Read USD/BRL *indicative ask* with the owner's confirmed display permission.
 
-    AwesomeAPI has a documented API and minute-level source timestamps.
-    Do not scrape the UOL site or embed an account API token in frontend JS.
-    Do not infer a formal closing auction from its last market tick.
+    During Brazil's regular business-day trading window require a source tick
+    within five minutes. Outside the window preserve the vendor's final
+    *observed quote*, never describe it as an official exchange closing price.
+    The API key stays in the GitHub secret, never shipped to browsers.
     """
     if os.getenv('AWESOMEAPI_REDISTRIBUTION_AUTHORIZED')!='true':
-        raise ValueError('AwesomeAPI publication rights not approved')
+        raise ValueError('AwesomeAPI publication rights not enabled')
     token=os.getenv('AWESOMEAPI_API_KEY','')
     if not token:raise ValueError('AWESOMEAPI_API_KEY not configured')
     url='https://economia.awesomeapi.com.br/json/last/USD-BRL'
@@ -268,17 +269,36 @@ def authorized_awesomeapi_usdbrl():
         raise ValueError('Invalid AwesomeAPI spot payload') from exc
     if not (0<bid<=ask<50):
         raise ValueError('Invalid AwesomeAPI USD/BRL bid/ask spread')
-    # This endpoint is indicative, not a certified B3 official close.
-    if when>NOW()+timedelta(seconds=30) or NOW()-when>timedelta(minutes=5):
-        raise ValueError('AwesomeAPI quote is stale; do not pass off as live')
+    age=NOW()-when
+    if age<timedelta(seconds=-30):
+        raise ValueError('AwesomeAPI quote timestamp is in the future')
+    from zoneinfo import ZoneInfo
+    local=NOW().astimezone(ZoneInfo('America/Sao_Paulo'))
+    # Indicative FX business-session window. Do not infer official settlement.
+    # Provider can halt or close earlier; the five-minute TTL will fail closed.
+    business_session=(local.weekday()<5 and 9<=local.hour<18
+                      and local.date().isoformat() not in {
+                          '2026-01-01','2026-04-03','2026-04-21','2026-05-01',
+                          '2026-09-07','2026-10-12','2026-11-02',
+                          '2026-11-20','2026-12-25'})
+    if business_session and age>timedelta(minutes=5):
+        raise ValueError('AwesomeAPI quote stale during trading window')
+    # Do not keep indefinitely old values; covers weekends and normal holidays.
+    if age>timedelta(days=4):
+        raise ValueError('AwesomeAPI previous observation older than four days')
     try:change=float(row['pctChange'])
     except (ValueError,KeyError,TypeError):change=None
     q=dated_quote(ask,'AwesomeAPI — USD/BRL venda indicativa',
                   when.isoformat(timespec='seconds'),change,
                   'https://docs.awesomeapi.com.br/api-de-moedas')
+    is_live=business_session and age<=timedelta(minutes=5)
     q.update(symbol='USD/BRL',instrument='spot',price_type='commercial',
-             quote_status='live_snapshot',session_status='open',
-             rate_side='ask',bid=bid,ask=ask,indicative=True)
+             quote_status='live_snapshot' if is_live else 'last_provider_observation',
+             session_status='open' if is_live else 'closed',
+             rate_side='ask',bid=bid,ask=ask,indicative=True,
+             checked_at=NOW().isoformat(timespec='seconds'))
+    if not is_live:
+        q.update(close_date=when.date().isoformat(),close_value=ask)
     return q
 
 
