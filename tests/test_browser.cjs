@@ -45,7 +45,17 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('.brand img').getAttribute('src'),'assets/logo-drivmatch-news.png');
    assert.equal(await page.locator('#edition-date').isVisible(),false,'Internal edition date is not visible');
    assert.equal((await page.locator('.header').innerText()).includes('EDIÇÃO DIGITAL'),false,'No technical edition text on masthead');
-   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow ${width}`);
+   const overflowDetails=await page.evaluate(()=>({
+      viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth,
+      offenders:[...document.querySelectorAll('body *')].map(el=>{
+        const rect=el.getBoundingClientRect();
+        return {tag:el.tagName,id:el.id,cls:String(el.className||'').slice(0,75),
+                left:Math.round(rect.left),right:Math.round(rect.right),
+                width:Math.round(rect.width),text:(el.textContent||'').slice(0,35)}
+      }).filter(x=>x.right>innerWidth+2&&x.width>0).sort((a,b)=>b.right-a.right).slice(0,12)
+    }));
+   assert.equal(overflowDetails.scrollWidth<=overflowDetails.viewport,true,
+      `overflow ${width}: ${JSON.stringify(overflowDetails)}`);
    // Immutable editorial composition: search exclusively above institutional footer.
    const layout=await page.evaluate(()=>{
      const q=document.getElementById('pesquisa-noticias');
