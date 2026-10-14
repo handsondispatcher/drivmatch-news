@@ -644,7 +644,7 @@
     const roleLabel=language==='en'?'Professional checklist:':language==='es'?'Lista de verificación profesional:':'Checklist profissional:';
     $('article-impact-text').textContent=verifiedText
       ?[verifiedText,roleLabel+' '+roleCheck].join('\n\n')
-      :paragraphs.filter(Boolean).join('\n\n');
+      :[...paragraphs.filter(Boolean),roleLabel+' '+roleCheck].join('\n\n');
   }
   function renderArticle(){if(!opened)return;const txt=localeOf(opened,articleLang), cat=catLabels[opened.category]?.[indices[articleLang]]||opened.category;const al=labels[articleLang];
     const storyPhoto=displayedPhotoOf(opened);
