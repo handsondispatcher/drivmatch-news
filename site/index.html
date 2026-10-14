@@ -1180,9 +1180,11 @@ body{background:#f7f9fc;color:#14283c}
 .dm-brent-tradingview .tradingview-widget-copyright{font-size:9px;text-align:right}
 .dm-brent-tradingview .tradingview-widget-copyright a{color:#006bb6}
 #dm-utility .dm-brent-tradingview{display:block}
-#dm-utility .dm-util-quote:has(#top-brent-value) .dm-util-money{display:none}
+/* Never hide verified fallback when an external provider widget fails. */
+#dm-utility .dm-util-quote:has(#top-brent-value) .dm-util-money{display:block}
 .dm-brent-tradingview tv-single-ticker{width:220px;max-width:100%;min-height:65px}
-.dm-brent-attribution{display:block;text-align:right;font:9px Arial,sans-serif}
+.dm-brent-attribution,.dm-brent-source-backup{display:block;text-align:right;font:9px Arial,sans-serif}
+.dm-brent-source-backup{color:#006bb6}
 @media(max-width:700px){.dm-brent-tradingview{width:180px}}
 </style>
 </head>
@@ -1212,6 +1214,7 @@ body{background:#f7f9fc;color:#14283c}
      <a href="https://www.tradingview.com/symbols/VELOCITY-BRENT/" target="_blank" rel="noopener noreferrer">Consultar Brent — Velocity Trade ↗</a>
     </tv-single-ticker>
     <span class="dm-brent-attribution">Cotação fornecida por <a href="https://www.tradingview.com/" target="_blank" rel="noopener noreferrer">TradingView</a></span>
+    <a class="dm-brent-source-backup" href="https://www.tradingview.com/symbols/VELOCITY-BRENT/" target="_blank" rel="noopener noreferrer">Fonte Brent · Velocity Trade ↗</a>
     <script type="module" src="https://www.tradingview-widget.com/w/en/tv-single-ticker.js"></script>
    </div>
    <small id="top-brent-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">Sem cotação</small>
