@@ -329,8 +329,8 @@ const {spawn}=require('node:child_process');
      'https://br.tradingview.com/symbols/FX_IDC-USDBRL/',
      'Dólar title itself links to USD/BRL source');
    assert.equal(await page.locator('#top-brent-label').getAttribute('href'),
-     'https://br.investing.com/commodities/brent-oil',
-     'Brent title links to actual quote source instead of a blocked market widget');
+     'https://www.tradingview.com/symbols/VELOCITY-BRENT/',
+     'Brent title links to selected Velocity Trade quote source');
    const marketFont=await page.locator('#top-brent-label').evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
    assert.ok(marketFont>=14,'Market headings must be legible');
    assert.equal(await page.locator('#top-usd-label').innerText(),'Dólar','No PTAX label in the headline');
