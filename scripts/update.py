@@ -298,7 +298,7 @@ def authorized_awesomeapi_usdbrl():
              rate_side='ask',bid=bid,ask=ask,indicative=True,
              checked_at=NOW().isoformat(timespec='seconds'))
     if not is_live:
-        q.update(close_date=when.date().isoformat(),close_value=ask)
+        q.update(close_date=when.astimezone(ZoneInfo('America/Sao_Paulo')).date().isoformat(),close_value=ask)
     return q
 
 
