@@ -1,0 +1,25 @@
+name: Fast mobile overflow diagnosis
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/index.html'
+      - 'site/assets/**'
+      - 'scripts/diagnose_mobile_overflow.cjs'
+      - '.github/workflows/mobile-overflow-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx playwright install chromium
+      - name: Find actual overflowing elements
+        run: node scripts/diagnose_mobile_overflow.cjs
