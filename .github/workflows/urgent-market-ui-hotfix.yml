@@ -1,0 +1,61 @@
+name: Urgent market UI hotfix (preserve last published site)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/urgent-market-ui-hotfix.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: drivmatch-market-ui-emergency
+  cancel-in-progress: true
+jobs:
+  hotfix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the last successful complete Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 38434946949
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: baseline
+      - name: Apply verified UI-only patch without rebuilding editorial photos
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s baseline/artifact.tar
+          mkdir -p staging
+          tar -xf baseline/artifact.tar -C staging
+          test -s staging/index.html
+          test -s staging/data/bootstrap.js
+          test -d staging/assets/news-photos
+          cp site/index.html staging/index.html
+          cp -a site/assets/. staging/assets/
+          test -s staging/assets/ads/aileen-souza-motorista-disponivel-original.jpg
+          test "$(sha256sum staging/assets/ads/aileen-souza-motorista-disponivel-original.jpg | cut -d' ' -f1)" = "191ab228dd8bf894e8ab4ff3585fd372eca9fff83c38cb8901a754afa66d1bc5"
+          grep -q 'assets/utility-strip.js?v=market-links-clean-v1-20261013' staging/index.html
+          grep -q 'assets/app.js?v=market-links-clean-v1-20261013' staging/index.html
+          if grep -q '<tv-tickers' staging/index.html; then
+            echo 'Unsupported market widget has returned'; exit 1
+          fi
+          node --check staging/assets/utility-strip.js
+          node --check staging/assets/app.js
+          echo "HOTFIX PASSED: original ads/photos/editorial kept; native market UI replaces unsupported widgets"
+      - uses: actions/configure-pages@v5
+      - name: Upload hotfix preserving original production artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: staging
+      - id: deployment
+        name: Deploy corrected UI immediately
+        uses: actions/deploy-pages@v4
