@@ -174,7 +174,7 @@
       const title=localeOf(article)?.title||article.locales?.en?.title||'';
       const url=String(article.source_url||'').split('#')[0].replace(/\/$/,'').toLowerCase();
       if((article.id&&seenIds.has(article.id))||(url&&seenUrls.has(url)))continue;
-      if(unique.some(previous=>duplicateEvent(title,localeOf(previous)?.title||previous.locales?.en?.title||'')))continue;
+      if(unique.some(previous=>duplicateEvent(title,localeOf(previous)?.title||previous.locales?.en?.title||'')||repetitiveOfficialBulletin(article,previous)))continue;
       unique.push(article);if(article.id)seenIds.add(article.id);if(url)seenUrls.add(url);
     }
     return unique;
@@ -244,6 +244,26 @@
     if(Math.min(one.size,two.size)<6)return false;
     const overlap=[...one].filter(t=>two.has(t)).length;
     return overlap/Math.max(1,one.size+two.size-overlap)>=.84;
+  }
+  // NEWSROOM REPETITION GATE: identical NWS hazard types across counties
+  // within a short window are a single homepage theme, not separate stories.
+  // All original source links remain in the source-headlines catalog; only
+  // repetitive homepage cards are suppressed. Never conflate different
+  // hazard classes (flood vs tornado) or warning severities.
+  function repetitiveOfficialBulletin(a,b){
+    if(a?.editorial_type!=='operational_bulletin'||b?.editorial_type!=='operational_bulletin')return false;
+    if(!/national weather service|\\bNWS\\b/i.test(String(a.source||''))||
+       !/national weather service|\\bNWS\\b/i.test(String(b.source||'')))return false;
+    const first=Date.parse(a.published_at||''),second=Date.parse(b.published_at||'');
+    if(!Number.isFinite(first)||!Number.isFinite(second)||Math.abs(first-second)>2*3600000)return false;
+    const headline=x=>eventFingerprint(x.locales?.pt?.title||x.titles?.pt||x.locales?.en?.title||x.title||'');
+    const hazard=x=>{
+      const h=headline(x).replace(/^nws /,'').split(/\\s+[—–-]\\s+|\\s+ (?:em|para|for|in) (?:o |a |the )?/)[0].trim();
+      return h.replace(/\\b(?:calhoun|okaloosa|brantley)\\b/g,'').trim();
+    };
+    const x=hazard(a),y=hazard(b);
+    // Require a substantial common hazard phrase, not generic 'weather alert'.
+    return x.length>=15&&x===y;
   }
   function storyCard(a,i,featured=false,showContext=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
     if(a.kind==='external_link'){
