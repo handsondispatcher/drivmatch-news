@@ -42,7 +42,7 @@ class CommercialFX(unittest.TestCase):
             for age in (-6,6):
                 timestamp=now+timedelta(minutes=age)
                 with patch.object(market,'fetch',return_value=self.response(timestamp)):
-                    with self.assertRaisesRegex(ValueError,'stale'):
+                    with self.assertRaisesRegex(ValueError,'future' if age==6 else 'stale'):
                         market.authorized_awesomeapi_usdbrl()
 
     def test_last_provider_quote_after_hours_is_available_but_not_live(self):
