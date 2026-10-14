@@ -29,7 +29,9 @@ def verify_site(origin):
         ('assets/app.js',"class=\"sideitem market-live-row\"")
     ]:
         req=Request(origin+path+'?market-ui-check=20261014-verified',
-                    headers={'Cache-Control':'no-cache'})
+                    headers={'Cache-Control':'no-cache',
+                             'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131.0 Safari/537.36',
+                             'Accept':'text/javascript,application/javascript,*/*'})
         with urlopen(req,timeout=20) as resp:
             body=resp.read(500_000).decode('utf-8','replace')
         if needle not in body:raise ValueError(origin+path+': outdated script still served')
