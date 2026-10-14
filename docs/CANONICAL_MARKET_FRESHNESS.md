@@ -89,3 +89,15 @@ Approved scope: only market header/sidebar display. This replaces the previous w
 - Audit source state and timestamp behind the scenes. No timestamp paragraphs under prices. Weekly EIA pump-price average remains weekly.
 - This UI fix is not proof of a working minute-by-minute USD/BRL or Brent numerical API. Source contracts and authorization remain outstanding until configured and observed in production. Report that limitation transparently.
 - This release must not move or edit any UCR, car-hauler or driver advertisement, news order or other approved site element.
+
+## Owner-approved AwesomeAPI activation — 2026-10-13
+
+Owner explicitly stated "AwesomeAPI autorizou! É só seguir adiante" and authorized proceeding with USD/BRL publication; the authenticated key had previously passed isolated GitHub Actions verification without revealing it. The repository workflow sets `AWESOMEAPI_REDISTRIBUTION_AUTHORIZED=true` for its sole AwesomeAPI USD/BRL adapter. This is owner-supplied representation of display permission, not independent review of provider agreement; preserve any written agreement and re-check scope if licensing conditions change.
+
+- Market-open quotes must have valid timestamp <=5 minutes old, and always retain their vendor `observed_at`.
+- Outside Brazilian weekday business window (approx 09:00–18:00 America/Sao_Paulo, federal holidays excluded), show up to 4 days of the **last provider-observed indicative commercial quote**, marked `quote_status=last_provider_observation`, `session_status=closed`, not `last_verified_close` or an official stock-exchange settlement. Preserve the provider's actual timestamp and source; do not stamp the site build time as quote time.
+- PTAX is separate internal `references.usdbrl_ptax` and is not substituted as commercial dollar.
+- Front-end number formatting stays 2 decimals; do not expose API key or marketing/technical footnote in the quote strip.
+- A build/commit is not evidence of successful production publication. Confirm `data/market.json` reports `indicators.usdbrl.source=AwesomeAPI`, `instrument=spot`, `quote_status` and actual `observed_at`, compare both public domains and verify rendered price.
+- The approved license covers USD/BRL via AwesomeAPI only, **not** ICE Brent or any other instrument.
+- Limit of this deployment: static GitHub Pages data refreshes only on a successful scheduled build (nominally every 10 minutes), not minute-by-minute. Minute-rate update needs a separate secure token-hiding API/proxy, with appropriate quota and production QA.
