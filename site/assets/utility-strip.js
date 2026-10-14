@@ -45,7 +45,7 @@ function showMarket(){
  // Never relabel an official PTAX reference as a traded commercial quote.
  el('top-usd-label').textContent=localized('Dólar','US Dollar','Dólar');
  el('top-diesel-label').textContent=localized('Diesel nos EUA','US Diesel','Diésel en EE. UU.');
- el('top-brent-label').textContent=localized('Petróleo Brent','Brent Crude Oil','Petróleo Brent');
+ el('top-brent-label').textContent=localized('Petróleo Bruto Brent','Brent Crude Oil','Petróleo crudo Brent');
  const values=[
   {id:'usd',data:usd,decimals:3,prefix:'R$ ',suffix:''},
   {id:'diesel',data:market.diesel,decimals:2,prefix:'US$ ',suffix:'/gal'},
