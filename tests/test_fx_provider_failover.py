@@ -69,6 +69,31 @@ class CommercialFX(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'stale during trading'):
                 market.authorized_awesomeapi_usdbrl()
 
+    def test_verified_commercial_close_precedes_indicative_ask_after_hours(self):
+        # At 20:30 in Sao Paulo, don't show the provider's indicative
+        # post-session offer if a dated, independently reported close exists.
+        now=datetime(2026,10,14,23,30,tzinfo=UTC)
+        with patch.object(market,'NOW',return_value=now),\
+             patch.object(market,'authorized_spot') as primary,\
+             patch.object(market,'authorized_awesomeapi_usdbrl') as indicative:
+            quote=market.authorized_fx_market_quote()
+        self.assertEqual(quote['close_date'],'2026-10-14')
+        self.assertEqual(quote['value'],5.0289)
+        self.assertEqual(quote['session_status'],'closed')
+        self.assertIn('Estadão Conteúdo',quote['source'])
+        primary.assert_not_called()
+        indicative.assert_not_called()
+
+    def test_next_business_session_does_not_pin_prior_close(self):
+        # Next day at 12:00 in Sao Paulo, the commercial feed is used again.
+        now=datetime(2026,10,15,15,tzinfo=UTC)
+        expected={'instrument':'spot','value':5.123,'session_status':'open'}
+        with patch.object(market,'NOW',return_value=now),\
+             patch.object(market,'authorized_spot',return_value=expected) as primary:
+            quote=market.authorized_fx_market_quote()
+        self.assertEqual(quote,expected)
+        primary.assert_called_once()
+
     def test_error_primary_tries_authorized_secondary(self):
         now=datetime(2026,10,13,15,tzinfo=UTC)
         with patch.object(market,'authorized_spot',side_effect=ValueError('offline')),\
