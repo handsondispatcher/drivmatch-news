@@ -1188,6 +1188,84 @@ body{background:#f7f9fc;color:#14283c}
 #dm-utility .dm-brent-quote:has(tv-single-ticker:defined) .dm-brent-fallback{display:none!important}
 @media(max-width:900px){#dm-utility .dm-util-inner{flex-wrap:wrap!important;height:auto!important;overflow:visible!important}#dm-utility .dm-brent-quote{flex:1 1 100%!important;width:100%!important;max-width:100%!important}}
 </style>
+
+<style id="dm-market-visual-balance-v1">
+/* Balanced market typography and grid. No extra source text; preserve
+   the official TradingView ticker, its full footprint and required branding. */
+#dm-utility .dm-util-quote:not(.dm-brent-quote){
+  min-width:0!important;min-height:100px!important;
+  grid-template-columns:29px minmax(0,1fr)!important;
+  grid-template-rows:25px 33px!important;align-content:center!important;
+  column-gap:8px!important;row-gap:2px!important;padding:7px 10px!important;
+}
+#dm-utility .dm-util-quote:not(.dm-brent-quote) .dm-util-label{
+  font-size:15px!important;line-height:24px!important;font-weight:800!important;
+}
+#dm-utility .dm-util-quote:not(.dm-brent-quote) .dm-util-money{
+  display:flex!important;align-items:baseline!important;gap:5px!important;
+  white-space:nowrap!important;min-width:0!important;
+}
+#dm-utility .dm-util-quote:not(.dm-brent-quote) .dm-util-money strong{
+  font:800 21px/1.25 Arial,sans-serif!important;letter-spacing:-.45px!important;
+  font-variant-numeric:tabular-nums!important;
+}
+#dm-utility .dm-util-quote:not(.dm-brent-quote) .dm-util-money em{
+  font-size:11px!important;line-height:1.3!important;white-space:nowrap!important;
+}
+#dm-utility .dm-market-line-icon svg{display:block;width:24px;height:24px}
+#dm-utility .dm-util-quote.dm-brent-quote{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  min-height:120px!important;grid-template-columns:29px minmax(0,1fr)!important;
+  grid-template-rows:23px 89px!important;column-gap:8px!important;
+}
+#dm-utility .dm-brent-quote .dm-util-label{
+  font-size:15px!important;line-height:23px!important;font-weight:800!important;
+  grid-column:2!important;white-space:nowrap!important;
+}
+#dm-utility .dm-brent-quote .dm-brent-provider{
+  width:100%!important;max-width:100%!important;height:89px!important;
+  overflow:visible!important;
+}
+@media(min-width:1281px){
+  #dm-utility .dm-util-inner{
+    grid-template-columns:minmax(185px,1.1fr) minmax(215px,1.18fr)
+      minmax(330px,1.7fr) minmax(145px,.91fr) minmax(135px,.82fr)!important;
+    align-items:center!important;
+  }
+}
+@media(min-width:851px) and (max-width:1280px){
+  #dm-utility .dm-util-inner{
+    grid-template-columns:minmax(195px,1fr) minmax(235px,1.1fr)
+      minmax(320px,1.45fr)!important;
+    align-items:center!important;
+  }
+}
+@media(max-width:850px){
+  #dm-utility .dm-util-inner{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    align-items:center!important;
+  }
+  #dm-utility .dm-brent-quote{grid-column:1/-1!important}
+}
+@media(max-width:480px){
+  #dm-utility .dm-util-quote:not(.dm-brent-quote){
+    grid-template-columns:24px minmax(0,1fr)!important;
+    grid-template-rows:24px auto!important;
+    padding:8px 5px!important;column-gap:5px!important;min-height:86px!important;
+  }
+  #dm-utility .dm-util-quote:not(.dm-brent-quote) .dm-util-label{
+    font-size:14px!important;
+  }
+  #dm-utility .dm-util-quote:not(.dm-brent-quote) .dm-util-money{
+    white-space:normal!important;flex-wrap:wrap!important;gap:0 4px!important;
+  }
+  #dm-utility .dm-util-quote:not(.dm-brent-quote) .dm-util-money strong{
+    font-size:17px!important;overflow-wrap:normal!important;white-space:nowrap!important;
+  }
+  #dm-utility .dm-util-quote:not(.dm-brent-quote) .dm-util-money em{font-size:10px!important}
+  #dm-utility .dm-market-line-icon svg{width:21px;height:21px}
+}
+</style>
 </head>
 <body>
 <header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.11</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português (Brasil)</option><option value="en">English</option><option value="es">Español (Latinoamérica)</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true" title="Português brasileiro (pt-BR)"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false" title="English (US)"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false" title="Español latinoamericano (es-419)"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
@@ -1195,20 +1273,20 @@ body{background:#f7f9fc;color:#14283c}
 <section id="dm-utility" class="dm-utility" aria-label="Cotações e condições do tempo">
  <div class="dm-util-inner">
   <div class="dm-util-quote">
-   <span class="dm-util-icon" aria-hidden="true">📈</span>
+   <span class="dm-util-icon dm-market-line-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" focusable="false"><path d="M3 20V4M3 20h18" fill="none" stroke="#1b4d72" stroke-width="2" stroke-linecap="round"/><path d="m6 16 5-5 4 2 5-8" fill="none" stroke="#168d72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
    <a id="top-usd-label" class="dm-util-label dm-market-ref-link" href="https://br.tradingview.com/symbols/FX_IDC-USDBRL/" target="_blank" rel="noopener noreferrer" title="Abrir USD/BRL na TradingView">Dólar</a>
    <div class="dm-util-money"><strong id="top-usd-value">—</strong><em id="top-usd-change" hidden></em></div>
    <small id="top-usd-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">Sem cotação</small>
   </div>
   <div class="dm-util-quote">
-   <span class="dm-util-icon" aria-hidden="true">⛽</span>
+   <span class="dm-util-icon dm-market-line-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" focusable="false"><path d="M5 21V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17H5ZM7 6h8v6H7ZM4 21h14" fill="none" stroke="#1b4d72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 8h2l2 3v7a2 2 0 0 1-4 0v-3" fill="none" stroke="#168d72" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
    <a id="top-diesel-label" class="dm-util-label dm-market-ref-link" href="https://www.tradingview.com/symbols/FRED-GASDESW/" target="_blank" rel="noopener noreferrer" title="Consultar série semanal oficial EIA / FRED GASDESW">Diesel nos EUA</a>
    <div class="dm-util-money"><strong id="top-diesel-value">—</strong><em id="top-diesel-change" hidden></em></div>
    <small id="top-diesel-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">EIA · semanal</small>
   </div>
   <div class="dm-util-quote dm-brent-quote">
    <span class="dm-util-icon dm-brent-oil-icon" aria-hidden="true"><svg width="22" height="27" viewBox="0 0 22 27" focusable="false"><path fill="#111111" d="M11 0C8.5 5.2 2 13.4 2 18a9 9 0 0 0 18 0C20 13.4 13.5 5.2 11 0Z"/></svg></span>
-   <a id="top-brent-label" class="dm-util-label dm-market-ref-link" href="https://www.tradingview.com/symbols/VELOCITY-BRENT/" target="_blank" rel="noopener noreferrer" title="Petróleo Brent — Velocity Trade / TradingView">Petróleo Brent</a>
+   <a id="top-brent-label" class="dm-util-label dm-market-ref-link" href="https://www.tradingview.com/symbols/VELOCITY-BRENT/" target="_blank" rel="noopener noreferrer" title="Petróleo Bruto Brent — Velocity Trade / TradingView">Petróleo Bruto Brent</a>
    <div class="dm-util-money dm-brent-fallback"><strong id="top-brent-value">—</strong><em id="top-brent-change" hidden></em></div>
    <div class="dm-brent-provider" aria-label="Cotação do Petróleo Brent pela TradingView"><tv-single-ticker symbol="VELOCITY:BRENT" aria-label="Brent USD por barril e variação percentual"></tv-single-ticker></div>
    
@@ -1333,7 +1411,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=professional-role-context-v5-20261014" defer></script>
 <script src="assets/road-tv-live.js?v=v34-18-durable-live-first-20261011" defer></script>
-<script src="assets/utility-strip.js?v=fx-published-ttl-v6-20261014" defer></script>
+<script src="assets/utility-strip.js?v=market-balanced-v7-20261014" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
 <script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-single-ticker.js"></script>
