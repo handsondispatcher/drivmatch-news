@@ -183,7 +183,7 @@ class PublicationTests(unittest.TestCase):
   self.assertNotIn('Publicidade · DrivMatch',app)
   self.assertIn('assets/app.js?v=',page)
   self.assertIn('href="https://br.tradingview.com/symbols/FX_IDC-USDBRL/"',page)
-  self.assertIn('href="https://br.investing.com/commodities/brent-oil"',page)
+  self.assertIn('href="https://www.tradingview.com/symbols/VELOCITY-BRENT/"',page)
   self.assertNotIn('<tv-tickers ',page)
   self.assertIn('assets/utility-strip.js?v=',page)
   self.assertIn('function searchCity()', (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
