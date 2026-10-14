@@ -49,13 +49,16 @@ function showMarket(){
  for(const item of values){
    const v=item.data;
    // An old EIA reference cannot be shown as today's Brent price.
-   const historical=item.id==='brent'&&v?.quote_status==='historical_reference';
-   const current=marketFresh(v,item.id)&&!historical;
+   const historical=item.id==='brent'&&v?.instrument==='brent_eia_reference'&&
+     v?.quote_status==='historical_reference'&&v?.session_status==='historical_reference';
+   const current=marketFresh(v,item.id);
+   const datedReference=historical&&current;
    const value=el('top-'+item.id+'-value');
    const chg=el('top-'+item.id+'-change');
    const meta=el('top-'+item.id+'-date');
    if(current){
-     value.textContent=item.prefix+number(v.value,item.decimals)+item.suffix;
+     value.textContent=item.prefix+number(v.value,item.decimals)+item.suffix+
+       (datedReference?' · '+localized('ref. '+String(v.observed_at||''),'ref. '+String(v.observed_at||''),'ref. '+String(v.observed_at||'')):'');
      value.classList.remove('dm-market-missing');
    }else{
      // Clear but useful fallback: opens a real provider page, never an old
@@ -86,10 +89,11 @@ function showMarket(){
       item.id==='brent'?
       localized('Referência física Brent','Brent physical spot reference','Referencia física Brent'):
       localized('Dólar comercial','Commercial USD/BRL','Dólar comercial');
-   const source=current?
+   const source=datedReference?
+      localized('Referência histórica Brent, não ao vivo','Historical Brent reference, not live','Referencia histórica Brent, no en vivo')+
+      ' · '+String(v.source||'')+' · '+String(v.observed_at||''):
+      current?
       label+' · '+String(v.source||'')+' · '+String(v.observed_at||''):
-      historical?
-      localized('Preço histórico Brent indisponível como cotação atual','Historical Brent is not a current quote','El Brent histórico no es cotización actual')+' · '+String(v.observed_at||''):
       localized('Cotação atual indisponível','Current quote unavailable','Cotización actual no disponible');
    meta.textContent=source;
    meta.title=source;
