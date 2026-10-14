@@ -1,0 +1,75 @@
+name: Urgent licensed USD-BRL publication (preserve site)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/urgent-awesomeapi-fx.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+concurrency:
+  group: drivmatch-awesomeapi-emergency
+  cancel-in-progress: true
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore last verified complete public site without reconstructing ads or editorial
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          run-id: 38491811794
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: baseline
+      - name: Unpack and verify approved visual baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s baseline/artifact.tar
+          mkdir -p staging
+          tar -xf baseline/artifact.tar -C staging
+          test -s staging/index.html
+          test -s staging/data/bootstrap.js
+          test -s staging/data/market.json
+          test -s staging/data/content.json
+          test -d staging/assets/news-photos
+          test -s staging/assets/ads/aileen-souza-motorista-disponivel-original.jpg
+          test "$(sha256sum staging/assets/ads/aileen-souza-motorista-disponivel-original.jpg | cut -d' ' -f1)" = "191ab228dd8bf894e8ab4ff3585fd372eca9fff83c38cb8901a754afa66d1bc5"
+          if grep -q '<tv-tickers' staging/index.html; then
+            echo "Old blocked provider widget detected in baseline"; exit 1
+          fi
+      - name: Fetch authenticated AwesomeAPI USD-BRL and patch only the three market data files
+        env:
+          AWESOMEAPI_API_KEY: ${{ secrets.AWESOMEAPI_API_KEY }}
+          AWESOMEAPI_REDISTRIBUTION_AUTHORIZED: 'true'
+        run: python scripts/publish_awesomeapi_usd_only.py
+      - name: Assert only existing three market data files changed
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('staging/data/market.json').read_text())
+          q=x['indicators']['usdbrl']
+          assert q['instrument']=='spot' and q['source'].startswith('AwesomeAPI')
+          assert q['quote_status'] in ('live_snapshot','last_provider_observation')
+          print('FX DATA QA PASS:',q['quote_status'],q['observed_at'])
+          PY
+      - uses: actions/configure-pages@v5
+      - name: Upload approved site with licensed dollar quote
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: staging
+      - id: deployment
+        name: Deploy authenticated dollar
+        uses: actions/deploy-pages@v4
