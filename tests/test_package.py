@@ -379,18 +379,19 @@ class PublicationTests(unittest.TestCase):
    self.assertEqual(up.verified_external_source_links(),[])
   self.assertEqual(up.verified_external_source_links(offline=True),[])
 
- def test_09_oct_2026_commercial_close_is_correct_and_date_bounded(self):
+ def test_14_oct_2026_commercial_close_is_correct_and_date_bounded(self):
   quote=json.loads((BASE/'content/usdbrl_last_close.json').read_text(encoding='utf-8'))
-  self.assertEqual(quote['close_date'],'2026-10-09')
-  self.assertEqual(quote['close_value'],4.985)
-  self.assertEqual(quote['change_pct'],-0.79)
-  self.assertIn('/2026/10/09/',quote['source_url'])
-  with patch.object(up,'NOW',return_value=datetime(2026,10,10,12,tzinfo=timezone.utc)):
+  self.assertEqual(quote['close_date'],'2026-10-14')
+  self.assertEqual(quote['close_value'],5.0289)
+  self.assertEqual(quote['change_pct'],0.17)
+  self.assertIn('/2026/10/14/',quote['source_url'])
+  self.assertIn('Estadão Conteúdo',quote['source'])
+  with patch.object(up,'NOW',return_value=datetime(2026,10,15,12,tzinfo=timezone.utc)):
    q=up.verified_previous_close()
-   self.assertEqual(q['value'],4.985)
+   self.assertEqual(q['value'],5.0289)
    self.assertEqual(q['quote_status'],'last_verified_close')
    self.assertEqual(q['instrument'],'spot')
-  with patch.object(up,'NOW',return_value=datetime(2026,10,16,12,tzinfo=timezone.utc)):
+  with patch.object(up,'NOW',return_value=datetime(2026,10,20,12,tzinfo=timezone.utc)):
    with self.assertRaises(ValueError):up.verified_previous_close()
 
  def test_bcb_ptax_is_dated_separate_instrument_not_fake_commercial_spot(self):
