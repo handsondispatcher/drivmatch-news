@@ -1,0 +1,7 @@
+{
+  "value": 125.44,
+  "source": "EIA / FRED (diário)",
+  "observed_at": "2026-10-06",
+  "change_pct": -0.056,
+  "source_url": "https://fred.stlouisfed.org/series/DCOILBRENTEU"
+}
