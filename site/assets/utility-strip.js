@@ -51,7 +51,7 @@ function showMarket(){
    // An old EIA reference cannot be shown as today's Brent price.
    const historical=item.id==='brent'&&v?.instrument==='brent_eia_reference'&&
      v?.quote_status==='historical_reference'&&v?.session_status==='historical_reference';
-   const current=marketFresh(v,item.id);
+   const current=marketFresh(v,item.id)&&!historical;
    const datedReference=historical&&current;
    const value=el('top-'+item.id+'-value');
    const chg=el('top-'+item.id+'-change');
