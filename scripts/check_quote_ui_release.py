@@ -32,7 +32,7 @@ def read_live(url):
 def verify(fetch=read_live,attempts=4,delay=10):
     missing={}
     for origin in ORIGINS:
-        for path,marker in CANARIES.items():
+        for path,marker in [*CANARIES.items(), ('', 'VELOCITY:BRENT'), ('', 'tv-single-ticker')]:
             url=origin.rstrip('/')+'/'+path+'?quote-ui-check='+os.getenv('GITHUB_RUN_ID','manual')
             ok=False
             for attempt in range(attempts):
