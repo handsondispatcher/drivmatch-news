@@ -96,7 +96,8 @@ class CommercialFX(unittest.TestCase):
 
     def test_error_primary_tries_authorized_secondary(self):
         now=datetime(2026,10,13,15,tzinfo=UTC)
-        with patch.object(market,'authorized_spot',side_effect=ValueError('offline')),\
+        with patch.object(market,'NOW',return_value=now),\
+             patch.object(market,'authorized_spot',side_effect=ValueError('offline')),\
              patch.object(market,'authorized_awesomeapi_usdbrl',return_value={'instrument':'spot','value':5.1}):
             result=market.authorized_fx_market_quote()
         self.assertEqual(result['value'],5.1)
