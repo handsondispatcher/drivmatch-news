@@ -1176,16 +1176,7 @@ body{background:#f7f9fc;color:#14283c}
 </style>
 
 
-<style id="dm-brent-fit-widget-v2">
-/* Dedicated full-size Brent cell: don't crop quotes or the mandatory provider mark. */
-#dm-utility .dm-util-inner{min-height:114px!important;align-items:center!important}
-#dm-utility .dm-util-quote:has(#top-brent-value){flex:0 0 320px!important;width:320px!important;min-width:320px!important;max-width:320px!important;min-height:106px!important;grid-template-rows:22px 76px!important;align-content:center!important;overflow:visible!important}
-#dm-utility .dm-brent-full-widget{display:block!important;position:relative!important;grid-row:2!important;width:290px!important;min-width:290px!important;max-width:none!important;height:76px!important;overflow:visible!important;white-space:normal!important}
-#dm-utility .dm-brent-full-widget tv-single-ticker{display:block;width:290px;height:76px;min-height:76px;overflow:visible}
-#dm-utility .dm-brent-full-widget tv-single-ticker:defined~strong{display:none}
-#dm-utility .dm-brent-full-widget:has(tv-single-ticker:defined)>strong,#dm-utility .dm-brent-full-widget:has(tv-single-ticker:defined)>em{display:none!important}
-@media(max-width:900px){#dm-utility .dm-util-inner{flex-wrap:wrap!important;height:auto!important}#dm-utility .dm-util-quote:has(#top-brent-value){flex-basis:320px!important}}
-</style>
+
 <style id="dm-brent-oil-icon-color">#dm-utility .dm-brent-oil-icon{color:#111!important;font-size:24px!important;line-height:1!important}</style>
 </head>
 <body>
@@ -1206,9 +1197,9 @@ body{background:#f7f9fc;color:#14283c}
    <small id="top-diesel-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">EIA · semanal</small>
   </div>
   <div class="dm-util-quote">
-   <span class="dm-util-icon dm-brent-oil-icon" aria-hidden="true">●</span>
+   <span class="dm-util-icon dm-brent-oil-icon" aria-hidden="true"><svg width="22" height="27" viewBox="0 0 22 27" focusable="false"><path fill="#111111" d="M11 0C8.5 5.2 2 13.4 2 18a9 9 0 0 0 18 0C20 13.4 13.5 5.2 11 0Z"/></svg></span>
    <a id="top-brent-label" class="dm-util-label dm-market-ref-link" href="https://www.tradingview.com/symbols/VELOCITY-BRENT/" target="_blank" rel="noopener noreferrer" title="Petróleo Brent — Velocity Trade / TradingView">Petróleo Brent</a>
-   <div class="dm-util-money dm-brent-full-widget"><strong id="top-brent-value">—</strong><em id="top-brent-change" hidden></em><tv-single-ticker symbol="VELOCITY:BRENT" aria-label="Cotação Brent Velocity Trade TradingView"></tv-single-ticker></div>
+   <div class="dm-util-money"><strong id="top-brent-value">—</strong><em id="top-brent-change" hidden></em></div>
    
    <small id="top-brent-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">Sem cotação</small>
   </div>
@@ -1334,5 +1325,4 @@ body{background:#f7f9fc;color:#14283c}
 <script src="assets/utility-strip.js?v=brent-compact-v3-20261014" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>
 <script src="assets/clima-spot.js?v=d979f35a27b44e42" defer></script>
-<script type="module" src="https://widgets.tradingview-widget.com/w/en/tv-single-ticker.js"></script>
 </body></html>
