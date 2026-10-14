@@ -448,6 +448,45 @@ def authorized_brent_spot():
     return normalize_brent_spot_quote(obj)
 
 
+
+def oilpriceapi_brent_for_internal_validation():
+    """Validate OilPriceAPI Brent privately. No public redistribution rights.
+
+    Source explicitly prohibits public display of third-party Brent on all
+    standard tiers. This method must not be wired into make_market() or site/.
+    Never log or serialize the API token.
+    """
+    token=os.getenv('OILPRICEAPI_API_KEY','').strip()
+    if not token:
+        raise ValueError('OILPRICEAPI_API_KEY not configured')
+    url='https://api.oilpriceapi.com/v1/prices/latest?by_code=BRENT_CRUDE_USD'
+    payload=json.loads(fetch(url,headers={'Authorization':'Token '+token},timeout=12))
+    data=payload.get('data')
+    if payload.get('status')!='success' or not isinstance(data,dict):
+        raise ValueError('OilPriceAPI did not return a successful Brent response')
+    if data.get('code')!='BRENT_CRUDE_USD' or data.get('currency') not in ('USD',None):
+        raise ValueError('OilPriceAPI unexpected instrument/currency')
+    import math
+    value=data.get('price')
+    if type(value) not in (int,float) or not math.isfinite(value) or not 0<value<10000:
+        raise ValueError('Invalid OilPriceAPI Brent price')
+    # Use source observation time, never collection or response creation time.
+    observed_str=data.get('as_of') or data.get('observed_at')
+    if not isinstance(observed_str,str):
+        raise ValueError('OilPriceAPI source observation time missing')
+    observed=datetime.fromisoformat(observed_str.replace('Z','+00:00'))
+    if observed.tzinfo is None or observed>NOW()+timedelta(seconds=30):
+        raise ValueError('Invalid OilPriceAPI source observation time')
+    if data.get('stale') is True or data.get('synthetic') is True or data.get('data_status')=='stale':
+        raise ValueError('Stale/synthetic OilPriceAPI reading')
+    if NOW()-observed>timedelta(minutes=30):
+        raise ValueError('OilPriceAPI source observation older than 30 minutes')
+    return {'instrument':'brent_price_api_internal','value':float(value),
+            'unit':'USD/bbl','observed_at':observed.isoformat(),
+            'source':'OilPriceAPI (internal evaluation only)',
+            'public_display_authorized':False}
+
+
 def market_reference_current(quote, key, now=None):
     """Bound age by actual source cadence, never by website polling frequency.
 
