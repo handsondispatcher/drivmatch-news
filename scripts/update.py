@@ -281,8 +281,10 @@ def authorized_awesomeapi_usdbrl():
                           '2026-01-01','2026-04-03','2026-04-21','2026-05-01',
                           '2026-09-07','2026-10-12','2026-11-02',
                           '2026-11-20','2026-12-25'})
-    if business_session and age>timedelta(minutes=5):
-        raise ValueError('AwesomeAPI quote stale during trading window')
+    # A delayed vendor observation remains useful if visibly marked as delayed.
+    # It must never be represented as a live tick or official market close.
+    if business_session and age>timedelta(hours=4):
+        raise ValueError('AwesomeAPI observation more than four hours old during trading window')
     # Do not keep indefinitely old values; covers weekends and normal holidays.
     if age>timedelta(days=4):
         raise ValueError('AwesomeAPI previous observation older than four days')
@@ -292,12 +294,13 @@ def authorized_awesomeapi_usdbrl():
                   when.isoformat(timespec='seconds'),change,
                   'https://docs.awesomeapi.com.br/api-de-moedas')
     is_live=business_session and age<=timedelta(minutes=5)
+    delayed=business_session and not is_live
     q.update(symbol='USD/BRL',instrument='spot',price_type='commercial',
-             quote_status='live_snapshot' if is_live else 'last_provider_observation',
-             session_status='open' if is_live else 'closed',
+             quote_status='live_snapshot' if is_live else ('delayed_provider_observation' if delayed else 'last_provider_observation'),
+             session_status='open' if is_live else ('delayed' if delayed else 'closed'),
              rate_side='ask',bid=bid,ask=ask,indicative=True,
              checked_at=NOW().isoformat(timespec='seconds'))
-    if not is_live:
+    if not is_live and not delayed:
         q.update(close_date=when.astimezone(ZoneInfo('America/Sao_Paulo')).date().isoformat(),close_value=ask)
     return q
 
