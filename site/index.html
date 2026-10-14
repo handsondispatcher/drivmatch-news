@@ -1160,6 +1160,13 @@ body{background:#f7f9fc;color:#14283c}
  #dm-utility .dm-util-quote .dm-util-label{font-size:14px!important}
  #dm-utility .dm-util-quote .dm-util-money strong{font-size:17px!important}
 }
+/* Mobile 360px regression: price + daily change must fit without overflow. */
+@media(max-width:390px){
+ #dm-utility .dm-util-quote{min-width:0!important;overflow:hidden;gap:1px 4px!important}
+ #dm-utility .dm-util-quote .dm-util-money{min-width:0;max-width:100%;display:flex!important;flex-wrap:wrap!important;gap:0 3px!important;white-space:normal!important}
+ #dm-utility .dm-util-quote .dm-util-money strong{font-size:15px!important;max-width:100%;white-space:normal!important;overflow-wrap:anywhere}
+ #dm-utility .dm-util-quote .dm-util-money em{font-size:10px!important;line-height:1.2}
+}
 @media(max-width:480px){
  #dm-utility .dm-util-quote .dm-util-label{font-size:14px!important}
  #dm-utility .dm-util-quote .dm-util-money strong{font-size:17px!important}
