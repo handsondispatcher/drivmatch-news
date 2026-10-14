@@ -368,16 +368,18 @@
       ?'https://br.investing.com/commodities/brent-oil'
       :'https://www.tradingview.com/symbols/FRED-GASDESW/';
     const valid=verifiedMarketQuote(v,key)&&
-      !(key==='brent'&&v?.quote_status==='historical_reference')&&
       !(key==='usdbrl'&&v?.instrument==='ptax_reference');
     const delayed=valid&&key==='usdbrl'&&v?.quote_status==='delayed_provider_observation';
+    const brentReference=valid&&key==='brent'&&v?.instrument==='brent_eia_reference';
+    const brentSourceLabel=brentReference?'<small class="market-delayed-label">'+
+      escapeHTML((lang==='pt'?'Referência EIA, não ao vivo · ':lang==='es'?'Referencia EIA, no en vivo · ':'EIA reference, not live · ')+v.observed_at)+'</small>':'';
     const detail=valid?
       String(v.source||'')+' · '+String(v.observed_at||'')+' · '+String(v.quote_status||v.session_status||''):
       (lang==='pt'?'Cotação atual não verificada':lang==='es'?'Cotización actual no verificada':'Current quote not verified');
     const label='<a href="'+source+'" target="_blank" rel="noopener noreferrer" class="market-source-link">'+escapeHTML(name)+'</a>';
     const delayedLabel=delayed?'<small class="market-delayed-label">'+
       escapeHTML(lang==='pt'?'Cotação atrasada · '+v.observed_at:lang==='es'?'Cotización retrasada · '+v.observed_at:'Delayed quote · '+v.observed_at)+'</small>':'';
-    const value=valid?marketValue(v,key)+delayedLabel
+    const value=valid?marketValue(v,key)+delayedLabel+brentSourceLabel
       :'<a href="'+source+'" target="_blank" rel="noopener noreferrer" class="market-source-link">'+
         (lang==='en'?'View quote ↗':lang==='es'?'Ver cotización ↗':'Ver cotação ↗')+'</a>';
     return '<div class="sideitem market-live-row" data-market-key="'+key+
