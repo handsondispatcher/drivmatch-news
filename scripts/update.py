@@ -510,9 +510,16 @@ def market_reference_current(quote, key, now=None):
 
 def cached_verified_market_reference(key):
     """Short outage fallback: only a known, attributed SAME instrument."""
+    # The generated market.json can legitimately lose a quote after an upstream
+    # outage. Keep a separate, checked-in verified observation as an independent
+    # disaster-recovery input; never silently extend its expiry.
     path=ROOT/'site/data/market.json'
-    if not path.exists():raise ValueError('No previously verified public snapshot')
-    record=read_json(path).get('indicators',{}).get(key,{})
+    primary=read_json(path).get('indicators',{}).get(key,{}) if path.exists() else {}
+    if key=='brent' and not primary:
+        archive=ROOT/'content/verified-brent-reference.json'
+        primary=read_json(archive) if archive.exists() else {}
+    record=primary
+    if not record:raise ValueError('No previously verified public snapshot')
     approved_provenance={
         'diesel':{
             ('EIA / FRED (semanal)','https://fred.stlouisfed.org/series/GASDESW'),
