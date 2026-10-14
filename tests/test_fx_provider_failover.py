@@ -45,6 +45,30 @@ class CommercialFX(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError,'stale'):
                         market.authorized_awesomeapi_usdbrl()
 
+    def test_last_provider_quote_after_hours_is_available_but_not_live(self):
+        # 01:03 UTC on Wednesday = 22:03 in Brazil on Tuesday.
+        now=datetime(2026,10,14,1,3,tzinfo=UTC)
+        seen=now-timedelta(minutes=153)
+        with patch.object(market,'NOW',return_value=now),\
+             patch.dict('os.environ',{'AWESOMEAPI_REDISTRIBUTION_AUTHORIZED':'true',
+                                      'AWESOMEAPI_API_KEY':'test-key'}),\
+             patch.object(market,'fetch',return_value=self.response(seen)):
+            q=market.authorized_awesomeapi_usdbrl()
+        self.assertEqual(q['session_status'],'closed')
+        self.assertEqual(q['quote_status'],'last_provider_observation')
+        self.assertEqual(q['instrument'],'spot')
+        self.assertEqual(q['close_date'],'2026-10-13')
+        self.assertEqual(q['close_value'],q['value'])
+
+    def test_stale_during_business_session_fails_closed(self):
+        now=datetime(2026,10,14,15,tzinfo=UTC)
+        with patch.object(market,'NOW',return_value=now),\
+             patch.dict('os.environ',{'AWESOMEAPI_REDISTRIBUTION_AUTHORIZED':'true',
+                                      'AWESOMEAPI_API_KEY':'test-key'}),\
+             patch.object(market,'fetch',return_value=self.response(now-timedelta(minutes=7))):
+            with self.assertRaisesRegex(ValueError,'stale during trading'):
+                market.authorized_awesomeapi_usdbrl()
+
     def test_error_primary_tries_authorized_secondary(self):
         now=datetime(2026,10,13,15,tzinfo=UTC)
         with patch.object(market,'authorized_spot',side_effect=ValueError('offline')),\
