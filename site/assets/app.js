@@ -256,10 +256,12 @@
        !/national weather service|\\bNWS\\b/i.test(String(b.source||'')))return false;
     const first=Date.parse(a.published_at||''),second=Date.parse(b.published_at||'');
     if(!Number.isFinite(first)||!Number.isFinite(second)||Math.abs(first-second)>2*3600000)return false;
-    const headline=x=>eventFingerprint(x.locales?.pt?.title||x.titles?.pt||x.locales?.en?.title||x.title||'');
     const hazard=x=>{
-      const h=headline(x).replace(/^nws /,'').split(/\\s+[—–-]\\s+|\\s+ (?:em|para|for|in) (?:o |a |the )?/)[0].trim();
-      return h.replace(/\\b(?:calhoun|okaloosa|brantley)\\b/g,'').trim();
+      const raw=String(x.locales?.pt?.title||x.titles?.pt||x.locales?.en?.title||x.title||'');
+      // Extract the event, discarding geographic suffix after the em dash.
+      // Do not remove arbitrary towns from headlines or merge other hazards.
+      const heading=raw.split(/\\s+[—–]\\s+/)[0].replace(/^NWS\\s*:\\s*/i,'');
+      return eventFingerprint(heading);
     };
     const x=hazard(a),y=hazard(b);
     // Require a substantial common hazard phrase, not generic 'weather alert'.
