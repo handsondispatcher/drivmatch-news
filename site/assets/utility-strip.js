@@ -71,7 +71,7 @@ function showMarket(){
      value.textContent='';
      const link=document.createElement('a');
      link.href=url;link.target='_blank';link.rel='noopener noreferrer';
-     link.textContent=localized('Ver cotação ↗','View quote ↗','Ver cotización ↗');
+     link.textContent=item.id==='brent'?'—':localized('Ver cotação ↗','View quote ↗','Ver cotización ↗');
      link.setAttribute('aria-label',localized('Consultar cotação na fonte','Check quote at source','Consultar cotización en la fuente'));
      value.appendChild(link);
      value.classList.add('dm-market-missing');
