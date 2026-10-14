@@ -396,6 +396,7 @@
       ?'https://br.investing.com/commodities/brent-oil'
       :'https://www.tradingview.com/symbols/FRED-GASDESW/';
     const valid=verifiedMarketQuote(v,key)&&
+      !(key==='brent'&&v?.quote_status==='historical_reference')&&
       !(key==='usdbrl'&&v?.instrument==='ptax_reference');
     const delayed=valid&&key==='usdbrl'&&v?.quote_status==='delayed_provider_observation';
     const brentReference=valid&&key==='brent'&&v?.instrument==='brent_eia_reference';
