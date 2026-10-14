@@ -306,7 +306,26 @@ def authorized_awesomeapi_usdbrl():
 
 
 def authorized_fx_market_quote():
-    """Prefer approved contracted FX feed; fail over to independently licensed API."""
+    """Licensed intraday USD/BRL, then verified same-day market close after hours.
+
+    An indicative bank/provider ask may diverge from the reported interbank
+    commercial closing quote. When a dated, independently sourced closing
+    observation exists for TODAY, use it after 19:00 in Sao Paulo, or until
+    the next session opens at 09:00. Never pass it off as a live tick. The
+    special window expires; do not pin an old daily rate to future sessions.
+    """
+    from zoneinfo import ZoneInfo
+    local=NOW().astimezone(ZoneInfo('America/Sao_Paulo'))
+    if local.hour>=19 or local.hour<9:
+        try:
+            close=verified_previous_close()
+            close_day=datetime.strptime(close['close_date'],'%Y-%m-%d').date()
+            same_evening=local.date()==close_day and local.hour>=19
+            next_morning=local.date()==close_day+timedelta(days=1) and local.hour<9
+            if (same_evening or next_morning) and close['source_url'].startswith('https://'):
+                return close
+        except (ValueError,KeyError,TypeError,FileNotFoundError):
+            pass
     failures=[]
     for name,reader in [('primary_spot',authorized_spot),
                         ('awesomeapi',authorized_awesomeapi_usdbrl)]:
