@@ -19,7 +19,8 @@ function marketFresh(v,key){
  if(age< -5*60000)return false;
  // A real-time quote expires in 5 minutes; published references use their
  // own official source cadence. A cached web page cannot prolong freshness.
- if(v.session_status==='open')return age<=5*60000;
+ // Published FX snapshots can age while the site builds. They remain last-observed quotes, not streaming ticks.
+ if(v.session_status==='open')return age<=(key==='usd'?25:5)*60000;
  if(key==='brent'&&v.instrument==='brent_eia_reference'&&
     v.quote_status==='historical_reference'&&v.session_status==='historical_reference')
    return age<=21*86400000;
@@ -89,11 +90,14 @@ function showMarket(){
       item.id==='brent'?
       localized('Referência física Brent','Brent physical spot reference','Referencia física Brent'):
       localized('Dólar comercial','Commercial USD/BRL','Dólar comercial');
+   const publishedFxAge=current&&item.id==='usd'&&v?.session_status==='open'
+      ?Math.max(0,Date.now()-Date.parse(v.observed_at||'')):0;
+   const publishedFxNote=publishedFxAge>5*60000?' · '+localized('última observação publicada, não streaming','last published observation, not streaming','última observación publicada, no en directo'):'';
    const source=datedReference?
       localized('Referência histórica Brent, não ao vivo','Historical Brent reference, not live','Referencia histórica Brent, no en vivo')+
       ' · '+String(v.source||'')+' · '+String(v.observed_at||''):
       current?
-      label+' · '+String(v.source||'')+' · '+String(v.observed_at||''):
+      label+' · '+String(v.source||'')+' · '+String(v.observed_at||'')+publishedFxNote:
       localized('Cotação atual indisponível','Current quote unavailable','Cotización actual no disponible');
    meta.textContent=source;
    meta.title=source;
