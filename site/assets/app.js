@@ -250,22 +250,28 @@
   // All original source links remain in the source-headlines catalog; only
   // repetitive homepage cards are suppressed. Never conflate different
   // hazard classes (flood vs tornado) or warning severities.
+  // Main-feed editorial diversity gate. This operates on the final display
+  // stories (including bootstrapped articles), not only the external RSS array.
   function repetitiveOfficialBulletin(a,b){
-    if(a?.editorial_type!=='operational_bulletin'||b?.editorial_type!=='operational_bulletin')return false;
-    if(!/national weather service|\bNWS\b/i.test(String(a.source||''))||
-       !/national weather service|\bNWS\b/i.test(String(b.source||'')))return false;
-    const first=Date.parse(a.published_at||''),second=Date.parse(b.published_at||'');
-    if(!Number.isFinite(first)||!Number.isFinite(second)||Math.abs(first-second)>2*3600000)return false;
-    const hazard=x=>{
-      const raw=String(x.locales?.pt?.title||x.titles?.pt||x.locales?.en?.title||x.title||'');
-      // Extract the event, discarding geographic suffix after the em dash.
-      // Do not remove arbitrary towns from headlines or merge other hazards.
-      const heading=raw.split(/\s+[—–]\s+/)[0].replace(/^NWS\s*:\s*/i,'');
-      return eventFingerprint(heading);
+    const title=x=>String(x.locales?.pt?.title||x.titles?.pt||
+      x.locales?.en?.title||x.title||'');
+    const notice=x=>{
+      const raw=title(x);
+      const source=String(x.source||'');
+      if(!/national weather service|\\bNWS\\b/i.test(source)&&
+         !/^NWS\\s*:/i.test(raw))return null;
+      const normalized=raw.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'')
+        .toLowerCase().trim().replace(/^nws\\s*:\\s*/,'');
+      const segments=normalized.split(/\\s+[—–]\\s+/);
+      if(segments.length<2)return null; // do not remove arbitrary geography
+      const hazard=segments[0].replace(/[^a-z0-9]+/g,' ').trim();
+      if(hazard.length<12||!/(alert|warning|watch|aviso|alerta|enchente|inundacao|flood|tornado|storm)/.test(hazard))return null;
+      const timestamp=Date.parse(x.published_at||'');
+      return Number.isFinite(timestamp)?{hazard,timestamp}:null;
     };
-    const x=hazard(a),y=hazard(b);
-    // Require a substantial common hazard phrase, not generic 'weather alert'.
-    return x.length>=15&&x===y;
+    const x=notice(a),y=notice(b);
+    return !!(x&&y&&x.hazard===y.hazard&&
+      Math.abs(x.timestamp-y.timestamp)<=2*3600000);
   }
   function storyCard(a,i,featured=false,showContext=false){const txt=localeOf(a);const cat=escapeHTML(localizedCategory(a.category));
     if(a.kind==='external_link'){
