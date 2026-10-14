@@ -252,15 +252,15 @@
   // hazard classes (flood vs tornado) or warning severities.
   function repetitiveOfficialBulletin(a,b){
     if(a?.editorial_type!=='operational_bulletin'||b?.editorial_type!=='operational_bulletin')return false;
-    if(!/national weather service|\\bNWS\\b/i.test(String(a.source||''))||
-       !/national weather service|\\bNWS\\b/i.test(String(b.source||'')))return false;
+    if(!/national weather service|\bNWS\b/i.test(String(a.source||''))||
+       !/national weather service|\bNWS\b/i.test(String(b.source||'')))return false;
     const first=Date.parse(a.published_at||''),second=Date.parse(b.published_at||'');
     if(!Number.isFinite(first)||!Number.isFinite(second)||Math.abs(first-second)>2*3600000)return false;
     const hazard=x=>{
       const raw=String(x.locales?.pt?.title||x.titles?.pt||x.locales?.en?.title||x.title||'');
       // Extract the event, discarding geographic suffix after the em dash.
       // Do not remove arbitrary towns from headlines or merge other hazards.
-      const heading=raw.split(/\\s+[—–]\\s+/)[0].replace(/^NWS\\s*:\\s*/i,'');
+      const heading=raw.split(/\s+[—–]\s+/)[0].replace(/^NWS\s*:\s*/i,'');
       return eventFingerprint(heading);
     };
     const x=hazard(a),y=hazard(b);
