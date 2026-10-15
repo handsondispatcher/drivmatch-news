@@ -237,7 +237,15 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
     Discovery does NOT mean live: videos.list still verifies status and embed.
     """
     found = []
+    # Stable creators are the primary Road TV source. Their latest uploads
+    # are checked on EVERY newsroom build (normally every 10 minutes).
+    # Live search for the two priority channels remains hourly: each
+    # YouTube search.list costs 100 quota units.
     priority_set = set(range(min(2,len(channels)))) if targeted_hour is not None else set()
+    if diagnostics is not None:
+        diagnostics.setdefault('watchlist_channels_checked',0)
+        diagnostics.setdefault('watchlist_channels_resolved',0)
+        diagnostics.setdefault('watchlist_candidate_ids',0)
     for index,source in enumerate(channels[:8]):
         handle = str(source.get('handle') or '')
         if not re.fullmatch(r'@[A-Za-z0-9_.-]{3,40}', handle):
@@ -248,6 +256,10 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
             channel_data = api('https://www.googleapis.com/youtube/v3/channels?'+channel_params)
             channel = next(iter(channel_data.get('items') or []), {})
             channel_id = str(channel.get('id') or '')
+            if diagnostics is not None:
+                diagnostics['watchlist_channels_checked']+=1
+                if CHANNEL_ID.fullmatch(channel_id):
+                    diagnostics['watchlist_channels_resolved']+=1
             # Broadcasts can be LIVE on YouTube before appearing in uploads.
             # Ask for active broadcasts from this resolved channelId, not only
             # the latest uploaded items. Never trust a handle as a channel ID.
@@ -280,12 +292,14 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
                 continue
             playlist_params = urllib.parse.urlencode({
                 'part':'contentDetails', 'playlistId':playlist,
-                'maxResults':'12', 'key':key})
+                'maxResults':'8', 'key':key})
             rows = api('https://www.googleapis.com/youtube/v3/playlistItems?'+playlist_params)
             for item in rows.get('items') or []:
                 video_id = (item.get('contentDetails') or {}).get('videoId')
                 if VIDEO_ID.fullmatch(str(video_id or '')):
                     found.append(video_id)
+                    if diagnostics is not None:
+                        diagnostics['watchlist_candidate_ids']+=1
         except (OSError, TimeoutError, ValueError, KeyError, TypeError) as exc:
             errors.append('youtube_curated_channel_'+api_error_tag(exc))
     return list(dict.fromkeys(found))
@@ -449,7 +463,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     result={'schema_version':2,'generated_at':now.isoformat(),
       'live_checked_at':None,'live_status':'unverified','current_live':None,
       'candidates':[],'featured_recording':None,'channels':cfg['channel_sources'],
-      'autoselect_policy':'live_first_today_or_yesterday_replay_with_clock_alignment',
+      'autoselect_policy':'watched_truck_channels_first_then_broad_discovery_verified_live_first',
       'idle_policy':'metadata stop indicators + status refresh and alternate-switch timeout; pixel-level stopped-motion detection unavailable',
       'attribution':'Third-party YouTube/Twitch official players; no DrivMatch retransmission.',
       'warnings':[]}
@@ -471,7 +485,10 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
                  'targeted_video_title':None,'targeted_metadata_flags':None,
                  'videos_returned':0,
                  'rejected_not_public_embeddable':0,'rejected_no_geo_cargo_pov':0,
-                 'accepted_live':0}
+                 'accepted_live':0,
+                  'watchlist_channels_checked':0,
+                  'watchlist_channels_resolved':0,
+                  'watchlist_candidate_ids':0}
     approved=[]
     if fresh_cache and key:
         diagnostics['_targeted_video_ids']=[i for i in cached.get('targeted_video_ids',[])
@@ -496,9 +513,12 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
             if cache is None else [])  # Injected discovery fixtures remain deterministic.
         cached_creator_ids=[i for i in ((cached or {}).get('curated_ids') or [])
                             if VIDEO_ID.fullmatch(str(i))]
-        # Broad global LIVE hits must retain capacity even when curated
-        # uploads already fill the maximum verification batch.
-        ids=list(dict.fromkeys(search_ids+creator_ids+cached_creator_ids))[:MAX_CANDIDATES]
+        # CHANNEL-FIRST: a newly started stream found in a watched
+        # creator's uploads/live search must never be displaced by the broad
+        # search results. Limit each watched uploads feed to 8 so there is
+        # still capacity for up to 25 videos discovered more widely.
+        # Recheck cached IDs only after current channel and broad candidates.
+        ids=list(dict.fromkeys(creator_ids+search_ids+cached_creator_ids))[:MAX_CANDIDATES]
         discovery['youtube_ids']=search_ids
         discovery['curated_ids']=creator_ids
         discovery['targeted_video_ids']=diagnostics['_targeted_video_ids']
