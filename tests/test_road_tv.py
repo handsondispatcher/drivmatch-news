@@ -163,6 +163,48 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(sum(x[0]==["completed"] for x in calls),0)
   self.assertEqual(doc["live_status"],"none_verified")
 
+ def test_watched_channel_live_upload_enters_roadtv_before_global_search(self):
+  from unittest.mock import patch
+  from road_tv import make_road_tv
+  from urllib.parse import parse_qs,urlparse
+  watched_id='W1b2C3d4E5f'
+  global_id='G1b2C3d4E5f'
+  cache={'checked_at':NOW.isoformat(),'discovery_version':6,
+         'youtube_ids':[global_id], 'curated_ids':[]}
+  requested=[]
+  def api(url,**kwargs):
+   q=parse_qs(urlparse(url).query)
+   if '/channels?' in url:
+    if q.get('forHandle')==['@Ridealonggang']:
+     return {'items':[{'id':CHANNEL,'contentDetails':{'relatedPlaylists':{'uploads':'UUwatched'}}}]}
+    return {'items':[]}
+   if '/playlistItems?' in url:
+    self.assertEqual(q['maxResults'],['8'])
+    return {'items':[{'contentDetails':{'videoId':watched_id}}]}
+   if '/videos?' in url:
+    group=q['id'][0].split(',')
+    requested.extend(group)
+    stream={**LIVE,'id':watched_id}
+    other={**LIVE,'id':global_id}
+    return {'items':[x for x in (stream,other) if x['id'] in group]}
+   raise AssertionError('Unexpected request: '+url)
+  with patch('road_tv.safe_cached_discovery',return_value=cache):
+   result=make_road_tv(now=NOW,api_key='test-key',get_json=api)
+  self.assertEqual(requested[:2],[watched_id,global_id])
+  self.assertEqual(result['current_live']['video_id'],watched_id)
+  self.assertGreaterEqual(result['discovery_diagnostics']['watchlist_channels_checked'],1)
+  self.assertGreaterEqual(result['discovery_diagnostics']['watchlist_candidate_ids'],1)
+
+ def test_no_invalid_channel_id_can_claim_a_live(self):
+  from road_tv import youtube_curated_channel_discover
+  def api(url):
+   if '/channels?' in url:return {'items':[]}
+   raise AssertionError('Must not query invalid resolved channel')
+  d={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
+     'targeted_live_hits':0}
+  self.assertEqual(youtube_curated_channel_discover('test',[{'name':'Trucking Duke','handle':'@Unresolved'}],api,[],targeted_hour=1,diagnostics=d),[])
+  self.assertEqual(d['targeted_channel_unresolved'],'Trucking Duke')
+
  def test_user_search_terms_are_in_automatic_live_rotation(self):
   from road_tv import QUERIES, youtube_discover
   self.assertIn('usa truck live',QUERIES)
