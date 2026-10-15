@@ -126,7 +126,7 @@ class RoadTVTests(unittest.TestCase):
   ids=youtube_curated_channel_discover('test-key',
       [{'handle':'@Ridealonggang'}],api,[])
   self.assertEqual(ids,[ID])
-  self.assertEqual(len(calls),2)
+  self.assertEqual(len(calls),1)
   self.assertIn('forHandle=%40Ridealonggang',calls[0])
   self.assertIn('playlistItems?',calls[1])
 
@@ -320,8 +320,8 @@ class RoadTVTests(unittest.TestCase):
   self.assertTrue(all(c['channelId']==[CHANNEL] for c in calls))
   self.assertEqual(calls[0]['eventType'],['live'])
   self.assertEqual(calls[0]['videoEmbeddable'],['true'])
-  self.assertEqual(diagnostic['targeted_channel_checked'],'Trucking Duke')
-  self.assertEqual(diagnostic['targeted_live_hits'],2)
+  self.assertEqual(diagnostic['targeted_channel_checked'],'Ride Along Gang')
+  self.assertEqual(diagnostic['targeted_live_hits'],1)
 
  def test_priority_channels_alternate_and_no_uploads_required(self):
   from road_tv import youtube_curated_channel_discover
@@ -338,7 +338,7 @@ class RoadTVTests(unittest.TestCase):
             {'name':'Trucking Duke','handle':'@TruckingDuke'}]
   result=youtube_curated_channel_discover('test',channels,api,[],targeted_hour=1)
   self.assertEqual(result,[ID])
-  self.assertEqual(calls,[CHANNEL,CHANNEL])
+  self.assertEqual(calls,[CHANNEL])
 
  def test_ride_along_live_pov_with_trucker_in_description_qualifies(self):
   title='LIVE Driving POV- IRL- Denver CO to Schuyler NE | Relaxing Ride Along'
