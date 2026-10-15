@@ -45,7 +45,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('youtube_curated_channel_discover',engine)
   self.assertIn("'channelId':channel_id",engine)
   self.assertIn("'eventType':'live'",engine)
-  self.assertIn('targeted_hour=(now.hour if not fresh_cache else None)',engine)
+  self.assertIn('targeted_hour=(now.hour*3 + now.minute//20) if now.minute % 20 < 10 else None',engine)
   self.assertIn("cron: '7,17,27,37,47,57 * * * *'",workflow)
 
  def test_v34_11_release_contract(self):
