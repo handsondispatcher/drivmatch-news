@@ -217,6 +217,17 @@
    link.rel='noopener noreferrer';
    link.textContent=lang()==='en'?'Source ↗':lang()==='es'?'Fuente ↗':'Fonte ↗';
    caption.append(name,link);area.appendChild(caption);
+   // When the API finds no verified driver stream, provide a reliable way
+   // to reach the owner's known trucking channel; never label it verified LIVE.
+   if(!videos.some(v=>v.live&&v.view_type==='cargo_cab')){
+     const creator=document.createElement('a');
+     creator.href='https://www.youtube.com/@Ridealonggang/live';
+     creator.target='_blank';creator.rel='noopener noreferrer';
+     creator.className='roadtv-creator-fallback';
+     creator.textContent=lang()==='en'?'Watch Ride Along Gang on YouTube ↗':lang()==='es'?'Ver Ride Along Gang en YouTube ↗':'Ver Ride Along Gang no YouTube ↗';
+     creator.style.cssText='display:block;margin:4px 0 1px;color:#9bd7ff;font:600 11px Arial,sans-serif;text-align:center;text-decoration:underline';
+     area.appendChild(creator);
+   }
  }
  function failPublisher(id){
    const card=visible(),area=playbackArea(card);
