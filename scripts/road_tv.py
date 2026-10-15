@@ -43,30 +43,30 @@ US_STATE_CODES = ('AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|'
                   'MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|'
                   'SD|TN|TX|UT|VT|VA|WA|WV|WI|WY')
 CITY_STATE = re.compile(
-    r'\\b[A-Z][a-z]+(?:[ -][A-Z][a-z]+){0,2},?\\s+(?:'+US_STATE_CODES+r')\\b')
+    r'\b[A-Z][a-z]+(?:[ -][A-Z][a-z]+){0,2},?\s+(?:'+US_STATE_CODES+r')\b')
 # An unqualified second route endpoint is accepted only when it is an
 # unmistakably named US city, paired with another geotagged US city.
 US_CITY = re.compile(
-    r'\\b(?:Atlanta|Chicago|Houston|Dallas|Fort Worth|San Antonio|Austin|'
+    r'\b(?:Atlanta|Chicago|Houston|Dallas|Fort Worth|San Antonio|Austin|'
     r'New York|Los Angeles|San Francisco|San Diego|Seattle|Portland|'
     r'Denver|Phoenix|Las Vegas|Salt Lake City|Oklahoma City|'
-    r'Kansas City|St Louis|St\\.? Louis|Louisville|Nashville|Memphis|'
+    r'Kansas City|St Louis|St\.? Louis|Louisville|Nashville|Memphis|'
     r'Baton Rouge|New Orleans|Jacksonville|Orlando|Tampa|Miami|'
     r'Charlotte|Indianapolis|Columbus|Cleveland|Buffalo|'
     r'Philadelphia|Pittsburgh|Baltimore|Detroit|Minneapolis|'
     r'Milwaukee|Omaha|Lincoln|Albuquerque|El Paso|'
     r'Sacramento|Tucson|Raleigh|Richmond|Birmingham|'
-    r'Chattanooga)\\b', re.I)
-ROUTE_CONNECTOR = re.compile(r'\\b(?:to|toward|towards|from|through|via)\\b|[→➜➔➡⟶]', re.I)
+    r'Chattanooga)\b', re.I)
+ROUTE_CONNECTOR = re.compile(r'\b(?:to|toward|towards|from|through|via)\b|[→➜➔➡⟶]', re.I)
 # Full US state names are geographic assertions in publisher metadata.
 US_STATE_NAME = re.compile(
-    r'\\b(?:Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|'
+    r'\b(?:Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|'
     r'Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|'
     r'Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|'
     r'Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|'
     r'New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|'
     r'Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|'
-    r'Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)\\b', re.I)
+    r'Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)\b', re.I)
 
 
 def usa_route_evidence(title, desc=''):
