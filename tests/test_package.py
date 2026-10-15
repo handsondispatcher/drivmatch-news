@@ -18,8 +18,12 @@ class PublicationTests(unittest.TestCase):
   self.assertTrue(evidence('LIVE Driving POV IRL Denver CO to Schuyler NE trucker ride along'))
   self.assertFalse(evidence('LIVE driving POV France truck'))
   self.assertFalse(evidence('USA trucking POV parked at rest stop'))
-  self.assertTrue(any('Trucking Duke' in q for q in QUERIES))
-  self.assertTrue(any('Ride Along Gang' in q for q in QUERIES))
+  # New live streams are discovered broadly; approved creators are polled separately.
+  self.assertIn('usa truck live',QUERIES)
+  self.assertIn('usa trucking live',QUERIES)
+  channels=json.loads((BASE/'content/road-tv-curated.json').read_text(encoding='utf-8'))['channel_sources']
+  self.assertIn('Trucking Duke',[c['name'] for c in channels])
+  self.assertIn('Ride Along Gang',[c['name'] for c in channels])
   player=(BASE/'site/assets/road-tv-live.js').read_text(encoding='utf-8')
   self.assertIn('CAMERA_ROTATION_MS=10*60*1000',player)
   self.assertIn("priority(v)===priority(active)",player)
