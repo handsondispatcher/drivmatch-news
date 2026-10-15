@@ -261,6 +261,7 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
                 diagnostics['watchlist_channels_checked']+=1
                 if CHANNEL_ID.fullmatch(channel_id):
                     diagnostics['watchlist_channels_resolved']+=1
+                    diagnostics.setdefault('_resolved_watchlist_channels',{})[channel_id]=source.get('name','')
             # Broadcasts can be LIVE on YouTube before appearing in uploads.
             # Ask for active broadcasts from this resolved channelId, not only
             # the latest uploaded items. Never trust a handle as a channel ID.
@@ -364,21 +365,29 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
                     'actual_start_present':bool(when(live.get('actualStartTime'))),
                     'actual_end_present':bool(live.get('actualEndTime'))}
             profile=source_profile(title,desc)
-            # Narrow, publicly auditable owner-provided visual evidence:
-            # on 2026-10-10 this exact Ride Along Gang broadcast showed
-            # front-facing truck-cab driving, though its metadata can omit
-            # the vehicle keyword. Match the *officially resolved channel*,
-            # current targeted broadcast ID, and route/title, not just a name.
-            priority_source=(diagnostics or {}).get('_priority_source_by_video',{}).get(ident,{})
-            owner_ride_along=bool(diagnostics and
-                priority_source.get('name')=='Ride Along Gang' and
-                ident in diagnostics.get('_targeted_video_ids',[]) and
-                str(info.get('channelId') or '')==priority_source.get('channel_id') and
-                re.search(r'(?:\bDenver\s*(?:CO|Colorado)\b.*\bSchuyler\s*(?:NE|Nebraska)\b|\bMinden\s*(?:IA|Iowa)\b.*\bIndianapolis\s*(?:IN|Indiana)\b)', title, re.I) and
-                CAB.search(title) and not STOP.search(title))
-            if owner_ride_along:
-                diagnostics['targeted_title_match']=True
-                if not profile:
+            # Owner-observed Ride Along Gang front-cab streams may omit "truck"
+            # from the video title. Require an official handle->channel ID
+            # resolution on THIS run plus US route and POV evidence; the
+            # platform must still prove public, embeddable and actively LIVE.
+            resolved=(diagnostics or {}).get('_resolved_watchlist_channels',{})
+            ride_along_verified_channel=(
+                resolved.get(str(info.get('channelId') or ''))=='Ride Along Gang')
+            owner_ride_along=bool(
+                ride_along_verified_channel
+                and usa_route_evidence(title,desc)
+                and CAB.search(title)
+                and not STOP.search(title)
+                and info.get('liveBroadcastContent')=='live'
+                and when(live.get('actualStartTime'))
+                and not live.get('actualEndTime'))
+            if owner_ride_along and not profile:
+                profile={'source_rank':0,'view_type':'cargo_cab',
+                         'geo_evidence':'US route stated in publisher title; channel resolved via official YouTube API',
+                         'camera_evidence':'Owner-observed front cab POV for Ride Along Gang; metadata itself does not prove motion'}
+                if diagnostics is not None:
+                    diagnostics['owner_visual_evidence_used']+=1
+                    diagnostics['targeted_title_match']=True
+            if not profile:
                     profile={'source_rank':0,'view_type':'cargo_cab',
                              'geo_evidence':'US route explicitly named in live title; creator channel resolved by YouTube API',
                              'camera_evidence':'Owner visual screenshot dated 2026-10-10 of this exact Ride Along Gang forward truck-cab broadcast; not continuous motion proof'}
@@ -500,7 +509,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     discovery={'checked_at':now.isoformat(),'discovery_version':6}
     diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
                  'targeted_live_hits':0,'_targeted_video_ids':[],
-                 '_targeted_channel_id':None,'_priority_source_by_video':{},'targeted_title_match':False,
+                 '_targeted_channel_id':None,'_priority_source_by_video':{},'_resolved_watchlist_channels':{},'targeted_title_match':False,
                  'owner_visual_evidence_used':0,'targeted_failure_reason':None,
                  'targeted_video_title':None,'targeted_metadata_flags':None,
                  'videos_returned':0,
