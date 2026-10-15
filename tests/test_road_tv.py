@@ -163,6 +163,62 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(sum(x[0]==["completed"] for x in calls),0)
   self.assertEqual(doc["live_status"],"none_verified")
 
+ def test_user_search_terms_are_in_automatic_live_rotation(self):
+  from road_tv import QUERIES, youtube_discover
+  self.assertIn('usa truck live',QUERIES)
+  self.assertIn('usa trucking live',QUERIES)
+  calls=[]
+  def api(url):
+   q=parse_qs(urlparse(url).query)
+   calls.append(q)
+   return {'items':[]}
+  for h in (0,1):
+   youtube_discover('test-key',NOW.replace(hour=h),api,[])
+  self.assertEqual([x['q'][0] for x in calls],['usa truck live','usa trucking live'])
+  self.assertTrue(all(x['eventType']==['live'] and x['videoEmbeddable']==['true'] for x in calls))
+  self.assertTrue(all(x['maxResults']==['25'] for x in calls))
+
+ def test_user_screenshot_atlanta_to_chicago_live_accepted(self):
+  title='LIVE: DriveCam POV Driving from Atlanta, GA to Chicago #Trucking #ASMR #Travel #Dashcam #POV'
+  self.assertEqual(source_profile(title,'Come ride across the country')['view_type'],'cargo_cab')
+  entry={**LIVE,'snippet':{**SNIPPET,'title':title,'description':'Come ride across the country'}}
+  result=self.result(entry)
+  self.assertEqual(result['live_status'],'verified_live')
+  self.assertEqual(result['current_live']['video_id'],ID)
+
+ def test_fort_cayce_to_baton_rouge_live_not_rejected_for_geography(self):
+  title='LIVE Driving POV- IRL- Fort Cayce SC ➜ Baton Rouge LA | Relaxing Ride Along'
+  description='One trucker answers the call along the road.'
+  self.assertEqual(source_profile(title,description)['view_type'],'cargo_cab')
+  entry={**LIVE,'snippet':{**SNIPPET,'title':title,'description':description}}
+  self.assertEqual(self.result(entry)['live_status'],'verified_live')
+
+ def test_broad_search_does_not_admit_non_us_or_non_truck_lives(self):
+  for title in ('LIVE Trucker POV London to Birmingham',
+                'LIVE truck driver POV Toronto to Ottawa',
+                'LIVE car dashcam Atlanta GA to Chicago',
+                'LIVE trucking USA stopped for a shower'):
+   with self.subTest(title=title):
+    self.assertIsNone(source_profile(title,''))
+
+ def test_global_live_results_keep_verification_slots_before_uploads(self):
+  # Latest 70 curated upload IDs cannot suppress an active live discovered
+  # by the broader search. Candidate status still verified by videos.list.
+  all_ids=[f'A{i:010d}' for i in range(70)]
+  candidate=ID
+  cache={'checked_at':NOW.isoformat(),'discovery_version':6,
+         'youtube_ids':[candidate],'curated_ids':all_ids}
+  calls=[]
+  def api(url,**kwargs):
+   if '/videos?' in url:
+    ids=parse_qs(urlparse(url).query)['id'][0].split(',')
+    calls.extend(ids)
+    return {'items':[LIVE] if candidate in ids else []}
+   raise AssertionError(url)
+  d=make_road_tv(now=NOW,api_key='test',get_json=api,cache=cache)
+  self.assertEqual(calls[0],candidate)
+  self.assertEqual(d['live_status'],'verified_live')
+
  def test_twitch_discovery_live_but_not_stationary(self):
   def api(url,**kwargs):
    if "oauth2/token" in url:return {"access_token":"testtoken"}
