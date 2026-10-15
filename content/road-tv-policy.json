@@ -21,5 +21,8 @@
   "require_verified_current_live": true,
   "recorded_streams_after_cameras": true,
   "offline_camera_retry": true,
-  "display_title": false
+  "display_title": false,
+  "truck_lives_occupy_channels_first": true,
+  "truck_live_channel_assignment": "Sequential verified cargo-cab live streams: first CH1, second CH2, then CH3+; never reserve a slot for an offline stream.",
+  "non_truck_sources_after_truck_lives": true
 }
