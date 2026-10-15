@@ -42,6 +42,8 @@ function showMarket(){
  const usd=freshSpot?spot:publicSpot;
  const liveBrent=marketFresh(brentSpot,'brent')&&brentSpot?.instrument==='brent_spot';
  const brent=liveBrent?brentSpot:market.brent;
+ // Share the same verified quote candidates with the sidebar; never invent prices.
+ document.dispatchEvent(new CustomEvent('drivmatch:market-verified',{detail:{usdbrl:usd||null,diesel:market.diesel||null,brent:brent||null}}));
  // Never relabel an official PTAX reference as a traded commercial quote.
  el('top-usd-label').textContent=localized('Dólar','US Dollar','Dólar');
  el('top-diesel-label').textContent=localized('Diesel nos EUA','US Diesel','Diésel en EE. UU.');
