@@ -126,7 +126,7 @@ class RoadTVTests(unittest.TestCase):
   ids=youtube_curated_channel_discover('test-key',
       [{'handle':'@Ridealonggang'}],api,[])
   self.assertEqual(ids,[ID])
-  self.assertEqual(len(calls),1)
+  self.assertEqual(len(calls),2)
   self.assertIn('forHandle=%40Ridealonggang',calls[0])
   self.assertIn('playlistItems?',calls[1])
 
@@ -316,7 +316,7 @@ class RoadTVTests(unittest.TestCase):
   ids=youtube_curated_channel_discover('test-key',channels,api,[],targeted_hour=0,
                                       diagnostics=diagnostic)
   self.assertEqual(ids,[ID])
-  self.assertEqual(len(calls),2)
+  self.assertEqual(len(calls),1)
   self.assertTrue(all(c['channelId']==[CHANNEL] for c in calls))
   self.assertEqual(calls[0]['eventType'],['live'])
   self.assertEqual(calls[0]['videoEmbeddable'],['true'])
