@@ -4,7 +4,7 @@
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
   let externalHeadlines = [], photoByStory = {}, photoLibrary = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
-  let brentRealtime=null;
+  let brentRealtime=null, topMarketVerified=null;
   let sourceCheckedAt=source.source_monitor?.checked_at||'', newestSourceAt=source.source_monitor?.latest_original_published_at||'', currentSourceCount=(source.articles||[]).filter(x=>x.kind==='external_link').length;
   const pageSize = 6, featureSize = 4;
   const CATS = ['Transporte','Combustíveis','Acidentes','Clima','Rodovias','Fiscalização','Tecnologia','Fretes','Empregos','Caminhões','Mecânica','Caminhoneiros','Socorro','Negócios','Governo','Imigração','Segurança'];
@@ -378,7 +378,7 @@
     const historical=key==='brent'&&v.instrument==='brent_eia_reference'&&
       v.session_status==='historical_reference'&&v.quote_status==='historical_reference';
     const maxAge=(historical?21:{usdbrl:5,diesel:12,brent:5}[key])*86400000;
-    return age>=-5*60000 && age<=(v.session_status==='open'?5*60000:maxAge);
+    return age>=-5*60000 && age<=(v.session_status==='open'?(key==='usdbrl'?120:5)*60000:maxAge);
   }
 // MARKET_QUOTE_UI_RELEASE: compact-prices-only-20261013
   function marketValue(v,key){
@@ -418,6 +418,10 @@
   }
   function renderMarket(){
     const market=data.market||{},inds={...(market.indicators||{})};
+    // Prefer the exact provider candidates used by the top market strip.
+    if(topMarketVerified){for(const k of ['usdbrl','diesel','brent']){
+      if(topMarketVerified[k])inds[k]=topMarketVerified[k];
+    }}
     if(brentRealtime?.instrument==='brent_spot'&&verifiedMarketQuote(brentRealtime,'brent'))
       inds.brent=brentRealtime;
     const body=[
@@ -438,6 +442,10 @@
     $('market-note').textContent='';
     $('market-note-mobile').textContent='';
   }
+  document.addEventListener('drivmatch:market-verified',event=>{
+    topMarketVerified=event.detail||null;
+    if($('market')&&$('market-mobile'))renderMarket();
+  });
   document.addEventListener('drivmatch:brent-spot',event=>{
     const quote=event.detail;
     brentRealtime=quote?.instrument==='brent_spot'?quote:null;
