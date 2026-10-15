@@ -346,6 +346,13 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(source_profile(title,description)['view_type'],'cargo_cab')
   self.assertIsNone(source_profile(title,'A passenger car driving POV'))
  
+ def test_trucking_duke_atlanta_chicago_live_title_is_eligible(self):
+  title='LIVE: DriveCam POV Driving from Atlanta, GA to Chicago #Trucking #ASMR #Travel #Dashcam #POV'
+  description='Come ride across the country, looking at America from the windshield of a big truck.'
+  profile=source_profile(title,description)
+  self.assertIsNotNone(profile)
+  self.assertEqual(profile['view_type'],'cargo_cab')
+
  def test_real_owner_live_route_with_unicode_arrow(self):
   title='LIVE Driving POV- IRL- Minden IA ➜ Indianapolis IN | Relaxing Ride Along'
   description='Truck driver POV from the road. Generic description may mention truck stop break.'
