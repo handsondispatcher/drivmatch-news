@@ -239,9 +239,10 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
     found = []
     # Stable creators are the primary Road TV source. Their latest uploads
     # are checked on EVERY newsroom build (normally every 10 minutes).
-    # Live search for the two priority channels remains hourly: each
-    # YouTube search.list costs 100 quota units.
-    priority_set = set(range(min(2,len(channels)))) if targeted_hour is not None else set()
+    # Rotate one priority channel search every 20 minutes, with no more
+    # than three targeted searches/hour (plus one broad search/hour).
+    # Other builds rely on uploads + previously discovered video IDs.
+    priority_set = {targeted_hour % min(2,len(channels))} if targeted_hour is not None and channels else set()
     if diagnostics is not None:
         diagnostics.setdefault('watchlist_channels_checked',0)
         diagnostics.setdefault('watchlist_channels_resolved',0)
@@ -506,9 +507,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         # EVERY run, not only once per hour. Official API; no HTML scraping.
         creator_ids=(youtube_curated_channel_discover(
             key,cfg['channel_sources'],lambda u:api(u),result['warnings'],
-            # Prioritize the proven channel EVERY hour rather than looking
-            # for an unresolved secondary handle on alternating hours.
-            targeted_hour=(now.hour if not fresh_cache else None),
+            # Search alternating priority channels every 20 minutes while staying
+            # below the default YouTube Data API search quota budget.
+            targeted_hour=(now.hour*3 + now.minute//20) if now.minute % 20 < 10 else None,
             diagnostics=diagnostics)
             if cache is None else [])  # Injected discovery fixtures remain deterministic.
         cached_creator_ids=[i for i in ((cached or {}).get('curated_ids') or [])
