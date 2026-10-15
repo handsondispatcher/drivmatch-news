@@ -103,7 +103,7 @@
  const unavailableCamera=c=>cameraUnavailable.has(c.sourceId||c.id);
  let autoSwitch=true,userChannel=false,viewSize='small';
  let cameraUnavailable=new Set();
- const tvChannels=()=>[...videos.filter(v=>v.live&&!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_name||v.title||'Transmissão ao vivo'})),...directCameras.filter(v=>!publisherFailures.has(v.id)&&!unavailableCamera(v)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name})),...videos.filter(v=>!v.live&&!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_name||v.title||'Gravação'}))];
+ const tvChannels=()=>[...videos.filter(v=>v.live&&v.view_type==='cargo_cab'&&!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_name||v.title||'Transmissão ao vivo'})),...videos.filter(v=>v.live&&v.view_type!=='cargo_cab'&&!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_name||v.title||'Transmissão ao vivo'})),...directCameras.filter(v=>!publisherFailures.has(v.id)&&!unavailableCamera(v)).map(v=>({kind:'camera',ref:v,id:v.id,name:v.name})),...videos.filter(v=>!v.live&&!markedBad(v)).map(v=>({kind:'stream',ref:v,id:key(v),name:v.channel_name||v.title||'Gravação'}))];
  const tvCurrent=()=>active?key(active):directCameras[publisherIndex]?.id;
  function tvRefresh(){
    cards.forEach(card=>{
