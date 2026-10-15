@@ -323,6 +323,17 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(diagnostic['targeted_channel_checked'],'Ride Along Gang')
   self.assertEqual(diagnostic['targeted_live_hits'],1)
 
+ def test_unresolved_trucking_duke_finds_name_matched_live(self):
+  calls=[]
+  def api(url):
+   calls.append(url)
+   if '/channels?' in url:return {'items':[]}
+   if '/search?' in url:return {'items':[{'id':{'videoId':ID},'snippet':{'channelTitle':'Trucking Duke'}},{'id':{'videoId':'B1b2C3d4E5f'},'snippet':{'channelTitle':'Other Trucker'}}]}
+   raise AssertionError(url)
+  found=youtube_curated_channel_discover('key',[{'name':'Trucking Duke','handle':'@TruckingDuke'}],api,[],targeted_hour=0)
+  self.assertEqual(found,[ID])
+  self.assertEqual(len([u for u in calls if '/search?' in u]),1)
+
  def test_priority_channels_alternate_and_no_uploads_required(self):
   from road_tv import youtube_curated_channel_discover
   calls=[]
