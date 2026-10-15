@@ -26,15 +26,63 @@ US_ROUTE = re.compile(r'\b(?:ohio\s+(?:to|[-–>])\s+texas|denver\s*,?\s*(?:co|c
 CAB = re.compile(r'\b(?:dashcam|dash[\s-]?cam|windshield|front[\s-]?facing|forward[\s-]?view|front[\s-]?camera|cab[\s-]?view|driver[\s-]?pov|trucker[\s-]?pov|road[\s-]?view|from[\s-]?the[\s-]?cab|drivecam|driving[\s-]?pov|ride[\s-]?along|irl[\s-]?driv(?:e|ing))\b', re.I)
 CARGO = re.compile(r'\b(?:semi[\s-]?truck|18[\s-]?wheeler|tractor[\s-]?trailer|truck[\s-]?driv(?:er|ing)|trucking|box[\s-]?truck|straight[\s-]?truck|cargo[\s-]?van|sprinter[\s-]?van|pickup[\s-]?truck|pick[\s-]?up[\s-]?truck|hotshot[\s-]?truck|expedit(?:e|er|ing)[\s-]?van|truckers?|truck[\s-]?cam)\b', re.I)
 STOP = re.compile(r'\b(?:parked|parking break|rest stop|sleeping|shower|truck stop break|off duty|not driving|stopped|lunch break|taking a break|end of stream)\b', re.I)
+# Broad live searches, including the real search terms used by drivers.
+# Rotate ONE live search per hour (YouTube search.list = 100 quota units);
+# every candidate still passes official videos.list public/live/embed checks.
 QUERIES = (
-    'USA semi truck driver POV windshield live interstate',
-    'USA box truck cargo van dashcam front cab live',
-    'USA pickup truck hotshot trucking forward road live',
-    'Florida I-4 interstate live traffic camera highway',
-    'Peace Bridge Buffalo USA entrance live border traffic webcam trucks',
-    'Trucking Duke DriveCam POV Ohio Texas live',
-    'Ride Along Gang driving POV Denver Colorado live',
+    'usa truck live',
+    'usa trucking live',
+    'truck driver POV live USA',
+    'trucking live driving USA',
+    'truck dashcam live usa',
 )
+# City/state route evidence. There are 50 US state postal codes; require
+# actual title-like "City ST" syntax, not bare two-letter words ("in", "or").
+# This enables new driver routes without whitelisting every pair of cities.
+US_STATE_CODES = ('AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|'
+                  'MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|'
+                  'SD|TN|TX|UT|VT|VA|WA|WV|WI|WY')
+CITY_STATE = re.compile(
+    r'\\b[A-Z][a-z]+(?:[ -][A-Z][a-z]+){0,2},?\\s+(?:'+US_STATE_CODES+r')\\b')
+# An unqualified second route endpoint is accepted only when it is an
+# unmistakably named US city, paired with another geotagged US city.
+US_CITY = re.compile(
+    r'\\b(?:Atlanta|Chicago|Houston|Dallas|Fort Worth|San Antonio|Austin|'
+    r'New York|Los Angeles|San Francisco|San Diego|Seattle|Portland|'
+    r'Denver|Phoenix|Las Vegas|Salt Lake City|Oklahoma City|'
+    r'Kansas City|St Louis|St\\.? Louis|Louisville|Nashville|Memphis|'
+    r'Baton Rouge|New Orleans|Jacksonville|Orlando|Tampa|Miami|'
+    r'Charlotte|Indianapolis|Columbus|Cleveland|Buffalo|'
+    r'Philadelphia|Pittsburgh|Baltimore|Detroit|Minneapolis|'
+    r'Milwaukee|Omaha|Lincoln|Albuquerque|El Paso|'
+    r'Sacramento|Tucson|Raleigh|Richmond|Birmingham|'
+    r'Chattanooga)\\b', re.I)
+ROUTE_CONNECTOR = re.compile(r'\\b(?:to|toward|towards|from|through|via)\\b|[→➜➔➡⟶]', re.I)
+# Full US state names are geographic assertions in publisher metadata.
+US_STATE_NAME = re.compile(
+    r'\\b(?:Alabama|Alaska|Arizona|Arkansas|California|Colorado|Connecticut|'
+    r'Delaware|Florida|Georgia|Hawaii|Idaho|Illinois|Indiana|Iowa|Kansas|'
+    r'Kentucky|Louisiana|Maine|Maryland|Massachusetts|Michigan|Minnesota|'
+    r'Mississippi|Missouri|Montana|Nebraska|Nevada|New Hampshire|New Jersey|'
+    r'New Mexico|New York|North Carolina|North Dakota|Ohio|Oklahoma|Oregon|'
+    r'Pennsylvania|Rhode Island|South Carolina|South Dakota|Tennessee|Texas|'
+    r'Utah|Vermont|Virginia|Washington|West Virginia|Wisconsin|Wyoming)\\b', re.I)
+
+
+def usa_route_evidence(title, desc=''):
+    """Publisher-stated US geography, not independent position verification."""
+    text=f'{title or ""} {desc or ""}'[:1400]
+    if US.search(text) or US_ROUTE.search(text) or US_STATE_NAME.search(text):
+        return True
+    # Avoid treating arbitrary two-letter tokens as a country confirmation.
+    geotags=CITY_STATE.findall(title or '')
+    if not ROUTE_CONNECTOR.search(title or ''):
+        return False
+    if len(geotags)>=2:
+        return True
+    return bool(geotags and len({v.casefold() for v in US_CITY.findall(title or '')})>=2)
+
+
 TWITCH_QUERIES = ('trucking', 'truckdriver', 'dashcam')
 CACHE_PATH = ROOT / 'build' / 'roadtv-discovery.json'
 PACIFIC = ZoneInfo('America/Los_Angeles')
@@ -60,7 +108,7 @@ def when(value):
 def evidence(title, desc=''):
     """Explicit USA + forward-facing cargo vehicle descriptions required."""
     text = f'{title or ""} {desc or ""}'[:1400]
-    return bool((US.search(text) or US_ROUTE.search(text)) and CAB.search(text) and CARGO.search(text) and not STOP.search(title or ''))
+    return bool(usa_route_evidence(title,desc) and CAB.search(text) and CARGO.search(text) and not STOP.search(title or ''))
 
 
 
@@ -135,7 +183,7 @@ def safe_cached_discovery(now):
     try:
         data = json.loads(CACHE_PATH.read_text(encoding='utf-8'))
         ts = when(data.get('checked_at'))
-        if data.get('discovery_version')==5 and ts and 0 <= (now-ts).total_seconds() < 3700:
+        if data.get('discovery_version')==6 and ts and 0 <= (now-ts).total_seconds() < 3700:
             return data
     except (OSError, ValueError, TypeError):
         pass
@@ -162,13 +210,12 @@ def youtube_discover(key, now, api, errors):
     # completed-broadcast search = 72 YouTube search calls/day maximum.
     # One broad live search here; the second is a targeted creator-channel
     # LIVE search below. Together with replay: <= 3 search.list/hour.
-    general_queries=QUERIES[:5]
-    selected_live=(general_queries[now.hour % len(general_queries)],)
+    selected_live=(QUERIES[now.hour % len(QUERIES)],)
     for query in selected_live:
         try:
             params = dict(part='snippet', type='video', eventType='live',
                           videoEmbeddable='true', regionCode='US',
-                          maxResults='15', q=query, key=key)
+                          maxResults='25', order='date', q=query, key=key)
             response = api('https://www.googleapis.com/youtube/v3/search?'+urllib.parse.urlencode(params))
             for item in response.get('items', []):
                 ident = (item.get('id') or {}).get('videoId')
@@ -416,7 +463,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
     api=get_json or request_json
     cached=cache if cache is not None else safe_cached_discovery(now)
     fresh_cache=cached and when(cached.get('checked_at')) and (now-when(cached['checked_at'])).total_seconds()<3700
-    discovery={'checked_at':now.isoformat(),'discovery_version':5}
+    discovery={'checked_at':now.isoformat(),'discovery_version':6}
     diagnostics={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
                  'targeted_live_hits':0,'_targeted_video_ids':[],
                  '_targeted_channel_id':None,'_priority_source_by_video':{},'targeted_title_match':False,
@@ -449,7 +496,9 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
             if cache is None else [])  # Injected discovery fixtures remain deterministic.
         cached_creator_ids=[i for i in ((cached or {}).get('curated_ids') or [])
                             if VIDEO_ID.fullmatch(str(i))]
-        ids=list(dict.fromkeys(creator_ids+cached_creator_ids+search_ids))[:MAX_CANDIDATES]
+        # Broad global LIVE hits must retain capacity even when curated
+        # uploads already fill the maximum verification batch.
+        ids=list(dict.fromkeys(search_ids+creator_ids+cached_creator_ids))[:MAX_CANDIDATES]
         discovery['youtube_ids']=search_ids
         discovery['curated_ids']=creator_ids
         discovery['targeted_video_ids']=diagnostics['_targeted_video_ids']
