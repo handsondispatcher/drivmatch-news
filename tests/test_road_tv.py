@@ -199,7 +199,8 @@ class RoadTVTests(unittest.TestCase):
   from road_tv import youtube_curated_channel_discover
   def api(url):
    if '/channels?' in url:return {'items':[]}
-   raise AssertionError('Must not query invalid resolved channel')
+   if '/search?' in url:return {'items':[{'id':{'videoId':ID},'snippet':{'channelTitle':'Impostor Channel'}}]}
+   raise AssertionError('Unexpected API endpoint')
   d={'targeted_channel_checked':None,'targeted_channel_unresolved':None,
      'targeted_live_hits':0}
   self.assertEqual(youtube_curated_channel_discover('test',[{'name':'Trucking Duke','handle':'@Unresolved'}],api,[],targeted_hour=1,diagnostics=d),[])
