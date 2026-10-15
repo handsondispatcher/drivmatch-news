@@ -285,8 +285,27 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
                                     diagnostics.setdefault('_priority_source_by_video',{})[ident]={'name':source['name'],'channel_id':channel_id}
                     except (OSError,TimeoutError,ValueError,KeyError,TypeError) as exc:
                         errors.append('youtube_targeted_channel_live_'+api_error_tag(exc))
-                elif diagnostics is not None:
-                    diagnostics['targeted_channel_unresolved']=source['name']
+                else:
+                    if diagnostics is not None:
+                        diagnostics['targeted_channel_unresolved']=source['name']
+                    # Use this scheduled search slot for a verified publisher-name fallback.
+                    try:
+                        params=urllib.parse.urlencode({'part':'snippet','type':'video',
+                            'eventType':'live','videoEmbeddable':'true',
+                            'maxResults':'15','q':source['name']+' live trucking','key':key})
+                        rows=api('https://www.googleapis.com/youtube/v3/search?'+params)
+                        for row in rows.get('items') or []:
+                            snippet=row.get('snippet') or {}
+                            if str(snippet.get('channelTitle') or '').casefold().strip()!=str(source.get('name') or '').casefold().strip():
+                                continue
+                            ident=(row.get('id') or {}).get('videoId')
+                            if VIDEO_ID.fullmatch(str(ident or '')):
+                                found.append(ident)
+                                if diagnostics is not None:
+                                    diagnostics['targeted_live_hits']+=1
+                                    diagnostics.setdefault('_targeted_video_ids',[]).append(ident)
+                    except (OSError,TimeoutError,ValueError,KeyError,TypeError) as exc:
+                        errors.append('youtube_targeted_name_live_'+api_error_tag(exc))
             playlist = ((channel.get('contentDetails') or {})
                         .get('relatedPlaylists') or {}).get('uploads', '')
             if not playlist:
