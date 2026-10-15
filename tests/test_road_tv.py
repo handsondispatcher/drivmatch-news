@@ -73,6 +73,24 @@ class RoadTVTests(unittest.TestCase):
   self.assertEqual(self.result(stream)['live_status'],'verified_live')
   self.assertIsNone(source_profile(title+' — parked for shower',description))
 
+ def test_new_us_intercity_routes_auto_qualify(self):
+  for title,desc in [
+   ('LIVE: DriveCam POV Driving from Atlanta, GA to Chicago #Trucking', 'Truck driver dashcam from the highway'),
+   ('LIVE Driving POV- IRL- Fort Cayce SC ➜ Baton Rouge LA', 'Trucker on a freight delivery'),
+   ('LIVE: Truck POV driving from Atlanta GA to Chicago', 'Semi truck driver')
+  ]:
+   with self.subTest(title=title):
+    profile=source_profile(title,desc)
+    self.assertIsNotNone(profile)
+    self.assertEqual(profile['view_type'],'cargo_cab')
+  self.assertIsNone(source_profile('Live car dashcam from Paris to Lyon France',''))
+  self.assertIsNone(source_profile('Truck driver POV from Toronto to Ottawa Canada',''))
+
+ def test_rotating_usa_truck_live_search_is_broad(self):
+  from road_tv import QUERIES
+  self.assertIn('usa truck live',QUERIES)
+  self.assertIn('usa trucking live',QUERIES)
+
  def test_six_days_old_replay_rejected(self):
   stale={**REPLAY,"liveStreamingDetails":{
       "actualStartTime":"2026-10-01T20:10:00Z",
