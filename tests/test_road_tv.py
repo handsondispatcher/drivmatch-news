@@ -167,6 +167,36 @@ class RoadTVTests(unittest.TestCase):
       "actualEndTime":"2026-10-09T13:00:00Z"}}
   self.assertEqual(self.result(morning)["candidates"],[])
 
+ def test_auto_discovers_live_truck_route_between_us_cities(self):
+  for title,desc in (
+   ('LIVE: DriveCam POV Driving from Atlanta, GA to Chicago #Trucking #Dashcam',
+    'Ride in a big truck along US roads'),
+   ('LIVE Driving POV- IRL- Fort Cayce SC ➜ Baton Rouge LA | Relaxing Ride Along',
+    'One trucker is driving and streaming the road'),
+  ):
+   with self.subTest(title=title):
+    p=source_profile(title,desc)
+    self.assertIsNotNone(p)
+    self.assertEqual(p['view_type'],'cargo_cab')
+    stream={**LIVE,'snippet':{**SNIPPET,'title':title,'description':desc}}
+    self.assertEqual(self.result(stream)['live_status'],'verified_live')
+
+ def test_broad_terms_find_verified_live_without_treating_every_video_as_safe(self):
+  from road_tv import youtube_discover
+  calls=[]
+  def api(url):
+   q=parse_qs(urlparse(url).query)
+   calls.append(q)
+   return {'items':[{'id':{'videoId':ID},'snippet':SNIPPET}]}
+  for hour,expected in [(0,'usa truck live'),(1,'usa trucking live')]:
+   ids=youtube_discover('test-key',NOW.replace(hour=hour),api,[])
+   self.assertIn(ID,ids)
+   self.assertEqual(calls[-1]['q'],[expected])
+   self.assertEqual(calls[-1]['eventType'],['live'])
+   self.assertEqual(calls[-1]['maxResults'],['25'])
+  self.assertIsNone(source_profile('European truck cam in Berlin','Trucking on a foreign highway'))
+  self.assertIsNone(source_profile('USA passenger car dashcam on interstate','Driving live'))
+
  def test_discovery_rotates_categories_under_daily_search_cap(self):
   calls=[]
   def api(url,**kwargs):
