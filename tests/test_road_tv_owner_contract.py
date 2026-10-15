@@ -8,6 +8,8 @@ class RoadTvOwnerContract(unittest.TestCase):
     def test_single_source_of_truth(self):
         policy=json.loads((ROOT/'content/road-tv-policy.json').read_text(encoding='utf-8'))
         self.assertTrue(policy['driver_live_first'])
+        self.assertTrue(policy['truck_lives_occupy_channels_first'])
+        self.assertTrue(policy['non_truck_sources_after_truck_lives'])
         self.assertEqual(policy['driver_priority_channels'][:2],['Ride Along Gang','Trucking Duke'])
         self.assertEqual(policy['camera_priority_ids'][0],'i35-waco')
         self.assertEqual(policy['rotation_seconds'],600)
