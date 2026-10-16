@@ -37,7 +37,10 @@ jobs:
             site/assets/ads/auto-m-usa-pt-original.png
             site/assets/ads/auto-m-usa-es-original.png
             site/assets/ads/auto-m-usa-en-original.png
-          key: autom-usa-originals-20261016-v2
+            site/assets/ads/auto-m-usa-pt-wide-original.png
+            site/assets/ads/auto-m-usa-es-wide-original.png
+            site/assets/ads/auto-m-usa-en-wide-original.png
+          key: autom-usa-originals-20261016-v3-with-wide
       - name: Instalar as artes originais AUTO M USA com SHA-256
         run: python scripts/install_autom_usa_ads.py
       # Native 4.5:1 UCR creative is built BEFORE tests and never stretches a 2:1 photo.
@@ -55,6 +58,7 @@ jobs:
           python -m unittest discover -s tests
           node --check site/assets/utility-strip.js
           node --check site/assets/app.js
+          node --check site/assets/horizontal-ad-sequence.js
           node --check site/assets/sidebar-ad-rotation.js
           node --check site/assets/road-tv-live.js
           node tests/test_client.js
@@ -278,6 +282,8 @@ jobs:
       - name: Browser regression (bounded)
         timeout-minutes: 11
         run: npm run test:browser
+      - name: Verificar rotacao horizontal sincronizada de 5 segundos
+        run: node tests/test_horizontal_ads_browser.cjs
       # Editorial and browser checks may take minutes: keep FX fresh at the
       # instant the GitHub Pages artifact is assembled, without rerunning news.
       - name: Atualizar câmbio e Brent autorizado imediatamente antes da publicação

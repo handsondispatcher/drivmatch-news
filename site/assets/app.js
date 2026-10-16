@@ -563,6 +563,10 @@
       box.hidden=true;box.innerHTML='';
 
     }
+    // Notify the paired horizontal campaign sequencer after BOTH legacy creatives
+    // are rendered, including when the language is changed at the top of the site.
+    // The sequencer reuses these approved DOM renderings; original contracts stay intact.
+    document.dispatchEvent(new CustomEvent('drivmatch:horizontal-ads-rendered',{detail:{language:lang}}));
     // CLASSIFIED LOCK: HTML carries the original approved portrait directly
     // below UCR. It must NEVER depend on dynamic news/ads bootstrap data.
     // Preserve image pixels and approved WhatsApp hyperlink across languages.

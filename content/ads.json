@@ -295,5 +295,54 @@
     "clickable_ads_preserved": true,
     "state_indicator": true,
     "public_verification": "Custom domain Playwright probe"
+  },
+  "paired_horizontal_ad_rotation": {
+    "status": "ACTIVE",
+    "version": "1.0",
+    "position": "news-main-top-and-lower-ad-slot",
+    "cycle_seconds": 5,
+    "transition": "close_then_open_from_bottom",
+    "interaction": "no_vertical_carousel",
+    "phase_sequences": {
+      "top": [
+        "cars",
+        "ucr",
+        "auto-m-usa"
+      ],
+      "bottom": [
+        "ucr",
+        "auto-m-usa",
+        "cars"
+      ]
+    },
+    "disallow_same_campaign_simultaneously": true,
+    "language_selector": "top_pt_es_en",
+    "native_resolution": [
+      1774,
+      394
+    ],
+    "approved_auto_m_usa_wide": {
+      "pt": {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/214e0067e9af6df5fb9ce1357ec0da3d005d0ae37eca4871e3b149ecdebf620f.png",
+        "size": 110489,
+        "sha256": "66d3967413724fc2f4955ca2b1bf5dd1927460d485ea4ad619f1c0631f9b97c4",
+        "path": "assets/ads/auto-m-usa-pt-wide-original.png"
+      },
+      "es": {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/3062cb8be74cf32f3edb50de3922bca9d8ef312efe610b4c15c5ada95d803606.png",
+        "size": 106558,
+        "sha256": "5e84774f7ea5105718a713e22c0993a157156f2569d07dbd10d62da86975edce",
+        "path": "assets/ads/auto-m-usa-es-wide-original.png"
+      },
+      "en": {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/af62b66f6bc7d55e3ae29d67a36b6a580ee1b1a8b0741bdfcef524e93fdb517d.png",
+        "size": 102901,
+        "sha256": "34cb4d1e679e3e2242892a15109652935df0e0980f6ad55367131543fd8f2b7a",
+        "path": "assets/ads/auto-m-usa-en-wide-original.png"
+      }
+    },
+    "preserve_existing_sidebar_vertical_rotation": true,
+    "maintain_original_campaign_contact_links": true,
+    "governance_document": "docs/DRIVMATCH_NEWS_PAIRED_HORIZONTAL_AD_ROTATION_V1.md"
   }
 }

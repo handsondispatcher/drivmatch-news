@@ -15,9 +15,12 @@ BASE=Path(__file__).resolve().parents[1]
 ASSETS=BASE/'site/assets/ads'
 ASSETS.mkdir(parents=True,exist_ok=True)
 ARTS={"en":{"url":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/d768f613505254571a3491999b0f765b8745218fce79e7bd93ba6e00ad615ed5.png","sha256":"12a5708291c3e5cdd62c32980fac5d24c0dea21a51a434defcbfcf81e5bab417","size":1215824},"es":{"url":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/37907c30e22cded948606c26b781159e29c738d4861fe7d4b009517b03cae77f.png","sha256":"d0b776a552cca3de9cbd80f2f81b0b7cad95058c9988908331888c0f3d5f0c83","size":1266630},"pt":{"url":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/f36f5790c3be8b1f982c6e0bb65473c4f1896c2c66fbe572b75b2d0b2c10fb7d.png","sha256":"cef3af63240c505a84f65c190feaabcd0a05553b2afc328c81b718a96e3207ec","size":1654031}}
+
+WIDE_ARTS={"pt":{"url":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/214e0067e9af6df5fb9ce1357ec0da3d005d0ae37eca4871e3b149ecdebf620f.png","size":110489,"sha256":"66d3967413724fc2f4955ca2b1bf5dd1927460d485ea4ad619f1c0631f9b97c4"},"es":{"url":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/3062cb8be74cf32f3edb50de3922bca9d8ef312efe610b4c15c5ada95d803606.png","size":106558,"sha256":"5e84774f7ea5105718a713e22c0993a157156f2569d07dbd10d62da86975edce"},"en":{"url":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/af62b66f6bc7d55e3ae29d67a36b6a580ee1b1a8b0741bdfcef524e93fdb517d.png","size":102901,"sha256":"34cb4d1e679e3e2242892a15109652935df0e0980f6ad55367131543fd8f2b7a"}}
+
 def main():
-    for lang,item in ARTS.items():
-        path=ASSETS/f'auto-m-usa-{lang}-original.png'
+    for lang,item in list(ARTS.items()) + [(k,{**v,'wide':True}) for k,v in WIDE_ARTS.items()]:
+        path=ASSETS/(f'auto-m-usa-{lang}-wide-original.png' if item.get('wide') else f'auto-m-usa-{lang}-original.png')
         data=path.read_bytes() if path.exists() else None
         if data is None or hashlib.sha256(data).hexdigest()!=item['sha256']:
             data=None
@@ -33,7 +36,7 @@ def main():
         assert len(data)==item['size'],f"{lang}: image byte length changed"
         assert hashlib.sha256(data).hexdigest()==item['sha256'],f"{lang}: image SHA-256 mismatch"
         im=Image.open(io.BytesIO(data))
-        assert im.format=='PNG' and im.size==(1254,1254),f"{lang}: unexpected image dimensions"
+        assert im.format=='PNG' and im.size==((1774,394) if item.get('wide') else (1254,1254)),f"{lang}: unexpected image dimensions"
         path.write_bytes(data)
         print(f"AUTO M USA ORIGINAL {lang.upper()} VERIFIED: {len(data)} bytes")
 if __name__=='__main__':main()

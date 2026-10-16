@@ -1224,6 +1224,40 @@ body{background:#f7f9fc;color:#14283c}
 #dm-ad-rotation .dm-ad-rotation-toolbar{flex-wrap:wrap}
 #dm-ad-rotation #dm-ad-rotation-status{margin-left:auto;white-space:nowrap;color:#fff500;font:800 11px/1.5 Arial,sans-serif}
 #dm-ad-rotation[data-rotation-state="paused"] #dm-ad-rotation-status{color:white}
+
+/* Wide campaign swap: two exactly equal 1774:394 boxes, no vertical translation. */
+#news-commercial-banner.dm-horizontal-slot,
+#news-carhauler-banner.dm-horizontal-slot{
+ box-sizing:border-box!important;position:relative!important;display:block!important;
+ width:100%!important;max-width:100%!important;height:auto!important;min-height:0!important;
+ aspect-ratio:1774/394!important;padding:0!important;
+ overflow:hidden!important;background:#000!important;border:0!important;border-radius:4px!important;
+}
+.dm-horizontal-slot::before{display:none!important}
+.dm-horizontal-slot .dm-horizontal-stage{position:relative;display:block;width:100%;height:100%;overflow:hidden;contain:layout paint}
+.dm-horizontal-slot .dm-horizontal-stage.dm-horizontal-close{animation:dm-h-close 260ms ease-in forwards}
+.dm-horizontal-slot .dm-horizontal-stage.dm-horizontal-open{animation:dm-h-open 340ms ease-out both}
+@keyframes dm-h-close{from{clip-path:inset(0 0 0 0)}to{clip-path:inset(0 0 100% 0)}}
+@keyframes dm-h-open{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+.dm-horizontal-slot .car-official-ad,.dm-horizontal-slot .ucr-ad{height:100%;width:100%;margin:0!important;padding:0!important;box-sizing:border-box}
+.dm-horizontal-slot .car-official-disclosure,.dm-horizontal-slot .ucr-ad-disclosure,
+.dm-horizontal-slot .ucr-ad-note,.dm-horizontal-slot .ucr-native-mobile-actions{display:none!important}
+.dm-horizontal-slot .car-official-horizontal{display:block!important;width:100%;height:100%!important;aspect-ratio:1774/394!important}
+.dm-horizontal-slot .car-official-square{display:none!important}
+.dm-horizontal-slot .car-official-visual{height:100%}
+.dm-horizontal-slot .ucr-native-banner{display:block!important;width:100%;height:100%!important;aspect-ratio:1774/394!important}
+.dm-horizontal-slot .ucr-native-banner img{display:block;width:100%;height:100%;object-fit:fill}
+.dm-horizontal-auto-art{position:relative;width:100%;height:100%;overflow:hidden;background:#000}
+.dm-horizontal-auto-img{display:block;width:100%;height:100%;object-fit:contain}
+.dm-horizontal-auto-phone,.dm-horizontal-auto-instagram{display:block;position:absolute;z-index:5;top:79%;height:21%;cursor:pointer;border-radius:2px}
+.dm-horizontal-auto-phone{left:43%;width:28%}
+.dm-horizontal-auto-instagram{left:73%;width:26%}
+.dm-horizontal-auto-phone:hover,.dm-horizontal-auto-instagram:hover,
+.dm-horizontal-auto-phone:focus-visible,.dm-horizontal-auto-instagram:focus-visible{outline:2px solid #fff500;outline-offset:-2px}
+@media(prefers-reduced-motion:reduce){
+ .dm-horizontal-slot .dm-horizontal-stage.dm-horizontal-open,
+ .dm-horizontal-slot .dm-horizontal-stage.dm-horizontal-close{animation:none!important}
+}
 </style>
 
 
@@ -1484,6 +1518,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=market-rotator-20261016-1" defer></script>
 <script src="assets/auto-m-usa.js?v=20261016-originals-sidebar-2" defer></script>
+<script src="assets/horizontal-ad-sequence.js?v=20261016-wide-sequence-v1" defer></script>
 <script src="assets/sidebar-ad-rotation.js?v=20261016-vertical-v1-1-visible" defer></script>
 <script src="assets/road-tv-live.js?v=creator-link-20261015-1" defer></script>
 <script src="assets/utility-strip.js?v=market-share-20261015-1" defer></script>
