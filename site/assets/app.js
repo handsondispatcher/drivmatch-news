@@ -550,7 +550,7 @@
           // ONLY for the horizontal news ticker. The original Photo 1 remains
           // immutable in article/other placements and as the historical master.
           const national=slot==='news-top'&&fmt==='horizontal';
-          const activeArt=national?'assets/ads/carhauler-national-service-pt-1774x394.png':localArt;
+          const activeArt=national?'assets/ads/carhauler-national-no-news-logo-'+lang+'-1774x394.png':localArt;
           const ratio=localized?'3 / 1':v.ratio;
           const activeRatio=national?'1774 / 394':ratio;
           const style="background-image:url('"+escapeHTML(activeArt)+"');background-size:100% 100%;background-position:0 0;";
@@ -558,15 +558,15 @@
           const waHref=national?nationwideWhatsapp:ad.whatsapp_url;
           const waHit=national?'left:43%;top:78%;width:29%;height:22%':v.wa;
           const igHit=national?'left:73%;top:78%;width:27%;height:22%':v.ig;
-          return '<div class="car-official-frame car-official-'+fmt+(localized?' car-official-localized':'')+'" style="aspect-ratio:'+activeRatio+'" data-art-locale="'+(national?'pt':localized?lang:'en')+'">'+
-            '<div class="car-official-visual" role="group" aria-label="'+escapeHTML(national?'Transportamos seu carro em todo o país. Com seguro e licença de operação.':carCopy.visual)+'" style="'+style+'">'+
+          return '<div class="car-official-frame car-official-'+fmt+(localized?' car-official-localized':'')+'" style="aspect-ratio:'+activeRatio+'" data-art-locale="'+(national?lang:localized?lang:'en')+'">'+
+            '<div class="car-official-visual" role="group" aria-label="'+escapeHTML(national?({pt:'Transportamos seu carro em todo o país.',es:'Transportamos su auto en todo el país.',en:'We transport your car nationwide.'}[lang]):carCopy.visual)+'" style="'+style+'">'+
             '<a class="car-official-hit car-official-wa" href="'+escapeHTML(waHref)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+waHit+'" aria-label="WhatsApp (908) 291-3386"></a>'+
             '<a class="car-official-hit car-official-ig" href="'+escapeHTML(ad.url)+'" target="_blank" rel="noopener noreferrer sponsored" style="'+igHit+'" aria-label="Instagram @fabriciodispatcher"></a>'+
             '</div></div>';
         };
         const fmt=slot==='article-inline'?'rectangle':'horizontal';
         const nationalSlot=slot==='news-top';
-        const artProvenance=nationalSlot?'data-approved-national-v2-sha256="d013f68020a12c8b9dc2c7721ba19a2fc710999217bbf78ab891cfc9f9df9442"':'data-approved-photo1-sha256="'+ad.approved_master_sha256+'"';
+        const artProvenance=nationalSlot?'data-approved-national-v3-locale="'+lang+'"':'data-approved-photo1-sha256="'+ad.approved_master_sha256+'"';
         const disclosure=nationalSlot?(lang==='en'?'ADVERTISEMENT · NATIONWIDE VEHICLE TRANSPORT':lang==='es'?'PUBLICIDAD · TRANSPORTE DE VEHÍCULOS EN TODO EL PAÍS':'PUBLICIDADE · TRANSPORTE DE VEÍCULOS EM TODO O PAÍS'):carCopy.disclosure;
         box.innerHTML='<div class="car-official-ad" '+artProvenance+'>'+
           '<div class="car-official-disclosure">'+escapeHTML(disclosure)+'</div>'+

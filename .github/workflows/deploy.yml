@@ -50,6 +50,16 @@ jobs:
           key: carhauler-national-service-pt-v2-d013f68020a1
       - name: Verificar e instalar a nova arte de transporte nacional
         run: python scripts/install_carhauler_national_v2.py
+      - name: Cache 3 banners sem logomarca do jornal
+        uses: actions/cache@v4
+        with:
+          path: |
+            site/assets/ads/carhauler-national-no-news-logo-pt-1774x394.png
+            site/assets/ads/carhauler-national-no-news-logo-es-1774x394.png
+            site/assets/ads/carhauler-national-no-news-logo-en-1774x394.png
+          key: no-news-logo-pt-es-en-v3-20261016
+      - name: Instalar os banners comerciais PT ES EN aprovados
+        run: python scripts/install_carhauler_national_v3.py
       # Native 4.5:1 UCR creative is built BEFORE tests and never stretches a 2:1 photo.
       - name: Cache da matriz UCR aprovada
         uses: actions/cache@v4
