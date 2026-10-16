@@ -11,16 +11,17 @@
  const track=document.getElementById('dm-ad-rotation-track');
  const button=document.getElementById('dm-ad-rotation-toggle');
  const heading=document.getElementById('dm-ad-rotation-title');
+ const status=document.getElementById('dm-ad-rotation-status');
  const mq=window.matchMedia?.('(prefers-reduced-motion: reduce)');
  const labels={
-  pt:{head:'PUBLICIDADE',pause:'Pausar',play:'Reproduzir',aria:'Anúncios em rotação vertical'},
-  es:{head:'PUBLICIDAD',pause:'Pausar',play:'Reanudar',aria:'Anuncios en rotación vertical'},
-  en:{head:'ADVERTISEMENT',pause:'Pause',play:'Resume',aria:'Vertical rotating advertisements'}
+  pt:{head:'PUBLICIDADE',pause:'Pausar',play:'Reproduzir',moving:'SUBINDO ↑',stopped:'PAUSADO',aria:'Anúncios em rotação vertical'},
+  es:{head:'PUBLICIDAD',pause:'Pausar',play:'Reanudar',moving:'SUBIENDO ↑',stopped:'EN PAUSA',aria:'Anuncios en rotación vertical'},
+  en:{head:'ADVERTISEMENT',pause:'Pause',play:'Resume',moving:'MOVING UP ↑',stopped:'PAUSED',aria:'Vertical rotating advertisements'}
  };
  const locale=v=>String(v||'').startsWith('en')?'en':String(v||'').startsWith('es')?'es':'pt';
  let lang=locale(document.documentElement.lang), offset=0, prior=0;
  let userPaused=Boolean(mq?.matches), hovered=false, focused=false, touchPaused=false, visible=true, intersectionVisible=true;
- const speed=22; // CSS pixels per second: readable scroll, configurable by governance.
+ const speed=56; // visibly moving ticker (px/s), interaction still pauses.
  const paused=()=>userPaused||hovered||focused||touchPaused||!visible||!intersectionVisible;
  function controls(){
   const copy=labels[lang];
@@ -28,6 +29,9 @@
   viewport.setAttribute('aria-label',copy.aria);
   button.textContent=userPaused?copy.play:copy.pause;
   button.setAttribute('aria-pressed',String(userPaused));
+  const stopped=paused();
+  if(status)status.textContent=stopped?copy.stopped:copy.moving;
+  root.dataset.rotationState=stopped?'paused':'moving';
  }
  function resetClock(){prior=0;}
  function tick(now){
@@ -51,16 +55,16 @@
   requestAnimationFrame(tick);
  }
  button.addEventListener('click',()=>{userPaused=!userPaused;touchPaused=false;controls();resetClock();});
- viewport.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'||event.pointerType==='pen'){hovered=true;resetClock();}});
- viewport.addEventListener('pointerleave',()=>{hovered=false;resetClock();});
- viewport.addEventListener('focusin',()=>{focused=true;resetClock();});
- viewport.addEventListener('focusout',event=>{if(!viewport.contains(event.relatedTarget)){focused=false;resetClock();}});
+ viewport.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse'||event.pointerType==='pen'){hovered=true;resetClock();controls();}});
+ viewport.addEventListener('pointerleave',()=>{hovered=false;resetClock();controls();});
+ viewport.addEventListener('focusin',()=>{focused=true;resetClock();controls();});
+ viewport.addEventListener('focusout',event=>{if(!viewport.contains(event.relatedTarget)){focused=false;resetClock();controls();}});
  viewport.addEventListener('touchstart',()=>{touchPaused=true;userPaused=true;controls();resetClock();},{passive:true});
- document.addEventListener('visibilitychange',()=>{visible=!document.hidden;resetClock();});
+ document.addEventListener('visibilitychange',()=>{visible=!document.hidden;resetClock();controls();});
  document.addEventListener('drivmatch:language',event=>{lang=locale(event.detail?.language);controls();});
  mq?.addEventListener?.('change',event=>{if(event.matches)userPaused=true;controls();resetClock();});
  if('IntersectionObserver' in window){
-  const observer=new IntersectionObserver(entries=>{intersectionVisible=Boolean(entries[0]?.isIntersecting);resetClock();},{threshold:0});
+  const observer=new IntersectionObserver(entries=>{intersectionVisible=Boolean(entries[0]?.isIntersecting);resetClock();controls();},{threshold:0});
   observer.observe(root);
  }
  controls();

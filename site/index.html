@@ -1220,6 +1220,10 @@ body{background:#f7f9fc;color:#14283c}
 #dm-ad-rotation .dm-ad-rotation-item:focus-within{outline:1px solid #fff500;outline-offset:-1px}
 @media(max-width:990px){#mercados #dm-ad-rotation{max-width:420px;margin:16px auto 20px}#dm-ad-rotation .dm-ad-rotation-viewport{height:min(65vh,600px);min-height:355px}}
 @media(prefers-reduced-motion:reduce){#dm-ad-rotation .dm-ad-rotation-track{will-change:auto}}
+
+#dm-ad-rotation .dm-ad-rotation-toolbar{flex-wrap:wrap}
+#dm-ad-rotation #dm-ad-rotation-status{margin-left:auto;white-space:nowrap;color:#fff500;font:800 11px/1.5 Arial,sans-serif}
+#dm-ad-rotation[data-rotation-state="paused"] #dm-ad-rotation-status{color:white}
 </style>
 
 
@@ -1392,7 +1396,7 @@ body{background:#f7f9fc;color:#14283c}
 </section><h2 id="market-title">Cotações e Mercado</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p>
 <section id="dm-ad-rotation" class="dm-ad-rotation" aria-label="Publicidade em rotação">
- <div class="dm-ad-rotation-toolbar"><span id="dm-ad-rotation-title">PUBLICIDADE</span><button id="dm-ad-rotation-toggle" type="button" aria-controls="dm-ad-rotation-viewport" aria-pressed="false">Pausar</button></div>
+ <div class="dm-ad-rotation-toolbar"><span id="dm-ad-rotation-title">PUBLICIDADE</span><span id="dm-ad-rotation-status" aria-live="off">SUBINDO ↑</span><button id="dm-ad-rotation-toggle" type="button" aria-controls="dm-ad-rotation-viewport" aria-pressed="false">Pausar</button></div>
  <div id="dm-ad-rotation-viewport" class="dm-ad-rotation-viewport" aria-label="Anúncios na coluna direita: rotação vertical">
   <div id="dm-ad-rotation-track" class="dm-ad-rotation-track">
    <div class="dm-ad-rotation-item" data-ad-campaign="ucr-2027">
@@ -1480,7 +1484,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=market-rotator-20261016-1" defer></script>
 <script src="assets/auto-m-usa.js?v=20261016-originals-sidebar-2" defer></script>
-<script src="assets/sidebar-ad-rotation.js?v=20261016-vertical-v1" defer></script>
+<script src="assets/sidebar-ad-rotation.js?v=20261016-vertical-v1-1-visible" defer></script>
 <script src="assets/road-tv-live.js?v=creator-link-20261015-1" defer></script>
 <script src="assets/utility-strip.js?v=market-share-20261015-1" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>

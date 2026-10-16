@@ -276,12 +276,12 @@
   },
   "sidebar_ad_rotation": {
     "status": "active",
-    "version": "1.0",
+    "version": "1.1",
     "governance_doc": "docs/DRIVMATCH_NEWS_VERTICAL_AD_ROTATION_RULE_V1.md",
     "placement": "right-sidebar",
     "direction": "up",
     "infinite": true,
-    "speed_css_pixels_per_second": 22,
+    "speed_css_pixels_per_second": 56,
     "hover_pause": true,
     "focus_pause": true,
     "touch_pause": true,
@@ -292,6 +292,8 @@
       "market-sidebar-driver",
       "auto-m-usa"
     ],
-    "clickable_ads_preserved": true
+    "clickable_ads_preserved": true,
+    "state_indicator": true,
+    "public_verification": "Custom domain Playwright probe"
   }
 }

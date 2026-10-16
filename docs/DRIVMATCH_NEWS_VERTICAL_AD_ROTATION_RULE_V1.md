@@ -23,3 +23,6 @@ As três peças aprovadas e já existentes são agrupadas dentro de `#dm-ad-rota
 **Testes obrigatórios:** integridade dos três slots, controle de idioma, pause-on-hover, pause-on-focus, controle de toque, reduced motion, loop sem duplicação, links, visualização desktop/móvel e pipeline de publicação.
 
 **Nota operacional:** GitHub Pages pode publicar pelo pipeline `.github/workflows/deploy.yml`, mas `drivmatch.com/news` precisa de verificação independente para confirmar atualização do domínio personalizado.
+
+## V1.1 — Visible ticker correction (2026-10-16)
+Independent production browser check proved that v1.0 was moving but barely perceptibly at 22 CSS pixels/s (about 28px in 1.3s). Following advertiser feedback, increase baseline speed to **56 CSS pixels/s**, display localized **SUBINDO ↑ / PAUSADO**, **SUBIENDO ↑ / EN PAUSA**, **MOVING UP ↑ / PAUSED** status beside explicit pause control, and bump the JS cache version. Continue preserving approved artwork, hover/touch/focus pauses, reduced-motion, original contact links, and language-selector localization. Custom-domain probe must confirm real pixel movement, correct script version and pause in browser.
