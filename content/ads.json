@@ -139,7 +139,6 @@
       "creative_type": "trilingual-auto-m-usa",
       "campaign_id": "auto-m-usa-kissimmee-20261016",
       "formats": [
-        "horizontal-1774x394",
         "square-1254x1254"
       ],
       "language_variants": [
@@ -147,13 +146,38 @@
         "es",
         "en"
       ],
-      "artwork_pattern": "assets/ads/auto-m-usa-{lang}-{format}.svg",
+      "artwork_pattern": "assets/ads/auto-m-usa-{lang}-original.png",
       "address": "2040 E Irlo Bronson Memorial Hwy, Kissimmee, FL 34744",
       "phone": "+1 (407) 600-4737",
-      "whatsapp_url": "https://wa.me/14076004737?text=Vim%20pelo%20DrivMatch%20News",
+      "whatsapp_url": "https://wa.me/14076004737?text=Ol%C3%A1!%20Vim%20pelo%20an%C3%BAncio%20da%20DrivMatch%20News.",
       "instagram_url": "https://www.instagram.com/autom.usa/",
-      "pre_filled_message": "Vim pelo DrivMatch News",
-      "source_note": "Novas peças responsivas adaptadas da última tríade AUTO M USA aprovada, mantendo layout tipográfico, cores e informação. WhatsApp com mensagem pré-preenchida; Instagram abre perfil sem pré-preenchimento de mensagem."
+      "pre_filled_message": "Olá! Vim pelo anúncio da DrivMatch News.",
+      "source_note": "Exibir EXATAMENTE os 3 PNGs originais enviados pelo anunciante em 16/10/2026 (PT/ES/EN), sem redesenhar ou recortar. Um idioma por vez conforme seletor superior. O anúncio fica abaixo do classificado na coluna direita; telefone sobreposto leva ao WhatsApp com origem DrivMatch News; Instagram leva ao perfil.",
+      "format": "square-1254x1254",
+      "placement": "right-sidebar-below-driver-classified",
+      "master_images": {
+        "en": {
+          "path": "assets/ads/auto-m-usa-en-original.png",
+          "sha256": "12a5708291c3e5cdd62c32980fac5d24c0dea21a51a434defcbfcf81e5bab417",
+          "source_url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/d768f613505254571a3491999b0f765b8745218fce79e7bd93ba6e00ad615ed5.png",
+          "width": 1254,
+          "height": 1254
+        },
+        "es": {
+          "path": "assets/ads/auto-m-usa-es-original.png",
+          "sha256": "d0b776a552cca3de9cbd80f2f81b0b7cad95058c9988908331888c0f3d5f0c83",
+          "source_url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/37907c30e22cded948606c26b781159e29c738d4861fe7d4b009517b03cae77f.png",
+          "width": 1254,
+          "height": 1254
+        },
+        "pt": {
+          "path": "assets/ads/auto-m-usa-pt-original.png",
+          "sha256": "cef3af63240c505a84f65c190feaabcd0a05553b2afc328c81b718a96e3207ec",
+          "source_url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/f36f5790c3be8b1f982c6e0bb65473c4f1896c2c66fbe572b75b2d0b2c10fb7d.png",
+          "width": 1254,
+          "height": 1254
+        }
+      }
     }
   ],
   "approved_creative_rules": {

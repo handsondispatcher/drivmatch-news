@@ -1192,19 +1192,16 @@ body{background:#f7f9fc;color:#14283c}
  .dm-market-rotator .market-live-row{position:static;min-height:0;opacity:1;visibility:visible;animation:none}
 }
 
-/* AUTO M USA standalone campaign. Layout follows native DrivMatch News 1774:394 wide ratio. */
-.autom-usa-ad{width:min(calc(100% - 24px),1774px);margin:25px auto 30px;box-sizing:border-box}
-.autom-usa-label{font:700 11px/1.6 Arial,sans-serif;letter-spacing:.8px;color:#536171;margin-bottom:7px}
-.autom-usa-art{position:relative;background:#000;overflow:hidden;border-radius:4px}
-.autom-usa-art img{display:block;width:100%;height:100%;object-fit:fill}
-.autom-usa-wide{aspect-ratio:1774/394}.autom-usa-square{display:none;aspect-ratio:1}
-.autom-usa-hit{position:absolute;z-index:2;display:block;cursor:pointer}
-.autom-usa-hit:focus-visible,.autom-usa-hit:hover{outline:3px solid #fff500;outline-offset:-3px}
-.autom-usa-wide-phone{left:38.5%;top:74%;width:38%;height:25%}
-.autom-usa-wide-ig{left:78%;top:74%;width:22%;height:25%}
-.autom-usa-square-phone{left:6%;top:84%;width:88%;height:8.5%}
-.autom-usa-square-ig{left:25%;top:92%;width:50%;height:8%}
-@media(max-width:740px){.autom-usa-ad{max-width:420px;width:calc(100% - 24px);margin:20px auto 25px}.autom-usa-wide{display:none}.autom-usa-square{display:block}}
+/* AUTO M USA: real advertiser-approved PNGs inside the right news sidebar. */
+#mercados #auto-m-usa-banner{display:block;position:relative;box-sizing:border-box;width:100%;max-width:100%;min-width:0;margin:14px 0 18px;padding:0;overflow:hidden;background:transparent;color:#fff}
+#auto-m-usa-banner .autom-usa-label{margin:0 0 8px;color:#dbe8f5;font:700 10px/1.4 Arial,sans-serif;letter-spacing:.6px;text-transform:uppercase}
+#auto-m-usa-banner .autom-usa-art{position:relative;aspect-ratio:1/1;width:100%;max-width:100%;overflow:hidden;background:#000;border-radius:4px}
+#auto-m-usa-banner .autom-usa-art img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+#auto-m-usa-banner .autom-usa-hit{position:absolute;z-index:2;display:block;cursor:pointer}
+#auto-m-usa-banner .autom-usa-hit:hover,#auto-m-usa-banner .autom-usa-hit:focus-visible{outline:2px solid #fff500;outline-offset:-2px}
+#auto-m-usa-banner .autom-usa-phone{left:6%;top:81.4%;width:88%;height:10.2%}
+#auto-m-usa-banner .autom-usa-instagram{left:23%;top:91.6%;width:54%;height:8.4%}
+@media(max-width:990px){#mercados #auto-m-usa-banner{max-width:420px;margin:15px auto 20px}}
 
 </style>
 
@@ -1386,21 +1383,16 @@ body{background:#f7f9fc;color:#14283c}
     </a>
     <a class="dm-driver-whatsapp-hotspot" href="https://wa.me/14072852874" target="_blank" rel="noopener noreferrer sponsored" aria-label="Falar com Aileen Souza no WhatsApp (407) 285-2874" title="WhatsApp (407) 285-2874"></a>
   </div>
+</section>
+<section id="auto-m-usa-banner" class="autom-usa-ad" aria-label="Publicidade: AUTO M USA">
+ <div id="autom-usa-label" class="autom-usa-label">PUBLICIDADE · AUTO M USA</div>
+ <div class="autom-usa-art">
+  <img id="autom-usa-image" src="https://cdn.openart.ai/openart-uploads/production/attachment-transfers/f36f5790c3be8b1f982c6e0bb65473c4f1896c2c66fbe572b75b2d0b2c10fb7d.png" width="1254" height="1254" loading="lazy" decoding="async" alt="AUTO M USA em Kissimmee, Florida. Seu próximo carro começa aqui. Telefone +1 (407) 600-4737 e Instagram @autom.usa">
+  <a class="autom-usa-hit autom-usa-phone" href="https://wa.me/14076004737?text=Ol%C3%A1!%20Vim%20pelo%20an%C3%BAncio%20da%20DrivMatch%20News." target="_blank" rel="noopener noreferrer sponsored" aria-label="AUTO M USA: abrir WhatsApp +1 (407) 600-4737, com a mensagem de referência da DrivMatch News"></a>
+  <a class="autom-usa-hit autom-usa-instagram" href="https://www.instagram.com/autom.usa/" target="_blank" rel="noopener noreferrer sponsored" aria-label="Instagram da AUTO M USA: @autom.usa"></a>
+ </div>
 </section></aside>
 </div>
-<section class="autom-usa-ad" id="auto-m-usa-banner" aria-label="Publicidade: AUTO M USA">
-<div class="autom-usa-label" id="autom-usa-label">PUBLICIDADE · AUTO M USA</div>
-<div class="autom-usa-art autom-usa-wide">
- <img id="autom-usa-wide" src="assets/ads/auto-m-usa-pt-wide.svg" width="1774" height="394" loading="lazy" decoding="async" alt="AUTO M USA Kissimmee Florida">
- <a class="autom-usa-hit autom-usa-wide-phone" href="https://wa.me/14076004737?text=Vim%20pelo%20DrivMatch%20News" target="_blank" rel="noopener noreferrer sponsored" aria-label="WhatsApp AUTO M USA: +1 (407) 600-4737"></a>
- <a class="autom-usa-hit autom-usa-wide-ig" href="https://www.instagram.com/autom.usa/" target="_blank" rel="noopener noreferrer sponsored" aria-label="Instagram @autom.usa"></a>
-</div>
-<div class="autom-usa-art autom-usa-square">
- <img id="autom-usa-square" src="assets/ads/auto-m-usa-pt-square.svg" width="1254" height="1254" loading="lazy" decoding="async" alt="AUTO M USA Kissimmee Florida">
- <a class="autom-usa-hit autom-usa-square-phone" href="https://wa.me/14076004737?text=Vim%20pelo%20DrivMatch%20News" target="_blank" rel="noopener noreferrer sponsored" aria-label="WhatsApp AUTO M USA: +1 (407) 600-4737"></a>
- <a class="autom-usa-hit autom-usa-square-ig" href="https://www.instagram.com/autom.usa/" target="_blank" rel="noopener noreferrer sponsored" aria-label="Instagram @autom.usa"></a>
-</div>
-</section>
 <aside class="newsroom-partner-cta" aria-label="Acesso às oportunidades da DrivMatch">
   <div class="newsroom-cta-copy"><span class="newsroom-cta-eyebrow" id="newsroom-cta-eyebrow">SERVIÇOS DRIVMATCH · ACESSO EXTERNO AO JORNAL</span>
   <h2 id="newsroom-cta-title">Oportunidades no transporte</h2>
@@ -1457,7 +1449,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=market-rotator-20261016-1" defer></script>
-<script src="assets/auto-m-usa.js?v=20261016-01" defer></script>
+<script src="assets/auto-m-usa.js?v=20261016-originals-sidebar-2" defer></script>
 <script src="assets/road-tv-live.js?v=creator-link-20261015-1" defer></script>
 <script src="assets/utility-strip.js?v=market-share-20261015-1" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>
