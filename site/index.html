@@ -1203,6 +1203,23 @@ body{background:#f7f9fc;color:#14283c}
 #auto-m-usa-banner .autom-usa-instagram{left:23%;top:91.6%;width:54%;height:8.4%}
 @media(max-width:990px){#mercados #auto-m-usa-banner{max-width:420px;margin:15px auto 20px}}
 
+
+/* DrivMatch News vertical advertising ticker — v1.0 officially governed */
+#mercados #dm-ad-rotation{display:block;min-width:0;width:100%;max-width:100%;box-sizing:border-box;margin:13px 0 19px;overflow:hidden}
+#dm-ad-rotation .dm-ad-rotation-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 1px 8px;color:#dbeafa;font:700 10px/1.45 Arial,sans-serif;letter-spacing:.55px}
+#dm-ad-rotation .dm-ad-rotation-toolbar button{flex-shrink:0;min-height:30px;min-width:75px;padding:5px 9px;color:#fff;background:#174365;border:1px solid #7090a9;border-radius:4px;cursor:pointer;font:700 12px Arial,sans-serif;letter-spacing:0}
+#dm-ad-rotation .dm-ad-rotation-toolbar button:hover,#dm-ad-rotation .dm-ad-rotation-toolbar button:focus-visible{background:#255c82;outline:2px solid #fff500;outline-offset:2px}
+#dm-ad-rotation .dm-ad-rotation-viewport{position:relative;box-sizing:border-box;height:min(68vh,660px);min-height:390px;width:100%;overflow:hidden;isolation:isolate;touch-action:pan-y;overscroll-behavior:contain;contain:layout paint}
+#dm-ad-rotation .dm-ad-rotation-track{display:flex;flex-direction:column;gap:14px;will-change:transform;transform:translate3d(0,0,0)}
+#dm-ad-rotation .dm-ad-rotation-item{flex:none;min-width:0;width:100%;max-width:100%;box-sizing:border-box;overflow:hidden}
+#dm-ad-rotation .dm-ad-rotation-item > section{max-width:100%;margin:0!important;min-width:0}
+#dm-ad-rotation .dm-ad-rotation-item > section[hidden]{display:none!important}
+#dm-ad-rotation .dm-ad-rotation-item img{max-width:100%}
+#dm-ad-rotation .dm-ad-rotation-item[data-ad-campaign="auto-m-usa"]{padding:0}
+#mercados #dm-ad-rotation #auto-m-usa-banner{width:100%;max-width:100%;padding:0;background:transparent}
+#dm-ad-rotation .dm-ad-rotation-item:focus-within{outline:1px solid #fff500;outline-offset:-1px}
+@media(max-width:990px){#mercados #dm-ad-rotation{max-width:420px;margin:16px auto 20px}#dm-ad-rotation .dm-ad-rotation-viewport{height:min(65vh,600px);min-height:355px}}
+@media(prefers-reduced-motion:reduce){#dm-ad-rotation .dm-ad-rotation-track{will-change:auto}}
 </style>
 
 
@@ -1374,7 +1391,14 @@ body{background:#f7f9fc;color:#14283c}
   <div class="roadtv-screen" aria-label="Transmissão em vídeo" aria-live="off"></div>
 </section><h2 id="market-title">Cotações e Mercado</h2><div id="market"></div>
 <p class="micro" id="market-note" role="status"></p>
+<section id="dm-ad-rotation" class="dm-ad-rotation" aria-label="Publicidade em rotação">
+ <div class="dm-ad-rotation-toolbar"><span id="dm-ad-rotation-title">PUBLICIDADE</span><button id="dm-ad-rotation-toggle" type="button" aria-controls="dm-ad-rotation-viewport" aria-pressed="false">Pausar</button></div>
+ <div id="dm-ad-rotation-viewport" class="dm-ad-rotation-viewport" aria-label="Anúncios na coluna direita: rotação vertical">
+  <div id="dm-ad-rotation-track" class="dm-ad-rotation-track">
+   <div class="dm-ad-rotation-item" data-ad-campaign="ucr-2027">
 <section id="market-commercial-banner" class="ad-placement ad-placement-side" aria-label="Publicidade"></section>
+   </div>
+   <div class="dm-ad-rotation-item" data-ad-campaign="driver-available">
 <section id="market-driver-availability-banner" class="dm-driver-sidebar-placement" aria-label="Classificado: motorista disponível">
   <div class="dm-driver-ad-label">PUBLICIDADE · MOTORISTA DISPONÍVEL</div>
   <div class="dm-driver-visual">
@@ -1384,12 +1408,18 @@ body{background:#f7f9fc;color:#14283c}
     <a class="dm-driver-whatsapp-hotspot" href="https://wa.me/14072852874" target="_blank" rel="noopener noreferrer sponsored" aria-label="Falar com Aileen Souza no WhatsApp (407) 285-2874" title="WhatsApp (407) 285-2874"></a>
   </div>
 </section>
+</div>
+   <div class="dm-ad-rotation-item" data-ad-campaign="auto-m-usa">
 <section id="auto-m-usa-banner" class="autom-usa-ad" aria-label="Publicidade: AUTO M USA">
  <div id="autom-usa-label" class="autom-usa-label">PUBLICIDADE · AUTO M USA</div>
  <div class="autom-usa-art">
   <img id="autom-usa-image" src="https://cdn.openart.ai/openart-uploads/production/attachment-transfers/f36f5790c3be8b1f982c6e0bb65473c4f1896c2c66fbe572b75b2d0b2c10fb7d.png" width="1254" height="1254" loading="lazy" decoding="async" alt="AUTO M USA em Kissimmee, Florida. Seu próximo carro começa aqui. Telefone +1 (407) 600-4737 e Instagram @autom.usa">
   <a class="autom-usa-hit autom-usa-phone" href="https://wa.me/14076004737?text=Ol%C3%A1!%20Vim%20pelo%20an%C3%BAncio%20da%20DrivMatch%20News." target="_blank" rel="noopener noreferrer sponsored" aria-label="AUTO M USA: abrir WhatsApp +1 (407) 600-4737, com a mensagem de referência da DrivMatch News"></a>
   <a class="autom-usa-hit autom-usa-instagram" href="https://www.instagram.com/autom.usa/" target="_blank" rel="noopener noreferrer sponsored" aria-label="Instagram da AUTO M USA: @autom.usa"></a>
+ </div>
+</section>
+   </div>
+  </div>
  </div>
 </section></aside>
 </div>
@@ -1450,6 +1480,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=market-rotator-20261016-1" defer></script>
 <script src="assets/auto-m-usa.js?v=20261016-originals-sidebar-2" defer></script>
+<script src="assets/sidebar-ad-rotation.js?v=20261016-vertical-v1" defer></script>
 <script src="assets/road-tv-live.js?v=creator-link-20261015-1" defer></script>
 <script src="assets/utility-strip.js?v=market-share-20261015-1" defer></script>
 <script src="assets/news-crawler.js?v=restore-source-20261013" defer></script>

@@ -273,5 +273,25 @@
       ],
       "approved_caption": "CARGA DISPONIBLE PARA TRANSPORTISTAS DE VEHÍCULOS"
     }
+  },
+  "sidebar_ad_rotation": {
+    "status": "active",
+    "version": "1.0",
+    "governance_doc": "docs/DRIVMATCH_NEWS_VERTICAL_AD_ROTATION_RULE_V1.md",
+    "placement": "right-sidebar",
+    "direction": "up",
+    "infinite": true,
+    "speed_css_pixels_per_second": 22,
+    "hover_pause": true,
+    "focus_pause": true,
+    "touch_pause": true,
+    "reduced_motion_default_paused": true,
+    "language_selector": "top-pt-es-en",
+    "slots": [
+      "market-sidebar",
+      "market-sidebar-driver",
+      "auto-m-usa"
+    ],
+    "clickable_ads_preserved": true
   }
 }

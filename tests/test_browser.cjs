@@ -134,6 +134,30 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#news-commercial-banner .ucr-frame').count(),0,'UCR must never replace the horizontal vehicle load banner');
    assert.equal(await page.locator('#market-commercial-banner .ucr-frame-square').count(),1,'UCR square creative stays in the right sidebar');
    assert.equal(await page.locator('#market-commercial-banner').isVisible(),width>=991,'Right sidebar UCR is visible only on desktop');
+   // Official vertical ad rotation in the right sidebar; only the original three adverts exist.
+   assert.equal(await page.locator('#dm-ad-rotation-track > .dm-ad-rotation-item').count(),3);
+   assert.equal(await page.locator('#dm-ad-rotation-track #market-commercial-banner').count(),1);
+   assert.equal(await page.locator('#dm-ad-rotation-track #market-driver-availability-banner').count(),1);
+   assert.equal(await page.locator('#dm-ad-rotation-track #auto-m-usa-banner').count(),1);
+   assert.equal(await page.locator('#dm-ad-rotation-toggle').count(),1);
+   if(width===1280){
+     const vp=page.locator('#dm-ad-rotation-viewport');
+     await vp.scrollIntoViewIfNeeded();
+     await page.mouse.move(0,0);
+     await page.waitForTimeout(250);
+     const start=await page.locator('#dm-ad-rotation-track').evaluate(el=>el.getBoundingClientRect().top);
+     await page.waitForTimeout(600);
+     const moved=await page.locator('#dm-ad-rotation-track').evaluate(el=>el.getBoundingClientRect().top);
+     assert.ok(moved<start-4,'ad loop must travel continuously upward');
+     await vp.hover();
+     await page.waitForTimeout(120);
+     const still=await page.locator('#dm-ad-rotation-track').evaluate(el=>el.getBoundingClientRect().top);
+     await page.waitForTimeout(500);
+     const paused=await page.locator('#dm-ad-rotation-track').evaluate(el=>el.getBoundingClientRect().top);
+     assert.ok(Math.abs(still-paused)<0.5,'hover must stop the ad carousel');
+     await page.locator('#dm-ad-rotation-toggle').click();
+     assert.equal(await page.locator('#dm-ad-rotation-toggle').getAttribute('aria-pressed'),'true','manual pause must be active');
+   }
    // Independent approved driver classified directly under UCR, not dependent
    // on the dynamic ads bootstrap. Contact hotspot keeps Aileen's own phone.
    const driverPoster=page.locator('#market-driver-availability-banner .dm-driver-poster-open img');

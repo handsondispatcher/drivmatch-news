@@ -55,6 +55,7 @@ jobs:
           python -m unittest discover -s tests
           node --check site/assets/utility-strip.js
           node --check site/assets/app.js
+          node --check site/assets/sidebar-ad-rotation.js
           node --check site/assets/road-tv-live.js
           node tests/test_client.js
       # Road TV discovery queries are cached by UTC hour across 10-minute
