@@ -1,0 +1,25 @@
+name: Verify live right-side ad carousel
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/index.html'
+      - 'site/assets/sidebar-ad-rotation.js'
+      - '.github/workflows/verify-live-ad-rotation.yml'
+      - 'scripts/verify_live_ad_rotation.cjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Check actual custom-domain carousel DOM and animation
+        run: node scripts/verify_live_ad_rotation.cjs
