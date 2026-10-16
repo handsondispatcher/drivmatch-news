@@ -1173,6 +1173,25 @@ body{background:#f7f9fc;color:#14283c}
  #dm-utility .dm-util-quote{grid-template-rows:22px 29px!important}
 }
 
+
+/* Approved market-panel enhancement: rotate presentation ONLY; verified quotes,
+   provider polling, source dates and news/TV/weather placements are unchanged. */
+.dm-market-rotator{position:relative;min-height:108px;isolation:isolate}
+.dm-market-rotator .market-live-row{margin:0;min-height:108px;align-items:center}
+.dm-market-count-2 .market-live-row,.dm-market-count-3 .market-live-row{position:absolute;inset:0;width:100%;opacity:0;visibility:hidden;animation:dm-market-quote-three 15s linear infinite}
+.dm-market-count-2 .market-live-row{animation-name:dm-market-quote-two;animation-duration:10s}
+.dm-market-count-2 .market-live-row:nth-child(1),.dm-market-count-3 .market-live-row:nth-child(1){animation-delay:0s}
+.dm-market-count-2 .market-live-row:nth-child(2){animation-delay:-5s}
+.dm-market-count-3 .market-live-row:nth-child(2){animation-delay:-10s}
+.dm-market-count-3 .market-live-row:nth-child(3){animation-delay:-5s}
+@keyframes dm-market-quote-three{0%,30%{opacity:1;visibility:visible}33.333%,100%{opacity:0;visibility:hidden}}
+@keyframes dm-market-quote-two{0%,45%{opacity:1;visibility:visible}50%,100%{opacity:0;visibility:hidden}}
+.dm-market-rotator:hover .market-live-row,.dm-market-rotator:focus-within .market-live-row{animation-play-state:paused}
+@media(prefers-reduced-motion:reduce){
+ .dm-market-rotator{min-height:0}
+ .dm-market-rotator .market-live-row{position:static;min-height:0;opacity:1;visibility:visible;animation:none}
+}
+
 </style>
 
 

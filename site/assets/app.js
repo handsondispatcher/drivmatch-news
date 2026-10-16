@@ -435,7 +435,7 @@
     const empty=lang==='pt'?'Sem indicadores recentes e verificados nesta atualização. Não exibimos cotações fictícias.':
       lang==='es'?'No hay indicadores recientes y verificados. No mostramos cotizaciones ficticias.':
       'No recent verified market indicators are available. No invented quotes.';
-    const marketHTML=body.length?body.join(''):`<p class="market-unavailable">${empty}</p>`;
+    const marketHTML=body.length?'<div class="dm-market-rotator dm-market-count-'+body.length+'" aria-label="'+escapeHTML(lang==='en'?'Market quotes':lang==='es'?'Cotizaciones del mercado':'Cotações do mercado')+'">'+body.join('')+'</div>':`<p class="market-unavailable">${empty}</p>`;
     $('market').innerHTML=marketHTML;
     $('market-mobile').innerHTML=marketHTML;
     // Provider audit runs behind the UI. Keep the public panel compact.
