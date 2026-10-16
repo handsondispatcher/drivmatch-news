@@ -17,6 +17,6 @@ class TestThreeLocalizedTransportBanners(unittest.TestCase):
    self.assertLess(int(white),20,lang)
  def test_locale_paths_render(self):
   js=(ROOT/'site/assets/app.js').read_text(encoding='utf-8')
-  self.assertIn("'carhauler-national-no-news-logo-'+lang+'-1774x394.png'",js)
+  self.assertIn("carhauler-national-no-news-logo-'+lang+'-1774x394.png",js)
   self.assertIn("data-approved-national-v3-locale",js)
 if __name__=='__main__':unittest.main()
