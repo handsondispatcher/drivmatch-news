@@ -1,7 +1,6 @@
 """No newspaper-brand graphic on each 1774x394 approved advertising PNG."""
 from pathlib import Path
 import unittest,io,json,hashlib
-import numpy as np
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[1]
 class TestThreeLocalizedTransportBanners(unittest.TestCase):
@@ -13,8 +12,8 @@ class TestThreeLocalizedTransportBanners(unittest.TestCase):
    self.assertEqual(hashlib.sha256(raw).hexdigest(),rec['sha256'])
    im=Image.open(io.BytesIO(raw))
    self.assertEqual(im.size,(1774,394))
-   top=np.array(im.convert('RGB'))[17:55,47:325]
-   white=((top[:,:,0]>175)&(top[:,:,1]>175)&(top[:,:,2]>175)).sum()
+   top=im.convert('RGB').crop((47,17,325,55))
+   white=sum(1 for r,g,b in top.getdata() if r>175 and g>175 and b>175)
    self.assertLess(int(white),20,lang)
  def test_locale_paths_render(self):
   js=(ROOT/'site/assets/app.js').read_text(encoding='utf-8')
