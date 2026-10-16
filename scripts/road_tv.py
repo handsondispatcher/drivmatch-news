@@ -389,7 +389,7 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
                 and ident in diagnostics.get('_targeted_video_ids',[])
                 and str(info.get('channelId') or '')==diagnostics.get('_targeted_channel_id')
                 and (diagnostics.get('_priority_source_by_video',{}).get(ident) or {}).get('name')=='Ride Along Gang'
-                and re.search(r'Denver\\s*,?\\s*CO\\s*[→➜➔➡⟶-]\\s*Schuyler\\s*,?\\s*NE',title,re.I)
+                and re.search(r'Denver\s*,?\s*CO\s*[→➜➔➡⟶-]\s*Schuyler\s*,?\s*NE',title,re.I)
                 and CAB.search(title)
                 and not STOP.search(title)
                 and info.get('liveBroadcastContent')=='live'
