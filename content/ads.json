@@ -129,6 +129,31 @@
       "whatsapp_url": "https://wa.me/14072852874",
       "image_status": "original_uploaded_chat_asset_pending_repo_binary",
       "source_note": "Arte exata fornecida pelo usuário em 13/10/2026. É proibido reconstruir, recortar, reescrever ou trocar a imagem. Ajustar exclusivamente a escala CSS (width:100%;height:auto;object-fit:contain) dentro da coluna lateral, abaixo do UCR quadrado. Área invisível clicável sobre o número (407) 285-2874 abre o WhatsApp do anunciante. Publicar apenas quando a imagem original com hash verificado existir no repositório."
+    },
+    {
+      "slot": "auto-m-usa",
+      "label": "Publicidade",
+      "enabled": true,
+      "relationship": "third_party_advertiser",
+      "sponsor": "AUTO M USA",
+      "creative_type": "trilingual-auto-m-usa",
+      "campaign_id": "auto-m-usa-kissimmee-20261016",
+      "formats": [
+        "horizontal-1774x394",
+        "square-1254x1254"
+      ],
+      "language_variants": [
+        "pt",
+        "es",
+        "en"
+      ],
+      "artwork_pattern": "assets/ads/auto-m-usa-{lang}-{format}.svg",
+      "address": "2040 E Irlo Bronson Memorial Hwy, Kissimmee, FL 34744",
+      "phone": "+1 (407) 600-4737",
+      "whatsapp_url": "https://wa.me/14076004737?text=Vim%20pelo%20DrivMatch%20News",
+      "instagram_url": "https://www.instagram.com/autom.usa/",
+      "pre_filled_message": "Vim pelo DrivMatch News",
+      "source_note": "Novas peças responsivas adaptadas da última tríade AUTO M USA aprovada, mantendo layout tipográfico, cores e informação. WhatsApp com mensagem pré-preenchida; Instagram abre perfil sem pré-preenchimento de mensagem."
     }
   ],
   "approved_creative_rules": {
