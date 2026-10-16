@@ -381,7 +381,27 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
                 and info.get('liveBroadcastContent')=='live'
                 and when(live.get('actualStartTime'))
                 and not live.get('actualEndTime'))
-            if owner_ride_along and not profile:
+            # The 2026-10-10 owner screenshot applies only to the exact
+            # targeted video, verified channel and Denver-to-Schuyler route.
+            # It cannot validate other uploads from the same channel.
+            screenshot_match=bool(
+                diagnostics is not None
+                and ident in diagnostics.get('_targeted_video_ids',[])
+                and str(info.get('channelId') or '')==diagnostics.get('_targeted_channel_id')
+                and (diagnostics.get('_priority_source_by_video',{}).get(ident) or {}).get('name')=='Ride Along Gang'
+                and re.search(r'Denver\\s*,?\\s*CO\\s*[→➜➔➡⟶-]\\s*Schuyler\\s*,?\\s*NE',title,re.I)
+                and CAB.search(title)
+                and not STOP.search(title)
+                and info.get('liveBroadcastContent')=='live'
+                and when(live.get('actualStartTime'))
+                and not live.get('actualEndTime'))
+            if screenshot_match and not profile:
+                profile={'source_rank':0,'view_type':'cargo_cab',
+                         'geo_evidence':'Exact US route in verified target title',
+                         'camera_evidence':'Owner visual screenshot 2026-10-10 of exact Ride Along Gang stream; not independent motion proof'}
+                diagnostics['owner_visual_evidence_used']+=1
+                diagnostics['targeted_title_match']=True
+            elif owner_ride_along and not profile:
                 profile={'source_rank':0,'view_type':'cargo_cab',
                          'geo_evidence':'US route stated in publisher title; channel resolved via official YouTube API',
                          'camera_evidence':'Owner-observed front cab POV for Ride Along Gang; metadata itself does not prove motion'}
