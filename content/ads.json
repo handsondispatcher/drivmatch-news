@@ -34,7 +34,10 @@
       "format": "horizontal",
       "url": "https://instagram.com/fabriciodispatcher",
       "whatsapp_url": "https://wa.me/19082913386?text=Hi%2C%20I%27m%20interested%20in%20the%203-vehicle%20car%20hauler%20load%20from%20Kissimmee%20to%20Miami.",
-      "source_note": "Foto 1 fornecida e aprovada pelo usuário. Exibir somente recortes geométricos das três artes presentes na foto original; proibição de redesenho, recoloração ou elementos gráficos adicionais."
+      "source_note": "Arte anterior Foto 1 permanece arquivada e intacta para publicidade de artigo. A chamada principal da posição horizontal agora usa a nova arte de transporte nacional enviada à campanha em 2026-10-16; contatos (908) 291-3386 e @fabriciodispatcher preservados. Troca aprovada por instrução do proprietário no chat.",
+      "presentation_revision": "national-vehicle-transport-v2-20261016",
+      "current_horizontal_creative": "assets/ads/carhauler-national-service-pt-1774x394.png",
+      "current_horizontal_creative_sha256": "d013f68020a12c8b9dc2c7721ba19a2fc710999217bbf78ab891cfc9f9df9442"
     },
     {
       "slot": "market-sidebar",
@@ -343,6 +346,19 @@
     },
     "preserve_existing_sidebar_vertical_rotation": true,
     "maintain_original_campaign_contact_links": true,
-    "governance_document": "docs/DRIVMATCH_NEWS_PAIRED_HORIZONTAL_AD_ROTATION_V1.md"
+    "governance_document": "docs/DRIVMATCH_NEWS_PAIRED_HORIZONTAL_AD_ROTATION_V1.md",
+    "carhauler_national_service_v2": {
+      "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/e9714d4e1115bad8752332f92cff4a185555b2e842e0d6abf2027c628e3eefad.png",
+      "sha256": "d013f68020a12c8b9dc2c7721ba19a2fc710999217bbf78ab891cfc9f9df9442",
+      "size": 1027424,
+      "width": 1774,
+      "height": 394,
+      "path": "assets/ads/carhauler-national-service-pt-1774x394.png",
+      "language": "pt",
+      "creative_copy": "Transportamos seu carro · Em todo o país · Com seguro e licença de operação",
+      "head_services": "Pick up e delivery em leilões, dealers, oficina, mudança, privado, exportação, portos e aeroportos, transferência, veículos quebrados, barcos, motos, caminhonetes e caminhões.",
+      "contact_phone": "(908) 291-3386",
+      "instagram": "@fabriciodispatcher"
+    }
   }
 }

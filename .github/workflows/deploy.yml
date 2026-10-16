@@ -43,6 +43,13 @@ jobs:
           key: autom-usa-originals-20261016-v3-with-wide
       - name: Instalar as artes originais AUTO M USA com SHA-256
         run: python scripts/install_autom_usa_ads.py
+      - name: Cache do banner transporte nacional - nova arte
+        uses: actions/cache@v4
+        with:
+          path: site/assets/ads/carhauler-national-service-pt-1774x394.png
+          key: carhauler-national-service-pt-v2-d013f68020a1
+      - name: Verificar e instalar a nova arte de transporte nacional
+        run: python scripts/install_carhauler_national_v2.py
       # Native 4.5:1 UCR creative is built BEFORE tests and never stretches a 2:1 photo.
       - name: Cache da matriz UCR aprovada
         uses: actions/cache@v4
