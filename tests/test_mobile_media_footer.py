@@ -20,7 +20,7 @@ class MobileMediaFooter(unittest.TestCase):
                    '#mercados.side{',
                    '#mercados .weather-desktop{display:block!important}',
                    '.mobile-market{display:none!important}',
-                   '#mercados #dm-ad-rotation{display:block!important}'):
+                   '#mercados #dm-ad-rotation{display:block!important;width:100%'):
    self.assertIn(fragment,html)
   for item in ('id="clima-desktop"','id="roadtv-desktop"','id="market"','id="dm-ad-rotation"',
                'id="market-commercial-banner"','id="market-driver-availability-banner"','id="auto-m-usa-banner"'):
