@@ -77,6 +77,19 @@ jobs:
         run: |
           python scripts/build_ucr_exact_wide.py
           UCR_WIDE_REQUIRED=1 python -m unittest discover -s tests -p 'test_ucr_wide.py'
+      - name: Cache das seis artes originais Gracie Barra Burlington
+        uses: actions/cache@v4
+        with:
+          path: |
+            site/assets/ads/gracie-barra-pt-square.png
+            site/assets/ads/gracie-barra-en-square.png
+            site/assets/ads/gracie-barra-es-square.png
+            site/assets/ads/gracie-barra-pt-wide.png
+            site/assets/ads/gracie-barra-en-wide.png
+            site/assets/ads/gracie-barra-es-wide.png
+          key: gracie-barra-six-owner-originals-20261017-v1
+      - name: Instalar e validar seis imagens originais Gracie Barra
+        run: python scripts/install_gracie_barra_ads.py
       - name: Testes de publicação e interface
         run: |
           python -m unittest discover -s tests
@@ -85,6 +98,7 @@ jobs:
           node --check site/assets/top-quote-ad-rotation.js
           node --check site/assets/horizontal-ad-sequence.js
           node --check site/assets/sidebar-ad-rotation.js
+          node --check site/assets/gracie-barra-ads.js
           node --check site/assets/mobile-media-footer.js
           node --check site/assets/road-tv-live.js
           node tests/test_client.js

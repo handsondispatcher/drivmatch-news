@@ -1,0 +1,18 @@
+/* Gracie Barra Burlington: fixed advertiser-approved art, HTML link overlays */
+#dm-ad-rotation .dm-gracie-square{width:100%;margin:0;padding:0;box-sizing:border-box;background:transparent}
+.dm-gracie-square-label{padding:0 0 7px;color:#dbe8f5;font:700 10px/1.4 Arial,sans-serif;letter-spacing:.5px}
+.dm-gracie-square-art{position:relative;aspect-ratio:1/1;width:100%;overflow:hidden;border-radius:5px;background:#fff}
+.dm-gracie-square-img{display:block;width:100%;height:100%;object-fit:contain}
+.dm-gracie-square-site,.dm-gracie-square-maps,.dm-gracie-wide-site,.dm-gracie-wide-maps{position:absolute;z-index:7;display:block;cursor:pointer}
+.dm-gracie-square-site{left:10%;top:72%;width:80%;height:14%}
+.dm-gracie-square-maps{left:51%;top:87%;width:44%;height:12%}
+.dm-gracie-wide-art{position:relative;width:100%;height:100%;overflow:hidden;background:#fafafa}
+.dm-gracie-wide-img{width:100%;height:100%;display:block;object-fit:fill}
+.dm-gracie-wide-site{left:42%;top:75%;width:32%;height:25%}
+.dm-gracie-wide-maps{left:74%;top:75%;width:26%;height:25%}
+.dm-gracie-square-site:hover,.dm-gracie-square-maps:hover,
+.dm-gracie-square-site:focus-visible,.dm-gracie-square-maps:focus-visible,
+.dm-gracie-wide-site:hover,.dm-gracie-wide-maps:hover,
+.dm-gracie-wide-site:focus-visible,.dm-gracie-wide-maps:focus-visible{
+ outline:3px solid #fff500;outline-offset:-3px;border-radius:5px
+}

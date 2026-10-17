@@ -8,7 +8,7 @@
  const top=document.getElementById('news-commercial-banner');
  const bottom=document.getElementById('news-carhauler-banner');
  if(!top||!bottom)return;
- const order=['cars','ucr','auto'];
+ const order=['cars','ucr','auto']; order.push('gracie');
  const contact='https://wa.me/14076004737?text=Ol%C3%A1%21%20Vim%20pelo%20an%C3%BAncio%20da%20DrivMatch%20News.';
  const insta='https://www.instagram.com/autom.usa/';
  const mapsUrl='https://www.google.com/maps/search/?api=1&query=2040%20E%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Kissimmee%2C%20FL%2034744';
@@ -23,11 +23,23 @@
    en:'assets/ads/auto-m-usa-en-wide-original.png'
  };
  const autoFallback={"pt":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/214e0067e9af6df5fb9ce1357ec0da3d005d0ae37eca4871e3b149ecdebf620f.png","es":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/3062cb8be74cf32f3edb50de3922bca9d8ef312efe610b4c15c5ada95d803606.png","en":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/af62b66f6bc7d55e3ae29d67a36b6a580ee1b1a8b0741bdfcef524e93fdb517d.png"};
+ const gracieFallback={"en":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/3671c98b662975c4936116e0c4b730b0ac48afd81487112dc96bff8e55d96b94.png","pt":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/6349400c1adeb7b5f13cee365bffbccc5aeab9f645da32c3548eb2fdae2f0b0f.png","es":"https://cdn.openart.ai/openart-uploads/production/attachment-transfers/909641ba1058ae2b633b8d81e5d4d4342e5ad760f79497fae02a36128edc3241.png"};
+ const gracieMap="https://www.google.com/maps/search/?api=1&query=207+Cambridge+Street+Burlington+MA+01803";
+ const gracieSite="https://graciebarraburlington.com/";
+ const gracieCopy={pt:{site:'Abrir site da Gracie Barra Burlington',maps:'Abrir no Google Maps: 207 Cambridge Street, Burlington, MA 01803',alt:'Jiu-jítsu em breve em Burlington, MA'},en:{site:'Open Gracie Barra Burlington website',maps:'Open Google Maps: 207 Cambridge Street, Burlington, MA 01803',alt:'Jiu-jitsu coming soon in Burlington, MA'},es:{site:'Abrir sitio de Gracie Barra Burlington',maps:'Abrir Google Maps: 207 Cambridge Street, Burlington, MA 01803',alt:'Jiu-jitsu próximamente en Burlington, MA'}};
  const autoCopy={pt:'Seu próximo carro começa aqui.',es:'Tu próximo auto empieza aquí.',en:'Your next car starts here.'};
  const normalize=value=>String(value||'').startsWith('en')?'en':String(value||'').startsWith('es')?'es':'pt';
  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)');
  let templates=null,phase=0,interval=null,moving=false,inside=false,keyboard=false,manualFreeze=Boolean(reduced?.matches);
  function creative(id,language){
+   if(id==='gracie'){
+    const locale=normalize(language),copy=gracieCopy[locale];
+    return '<div class="dm-gracie-wide-art">'+
+      '<img class="dm-gracie-wide-img" src="assets/ads/gracie-barra-'+locale+'-wide.png" width="2048" height="464" loading="eager" decoding="async" data-fallback="'+gracieFallback[locale]+'" alt="'+copy.alt+'">'+
+      '<a class="dm-gracie-wide-site" href="'+gracieSite+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+copy.site+'" title="'+copy.site+'"></a>'+
+      '<a class="dm-gracie-wide-maps" href="'+gracieMap+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+copy.maps+'" title="'+copy.maps+'"></a>'+
+      '</div>';
+   }
    if(id!=='auto')return templates?.[id]||'';
    const locale=normalize(language);
    const file=autoFiles[locale],fallback=autoFallback[locale];
@@ -47,12 +59,12 @@
    if(!stage||!templates)return;
    stage.innerHTML=creative(campaign,document.documentElement.lang);
    slot.dataset.currentCampaign=campaign;
-   const img=stage.querySelector('.dm-horizontal-auto-img');
+   const img=stage.querySelector('.dm-horizontal-auto-img, .dm-gracie-wide-img');
    if(img)img.addEventListener('error',function(){if(this.dataset.fallback){this.src=this.dataset.fallback;delete this.dataset.fallback;}},{once:true});
  }
  function paint(animate){
    if(!templates)return;
-   const pair=[order[phase],order[(phase+1)%3]];
+   const pair=[order[phase],order[(phase+1)%order.length]];
    const slots=[top,bottom];
    slots.forEach((slot,i)=>{
      const stage=slot.querySelector('.dm-horizontal-stage');
@@ -72,7 +84,7 @@
  }
  function advance(){
    if(!templates||moving||inside||keyboard||manualFreeze||document.hidden)return;
-   moving=true;phase=(phase+1)%3;paint(true);
+   moving=true;phase=(phase+1)%order.length;paint(true);
  }
  function capture(){
    // Only trust the approved advertiser markup just rendered by app.js, not
@@ -102,6 +114,7 @@
   slot.addEventListener('touchstart',()=>{manualFreeze=true;},{passive:true});
  }
  document.addEventListener('drivmatch:horizontal-ads-rendered',capture);
+ document.addEventListener('drivmatch:language',()=>{if(templates){moving=false;paint(false);}});
  reduced?.addEventListener?.('change',e=>{manualFreeze=Boolean(e.matches);});
  // Install order: app.js registers DOMContentLoaded before this deferred file,
  // so schedule fallback only after app's initial render has completed.

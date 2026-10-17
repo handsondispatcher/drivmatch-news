@@ -15,9 +15,9 @@
  const mq=window.matchMedia?.('(prefers-reduced-motion: reduce)');
  const mobileLayout=window.matchMedia?.('(max-width: 990px)');
  const labels={
-  pt:{head:'PUBLICIDADE',pause:'Pausar',play:'Reproduzir',moving:'SUBINDO ↑',stopped:'PAUSADO',aria:'Anúncios em rotação vertical',all:'3 PATROCINADORES · VISÃO COMPLETA'},
-  es:{head:'PUBLICIDAD',pause:'Pausar',play:'Reanudar',moving:'SUBIENDO ↑',stopped:'EN PAUSA',aria:'Anuncios en rotación vertical',all:'3 PATROCINADORES · VISTA COMPLETA'},
-  en:{head:'ADVERTISEMENT',pause:'Pause',play:'Resume',moving:'MOVING UP ↑',stopped:'PAUSED',aria:'Vertical rotating advertisements',all:'THREE SPONSORS · FULL VIEW'}
+  pt:{head:'PUBLICIDADE',pause:'Pausar',play:'Reproduzir',moving:'SUBINDO ↑',stopped:'PAUSADO',aria:'Anúncios em rotação vertical',all:'4 PATROCINADORES · VISÃO COMPLETA'},
+  es:{head:'PUBLICIDAD',pause:'Pausar',play:'Reanudar',moving:'SUBIENDO ↑',stopped:'EN PAUSA',aria:'Anuncios en rotación vertical',all:'4 PATROCINADORES · VISTA COMPLETA'},
+  en:{head:'ADVERTISEMENT',pause:'Pause',play:'Resume',moving:'MOVING UP ↑',stopped:'PAUSED',aria:'Vertical rotating advertisements',all:'FOUR SPONSORS · FULL VIEW'}
  };
  const locale=v=>String(v||'').startsWith('en')?'en':String(v||'').startsWith('es')?'es':'pt';
  let lang=locale(document.documentElement.lang), offset=0, prior=0;
@@ -25,7 +25,7 @@
  const speed=56; // visibly moving ticker (px/s), interaction still pauses.
  const allSponsors=()=>Boolean(mobileLayout?.matches);
  const paused=()=>allSponsors()||userPaused||hovered||focused||touchPaused||!visible||!intersectionVisible;
- const canonicalOrder=['ucr-2027','driver-available','auto-m-usa'];
+ const canonicalOrder=['ucr-2027','driver-available','auto-m-usa','gracie-barra'];
  function normalizeForMobile(){
   if(!allSponsors())return;
   for(const campaign of canonicalOrder){

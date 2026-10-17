@@ -7,8 +7,8 @@ class PairedWideAds(unittest.TestCase):
   c=json.loads((P/'content/ads.json').read_text(encoding='utf-8'))['paired_horizontal_ad_rotation']
   self.assertEqual(c['cycle_seconds'],5)
   self.assertEqual(c['native_resolution'],[1774,394])
-  self.assertEqual(c['phase_sequences']['top'],['cars','ucr','auto-m-usa'])
-  self.assertEqual(c['phase_sequences']['bottom'],['ucr','auto-m-usa','cars'])
+  self.assertEqual(c['phase_sequences']['top'],['cars','ucr','auto-m-usa','gracie-barra'])
+  self.assertEqual(c['phase_sequences']['bottom'],['ucr','auto-m-usa','gracie-barra','cars'])
   for a,b in zip(c['phase_sequences']['top'],c['phase_sequences']['bottom']):self.assertNotEqual(a,b)
   for l in ('pt','es','en'):
    master=c['approved_auto_m_usa_wide'][l]

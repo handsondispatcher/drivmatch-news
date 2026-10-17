@@ -195,6 +195,44 @@
           "height": 1254
         }
       }
+    },
+    {
+      "slot": "sidebar-rotation",
+      "label": "Publicidade",
+      "enabled": true,
+      "relationship": "third_party_advertiser",
+      "sponsor": "Gracie Barra Burlington",
+      "campaign_id": "gracie-barra-burlington-20261017",
+      "format": "square",
+      "language_variants": [
+        "pt",
+        "en",
+        "es"
+      ],
+      "image_pattern": "assets/ads/gracie-barra-{lang}-square.png",
+      "website_url": "https://graciebarraburlington.com/",
+      "maps_url": "https://www.google.com/maps/search/?api=1&query=207+Cambridge+Street+Burlington+MA+01803",
+      "address": "207 Cambridge Street, Burlington, MA 01803",
+      "image_policy": "exact-owner-supplied-image-sha256-verified; separate interactive links"
+    },
+    {
+      "slot": "paired-horizontal-rotation",
+      "label": "Publicidade",
+      "enabled": true,
+      "relationship": "third_party_advertiser",
+      "sponsor": "Gracie Barra Burlington",
+      "campaign_id": "gracie-barra-burlington-20261017",
+      "format": "horizontal",
+      "language_variants": [
+        "pt",
+        "en",
+        "es"
+      ],
+      "image_pattern": "assets/ads/gracie-barra-{lang}-wide.png",
+      "website_url": "https://graciebarraburlington.com/",
+      "maps_url": "https://www.google.com/maps/search/?api=1&query=207+Cambridge+Street+Burlington+MA+01803",
+      "address": "207 Cambridge Street, Burlington, MA 01803",
+      "image_policy": "exact-owner-supplied-image-sha256-verified; separate interactive links"
     }
   ],
   "approved_creative_rules": {
@@ -315,7 +353,7 @@
   },
   "paired_horizontal_ad_rotation": {
     "status": "ACTIVE",
-    "version": "1.0",
+    "version": "1.1-gracie-barra-20261017",
     "position": "news-main-top-and-lower-ad-slot",
     "cycle_seconds": 5,
     "transition": "close_then_open_from_bottom",
@@ -324,11 +362,13 @@
       "top": [
         "cars",
         "ucr",
-        "auto-m-usa"
+        "auto-m-usa",
+        "gracie-barra"
       ],
       "bottom": [
         "ucr",
         "auto-m-usa",
+        "gracie-barra",
         "cars"
       ]
     },
