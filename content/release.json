@@ -171,9 +171,10 @@
   },
   "brand_policy": {
     "approved_logo": "unchanged_official_blue_gradient",
-    "header_bg": "#020408",
-    "white_logo_variant": "requires_owner_change_control",
-    "no_recreation_of_logo": true
+    "header_bg": "light_broadcast_gradient_owner_approved_2026-10-16",
+    "white_logo_variant": "not_required",
+    "no_recreation_of_logo": true,
+    "light_masthead_approved": true
   },
   "reader_ui": {
     "no_top_news_category_nav": true,
