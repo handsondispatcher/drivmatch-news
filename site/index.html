@@ -1394,6 +1394,53 @@ body{background:#f7f9fc;color:#14283c}
   #dm-utility .dm-market-line-icon svg{width:21px;height:21px}
 }
 </style>
+
+<style id="dm-broadcast-cosmetic-v1">
+/* War Room 2026-10-16: visual layer only. No DOM, JS, editorial, market or player changes. */
+:root{--navy:#092654;--navy2:#0b376b;--navy3:#123e74;--blue:#066cf4;--line:#dbe7f5;--paper:#f1f7ff;--ink:#071b40;--muted:#647791;--soft:#eaf3ff}
+body{background:linear-gradient(180deg,#e9f4ff 0,#f4f9ff 230px,#f8fbff 620px)!important;color:#071b40}
+.header{background:linear-gradient(115deg,#fff 0%,#f5faff 72%,#ebf4ff 100%)!important;color:#071b40!important;border-top:4px solid #0675ff;border-bottom:1px solid #dbe9f9;box-shadow:0 4px 18px #173f7012}
+.header-inner{min-height:74px;gap:16px}
+.edition,.edition select{color:#12376a}
+.language-picker{background:transparent!important;border:0!important;box-shadow:none!important}
+.language-shortcuts{display:inline-flex;gap:7px!important;align-items:center;flex-direction:row!important}
+.language-shortcuts button{background:linear-gradient(180deg,#15477f,#082b5c)!important;color:#fff!important;border:1px solid #d6e7ff!important;border-radius:9px!important;box-shadow:0 3px 10px #12468a22;min-height:38px}
+.language-shortcuts button.selected,.language-shortcuts button[aria-pressed="true"]{background:linear-gradient(135deg,#0559f2,#168fff)!important;color:#fff!important}
+.language-shortcuts button:hover{filter:brightness(1.09)}
+.navbar{background:#fff!important;color:#12376a!important;border-color:#dbe9f9!important}
+.nav-inner a:hover{color:#0878f4}
+#dm-utility,.dm-utility{background:transparent!important;border-bottom:0!important}
+#dm-utility .dm-util-inner{gap:10px!important;padding-top:13px!important;padding-bottom:12px!important}
+#dm-utility .dm-util-quote,#dm-utility .dm-util-city,#dm-utility .dm-util-city-select{background:linear-gradient(145deg,#fff,#f8fbff)!important;border:1px solid #e1ebf8!important;border-radius:13px!important;box-shadow:0 5px 18px #164f8f12!important}
+#dm-utility .dm-util-label{color:#0863d2!important}
+#dm-utility .dm-util-money strong{color:#071b40!important}
+.dm-news-crawler{background:#fff!important;color:#12376a!important;border:1px solid #deebfb!important;border-radius:12px;box-shadow:0 4px 14px #1c4b7b13;max-width:1390px;margin:5px auto 12px}
+.dm-crawler-link{color:#13345e!important}
+.dm-crawler-label{color:#0769e7!important}
+.main{gap:16px}
+.lead,.panel,.opportunity-bar,.item,.story,.empty{border:1px solid #dce9f7!important;border-radius:14px!important;box-shadow:0 6px 24px #194a8210!important;overflow:hidden}
+.lead{border-radius:17px!important}
+.story img,.thumb img{border-radius:10px 10px 0 0}
+.story:hover,.item:hover{box-shadow:0 10px 27px #104b8a1a!important}
+.topline,.opp-head{border-bottom-color:#147bff!important}
+.heading,.side h2{color:#102c58}
+.kicker,.tag,.opp .kind{color:#086ef0}
+.tag{border-radius:7px;background:#e6f1ff;padding:4px 8px}
+.btn{border-radius:9px!important;background:linear-gradient(135deg,#064fd6,#168dfb)!important;box-shadow:0 2px 8px #1769d222}
+.btn.secondary{background:#fff!important;color:#0b56b0!important;border:1px solid #c8dcf5!important;box-shadow:none}
+.btn:focus-visible,.language-shortcuts button:focus-visible,a:focus-visible{outline:3px solid #f0bb34!important;outline-offset:2px}
+.carousel-dot.active{background:#0878fa}
+.side{border-radius:14px!important;background:linear-gradient(180deg,#07386e,#082b56)!important;box-shadow:0 7px 25px #0b326528}
+.side .weather-card{border-radius:13px!important;overflow:hidden}
+.weather-card iframe{border-radius:10px}
+#market,#market-mobile{border-radius:12px}
+#mercados #dm-ad-rotation{border-radius:10px}
+.form input,.form select,input[type="search"]{border-radius:9px!important;border-color:#cbdff5!important}
+.modal{border-radius:18px!important}
+.footer{background:linear-gradient(100deg,#071d3e,#0b396c)!important}
+@media(max-width:990px){.main{gap:14px}.side{border-radius:12px!important}}
+@media(max-width:600px){.header-inner{min-height:0}.language-shortcuts{flex-wrap:wrap}.language-shortcuts button{min-height:36px}.dm-news-crawler{margin:6px 9px 12px;border-radius:9px}.lead,.panel,.item,.story{border-radius:11px!important}}
+</style>
 </head>
 <body>
 <header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.11</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português (Brasil)</option><option value="en">English</option><option value="es">Español (Latinoamérica)</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true" title="Português brasileiro (pt-BR)"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false" title="English (US)"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false" title="Español latinoamericano (es-419)"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
