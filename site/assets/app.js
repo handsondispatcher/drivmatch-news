@@ -813,13 +813,13 @@
       (articleLang==='pt'?'Fonte original ↗':articleLang==='es'?'Fuente original ↗':'Original source ↗')+'</a>':'';
     $('article-source').innerHTML=src?'<div class="full-article-heading">'+(isNwsBulletin
       ? (articleLang==='pt'?'BOLETIM OFICIAL NWS':articleLang==='es'?'BOLETÍN OFICIAL NWS':'OFFICIAL NWS BULLETIN')
-      : heading)
+      : heading)+
       '</div><div class="source-translations">'+langs.map(l=>sourceLink(l,l===articleLang)).join('')+
       '</div><p class="source-access-warning">'+(isNwsBulletin
         ? (bulletinAvailable
           ? (articleLang==='pt'?'Texto oficial NWS traduzido automaticamente; consulte o original para decisões de segurança.':articleLang==='es'?'Texto oficial del NWS traducido automáticamente; consulte el original para decisiones de seguridad.':'Original English NWS bulletin. Check the latest alert before travel.')
           : (articleLang==='pt'?'Tradução integral indisponível: exibindo o texto oficial em inglês.':articleLang==='es'?'Traducción completa no disponible: se muestra el texto oficial en inglés.':'Original English NWS bulletin.'))
-        : sourceNote)
+        : sourceNote)+
       '</p><p class="source-access-short">'+sourceNote+'</p>'+originalLink:
       escapeHTML(opened.source||'');
     const attribution=storyPhoto||opened;
