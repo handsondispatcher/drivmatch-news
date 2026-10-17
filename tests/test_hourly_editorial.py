@@ -20,9 +20,9 @@ class HourlyEditorialDiscoveryTests(unittest.TestCase):
         brief=(ROOT/'content/HOURLY_EDITORIAL_DISCOVERY_BRIEF.md').read_text(encoding='utf-8')
         self.assertIn('Saturdays, Sundays',brief)
         self.assertIn('No synthetic reports',brief)
-    def test_all_203_sources_have_feed_urls(self):
+    def test_all_registered_sources_have_feed_urls(self):
         sources=json.loads((ROOT/'content/sources.json').read_text(encoding='utf-8'))['sources']
-        self.assertEqual(len(sources),203)
+        self.assertGreaterEqual(len(sources),203)
         self.assertTrue(all(s.get('enabled') is not False and str(s.get('feed_url','')).startswith('https://') for s in sources))
         scoped=[s for s in sources if s.get('feed_kind')=='domain-scoped-aggregator']
         self.assertEqual(len(scoped),122)
@@ -40,7 +40,12 @@ class HourlyEditorialDiscoveryTests(unittest.TestCase):
     def test_every_registered_source_is_scanned(self):
         registry=json.loads((ROOT/'content/sources.json').read_text(encoding='utf-8'))['sources']
         collector=(ROOT/'scripts/collect_sources.py').read_text(encoding='utf-8')
-        self.assertEqual(len(registry),203)
+        self.assertGreaterEqual(len(registry),203)
         self.assertIn('discover_feed_urls(source)',collector)
         self.assertIn("status='no_valid_rss'",collector)
         self.assertIn('ET.fromstring(raw)',collector)
+        for name in ('hourly-food-gig-last-mile','hourly-amazon-flex-blocks','hourly-amazon-relay',
+                     'hourly-parcel-fedex-ups-dhl','hourly-curri-gig-courier','hourly-medical-courier',
+                     'hourly-agricultural-harvest','hourly-livestock-hauling','hourly-immigration-ice-logistics',
+                     'hourly-sean-duffy-transport','hourly-trump-transport-policy','hourly-logistics-investment-terminals'):
+            self.assertIn(name,{s['id'] for s in registry})

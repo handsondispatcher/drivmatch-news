@@ -57,6 +57,30 @@ CORE_ROAD = re.compile(r'\b(?:trucks?|truckers?|trucking|semi[- ]trucks?|18[- ]w
     r'haulage|haulers?|carriers?|tractor[- ]trailers?|weigh stations?|'
     r'elds?|sleeper berths?|hours.of.service|immigrant drivers?|'
     r'english proficiency|roadside inspections?|truck repair|truck tires?)\b',re.I)
+# Explicit US courier / gig-driver and medical/agricultural freight coverage.
+# A platform mention alone does not verify a headline or satisfy the external
+# publisher and national-event source gates.
+NEW_DELIVERY = re.compile(
+    r'\b(?:door\s?dash|amazon flex|amazon relay|curri|'
+    r'last[ -]?mile|delivery blocks?|food delivery|parcel delivery|'
+    r'package delivery|gig delivery|app[ -]?based delivery|'
+    r'same[ -]?day courier|courier drivers?|medical couriers?|'
+    r'delivery drivers?|fedex|ups delivery|dhl delivery|'
+    r'parcel hubs?|delivery vans?)\b',re.I)
+SPECIAL_LOADS = re.compile(
+    r'\b(?:harvest haul(?:ing)?|grain haul(?:ing)?|crop transport|'
+    r'agricultural freight|agricultural trucking|farm freight|'
+    r'livestock (?:haul(?:ing)?|transport|freight)|cattle truck(?:ing)?|'
+    r'live animal transport|medical (?:delivery|courier|freight|logistics)|'
+    r'healthcare logistics|specimen transport|pharmaceutical distribution)\b',re.I)
+NEW_TRANSPORT_CHANGE = re.compile(
+    r'\b(?:expan\w*|launch\w*|change\w*|update\w*|'
+    r'contract\w*|pay|wages?|earnings?|rates?|costs?|'
+    r'jobs?|fleet|deliver(?:y|ies)|freight|logistics|'
+    r'market|workers?|courier|insurance|safety|regulat\w*|'
+    r'capacity|investment|tariffs?|policy|blocks?|'
+    r'closures?|hub|network)\b',re.I)
+
 CONSUMER_FUEL = re.compile(r'\b(?:diesel|fuel prices?|gas prices?)\b',re.I)
 NON_ROAD_FREIGHT = re.compile(r'\b(?:ocean freight|air freight|air cargo|'
     r'rail freight|railcar|trans.pacific|container ship|vessel|'
@@ -101,6 +125,7 @@ def eligible(item):
     has_us=bool(US_LOCATION.search(title) or US_STATE_RE.search(title) or US_ABBREV.search(title))
     has_cross=bool(CROSS.search(title))
     core=bool(CORE_ROAD.search(title))
+    new_delivery=bool(NEW_DELIVERY.search(title) or SPECIAL_LOADS.search(title))
     trade_publisher=any(hostname==d or hostname.endswith('.'+d) for d in US_TRUCK_PUBLISHERS)
     # Foreign nationalities can be relevant to US immigrant/CDL driver rules;
     # an accident or local transport event overseas is not.
@@ -119,7 +144,8 @@ def eligible(item):
     elif not has_us:
         # National industry coverage need not name a city in its headline.
         # Do not extend this exception to local accidents, closures or weather.
-        industry=bool(NATIONAL_INDUSTRY.search(title) and BUSINESS_CHANGE.search(title))
+        industry=bool((NATIONAL_INDUSTRY.search(title) and BUSINESS_CHANGE.search(title)) or
+                      (new_delivery and NEW_TRANSPORT_CHANGE.search(title)))
         discovery=(item.get('origin_type')=='aggregator-discovery' and
                    str(item.get('source','')).startswith('Google News · '))
         if not (trade_publisher or (industry and (discovery or region in ('US','USA')))):
@@ -128,4 +154,6 @@ def eligible(item):
     if item.get('category')=='Clima':
         return bool((WEATHER.search(title) and (ROAD_IMPACT.search(title) or
             (hostname.endswith('noaa.gov') and has_us))) or (TRUCK.search(title) and ROAD_IMPACT.search(title)))
-    return bool((TRUCK.search(title) and (core or trade_publisher or has_us)) or (has_cross and has_us and core))
+    return bool((TRUCK.search(title) and (core or trade_publisher or has_us)) or
+                (new_delivery and (has_us or trade_publisher or region in ('US','USA'))) or
+                (has_cross and has_us and core))
