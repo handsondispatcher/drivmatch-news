@@ -382,8 +382,14 @@ const {spawn}=require('node:child_process');
    if(width>=944){
      const layout=await page.locator('.dm-util-inner').evaluate(el=>{
        const columns=getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length;
-       const rects=[...el.children].map(ch=>ch.getBoundingClientRect());
+       // The new advertising square is a separate commercial module, not a
+       // seventh market quote. Keep the original 3+3 market layout assertions.
+       const rects=[...el.children].filter(ch=>ch.id!=='top-quote-ad-slot').map(ch=>ch.getBoundingClientRect());
+       const ad=el.querySelector('#top-quote-ad-slot')?.getBoundingClientRect();
        const container=el.getBoundingClientRect();
+       const adFits=!ad||(ad.left>=container.left-2&&ad.right<=container.right+2&&ad.width>0&&Math.abs(ad.width-ad.height)<2);
+       const adCollision=Boolean(ad&&rects.some(r=>r.width>0&&r.height>0&&
+         r.left<ad.right-1&&r.right>ad.left+1&&r.top<ad.bottom-1&&r.bottom>ad.top+1));
        const overflow=rects.filter(r=>r.width>0&&r.height>0).some(r=>r.left<container.left-2||r.right>container.right+2);
        const collision=rects.some((r,i)=>rects.slice(i+1).some(q=>
          r.left<q.right-1&&r.right>q.left+1&&r.top<q.bottom-1&&r.bottom>q.top+1));
@@ -392,7 +398,7 @@ const {spawn}=require('node:child_process');
        const visibleSecondRow=rects.slice(3).filter(r=>r.width>0&&r.height>0);
        const separated=rects.length===6&&
          (!visibleSecondRow.length||Math.min(...visibleSecondRow.map(r=>r.top))>=Math.max(...rects.slice(0,3).map(r=>r.bottom))-2);
-       return {columns,overflow,collision,separated};
+       return {columns,overflow,collision,separated,adFits,adCollision};
      });
      assert.equal(layout.columns,width<=1280?3:6,
        'City selector must use 3×2 responsive market strip at 944px and 6-wide on desktop');
@@ -400,6 +406,8 @@ const {spawn}=require('node:child_process');
        'Below 1120px weather, city picker, and risk must sit beneath all three quotes');
      assert.equal(layout.overflow,false,'No weather/quote module should exceed its container');
      assert.equal(layout.collision,false,'Market/forecast modules must never overlap');
+     assert.equal(layout.adFits,true,'New quote ad must fit the utility strip without distortion');
+     assert.equal(layout.adCollision,false,'New quote ad must not cover market or forecast modules');
    }
    if(width===1440){
      for(const c of await page.locator('.related-rail p.editorial-context').all()){
