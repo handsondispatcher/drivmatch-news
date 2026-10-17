@@ -34,8 +34,9 @@
    img.src=src();
    img.alt=labels[language].alt;
    root.dataset.model=String(model+1);root.dataset.activeLanguage=language;
-   sms.href='sms:+19082913386?body='+encodeURIComponent(msg[language]);
-   whatsapp.href='https://wa.me/19082913386?text='+encodeURIComponent(msg[language]);
+   sms.removeAttribute('href');
+   sms.setAttribute('aria-hidden','true');sms.tabIndex=-1;
+   whatsapp.href='https://web.whatsapp.com/send?phone=19082913386&text='+encodeURIComponent(msg[language]);
    sms.setAttribute('aria-label',labels[language].sms);
    whatsapp.setAttribute('aria-label',labels[language].wa);
  }
