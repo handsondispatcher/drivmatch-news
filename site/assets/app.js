@@ -758,7 +758,11 @@
     else $('article-dialog').classList.remove('external-article');
     // Third-party headline links are not DrivMatch-authored article bodies.
     // Do not fabricate a summary, and never show a headline echo as article text.
-    $('modalbodytext').textContent=isExternal?'':(txt.body||txt.summary||'');
+    const isNwsBulletin=isExternal&&opened.origin_type==='official-operational-alert';
+    const bulletinAvailable=isNwsBulletin&&opened.nws_bulletin_available_langs?.includes(articleLang)&&Boolean(txt.body);
+    $('modalbodytext').textContent=isNwsBulletin
+      ? (bulletinAvailable?txt.body:(opened.locales?.en?.body||''))
+      : (isExternal?'':(txt.body||txt.summary||''));
     $('modalbrief').textContent='';
     $('article-disclosure').textContent=opened.demo?al.disclaimerDemo:
       opened.kind==='opportunity'?'Oportunidade do ecossistema DrivMatch. Verifique requisitos e validade na publicação original.':'';
@@ -779,6 +783,14 @@
         '&hl='+encodeURIComponent(interfaceLocale[target])+'&u='+encodeURIComponent(src);
     };
     const sourceLink=(target,primary=false)=>{
+      if(isNwsBulletin){
+        const available=opened.nws_bulletin_available_langs?.includes(target);
+        const text={pt:'Português',en:'English',es:'Español'}[target];
+        return '<button type="button" class="article-source-button '+(primary?'primary':'secondary')+
+          '" data-nws-bulletin-lang="'+target+'" '+(available?'':'disabled')+
+          ' title="'+(available?'': 'Official NWS full bulletin translation unavailable')+'">'+
+          '<img src="'+flags[target]+'" alt="" width="17" height="12"><span>'+text+'</span></button>';
+      }
       const text={pt:'Português',en:'English',es:'Español'}[target];
       const url=translatedUrl(target);
       const title=target===originalSourceLang?'Abrir texto original':
@@ -799,9 +811,15 @@
     const originalLink=src?'<a class="article-original-link" href="'+escapeHTML(src)+
       '" target="_blank" rel="noopener noreferrer">'+
       (articleLang==='pt'?'Fonte original ↗':articleLang==='es'?'Fuente original ↗':'Original source ↗')+'</a>':'';
-    $('article-source').innerHTML=src?'<div class="full-article-heading">'+heading+
+    $('article-source').innerHTML=src?'<div class="full-article-heading">'+(isNwsBulletin
+      ? (articleLang==='pt'?'BOLETIM OFICIAL NWS':articleLang==='es'?'BOLETÍN OFICIAL NWS':'OFFICIAL NWS BULLETIN')
+      : heading)
       '</div><div class="source-translations">'+langs.map(l=>sourceLink(l,l===articleLang)).join('')+
-      '</div><p class="source-access-warning">'+sourceNote+
+      '</div><p class="source-access-warning">'+(isNwsBulletin
+        ? (bulletinAvailable
+          ? (articleLang==='pt'?'Texto oficial NWS traduzido automaticamente; consulte o original para decisões de segurança.':articleLang==='es'?'Texto oficial del NWS traducido automáticamente; consulte el original para decisiones de seguridad.':'Original English NWS bulletin. Check the latest alert before travel.')
+          : (articleLang==='pt'?'Tradução integral indisponível: exibindo o texto oficial em inglês.':articleLang==='es'?'Traducción completa no disponible: se muestra el texto oficial en inglés.':'Original English NWS bulletin.'))
+        : sourceNote)
       '</p><p class="source-access-short">'+sourceNote+'</p>'+originalLink:
       escapeHTML(opened.source||'');
     const attribution=storyPhoto||opened;
@@ -809,8 +827,8 @@
       ? `<p class="image-credit"><span class="photo-credit-label">${articleLang==='en'?'Illustrative archive photo':articleLang==='es'?'Foto ilustrativa de archivo':'Foto ilustrativa de arquivo'} (não é imagem do acontecimento): </span><a href="${escapeHTML(attribution.image_source_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(attribution.image_credit||'Wikimedia Commons')}</a> · ${escapeHTML(attribution.image_license||'Licença na fonte')} <span class="photo-transform-note">· corte/redimensionamento</span></p>`:'';
     $('article-source').innerHTML+=photoCredit;
     $('articleLanguageTitle').textContent=lang==='en'?'Article language':lang==='es'?'Idioma de la noticia':'Idioma da notícia';
-    $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]&&(opened.kind!=='external_link'||opened.translated_langs?.includes(l))).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
-    $('article-reading').hidden=opened.kind==='external_link'&&(!opened.translated_langs||opened.translated_langs.length<2);
+    $('articleLanguageButtons').innerHTML=langs.filter(l=>opened.locales?.[l]&&(opened.kind!=='external_link'||(opened.origin_type==='official-operational-alert'?opened.nws_bulletin_available_langs?.includes(l):opened.translated_langs?.includes(l)))).map(l=>`<button data-article-lang="${l}" type="button" aria-pressed="${l===articleLang}" class="${l===articleLang?'active':''}"><img src="${flags[l]}" width="17" height="12" alt=""> ${l==='pt'?'Português':l==='en'?'English':'Español'}</button>`).join('');
+    $('article-reading').hidden=opened.kind==='external_link'&&opened.origin_type!=='official-operational-alert'&&(!opened.translated_langs||opened.translated_langs.length<2);
     $('translation').textContent=opened.demo?al.disclaimerDemo:'';
     renderImpact();
     $('share-feedback').textContent='';
@@ -1138,6 +1156,11 @@
     $('modaltitle').addEventListener('click',expandHeadline);
     $('modaltitle').addEventListener('keydown',e=>{
       if(e.key==='Enter'||e.key===' '){e.preventDefault();expandHeadline();}
+    });
+    $('article-source').addEventListener('click',e=>{
+      const button=e.target.closest('[data-nws-bulletin-lang]');
+      if(!button||button.disabled)return;
+      articleLang=button.dataset.nwsBulletinLang;renderArticle();
     });
     $('articleLanguageButtons').addEventListener('click',e=>{const b=e.target.closest('[data-article-lang]');if(!b)return;articleLang=b.dataset.articleLang;renderArticle();});
     $('shade').addEventListener('click',e=>{if(e.target===$('shade'))closeModal();});
