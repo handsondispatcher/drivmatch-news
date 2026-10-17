@@ -21,7 +21,7 @@ LOGO=ASSETS/"logo-drivmatch-news.png"
 MASTER_GIT_BLOB_SHA1="23eb7391d35da8ef7aa202bebb94045f2d8b8ba7"
 W,H=1200,630
 PICS=[
-    ("SEMI TRUCK","Freightliner Cascadia - Love’s Travel Centers.jpg"),
+    ("SEMI TRUCK","Freightliner eCascadia 4x2.jpg"),
     ("BOX TRUCK","Ryder Refrigerated Box Truck.jpg"),
     ("CARGO VAN","Ford Transit cargo delivery vans.jpg"),
     ("RAM 3500","Ram 3500 pickup truck Eastern Avenue downtown Saint Johnsbury VT September 2017.jpg"),
