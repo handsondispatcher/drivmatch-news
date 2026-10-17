@@ -91,20 +91,21 @@ data.articles=[...nw,...other];
 elements.language.value='pt';
 elements.language.dispatch('change',{target:{value:'pt'}});
 const orderedTitles=[...elements.list.innerHTML.matchAll(/<h3>([^<]*)<\/h3>/g)].map(m=>m[1]);
-assert.equal(orderedTitles.length,3,'Feed contains remaining stories, not copies of hero/rail/highlights');
-assert.equal(new Set([...elements.features.innerHTML.matchAll(/data-story="(\d+)"/g),...elements.highlightList.innerHTML.matchAll(/data-story="(\d+)"/g),...elements.list.innerHTML.matchAll(/data-story="(\d+)"/g)].map(m=>m[1])).size,12,'Every fixture story must appear in one homepage slot');
-assert.ok(orderedTitles.some(x=>x.includes('Freight')||x.includes('Driver')||x.includes('Truck')||x.includes('NWS')),'Remaining feed must contain real unique stories');
-assert.ok(elements.list.innerHTML.includes('não é fotografia do fenômeno')||
-          elements.list.innerHTML.includes('não retrata o evento meteorológico')||
-          elements.list.innerHTML.includes('Ilustração editorial'),
-  'NWS synthetic fixture with no licensed photo cannot pretend to show an actual weather event');
-assert.ok(elements.list.innerHTML.includes('data-bulletin="true"'),
-  'NWS photographic card must retain identification of official bulletin');
+assert.equal(orderedTitles.length,0,'No climate article may crowd the normal home feed after 7 eligible transport headlines fill featured+highlight areas');
+assert.ok(!elements.features.innerHTML.includes('NWS Weather Alert'));
+assert.ok(!elements.highlightList.innerHTML.includes('NWS Weather Alert'));
 assert.ok(elements.features.innerHTML.includes('Driver rule update'),
-  'Transport journalism must lead Panorama when non-bulletin reporting exists');
-assert.ok(!elements.features.innerHTML.split('related-rail')[0].includes('NWS Weather Alert'),
-  'NWS alert must not dominate the main feature while transport news exists');
-console.log('EDITORIAL MIX PASS: exclusive homepage slots, transport lead and no duplicate fixtures');
+  'Transport journalism must lead Panorama');
+assert.strictEqual(elements['weather-alerts-count'].textContent,'5','All five weather fixture alerts must remain accessible');
+elements['weather-alerts-button'].dispatch('click');
+assert.strictEqual(elements['weather-alerts-button']['aria-pressed'],'true');
+assert.equal((elements.list.innerHTML.match(/class="item dm-climate-item"/g)||[]).length,5,
+  'Five distinct NWS bulletins must appear in ALERTA CLIMÁTICO');
+assert.ok(elements.list.innerHTML.includes('NWS Weather Alert 4'));
+assert.strictEqual(elements.panorama.hidden,true,'Normal highlights hidden while reading weather desk');
+elements['weather-alerts-home'].dispatch('click');
+assert.strictEqual(elements.panorama.hidden,false,'Return to main news');
+console.log('EDITORIAL MIX PASS: weather alerts isolated, five separate NWS items preserved, transport news remains first');
 // Reproduce the reported bug: source is English but reader selects Português.
 data.articles=[{
  id:'translation-test',kind:'external_link',status:'external_source',demo:false,
