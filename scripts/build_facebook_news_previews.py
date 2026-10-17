@@ -21,8 +21,8 @@ LOGO=ASSETS/"logo-drivmatch-news.png"
 MASTER_GIT_BLOB_SHA1="23eb7391d35da8ef7aa202bebb94045f2d8b8ba7"
 W,H=1200,630
 PICS=[
-    ("SEMI TRUCK","Con-way Freight semi-tractor trailer.jpg"),
-    ("BOX TRUCK","Ford Medium-Duty Super Duty F-650 - Two Men and a Truck, box truck.jpg"),
+    ("SEMI TRUCK","Freightliner Cascadia - Love’s Travel Centers.jpg"),
+    ("BOX TRUCK","Ryder Refrigerated Box Truck.jpg"),
     ("CARGO VAN","Ford Transit cargo delivery vans.jpg"),
     ("RAM 3500","Ram 3500 pickup truck Eastern Avenue downtown Saint Johnsbury VT September 2017.jpg"),
 ]
@@ -85,8 +85,13 @@ def make(lang,master,photos):
     art.alpha_composite(Image.new("RGBA",(W,145),(3,11,24,255)),(0,0))
     for n,((label,_),pic) in enumerate(zip(PICS,photos)):
         x=n*300
-        slice_img=ImageOps.fit(pic,(300,352),Image.Resampling.LANCZOS,centering=(.5,.52)).convert("RGBA")
-        art.alpha_composite(slice_img,(x,143))
+        # Keep each whole vehicle visible in a narrow 1:1 Facebook preview cell.
+        # A blurred fill avoids cropping the semi/box truck into a trailer-only shot.
+        backdrop=ImageOps.fit(pic,(300,303),Image.Resampling.LANCZOS,
+                              centering=(.5,.5)).filter(ImageFilter.GaussianBlur(16)).convert("RGBA")
+        art.alpha_composite(backdrop,(x,143))
+        full=ImageOps.contain(pic,(296,298),Image.Resampling.LANCZOS).convert("RGBA")
+        art.alpha_composite(full,(x+(300-full.width)//2,143+(303-full.height)//2))
         ImageDraw.Draw(art,"RGBA").rectangle((x,143,x+6,495),fill=(4,17,28,230))
         ImageDraw.Draw(art,"RGBA").rectangle((x+7,446,x+297,493),fill=(2,16,29,215))
         ld=ImageDraw.Draw(art)
