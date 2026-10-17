@@ -955,6 +955,8 @@
     const track=(name,fields)=>window.DrivMatchAnalytics?.track?.(name,fields);
     const storyInfo=story=>({article_id:story?.id,article_category:story?.category,article_source:story?.source});
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=(climateMode?weatherStories():pageStories())[Number(item.dataset.story)];articleLang=lang;if(opened){track('news_article_open',storyInfo(opened));renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function'){track('news_source_click',storyInfo(opened));window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');}};
+    // Delegated article listeners retained for hero, news cards and highlight rail.
+    for(const id of ['features','list','highlights','highlightList'])$(id).addEventListener('click',clickArticle);
     const shareText=()=>opened?cleanHeadline(localeOf(opened,lang)?.title||'DrivMatch News'):'DrivMatch News';
     // WhatsApp rich cards require a SINGLE, complete HTTPS URL in the message.
     // The crawler builds the photo/headline card from og:image and og:title.
