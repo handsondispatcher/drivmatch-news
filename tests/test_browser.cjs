@@ -416,16 +416,16 @@ const {spawn}=require('node:child_process');
         height:el.getBoundingClientRect().height})),
         vpHeight:vp.getBoundingClientRect().height,
         trackHeight:document.getElementById('dm-ad-rotation-track').getBoundingClientRect().height,
-        thirdBottom:items[2].getBoundingClientRect().bottom,
+        lastBottom:items[items.length-1].getBoundingClientRect().bottom,
         footerTop:footer.getBoundingClientRect().top,
         footerAfter:!!(vp.compareDocumentPosition(footer)&Node.DOCUMENT_POSITION_FOLLOWING)};
      });
      assert.equal(complete.mode,'canonical-full-mobile');
-     assert.deepEqual(complete.items.map(x=>x.campaign),['ucr-2027','driver-available','auto-m-usa']);
-     assert.ok(complete.items.every(x=>x.visible&&x.height>150),'All UCR Aileen Auto M must be readable and full');
+     assert.deepEqual(complete.items.map(x=>x.campaign),['ucr-2027','driver-available','auto-m-usa','gracie-barra']);
+     assert.ok(complete.items.every(x=>x.visible&&x.height>150),'All UCR Aileen Auto M and Gracie Barra must be readable and full');
      assert.ok(complete.vpHeight>=complete.trackHeight-2,'Full mobile inventory must not be clipped');
-     assert.ok(complete.footerAfter&&complete.thirdBottom<=complete.footerTop+2,'Footer must follow third sponsor');
-     for(const selector of ['#market-commercial-banner','#market-driver-availability-banner','#auto-m-usa-banner'])
+     assert.ok(complete.footerAfter&&complete.lastBottom<=complete.footerTop+2,'Footer must follow fourth sponsor');
+     for(const selector of ['#market-commercial-banner','#market-driver-availability-banner','#auto-m-usa-banner','.dm-gracie-square'])
        assert.equal(await page.locator(selector).isVisible(),true,selector+' must be visible on mobile');
 
      assert.ok(await page.locator('#auto-m-usa-banner .autom-usa-phone').getAttribute('href').then(h=>h.includes('wa.me/14076004737')));
