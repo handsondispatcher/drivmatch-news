@@ -134,7 +134,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#news-commercial-banner .car-official-horizontal').count(),1,'Approved car-hauler artwork must occupy the horizontal top slot');
    assert.equal(await page.locator('#news-commercial-banner .ucr-frame').count(),0,'UCR must never replace the horizontal vehicle load banner');
    assert.equal(await page.locator('#market-commercial-banner .ucr-frame-square').count(),1,'UCR square creative stays in the right sidebar');
-   assert.equal(await page.locator('#market-commercial-banner').isVisible(),true,'Right-side sponsor remains visible after moving below news');
+   assert.equal(await page.locator('#dm-ad-rotation-viewport').isVisible(),true,'Full sponsor carousel visible at all widths; individual posters naturally rotate out of view');
    // Official vertical ad rotation in the right sidebar; only the original three adverts exist.
    assert.equal(await page.locator('#dm-ad-rotation-track > .dm-ad-rotation-item').count(),3);
    assert.equal(await page.locator('#dm-ad-rotation-track #market-commercial-banner').count(),1);
