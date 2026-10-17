@@ -1,0 +1,63 @@
+name: Audit DrivMatch News theme on both domains
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-news-theme.yml'
+permissions:
+  contents: read
+jobs:
+  theme-domains:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Compare public HTML, theme marker and release manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          import urllib.request, urllib.error, json, time, re
+          from datetime import datetime,timezone
+          roots={
+            "GITHUB_PAGES":"https://handsondispatcher.github.io/drivmatch-news/",
+            "CUSTOM_DOMAIN":"https://drivmatch.com/news/"
+          }
+          report={}
+          for name,root in roots.items():
+            info={"root":root}
+            for label,path in (("html",""),("manifest","data/release.json")):
+              url=root+path+"?theme_audit="+str(int(time.time()))
+              try:
+                req=urllib.request.Request(url,headers={"User-Agent":"DrivMatch-News-release-audit/1.0","Cache-Control":"no-cache","Pragma":"no-cache"})
+                with urllib.request.urlopen(req,timeout=25) as response:
+                  raw=response.read(3000000)
+                  info[label+"_http"]=response.status
+                  info[label+"_url"]=response.url
+                  info[label+"_cache"]=response.headers.get("CF-Cache-Status","")
+                  if label=="html":
+                    s=raw.decode("utf-8","replace")
+                    info["theme_present"]="dm-broadcast-cosmetic-v1" in s
+                    info["light_header_present"]="linear-gradient(115deg,#fff" in s
+                    info["news_html_version"]=(re.search(r'name="drivmatch-news-version" content="([^"]+)"',s) or [None,None])[1]
+                    info["legacy_black_css"]= "background:#020408" in s
+                  else:
+                    d=json.loads(raw.decode("utf-8"))
+                    info["manifest_version"]=d.get("version")
+                    info["release_policy"]=d.get("brand_policy",{}).get("header_bg")
+              except Exception as e:
+                info[label+"_error"]=str(e)
+            report[name]=info
+          print(json.dumps(report,ensure_ascii=False,indent=2))
+          with open("theme-audit.json","w") as f:json.dump(report,f,indent=2)
+          with open(__import__('os').environ["GITHUB_STEP_SUMMARY"],"a") as f:
+            f.write("## DrivMatch News — same theme on both domains?\n")
+            for key,v in report.items():
+              ok=v.get("theme_present") is True and v.get("light_header_present") is True and v.get("release_policy")=="light_broadcast_gradient_owner_approved_2026-10-16"
+              f.write(f"- **{key}**: {'PASS' if ok else 'FAIL / NOT CONFIRMED'}; theme={v.get('theme_present')}, header={v.get('light_header_present')}, policy={v.get('release_policy')}, HTML={v.get('html_http',v.get('html_error'))}, manifest={v.get('manifest_http',v.get('manifest_error'))}\n")
+          assert all(v.get("theme_present") is True and v.get("light_header_present") is True and v.get("release_policy")=="light_broadcast_gradient_owner_approved_2026-10-16" for v in report.values()),"Public theme mismatch: review domain routing/cache and GitHub Pages release"
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: drivmatch-news-domain-theme-audit
+          path: theme-audit.json
