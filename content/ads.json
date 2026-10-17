@@ -409,5 +409,20 @@
         }
       }
     }
+  },
+  "top_quote_ad_rotation": {
+    "version": "1.0",
+    "enabled": true,
+    "manifest": "content/top-quote-ad-models.json",
+    "placement": "utility-strip-rightmost",
+    "square": true,
+    "interval_ms": 4000,
+    "three_per_language": true,
+    "top_locale_selector": true,
+    "sms_to": "+19082913386",
+    "whatsapp_to": "+19082913386",
+    "region_top": "SMS",
+    "region_bottom": "WhatsApp",
+    "governance_doc": "docs/DRIVMATCH_NEWS_TOP_QUOTE_SQUARE_AD_ROTATION_V1.md"
   }
 }

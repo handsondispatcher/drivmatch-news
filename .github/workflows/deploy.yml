@@ -30,6 +30,13 @@ jobs:
           python-version: '3.12'
       - name: Dependência para cards sociais 1200x630
         run: python -m pip install Pillow==11.3.0
+      - name: Cache nove artes publicitárias originais das cotações
+        uses: actions/cache@v4
+        with:
+          path: site/assets/ads/top-square/
+          key: news-top-square-nine-pt-en-es-v1-20261017
+      - name: Instalar e verificar 9 artes do anúncio nas cotações
+        run: python scripts/install_top_quote_ads.py
       - name: Cache das 3 artes originais AUTO M USA
         uses: actions/cache@v4
         with:
@@ -75,6 +82,7 @@ jobs:
           python -m unittest discover -s tests
           node --check site/assets/utility-strip.js
           node --check site/assets/app.js
+          node --check site/assets/top-quote-ad-rotation.js
           node --check site/assets/horizontal-ad-sequence.js
           node --check site/assets/sidebar-ad-rotation.js
           node --check site/assets/road-tv-live.js
@@ -299,6 +307,8 @@ jobs:
       - name: Browser regression (bounded)
         timeout-minutes: 11
         run: npm run test:browser
+      - name: Verificar em navegador os 9 anúncios quadrados das cotações
+        run: node tests/test_top_quote_ad_browser.cjs
       - name: Verificar rotacao horizontal sincronizada de 5 segundos
         run: node tests/test_horizontal_ads_browser.cjs
       # Editorial and browser checks may take minutes: keep FX fresh at the

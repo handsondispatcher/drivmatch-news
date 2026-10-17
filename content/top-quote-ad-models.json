@@ -1,0 +1,94 @@
+{
+  "version": "1.0",
+  "image_resolution": [
+    1254,
+    1254
+  ],
+  "rotation_seconds": 4,
+  "models": {
+    "pt": [
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/c103203842c61e566a1d6bac212cbd6ac8288e5ff7049958830e9e654349a25f.png",
+        "sha256": "cfb1a5d21336f90f4200888a1d2989c9bbb7de85ac9a60035d6c872cf31cc480",
+        "size": 1479606,
+        "file": "assets/ads/top-square/pt-1.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/fed6984efc3fd032f3edcd6ccb87c8db14ffbcfe68ab192a6386254651a3e0b8.png",
+        "sha256": "b98d6c9ed0183731be9cd223d4a8ba5314497859850682eeab30613980064956",
+        "size": 1363310,
+        "file": "assets/ads/top-square/pt-2.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/2b98cebc605b8a63c38c46f24d1ad24ae95b4384628da7c9fca1b961fa9fe3c3.png",
+        "sha256": "678e8cc7c0d90f8dbb4b235d7cec9d2168d763310a17a29aeef318d2b289cedf",
+        "size": 1294879,
+        "file": "assets/ads/top-square/pt-3.png",
+        "width": 1254,
+        "height": 1254
+      }
+    ],
+    "es": [
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/e31db87f4bffd4676e9d1270bc1fc403e77184ca3b6cac8c908c2a706c6ae12d.png",
+        "sha256": "7b13682c72df99ca7ac6d2d3393b704abfc77742ae8e79a6ed7a64342ca21812",
+        "size": 1490691,
+        "file": "assets/ads/top-square/es-1.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/01a32049e8af75bd8bd9bc2e0cd9c2ae6cf75d82b23ec2643c5774365d2f0478.png",
+        "sha256": "4b09c32b43121e16da0041e0b15137b1243016fb4da1949436264859818d326d",
+        "size": 1333860,
+        "file": "assets/ads/top-square/es-2.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9a43e48d93eff603961db45dc596ce77d096e507c9ad4c706b5bde5b4c5a2bfd.png",
+        "sha256": "18e21a0de52cf2d0da426c8964fb53139ca5e55d01a2add8d7b8abedb95146b1",
+        "size": 1429249,
+        "file": "assets/ads/top-square/es-3.png",
+        "width": 1254,
+        "height": 1254
+      }
+    ],
+    "en": [
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/ab542c16c6a17e12bd533a6eb4035ca8e8192abf59bcef5b16b55b719ae62892.png",
+        "sha256": "a1307301d9fd2c0e8016b89ac319186f04d363f4c70b99883165eb108aa335a8",
+        "size": 1448295,
+        "file": "assets/ads/top-square/en-1.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/9dc2055bee1445e5cd77e64cb66e5492e6915398359690dab40446bb5c34084d.png",
+        "sha256": "51695742b03d8361788d5fbf55403fd38fcea2d61bd700b00c0a9808ffaf74f4",
+        "size": 1358848,
+        "file": "assets/ads/top-square/en-2.png",
+        "width": 1254,
+        "height": 1254
+      },
+      {
+        "url": "https://cdn.openart.ai/openart-uploads/production/attachment-transfers/f89b355c9fe656d4f83020c010596811979fd291c17c4a38e65c7d589612c991.png",
+        "sha256": "e303f941916207e90c45c9034d8a1798f16b55c7e30fbe3ff18377dca385686f",
+        "size": 1274573,
+        "file": "assets/ads/top-square/en-3.png",
+        "width": 1254,
+        "height": 1254
+      }
+    ]
+  },
+  "origin_note": "Nine original user-approved image-generation outputs from the same conversation; no rescaling, logos or text redrawn.",
+  "actions": {
+    "sms": "sms:+19082913386",
+    "whatsapp": "https://wa.me/19082913386",
+    "email": "handsondispatcher@gmail.com"
+  }
+}
