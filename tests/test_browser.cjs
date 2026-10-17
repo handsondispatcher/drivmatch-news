@@ -40,8 +40,9 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('.brand img').evaluate(e=>e.naturalWidth>0),true);
    assert.equal(await page.locator('meta[name="drivmatch-news-version"]').getAttribute('content'),'v34.11','public page has v34.11 version');
    assert.equal(await page.locator('#site-version').isVisible(),false,'Internal release must not appear in public masthead');
-   assert.equal(await page.locator('.header').evaluate(e=>getComputedStyle(e).backgroundColor),'rgb(2, 4, 8)',
-     'Keep approved gradient logo untouched on neutral-black background');
+   const headerStyle=await page.locator('.header').evaluate(e=>({color:getComputedStyle(e).color,background:getComputedStyle(e).backgroundImage}));
+   assert.ok(headerStyle.background.includes('gradient'),'Approved broadcast header must use a light gradient');
+   assert.equal(headerStyle.color,'rgb(7, 27, 64)','Header foreground must remain dark on light background');
    assert.equal(await page.locator('.brand img').getAttribute('src'),'assets/logo-drivmatch-news.png');
    assert.equal(await page.locator('#edition-date').isVisible(),false,'Internal edition date is not visible');
    assert.equal((await page.locator('.header').innerText()).includes('EDIÇÃO DIGITAL'),false,'No technical edition text on masthead');
