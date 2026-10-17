@@ -71,6 +71,11 @@ def parse_alerts(document, now=None, limit=5):
         dedup=(event,area.casefold())
         if dedup in unique_events:continue
         unique_events.add(dedup)
+        # NWS text is an official public-domain operational bulletin, not a publisher article.
+        # Preserve source wording; never infer highway closures.
+        description=str(p.get("description") or "").strip()[:12000]
+        instruction=str(p.get("instruction") or "").strip()[:3000]
+        bulletin="\n\n".join(part for part in (description, instruction) if part)
         en=f"NWS: {event} — {area}"
         pt=f"NWS: {EVENT_NAMES[event][0]} — {area}"
         es=f"NWS: {EVENT_NAMES[event][1]} — {area}"
@@ -83,6 +88,7 @@ def parse_alerts(document, now=None, limit=5):
             "origin_type":"official-operational-alert","geo_scope_verified":True,
             "curated_verified_headline":True,"link_only":True,
             "editorial_type":"operational_bulletin",
+            "nws_official_bulletin_en":bulletin,
             "verification_note":"NWS API: issued alert, severe/extreme, still active. Not a verified highway closure."
         })
     results.sort(key=lambda x:x["published_at"],reverse=True)
