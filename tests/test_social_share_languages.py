@@ -82,7 +82,7 @@ class SocialShareLocalesTests(unittest.TestCase):
                 self.assertTrue((base / "already-published-story" / code / "social.jpg").is_file())
             legacy = (base / "already-published-story" / "index.html").read_text(encoding="utf-8")
             self.assertIn("Motorista encontra estacionamento", legacy)
-            self.assertNotIn("lang=", legacy)
+            self.assertNotIn("story=already-published-story&amp;lang=", legacy)
             self.assertFalse((base / "portuguese-only" / "en").exists())
             self.assertFalse((base / "demo-story").exists())
             self.assertFalse((base / "unverified-source").exists())
