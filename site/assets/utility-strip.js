@@ -168,14 +168,16 @@ function showCity(){
    /thunder|severe storm/.test(d)?['⚡ Risco de tempestade','⚡ Storm risk','⚡ Riesgo de tormenta']:
    /heavy rain|flood/.test(d)?['Chuva intensa','Heavy rain','Lluvia intensa']:
    /dense fog/.test(d)?['Visibilidade reduzida','Low visibility','Visibilidad reducida']:null;
- const riskEl=el('top-risk');riskEl.hidden=!risk;
- riskEl.textContent=risk?risk[{pt:0,en:1,es:2}[lang()]||0]:'';
+ const riskEl=el('top-risk');riskEl.hidden=false;
+ riskEl.textContent=risk?risk[{pt:0,en:1,es:2}[lang()]||0]:({pt:'⚡ Verificar riscos climáticos',en:'⚡ Check weather alerts',es:'⚡ Consultar alertas meteorológicas'}[lang()]||'⚡ Verificar riscos climáticos');
  const hi=Math.round(picked.max_f),lo=Math.round(picked.min_f),l=lang();
  const max=l==='en'?'High':l==='es'?'Máx.':'Máx.',min=l==='en'?'Low':l==='es'?'Mín.':'Mín.';
  el('top-range-f').textContent=max+' '+hi+'°F · '+min+' '+lo+'°F';
  el('top-range-c').textContent=max+' '+Math.round((hi-32)*5/9)+'°C · '+min+' '+Math.round((lo-32)*5/9)+'°C';
  el('top-condition').title=picked.source||'NOAA / NWS forecast';
 }
+const riskAction=el('top-risk');
+if(riskAction)riskAction.addEventListener('click',()=>{const target=el('weather-alerts-button');if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.focus({preventScroll:true});target.click();}});
 function setSearchLocale(){
  const l=lang(),q=el('top-city-query'),label=el('top-city-select-label'),button=el('top-city-search');
  if(label)label.textContent=l==='en'?'Weather forecast':l==='es'?'Pronóstico del tiempo':'Previsão do tempo';

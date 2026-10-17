@@ -25,13 +25,15 @@ const {spawn}=require('node:child_process');
   await page.locator('[data-site-lang="es"]').click();
   await page.waitForFunction(()=>document.querySelector('#top-quote-ad-slot')?.dataset.activeLanguage==='es',{timeout:3000});
   assert.ok((await image.getAttribute('src')).includes('es-1.png'));
-  assert.ok((await page.locator('#top-quote-ad-sms').getAttribute('href')).startsWith('sms:+19082913386'));
-  assert.ok((await page.locator('#top-quote-ad-whatsapp').getAttribute('href')).startsWith('https://wa.me/19082913386'));
+  assert.equal(await page.locator('#top-quote-ad-sms').getAttribute('href'),null,'legacy SMS must be inactive');
+  assert.ok((await page.locator('#top-quote-ad-whatsapp').getAttribute('href')).startsWith('https://web.whatsapp.com/send?phone=19082913386'));
+  const full=await page.locator('#top-quote-ad-whatsapp').boundingBox();
+  assert.ok(full&&Math.abs(full.width-rect.width)<2&&Math.abs(full.height-rect.height)<2,'WhatsApp click target must cover entire ad');
   await slot.hover();
   await page.waitForTimeout(350);
   const still=await slot.getAttribute('data-model');
   await page.waitForTimeout(4300);
   assert.equal(await slot.getAttribute('data-model'),still,'hover must pause');
-  console.log('NINE QUOTE ADS PASS: original files, 4s rotation, language, SMS, WhatsApp, square sizing, hover pause');
+  console.log('NINE QUOTE ADS PASS: original files, 4s rotation, language, whole-surface WhatsApp Web, square sizing, hover pause');
  }finally{if(browser)await browser.close();server.kill();}
 })().catch(e=>{console.error('TOP QUOTE AD BROWSER ERROR',e.stack);process.exit(1);});
