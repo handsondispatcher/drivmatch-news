@@ -1,6 +1,6 @@
 /* Nine owner-supplied square ad models, 3 per top language, rotated every 4s.
- * Static 1:1 viewport in quotes strip. Two full-size click regions:
- * upper SMS, lower WhatsApp. Only one image element, no duplicated content.
+ * Static 1:1 viewport in quotes strip. Entire creative clicks to WhatsApp;
+ * the former SMS anchor stays inert for legacy DOM compatibility.
  */
 (()=>{'use strict';
  const root=document.getElementById('top-quote-ad-slot');
@@ -34,7 +34,9 @@
    img.src=src();
    img.alt=labels[language].alt;
    root.dataset.model=String(model+1);root.dataset.activeLanguage=language;
-   sms.href='sms:+19082913386?body='+encodeURIComponent(msg[language]);
+   sms.removeAttribute('href');
+   sms.setAttribute('aria-hidden','true');
+   sms.tabIndex=-1;
    whatsapp.href='https://wa.me/19082913386?text='+encodeURIComponent(msg[language]);
    sms.setAttribute('aria-label',labels[language].sms);
    whatsapp.setAttribute('aria-label',labels[language].wa);
