@@ -10,3 +10,7 @@ Data: 2026-10-16 / 17. **Regra aprovada pelo proprietário**.
 - Não distorcer: usar aspect-ratio 1 e `object-fit:contain`; nunca aumentar a barra de cotações além do necessário nem deslocar a navegação por cima.
 - Verificar os nove PNGs via tamanho e hash SHA-256 antes de cada publicação; o deploy deve testá-los em navegador no idioma selecionado.
 - Não alterar os anúncios horizontais, o carrossel lateral, cotações nem fontes editoriais.
+
+## Responsividade — v1.0.1
+
+Em 851–1280px, manter o anúncio na terceira linha, coluna direita, separadamente das cotações (primeira linha) e da previsão / avisos de risco (segunda linha). Não sobrepor ou esconder os avisos meteorológicos. Em desktop largo, manter o quadrado na última coluna da faixa; em telas móveis, adaptar ao grid de duas colunas. A lógica de troca de 4 segundos e os nove arquivos originais permanecem intactos.
