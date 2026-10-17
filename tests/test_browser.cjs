@@ -135,8 +135,11 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#news-commercial-banner .ucr-frame').count(),0,'UCR must never replace the horizontal vehicle load banner');
    assert.equal(await page.locator('#market-commercial-banner .ucr-frame-square').count(),1,'UCR square creative stays in the right sidebar');
    assert.equal(await page.locator('#dm-ad-rotation-viewport').isVisible(),true,'Full sponsor carousel visible at all widths; individual posters naturally rotate out of view');
-   // Official vertical ad rotation in the right sidebar; only the original three adverts exist.
-   assert.equal(await page.locator('#dm-ad-rotation-track > .dm-ad-rotation-item').count(),3);
+   // Official vertical ad rotation in the right sidebar; the original three plus Gracie Barra must each exist exactly once.
+   assert.equal(await page.locator('#dm-ad-rotation-track > .dm-ad-rotation-item').count(),4);
+   assert.equal(await page.locator('#dm-ad-rotation-track [data-ad-campaign="gracie-barra"]').count(),1);
+   assert.equal(await page.locator('.dm-gracie-square-site').getAttribute('href'),'https://graciebarraburlington.com/');
+   assert.ok((await page.locator('.dm-gracie-square-maps').getAttribute('href')).includes('207+Cambridge+Street+Burlington+MA+01803'));
    assert.equal(await page.locator('#dm-ad-rotation-track #market-commercial-banner').count(),1);
    assert.equal(await page.locator('#dm-ad-rotation-track #market-driver-availability-banner').count(),1);
    assert.equal(await page.locator('#dm-ad-rotation-track #auto-m-usa-banner').count(),1);
