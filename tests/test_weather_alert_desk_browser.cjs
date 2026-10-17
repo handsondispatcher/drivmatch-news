@@ -21,12 +21,34 @@ const {spawn}=require('node:child_process');
    notice('payne','Payne, OK','2026-10-16T22:08:00Z'),
    {...notice('private-weather','Storm market', '2026-10-16T21:00:00Z','Local Weather Desk','Clima'), editorial_type:'publisher_headline',source_url:'https://example.org/weather/test'},
   ];
+  // Isolated deterministic newsroom: tests do NOT mix real content with mock alerts.
+  const article={id:'transport-control',kind:'news',status:'approved',demo:false,category:'Transporte',
+   source:'Verified transport desk',source_url:'https://example.org/transport-control',original_lang:'en',
+   published_at:'2026-10-16T20:00:00Z',
+   locales:{pt:{title:'Novidades em transporte',summary:'',body:'Notícia de transporte.'},
+    en:{title:'Transport desk control story',summary:'',body:'Transport reporting.'},
+    es:{title:'Noticias de transporte',summary:'',body:'Información de transporte.'}}};
+  await page.route('**/data/bootstrap.js?**',route=>route.fulfill({
+   status:200,contentType:'application/javascript',
+   body:'window.DRIVMATCH_BOOTSTRAP='+JSON.stringify({articles:[article],market:{indicators:{},stocks:{}},ads:{enabled:false}})+';'
+  }));
+  await page.route('**/data/content.json?**',route=>route.fulfill({
+   status:200,contentType:'application/json',
+   body:JSON.stringify({articles:[article]})
+  }));
   await page.route('**/data/source-headlines.json?**',route=>route.fulfill({
    status:200,contentType:'application/json',
    body:JSON.stringify({headlines:records,generated_at:new Date().toISOString(),latest_headline_at:records[0].published_at})
   }));
+  page.on('pageerror',err=>console.log('WEATHER PAGEERROR',err.message));
   await page.goto('http://127.0.0.1:8774/',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.getElementById('weather-alerts-count')?.textContent==='4',{timeout:12000});
+  try {
+   await page.waitForFunction(()=>document.getElementById('weather-alerts-count')?.textContent==='4',null,{timeout:15000});
+  }catch(err){
+   const state=await page.evaluate(()=>({count:document.getElementById('weather-alerts-count')?.textContent,body:document.getElementById('list')?.innerText?.slice(0,350)}));
+   console.log('WEATHER TEST DIAGNOSTICS',JSON.stringify(state));
+   throw err;
+  }
   assert.equal(await page.locator('#list .dm-climate-item').count(),0,'Normal news must not display climate-only cards');
   const headlines=await page.locator('#list article h3, #features h3, #highlightList .highlight-headline').allTextContents();
   assert.equal(headlines.some(t=>/Brewster|Val Verde|Payne/.test(t)),false,'NWS alerts must leave regular main homepage');
