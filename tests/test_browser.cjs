@@ -134,7 +134,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#news-commercial-banner .car-official-horizontal').count(),1,'Approved car-hauler artwork must occupy the horizontal top slot');
    assert.equal(await page.locator('#news-commercial-banner .ucr-frame').count(),0,'UCR must never replace the horizontal vehicle load banner');
    assert.equal(await page.locator('#market-commercial-banner .ucr-frame-square').count(),1,'UCR square creative stays in the right sidebar');
-   assert.equal(await page.locator('#market-commercial-banner').isVisible(),width>=991,'Right sidebar UCR is visible only on desktop');
+   assert.equal(await page.locator('#market-commercial-banner').isVisible(),true,'Right-side sponsor remains visible after moving below news');
    // Official vertical ad rotation in the right sidebar; only the original three adverts exist.
    assert.equal(await page.locator('#dm-ad-rotation-track > .dm-ad-rotation-item').count(),3);
    assert.equal(await page.locator('#dm-ad-rotation-track #market-commercial-banner').count(),1);
@@ -308,10 +308,9 @@ const {spawn}=require('node:child_process');
    assert.ok(await page.locator('#market .market-live-row').count()<=3,'Only three verified indicator categories allowed');
    assert.equal(await page.locator('#market .market-live-row').count()+(await page.locator('#market .market-unavailable').count())>0,true,'Either verified data or one explanation is visible');
    // Road TV sits between visible Ventusky and USD/diesel/Brent on all screens.
-   const tv=width>990?'#roadtv-desktop':'#roadtv-mobile';
+   const tv='#roadtv-desktop';
    const flow=await page.evaluate(width=>{
-     const ids=width>990?['clima-desktop','roadtv-desktop','market-title']:
-                           ['clima-mobile','roadtv-mobile','market-title-mobile'];
+     const ids=['clima-desktop','roadtv-desktop','market-title'];
      return ids.map(id=>document.getElementById(id).getBoundingClientRect().top);
    },width);
    assert.ok(flow[0]<flow[1]&&flow[1]<flow[2],`Weather→TV→Market broken: ${flow}`);
@@ -339,8 +338,38 @@ const {spawn}=require('node:child_process');
      return frame&&frame.getAttribute('src')!==previous;
    },{selector:tv,previous:firstCameraSrc},{timeout:5000});
    assert.notEqual(await camera.getAttribute('src'),firstCameraSrc,'Next camera must load a distinct publisher source');
-   assert.equal(await page.locator('#mercados').isVisible(),width>990);
-   assert.equal(await page.locator('#mobile-market').isVisible(),width<=990);
+   assert.equal(await page.locator('#mercados').isVisible(),true,'Media rail visible on ALL widths');
+   assert.equal(await page.locator('#mobile-market').isVisible(),false,'Do not duplicate market on mobile');
+   if(width<=990){
+     const media=await page.evaluate(()=>{
+       const rail=document.getElementById('mercados');
+       const news=document.querySelector('.main > main');
+       const archive=document.getElementById('pesquisa-noticias');
+       const footer=document.querySelector('footer.footer');
+       return {
+         moved:rail.parentElement.id==='mobile-media-footer-slot',
+         afterNews:!!(news.compareDocumentPosition(rail)&Node.DOCUMENT_POSITION_FOLLOWING),
+         afterSearch:!!(archive.compareDocumentPosition(rail)&Node.DOCUMENT_POSITION_FOLLOWING),
+         beforeFooter:!!(rail.compareDocumentPosition(footer)&Node.DOCUMENT_POSITION_FOLLOWING),
+         mobileCloneVisible:!!document.querySelector('.weather-mobile')?.getClientRects().length,
+         desktopClimaVisible:!!document.getElementById('clima-desktop')?.getClientRects().length,
+         desktopRoadTVVisible:!!document.getElementById('roadtv-desktop')?.getClientRects().length,
+         uniqueIDCount:document.querySelectorAll('#mercados').length,
+         scrollWidth:document.documentElement.scrollWidth,
+         viewportWidth:window.innerWidth
+       };
+     });
+     assert.equal(media.moved,true,'Media rail must be moved immediately BEFORE footer');
+     assert.ok(media.afterNews&&media.afterSearch&&media.beforeFooter,'Complete news and search must precede media rail before footer');
+     assert.equal(media.mobileCloneVisible,false,'No second Ventusky/camera/player at the top of the page');
+     assert.ok(media.desktopClimaVisible&&media.desktopRoadTVVisible,'Ventusky and original live camera must remain visible');
+     assert.equal(media.uniqueIDCount,1,'No duplicated sidebar or advertiser inventory');
+     assert.ok(media.scrollWidth<=media.viewportWidth+2,'Mobile media rail must not create horizontal overflow');
+     assert.equal(await page.locator('#dm-ad-rotation').isVisible(),true,'Sponsorship ticker must remain visible');
+     assert.ok(await page.locator('#auto-m-usa-banner .autom-usa-phone').getAttribute('href').then(h=>h.includes('wa.me/14076004737')));
+   }else{
+     assert.equal(await page.locator('#mercados').getAttribute('data-layout-placement'),'desktop-right');
+   }
    assert.equal(await page.locator('#news-freshness').count(),1);
    assert.equal(await page.locator('#news-freshness').isVisible(),false,'Frescor editorial fica na auditoria, nunca no texto público');
    for(const id of ['top-usd-value','top-diesel-value','top-brent-value','top-weather-icon','top-risk']) {
@@ -425,7 +454,7 @@ const {spawn}=require('node:child_process');
      });
      assert.ok(size>=16,'Crawler must be >=16px on mobile');
    }
-   const card=width>990?'#clima-desktop':'#clima-mobile';
+   const card='#clima-desktop';
    assert.equal(await page.locator('#dm-crawler-track a[href*="thetrucker.com"]').count(),0,'Known geo-blocked publisher must not appear in ticker');
    // Approved layout: Ventusky is visible immediately, without a toggle.
    assert.match(await page.locator(card+' iframe').getAttribute('src'),/^https:\/\/embed\.ventusky\.com/);

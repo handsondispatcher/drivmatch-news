@@ -1316,6 +1316,44 @@ body{background:#f7f9fc;color:#14283c}
 .dm-climate-symbol{font-size:30px;color:#2689bb;text-align:center}
 @media(max-width:550px){.dm-weather-alert-button{font-size:12px}.dm-weather-alert-heading{font-size:20px}.dm-climate-item{grid-template-columns:minmax(0,1fr) 26px;gap:8px;padding:13px}.dm-climate-symbol{font-size:23px}}
 
+
+/* V34.12 / OWNER MOBILE MEDIA FOOTER — existing DESKTOP media rail moves
+   below ALL articles and the search panel; immediately before the real footer.
+   Never duplicate DOM IDs, feeds, ad creatives, TV video or market data. */
+#mobile-media-footer-slot{display:none}
+@media(max-width:990px){
+  .main{grid-template-columns:minmax(0,1fr)!important}
+  /* Mobile copies previously displayed at the top of the news column are
+     suppressed. The original media rail is now the ONE active instance. */
+  .main > main > .weather-mobile{display:none!important}
+  #mercados.side{
+    display:block!important;position:relative;min-width:0;width:100%;
+    max-width:100%;margin:0;padding:14px 12px 20px!important;
+    overflow:visible;box-sizing:border-box;border-radius:12px!important;
+  }
+  #mercados .weather-desktop{display:block!important}
+  #mercados .weather-card{width:100%;max-width:100%;box-sizing:border-box}
+  #mercados #clima-desktop .weather-map{width:100%;max-width:100%;min-width:0;overflow:hidden}
+  #mercados #clima-desktop iframe{display:block;width:100%;height:clamp(290px,70vw,460px);max-width:100%;border:0}
+  #mercados #roadtv-desktop{display:block;min-width:0;width:100%}
+  #mercados #roadtv-desktop .roadtv-screen{width:100%;max-width:100%;aspect-ratio:16/9;min-height:190px;overflow:hidden}
+  #mercados #roadtv-desktop iframe{max-width:100%}
+  #mercados #market{max-width:100%;min-width:0}
+  /* The old duplicate mobile data table must not create a second market. */
+  .mobile-market{display:none!important}
+  #mercados #dm-ad-rotation{display:block!important;width:100%;max-width:420px;margin:16px auto 20px}
+  #mercados #dm-ad-rotation-viewport{width:100%;max-width:100%;box-sizing:border-box}
+  #mobile-media-footer-slot{
+    display:block;box-sizing:border-box;width:100%;max-width:830px;
+    padding:0 12px;margin:18px auto 24px;
+  }
+}
+@media(max-width:420px){
+  #mobile-media-footer-slot{padding:0 9px;margin:14px auto 20px}
+  #mercados.side{padding:12px 9px 18px!important}
+  #mercados #clima-desktop iframe{height:320px}
+}
+
 </style>
 
 
@@ -1595,6 +1633,7 @@ body{background:linear-gradient(180deg,#e9f4ff 0,#f4f9ff 230px,#f8fbff 620px)!im
   </div>
 </aside>
 <section class="search-footer" id="pesquisa-noticias" aria-label="Pesquisar notícias e arquivo"><div class="lead"><div class="form"><input id="search" placeholder="Pesquisar manchetes, temas ou fontes..." aria-label="Pesquisar notícias"><select id="category"><option value="Todas">Todas as editorias</option></select><select id="age"><option value="all">Todo o arquivo</option><option value="2">Hoje e ontem</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option></select></div></div></section>
+<div id="mobile-media-footer-slot" aria-label="Clima, câmeras ao vivo, mercado e publicidade"></div>
 <footer class="footer" aria-label="Informações institucionais"><div class="footer-publisher" id="footer-publisher">DrivMatch News — um produto da Hands On Dispatcher LLC</div><div class="footer-legal" id="footer-legal">© 2026 Hands On Dispatcher LLC. Todos os direitos reservados. <span class="footer-version" id="footer-version">· v34.11</span></div></footer>
 <div class="modalshade" id="shade"><article class="modal" id="article-dialog" role="dialog" aria-modal="true" aria-labelledby="modaltitle"><div class="modalhero"><img id="modalimg" alt="Imagem da matéria"></div><div class="modalhead"><span class="kicker" id="modalkicker"></span><button class="x" onclick="closeModal()" aria-label="Fechar">×</button></div><div class="modalbody">
 <h1 id="modaltitle"></h1><div class="smalltext" id="modalmeta"></div>
@@ -1643,6 +1682,7 @@ body{background:linear-gradient(180deg,#e9f4ff 0,#f4f9ff 230px,#f8fbff 620px)!im
 <script src="assets/app.js?v=weather-alert-desk-20261017-v1" defer></script>
 <script src="assets/auto-m-usa.js?v=20261016-originals-sidebar-2" defer></script>
 <script src="assets/horizontal-ad-sequence.js?v=20261017-maps-button-v1" defer></script>
+<script src="assets/mobile-media-footer.js?v=20261017-mobile-media-footer-v1" defer></script>
 <script src="assets/sidebar-ad-rotation.js?v=20261016-vertical-v1-1-visible" defer></script>
 <script src="assets/road-tv-live.js?v=creator-link-20261015-1" defer></script>
 <script src="assets/utility-strip.js?v=market-share-20261015-1" defer></script>
