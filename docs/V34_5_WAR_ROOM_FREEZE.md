@@ -31,3 +31,8 @@ Data: 2026-10-10. Autoridade: decisões explícitas do proprietário sobre scree
 - **Pendente até evidência:** autoplay de streaming de rodovia, credenciais do provedor de vídeos e fluxo editorial com publicação nova no domínio real.
 - URL de mapa oficial: https://fl511.com/Map/EmbeddedMap?layers=Cameras&region=ALL&size=0
 - Snapshot imutável: commit v34.4 `829169282718c3bf546fdb74d5ae692ff0943bb6`, branch `snapshot/v34-4-pre-war-room-2026-10-10`.
+
+## Change Control — 2026-10-16: cabeçalho claro autorizado
+- O responsável aprovou o tema broadcast branco/azul conforme imagem de referência. Isso substitui apenas a exigência anterior de fundo preto para o cabeçalho.
+- Preservar sem recriação a logo oficial, e manter funções, links, controles, dados, publicação e regras editoriais/câmeras existentes.
+- Testar todas as larguras e regressões funcionais antes da publicação. Mockup não é fonte de notícias reais.

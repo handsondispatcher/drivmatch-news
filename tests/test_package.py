@@ -181,7 +181,7 @@ class PublicationTests(unittest.TestCase):
   self.assertIn("10*1000", (BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
   self.assertIn('drivmatch_weather_city_v1',(BASE/'site/assets/utility-strip.js').read_text(encoding='utf-8'))
   self.assertEqual(version['brand_policy']['approved_logo'],'unchanged_official_blue_gradient')
-  self.assertEqual(version['brand_policy']['header_bg'],'#020408')
+  self.assertEqual(version['brand_policy']['header_bg'],'light_broadcast_gradient_owner_approved_2026-10-16')
   self.assertTrue(version['reader_ui']['no_article_count'])
   self.assertIn('id="count" hidden aria-hidden="true"',page)
   self.assertNotIn('Publicidade · DrivMatch',app)
