@@ -167,8 +167,8 @@ const {spawn}=require('node:child_process');
      'https://wa.me/14072852874','Printed driver phone must open Aileen WhatsApp');
    const driverLoaded=await driverPoster.evaluate(async img=>{try{await img.decode();}catch(_){}return img.complete&&img.naturalWidth===1229&&img.naturalHeight===1536;});
    assert.equal(driverLoaded,true,'Exact original 1229x1536 classified should load successfully');
-   assert.equal(await page.locator('#market-driver-availability-banner').isVisible(),width>=991,
-     'Aileen classified is visible directly under UCR when desktop sidebar is visible');
+   assert.equal(await page.locator('#market-driver-availability-banner').isVisible(),true,
+     'Aileen original poster stays visible in desktop and mobile canonical inventory');
    if(width>=991){
      const rect=await driverPoster.evaluate(img=>img.getBoundingClientRect());
      assert.ok(rect.width>140&&rect.width<=330,'Portrait must fit within sidebar limits');
@@ -366,6 +366,27 @@ const {spawn}=require('node:child_process');
      assert.equal(media.uniqueIDCount,1,'No duplicated sidebar or advertiser inventory');
      assert.ok(media.scrollWidth<=media.viewportWidth+2,'Mobile media rail must not create horizontal overflow');
      assert.equal(await page.locator('#dm-ad-rotation').isVisible(),true,'Sponsorship ticker must remain visible');
+     const complete=await page.evaluate(()=>{
+      const root=document.getElementById('dm-ad-rotation'),vp=document.getElementById('dm-ad-rotation-viewport');
+      const items=[...document.querySelectorAll('#dm-ad-rotation-track > .dm-ad-rotation-item')];
+      const footer=document.querySelector('footer.footer');
+      return {mode:root.dataset.displayMode,items:items.map(el=>({
+        campaign:el.dataset.adCampaign,visible:getComputedStyle(el).display!=='none',
+        height:el.getBoundingClientRect().height})),
+        vpHeight:vp.getBoundingClientRect().height,
+        trackHeight:document.getElementById('dm-ad-rotation-track').getBoundingClientRect().height,
+        thirdBottom:items[2].getBoundingClientRect().bottom,
+        footerTop:footer.getBoundingClientRect().top,
+        footerAfter:!!(vp.compareDocumentPosition(footer)&Node.DOCUMENT_POSITION_FOLLOWING)};
+     });
+     assert.equal(complete.mode,'canonical-full-mobile');
+     assert.deepEqual(complete.items.map(x=>x.campaign),['ucr-2027','driver-available','auto-m-usa']);
+     assert.ok(complete.items.every(x=>x.visible&&x.height>150),'All UCR Aileen Auto M must be readable and full');
+     assert.ok(complete.vpHeight>=complete.trackHeight-2,'Full mobile inventory must not be clipped');
+     assert.ok(complete.footerAfter&&complete.thirdBottom<=complete.footerTop+2,'Footer must follow third sponsor');
+     for(const selector of ['#market-commercial-banner','#market-driver-availability-banner','#auto-m-usa-banner'])
+       assert.equal(await page.locator(selector).isVisible(),true,selector+' must be visible on mobile');
+
      assert.ok(await page.locator('#auto-m-usa-banner .autom-usa-phone').getAttribute('href').then(h=>h.includes('wa.me/14076004737')));
    }else{
      assert.equal(await page.locator('#mercados').getAttribute('data-layout-placement'),'desktop-right');
