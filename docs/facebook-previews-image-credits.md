@@ -5,7 +5,7 @@ The exact existing approved master at `site/assets/logo-drivmatch-news.png` is u
 ## Vehicle photography
 Each source image was cropped/resized into the Facebook social collage, labeled, and overlaid with the official DrivMatch News logo and localized headlines. Photographers are **not** endorsing the newspaper.
 
-1. Semi truck — Winnebaggo, **CC0 1.0**: https://commons.wikimedia.org/wiki/File:Freightliner_Cascadia_-_Love%E2%80%99s_Travel_Centers.jpg | https://creativecommons.org/publicdomain/zero/1.0/
+1. Semi truck — Bill Beers, **CC0 1.0**: https://commons.wikimedia.org/wiki/File:Freightliner_eCascadia_4x2.jpg | https://creativecommons.org/publicdomain/zero/1.0/
 2. Box truck — Mike.dill01, **CC0 1.0**: https://commons.wikimedia.org/wiki/File:Ryder_Refrigerated_Box_Truck.jpg | https://creativecommons.org/publicdomain/zero/1.0/
 3. Cargo van — MobiusDaXter, **CC BY-SA 4.0**: https://commons.wikimedia.org/wiki/File:Ford_Transit_cargo_delivery_vans.jpg | https://creativecommons.org/licenses/by-sa/4.0/
 4. RAM 3500 — Artaxerxes, **CC BY-SA 4.0**: https://commons.wikimedia.org/wiki/File:Ram_3500_pickup_truck_Eastern_Avenue_downtown_Saint_Johnsbury_VT_September_2017.jpg | https://creativecommons.org/licenses/by-sa/4.0/
