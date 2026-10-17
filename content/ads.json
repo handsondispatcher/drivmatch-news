@@ -408,6 +408,22 @@
           "path": "assets/ads/carhauler-national-no-news-logo-en-1774x394.png"
         }
       }
+    },
+    "auto_m_usa_google_maps": {
+      "version": "1.0",
+      "status": "active",
+      "address": "2040 E Irlo Bronson Memorial Hwy, Kissimmee, FL 34744",
+      "href": "https://www.google.com/maps/search/?api=1&query=2040%20E%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Kissimmee%2C%20FL%2034744",
+      "format": "live_html_overlay",
+      "replaces": "left address cell within horizontal AUTO M USA creative only",
+      "locales": {
+        "pt": "VER NO GOOGLE MAPS",
+        "es": "VER EN GOOGLE MAPS",
+        "en": "VIEW ON GOOGLE MAPS"
+      },
+      "preserve_original_png_sha256": true,
+      "phone_and_instagram_unchanged": true,
+      "applies_to": "both synchronized horizontal slots whenever AUTO M USA is displayed"
     }
   },
   "top_quote_ad_rotation": {

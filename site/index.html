@@ -1290,6 +1290,16 @@ body{background:#f7f9fc;color:#14283c}
   #dm-utility #top-quote-ad-art.dm-quote-open img{animation:none!important}
 }
 
+
+/* Google Maps link substitutes the left footer address on AUTO M USA horizontal. */
+.dm-horizontal-auto-maps{position:absolute;z-index:8;left:0;top:77.5%;width:42.25%;height:22.5%;display:flex;gap:clamp(3px,.5vw,9px);justify-content:center;align-items:center;box-sizing:border-box;padding:2px clamp(3px,.55vw,10px);overflow:hidden;text-decoration:none;background:#050505;color:#fff;border-top:2px solid #fff500;border-right:1px solid #555}
+.dm-horizontal-auto-maps:hover,.dm-horizontal-auto-maps:focus-visible{background:#181800;outline:2px solid #fff500;outline-offset:-2px}
+.dm-horizontal-auto-map-pin{flex:none;font-size:clamp(12px,1.9vw,28px);line-height:1}
+.dm-horizontal-auto-map-copy{display:flex;min-width:0;flex-direction:column;gap:2px;line-height:1.08}
+.dm-horizontal-auto-map-copy strong{color:#fff500;font:bold clamp(9px,1.35vw,20px)/1.05 Arial,Helvetica,sans-serif;white-space:nowrap}
+.dm-horizontal-auto-map-copy small{color:#eee;font:clamp(8px,.78vw,12px)/1.1 Arial,Helvetica,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:650px){.dm-horizontal-auto-map-copy small{display:none}.dm-horizontal-auto-map-pin{font-size:12px}}
+
 </style>
 
 
@@ -1557,7 +1567,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
 <script src="assets/app.js?v=carhauler-no-news-logo-v3-20261016" defer></script>
 <script src="assets/auto-m-usa.js?v=20261016-originals-sidebar-2" defer></script>
-<script src="assets/horizontal-ad-sequence.js?v=20261016-wide-sequence-v1" defer></script>
+<script src="assets/horizontal-ad-sequence.js?v=20261017-maps-button-v1" defer></script>
 <script src="assets/sidebar-ad-rotation.js?v=20261016-vertical-v1-1-visible" defer></script>
 <script src="assets/road-tv-live.js?v=creator-link-20261015-1" defer></script>
 <script src="assets/utility-strip.js?v=market-share-20261015-1" defer></script>

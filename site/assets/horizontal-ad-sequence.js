@@ -11,6 +11,12 @@
  const order=['cars','ucr','auto'];
  const contact='https://wa.me/14076004737?text=Ol%C3%A1%21%20Vim%20pelo%20an%C3%BAncio%20da%20DrivMatch%20News.';
  const insta='https://www.instagram.com/autom.usa/';
+ const mapsUrl='https://www.google.com/maps/search/?api=1&query=2040%20E%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Kissimmee%2C%20FL%2034744';
+ const mapsButtonCopy={
+  pt:{text:'VER NO GOOGLE MAPS',aria:'Ver AUTO M USA no Google Maps, 2040 E Irlo Bronson Memorial Hwy, Kissimmee, FL 34744'},
+  es:{text:'VER EN GOOGLE MAPS',aria:'Ver AUTO M USA en Google Maps, 2040 E Irlo Bronson Memorial Hwy, Kissimmee, FL 34744'},
+  en:{text:'VIEW ON GOOGLE MAPS',aria:'View AUTO M USA on Google Maps, 2040 E Irlo Bronson Memorial Hwy, Kissimmee, FL 34744'}
+ };
  const autoFiles={
    pt:'assets/ads/auto-m-usa-pt-wide-original.png',
    es:'assets/ads/auto-m-usa-es-wide-original.png',
@@ -27,6 +33,11 @@
    const file=autoFiles[locale],fallback=autoFallback[locale];
    return '<div class="dm-horizontal-auto-art">'+
     '<img class="dm-horizontal-auto-img" src="'+file+'" width="1774" height="394" loading="eager" decoding="async" data-fallback="'+fallback+'" alt="AUTO M USA. '+autoCopy[locale]+' Kissimmee, FL. +1 (407) 600-4737. @autom.usa" />'+
+    // Live link visually replaces the printed address cell of the unchanged original PNG.
+    '<a class="dm-horizontal-auto-maps" href="'+mapsUrl+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="'+mapsButtonCopy[locale].aria+'" title="'+mapsButtonCopy[locale].aria+'">'+
+      '<span class="dm-horizontal-auto-map-pin" aria-hidden="true">📍</span>'+
+      '<span class="dm-horizontal-auto-map-copy"><strong>'+mapsButtonCopy[locale].text+'</strong><small>Kissimmee, FL · 2040 E Irlo Bronson Memorial Hwy</small></span>'+
+    '</a>'+
     '<a class="dm-horizontal-auto-phone" href="'+contact+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="AUTO M USA: WhatsApp +1 (407) 600-4737. Vim pelo anúncio da DrivMatch News."></a>'+
     '<a class="dm-horizontal-auto-instagram" href="'+insta+'" target="_blank" rel="noopener noreferrer sponsored" aria-label="Instagram AUTO M USA @autom.usa"></a>'+
     '</div>';
