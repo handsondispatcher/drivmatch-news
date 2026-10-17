@@ -1,0 +1,18 @@
+name: Live browser verification of square quote ad
+on:
+  push:
+    branches: [qa/live-square-ads-20261017]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Check live domain original images and actual 4s rotation
+        run: node scripts/probe_top_quote_live.cjs
