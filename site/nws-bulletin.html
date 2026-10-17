@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NWS Bulletin | DrivMatch News</title><style>body{font:16px/1.65 system-ui,Arial,sans-serif;margin:0;background:#eef3f9;color:#12283d}header{background:#003c70;color:white;padding:17px 24px}main{max-width:850px;margin:25px auto;background:white;padding:24px;border-radius:10px;box-shadow:0 3px 16px #1e33521a}h1{line-height:1.2;font-size:clamp(23px,4vw,34px)}nav{display:flex;gap:8px;flex-wrap:wrap}nav a,.link{display:inline-block;padding:9px 13px;border:1px solid #2774b3;border-radius:5px;color:#07528b;text-decoration:none;font-weight:700}nav a[aria-current]{background:#0963a4;color:white}#message{color:#9e4500;font-weight:600}#body{white-space:pre-wrap;overflow-wrap:anywhere}footer{border-top:1px solid #c8d6e4;padding-top:14px;margin-top:25px}a:focus-visible{outline:3px solid #ffbd21}</style></head><body><header>DrivMatch News · National Weather Service</header><main><p><a href="./">← DrivMatch News</a></p><nav id="languages" aria-label="Bulletin language"><a data-lang="pt" href="#">🇧🇷 Português</a><a data-lang="en" href="#">🇺🇸 English</a><a data-lang="es" href="#">🇪🇸 Español</a></nav><h1 id="headline">NWS Bulletin</h1><p id="meta"></p><p id="message" role="status"></p><article id="body" aria-live="polite">Loading official bulletin...</article><footer><a class="link" id="source" href="#" target="_blank" rel="noopener noreferrer">NWS original alert (technical GeoJSON)</a><p id="disclaimer"></p></footer></main><script>
+(async()=>{'use strict';
+const params=new URLSearchParams(location.search),id=params.get('story')||'',locale=['pt','en','es'].includes(params.get('lang'))?params.get('lang'):'en';
+document.documentElement.lang=locale;
+const $=id=>document.getElementById(id),copy={
+pt:{missing:'Boletim oficial indisponível. Consulte o NWS.',notrans:'Tradução integral indisponível. O texto original em inglês é mostrado, sem alegar tradução.',source:'Alerta oficial NWS (GeoJSON técnico)',caution:'Confirme a situação atual junto ao NWS e as condições de rodovias no DOT/511. Um alerta não confirma fechamento de estrada.'},
+en:{missing:'Official bulletin unavailable. Consult NWS.',notrans:'Full translation unavailable; showing the original English bulletin.',source:'Official NWS alert (technical GeoJSON)',caution:'Check latest NWS warnings and DOT/511 road conditions. An alert does not prove a road closure.'},
+es:{missing:'Boletín oficial no disponible. Consulte el NWS.',notrans:'Traducción completa no disponible. Se muestra el texto original en inglés.',source:'Alerta oficial NWS (GeoJSON técnico)',caution:'Consulte avisos actuales del NWS y carreteras DOT/511. Una alerta no confirma cierres de carreteras.'}}[locale];
+for(const a of document.querySelectorAll('[data-lang]')){a.href='?story='+encodeURIComponent(id)+'&lang='+a.dataset.lang;if(a.dataset.lang===locale)a.setAttribute('aria-current','page');}
+$('disclaimer').textContent=copy.caution;$('source').textContent=copy.source;
+try{
+if(!/^nws-[a-f0-9]{20}$/.test(id))throw Error('Invalid NWS bulletin ID');
+const response=await fetch('data/content.json',{cache:'no-store'});
+if(!response.ok)throw Error('News data unavailable');
+const data=await response.json();const item=(data.articles||[]).find(x=>x.id===id&&x.origin_type==='official-operational-alert');
+if(!item)throw Error('NWS bulletin not found');
+const en=item.locales?.en||{},local=item.locales?.[locale]||en,translated=item.nws_bulletin_available_langs?.includes(locale);
+$('headline').textContent=local.title||en.title||'NWS';
+$('meta').textContent='National Weather Service · '+new Date(item.published_at).toLocaleString(locale==='pt'?'pt-BR':locale==='es'?'es-MX':'en-US');
+$('body').textContent=(translated?local.body:en.body)||copy.missing;
+if(!translated&&locale!=='en')$('message').textContent=copy.notrans;
+if(typeof item.source_url==='string'&&/^https:\/\/api\.weather\.gov\/alerts\//.test(item.source_url))$('source').href=item.source_url;else $('source').hidden=true;
+}catch(err){$('body').textContent=copy.missing;$('message').textContent='';$('source').hidden=true;}
+})();
+</script></body></html>
