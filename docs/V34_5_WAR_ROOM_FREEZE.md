@@ -31,3 +31,10 @@ Data: 2026-10-10. Autoridade: decisões explícitas do proprietário sobre scree
 - **Pendente até evidência:** autoplay de streaming de rodovia, credenciais do provedor de vídeos e fluxo editorial com publicação nova no domínio real.
 - URL de mapa oficial: https://fl511.com/Map/EmbeddedMap?layers=Cameras&region=ALL&size=0
 - Snapshot imutável: commit v34.4 `829169282718c3bf546fdb74d5ae692ff0943bb6`, branch `snapshot/v34-4-pre-war-room-2026-10-10`.
+
+## Change Control — 2026-10-16: atualização cosmética autorizada
+- O proprietário autorizou explicitamente o tema broadcast claro da referência enviada, substituindo exclusivamente a regra anterior de cabeçalho preto #020408.
+- A logomarca PNG oficial permanece intocada e íntegra; não é recriada.
+- Preservar lógica, botões, IDs, handlers, feed, câmeras, filtros, tradução, direitos e comportamento. Nenhum dado ilustrativo do mockup vira notícia factual.
+- Testes de cores passam a validar cabeçalho claro, sem relaxar gates funcionais e acessibilidade. Continuidade da regra de não declarar transmissão ao vivo sem verificação.
+- Publicação condicionada a CI completo e verificação do caminho público no domínio próprio.
