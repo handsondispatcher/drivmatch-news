@@ -1,0 +1,257 @@
+/* DrivMatch News — canonical mobile quote-and-weather layout v1
+   Scope: mobile utility area ONLY; never mutate data, language, ticker timing,
+   advertising creatives or outbound links. Override accumulated older rules. */
+@media screen and (max-width:850px) {
+  #dm-utility{
+    width:100%!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  #dm-utility .dm-util-inner{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-flow:row!important;
+    grid-auto-rows:auto!important;
+    gap:11px!important;
+    align-items:stretch!important;
+    justify-items:stretch!important;
+    width:100%!important;
+    max-width:620px!important;
+    min-width:0!important;
+    min-height:0!important;
+    height:auto!important;
+    box-sizing:border-box!important;
+    margin:0 auto!important;
+    padding:14px 14px 16px!important;
+    overflow:visible!important;
+  }
+
+  /* First row — original USD and diesel panels; real prices and source links. */
+  #dm-utility .dm-util-inner > .dm-util-quote:not(.dm-brent-quote){
+    grid-column:auto!important;
+    grid-row:auto!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:112px!important;
+    min-width:0!important;
+    max-width:100%!important;
+    align-self:stretch!important;
+    align-content:center!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:12px 10px!important;
+    border:1px solid #dae7f6!important;
+    border-radius:16px!important;
+    grid-template-columns:24px minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:6px!important;
+    row-gap:7px!important;
+    overflow:hidden!important;
+  }
+  #dm-utility .dm-util-inner > .dm-util-quote:not(.dm-brent-quote) .dm-util-label{
+    font-size:clamp(12px,3.6vw,15px)!important;
+    line-height:1.2!important;
+    white-space:normal!important;
+    overflow-wrap:normal!important;
+  }
+  #dm-utility .dm-util-inner > .dm-util-quote:not(.dm-brent-quote) .dm-util-money{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:baseline!important;
+    gap:1px 5px!important;
+    min-width:0!important;
+    max-width:100%!important;
+    white-space:normal!important;
+    overflow:visible!important;
+  }
+  #dm-utility .dm-util-inner > .dm-util-quote:not(.dm-brent-quote) .dm-util-money strong{
+    font-size:clamp(15px,4vw,19px)!important;
+    line-height:1.25!important;
+    letter-spacing:-.4px!important;
+    white-space:nowrap!important;
+  }
+  #dm-utility .dm-util-inner > .dm-util-quote:not(.dm-brent-quote) .dm-util-money em{
+    font-size:10px!important;
+    line-height:1.25!important;
+  }
+
+  /* Second row — Brent on its own line, uncropped original TradingView widget. */
+  #dm-utility .dm-util-inner > .dm-brent-quote{
+    grid-column:1/-1!important;
+    grid-row:auto!important;
+    display:grid!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    min-height:133px!important;
+    height:auto!important;
+    box-sizing:border-box!important;
+    padding:10px 12px!important;
+    margin:0!important;
+    border:1px solid #dae7f6!important;
+    border-radius:16px!important;
+    grid-template-columns:29px minmax(0,1fr)!important;
+    grid-template-rows:23px 89px!important;
+    align-items:center!important;
+    overflow:visible!important;
+  }
+  #dm-utility .dm-brent-quote .dm-brent-provider{
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:89px!important;
+    min-height:89px!important;
+    overflow:visible!important;
+  }
+
+  /* Weather report, nationwide city search and risk link form a vertical unit. */
+  #dm-utility .dm-util-inner > .dm-util-city:not([hidden]){
+    grid-column:1/-1!important;
+    grid-row:auto!important;
+    display:flex!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    min-height:75px!important;
+    margin:0!important;
+    padding:12px 14px!important;
+    border:1px solid #dae7f6!important;
+    border-radius:16px!important;
+    align-items:center!important;
+    overflow:hidden!important;
+  }
+  #dm-utility .dm-util-inner > .dm-util-city[hidden]{display:none!important}
+  #dm-utility .dm-util-inner > .dm-util-city-select{
+    grid-column:1/-1!important;
+    grid-row:auto!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    min-height:88px!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:12px!important;
+    border:1px solid #dae7f6!important;
+    border-radius:16px!important;
+  }
+  #dm-utility .dm-util-city-select label{
+    display:block!important;
+    margin:0 0 6px!important;
+    color:#163b58!important;
+    font-size:13px!important;
+    font-weight:750!important;
+  }
+  #dm-utility .dm-util-city-controls{
+    display:flex!important;
+    align-items:stretch!important;
+    flex-wrap:nowrap!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:44px!important;
+    margin:0!important;
+    gap:0!important;
+  }
+  #dm-utility .dm-util-city-controls #top-city-query{
+    flex:1 1 auto!important;
+    width:1px!important;
+    min-width:0!important;
+    height:44px!important;
+    min-height:44px!important;
+    box-sizing:border-box!important;
+    font-size:14px!important;
+    padding:8px 12px!important;
+  }
+  #dm-utility .dm-util-city-controls #top-city-search{
+    flex:0 0 45px!important;
+    width:45px!important;
+    min-width:45px!important;
+    max-width:45px!important;
+    height:44px!important;
+    min-height:44px!important;
+  }
+  #dm-utility #top-risk{
+    grid-column:1/-1!important;
+    grid-row:auto!important;
+    display:inline-flex!important;
+    position:static!important;
+    width:fit-content!important;
+    max-width:100%!important;
+    min-width:0!important;
+    min-height:44px!important;
+    margin:0 auto!important;
+    padding:10px 18px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    justify-self:center!important;
+    align-self:center!important;
+    box-sizing:border-box!important;
+    text-align:center!important;
+    white-space:normal!important;
+    border-radius:999px!important;
+    font-size:13px!important;
+    line-height:1.25!important;
+    cursor:pointer!important;
+  }
+
+  /* Commercial square: a dedicated centered row, not a right-aligned remnant. */
+  #dm-utility #top-quote-ad-slot{
+    grid-column:1/-1!important;
+    grid-row:auto!important;
+    display:block!important;
+    position:relative!important;
+    justify-self:center!important;
+    align-self:center!important;
+    width:clamp(154px,43vw,184px)!important;
+    height:auto!important;
+    max-width:184px!important;
+    min-width:0!important;
+    aspect-ratio:1/1!important;
+    box-sizing:border-box!important;
+    margin:3px auto 5px!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border-radius:12px!important;
+    box-shadow:0 7px 20px #12375d25!important;
+    background:#000!important;
+  }
+  #dm-utility #top-quote-ad-slot .top-quote-ad-art,
+  #dm-utility #top-quote-ad-image{
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    object-fit:contain!important;
+  }
+
+  /* Ticker starts AFTER the complete utility section, never floats over ads. */
+  #dm-news-crawler{
+    width:calc(100% - 28px)!important;
+    max-width:620px!important;
+    box-sizing:border-box!important;
+    margin:7px auto 16px!important;
+    border-radius:12px!important;
+    overflow:hidden!important;
+  }
+  #dm-news-crawler .dm-crawler-viewport{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    border-radius:inherit!important;
+  }
+}
+@media screen and (max-width:370px){
+  #dm-utility .dm-util-inner{padding-inline:9px!important;gap:9px!important}
+  #dm-utility .dm-util-inner > .dm-util-quote:not(.dm-brent-quote){
+    padding:10px 6px!important;
+    column-gap:5px!important;
+    grid-template-columns:21px minmax(0,1fr)!important;
+  }
+  #dm-utility .dm-util-inner > .dm-util-quote:not(.dm-brent-quote) .dm-util-money strong{
+    font-size:15px!important;
+  }
+}

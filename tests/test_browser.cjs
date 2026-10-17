@@ -268,6 +268,44 @@ const {spawn}=require('node:child_process');
      assert.match(await page.locator('#top-condition').innerText(),/nublado|limpo|Cloud|Sunny/i);
      assert.match(await page.locator('#top-range-f').innerText(),/72°F/);
    }
+   if(width<=768){
+     const topLayout=await page.evaluate(()=>{
+       const container=document.querySelector('#dm-utility .dm-util-inner');
+       const usd=container.children[0].getBoundingClientRect();
+       const diesel=container.children[1].getBoundingClientRect();
+       const brent=container.querySelector('.dm-brent-quote').getBoundingClientRect();
+       const weather=container.querySelector('.dm-util-city').getBoundingClientRect();
+       const search=container.querySelector('.dm-util-city-select').getBoundingClientRect();
+       const risk=container.querySelector('#top-risk').getBoundingClientRect();
+       const ad=container.querySelector('#top-quote-ad-slot').getBoundingClientRect();
+       const ticker=document.getElementById('dm-news-crawler').getBoundingClientRect();
+       const box=container.getBoundingClientRect();
+       const css=getComputedStyle(container);
+       const noOverlap=(a,b)=>a.right<=b.left+2||b.right<=a.left+2||a.bottom<=b.top+2||b.bottom<=a.top+2;
+       return {
+         columns:css.gridTemplateColumns.split(/\\s+/).length,
+         sameRow:Math.abs(usd.top-diesel.top)<3,
+         separatedQuotes:noOverlap(usd,diesel),
+         brentFull:brent.left>=box.left-2&&brent.right<=box.right+2&&brent.width>=box.width-3,
+         brentAfter:brent.top>=Math.max(usd.bottom,diesel.bottom)-2,
+         weatherAfter:weather.height===0||weather.top>=brent.bottom-2,
+         searchFull:search.width>=box.width-3,
+         searchAfter:search.top>=(weather.height?weather.bottom:brent.bottom)-2,
+         riskAfter:risk.top>=search.bottom-2,
+         adCentered:Math.abs((ad.left+ad.right)/2-(box.left+box.right)/2)<4,
+         adSquare:Math.abs(ad.width-ad.height)<2,
+         adAfter:ad.top>=risk.bottom-2,
+         tickerAfter:ticker.height===0||ticker.top>=box.bottom-2,
+         noPageOverflow:document.documentElement.scrollWidth<=innerWidth+2
+       };
+     });
+     assert.equal(topLayout.columns,2,'Mobile top area has exactly two pricing columns');
+     assert.ok(topLayout.sameRow&&topLayout.separatedQuotes,'USD and diesel belong in the first row without overlap');
+     assert.ok(topLayout.brentFull&&topLayout.brentAfter,'Brent stays full-width immediately below the quotes');
+     assert.ok(topLayout.weatherAfter&&topLayout.searchFull&&topLayout.searchAfter,'Weather and city search have coherent vertical full-width flow');
+     assert.ok(topLayout.riskAfter&&topLayout.adAfter&&topLayout.adCentered&&topLayout.adSquare,'Weather risk and square advertiser are centered below the search');
+     assert.ok(topLayout.tickerAfter&&topLayout.noPageOverflow,'Ticker follows quote-ad module without page overflow');
+   }
    if(width===1440){
      await page.waitForTimeout(10300);
      assert.equal((await page.locator('#top-city').innerText()).trim(),'St. Charles, IL',
