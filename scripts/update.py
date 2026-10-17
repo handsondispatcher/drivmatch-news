@@ -107,6 +107,19 @@ def localize_source_headlines(headlines, errors, offline):
     from concurrent.futures import ThreadPoolExecutor, as_completed
     def process(item):
         item=dict(item)
+        # For NWS only, publish the actual official alert body in the modal.
+        # Translations require an authorized translation key; unavailable versions are
+        # not labeled as translated and the English original is retained.
+        if item.get('origin_type')=='official-operational-alert':
+            original=item.get('nws_official_bulletin_en') or ''
+            body={'en':original} if original else {}
+            for target in ('pt','es'):
+                if not original or not os.getenv('GOOGLE_TRANSLATE_API_KEY'):continue
+                try:
+                    translated=google_translate(original,target)
+                    if translated:body[target]=translated
+                except Exception:pass
+            item['nws_bulletin_locales']=body
         # Curated external first-party link has independently checked human-readable
         # headline translations; don't overwrite them or fabricate a full article.
         if item.get('curated_verified_headline') is True and all((item.get('titles') or {}).get(l) for l in ('pt','en','es')):
@@ -784,8 +797,9 @@ def bootstrap_external_story_cards(headlines, first_party):
             'source':item['source'], 'source_url':url, 'published_at':stamp,
             'original_lang':original, 'region':item.get('region','US'),
             'translated_langs':[language for language in ('pt','en','es') if titles.get(language)],
+            'nws_bulletin_available_langs':list((item.get('nws_bulletin_locales') or {}).keys()),
             'locales':{language:{'title':titles.get(language) or item['title'],
-                                 'summary':'','body':''}
+                                 'summary':'','body':(item.get('nws_bulletin_locales') or {}).get(language,'')}
                        for language in ('pt','en','es')}
         })
         existing.add(url)
