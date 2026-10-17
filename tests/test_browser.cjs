@@ -665,7 +665,7 @@ const {spawn}=require('node:child_process');
      await page.waitForFunction(id=>(document.querySelector('#roadtv-desktop iframe')?.src||'').includes(id),second);
      assert.ok((await page.locator('#roadtv-desktop iframe').getAttribute('src')).includes(second),'Player failure selects alternative');
    }
-   await page.screenshot({path:`test-results/${width}.png`,fullPage:true});await page.close();
+   await page.screenshot({path:`test-results/${width}.png`,fullPage:true,animations:'disabled',timeout:90000});await page.close();
    console.log(`PASS ${width}px: logo, no overflow, market, weather, article translation`);
   }
  }finally{if(browser)await browser.close();server.kill()}
