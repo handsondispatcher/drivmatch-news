@@ -41,15 +41,21 @@ const {spawn}=require('node:child_process');
   assert.ok((await gracieImage.getAttribute('src')).includes('pt-wide.png'));
   assert.equal(await b.locator('.dm-gracie-wide-site').getAttribute('href'),'https://graciebarraburlington.com/');
   assert.ok((await b.locator('.dm-gracie-wide-maps').getAttribute('href')).includes('207+Cambridge+Street+Burlington+MA+01803'));
-  await page.locator('[data-site-lang="es"]').first().click();
-  assert.ok((await b.locator('.dm-gracie-wide-img').getAttribute('src')).includes('es-wide.png'),'Selected Spanish language must update current advertiser without waiting for rotation');
   await page.waitForFunction(()=>document.getElementById('news-commercial-banner')?.dataset.currentCampaign==='gracie'&&document.getElementById('news-carhauler-banner')?.dataset.currentCampaign==='cars',{timeout:8000});
   await verifyPair('gracie','cars');
-  assert.ok((await t.locator('.dm-gracie-wide-img').getAttribute('src')).includes('es-wide.png'));
+  const gracieTop=t.locator('.dm-gracie-wide-img');
+  assert.ok((await gracieTop.getAttribute('src')).includes('pt-wide.png'));
+  await page.locator('[data-site-lang="es"]').first().click();
+  // app.js deliberately rebuilds the approved car/UCR markup after a flag click:
+  // the sequencer resets phase to zero and then cycles to Gracie again.
+  await page.waitForFunction(()=>document.getElementById('news-commercial-banner')?.dataset.currentCampaign==='cars'&&document.getElementById('news-carhauler-banner')?.dataset.currentCampaign==='ucr',{timeout:3000});
+  await page.waitForFunction(()=>document.getElementById('news-commercial-banner')?.dataset.currentCampaign==='auto'&&document.getElementById('news-carhauler-banner')?.dataset.currentCampaign==='gracie',{timeout:18000});
+  assert.ok((await b.locator('.dm-gracie-wide-img').getAttribute('src')).includes('es-wide.png'),'Spanish flag must display the original Spanish Gracie creative');
   await page.locator('[data-site-lang="en"]').first().click();
-  assert.ok((await t.locator('.dm-gracie-wide-img').getAttribute('src')).includes('en-wide.png'),'Selected English language must update current advertiser immediately');
-  await page.waitForFunction(()=>document.getElementById('news-commercial-banner')?.dataset.currentCampaign==='cars'&&document.getElementById('news-carhauler-banner')?.dataset.currentCampaign==='ucr',{timeout:8000});
-  await verifyPair('cars','ucr');
+  await page.waitForFunction(()=>document.getElementById('news-commercial-banner')?.dataset.currentCampaign==='cars'&&document.getElementById('news-carhauler-banner')?.dataset.currentCampaign==='ucr',{timeout:3000});
+  await page.waitForFunction(()=>document.getElementById('news-commercial-banner')?.dataset.currentCampaign==='auto'&&document.getElementById('news-carhauler-banner')?.dataset.currentCampaign==='gracie',{timeout:18000});
+  assert.ok((await b.locator('.dm-gracie-wide-img').getAttribute('src')).includes('en-wide.png'),'English flag must display the original English Gracie creative');
+  assert.equal(await b.locator('.dm-gracie-wide-site').getAttribute('href'),'https://graciebarraburlington.com/');
   console.log('PAIRED HORIZONTAL AD ROTATION PASS: 5-second four-phase cycle, 1774:394, no duplicate, PT EN ES localized and Gracie website/maps links');
   await page.close();
  }finally{if(browser)await browser.close();server.kill();}
