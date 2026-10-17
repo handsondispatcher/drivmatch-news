@@ -283,7 +283,7 @@ const {spawn}=require('node:child_process');
        const css=getComputedStyle(container);
        const noOverlap=(a,b)=>a.right<=b.left+2||b.right<=a.left+2||a.bottom<=b.top+2||b.bottom<=a.top+2;
        return {
-         columns:css.gridTemplateColumns.split(/\\s+/).length,
+         columns:css.gridTemplateColumns.trim().split(/\s+/).length,
          sameRow:Math.abs(usd.top-diesel.top)<3,
          separatedQuotes:noOverlap(usd,diesel),
          brentFull:brent.left>=box.left-2&&brent.right<=box.right+2&&brent.width>=box.width-3,
