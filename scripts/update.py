@@ -63,6 +63,49 @@ def translate_source_headline(title, source_lang, target_lang):
     return translated
 
 
+def translate_nws_bulletin(original, target):
+    """Translate official NWS public bulletin, keeping paragraph breaks.
+    Do not label untranslated or truncated text as a finished translation.
+    A verified Google Cloud Translation key is preferred; the existing
+    public translation endpoint is best-effort fallback with bounded chunks.
+    """
+    if target not in ('pt','es') or not isinstance(original,str):return None
+    original=original.strip()
+    if not original or len(original)>12000:return None
+    if os.getenv('GOOGLE_TRANSLATE_API_KEY'):
+        try:
+            result=google_translate(original,target)
+            if result and result.strip()!=original and len(result.strip())>len(original)*0.35:
+                return result
+        except (OSError,ValueError,KeyError,TypeError):
+            pass
+    # Preserve all content. One failed chunk invalidates the entire translation.
+    chunks=[];current=''
+    for paragraph in original.splitlines(keepends=True):
+        while len(paragraph)>1600:
+            if current:chunks.append(current);current=''
+            chunks.append(paragraph[:1600]);paragraph=paragraph[1600:]
+        if len(current)+len(paragraph)>1600:
+            if current:chunks.append(current)
+            current=''
+        current+=paragraph
+    if current:chunks.append(current)
+    if not chunks or len(chunks)>12:return None
+    out=[]
+    for piece in chunks:
+        if not piece.strip():out.append(piece);continue
+        try:
+            params=urllib.parse.urlencode({'client':'gtx','sl':'en','tl':target,'dt':'t','q':piece})
+            result=json.loads(fetch('https://translate.googleapis.com/translate_a/single?'+params,timeout=8))
+            translated=''.join(part[0] for part in result[0] if isinstance(part,list) and part and isinstance(part[0],str))
+        except (OSError,ValueError,KeyError,IndexError,TypeError,json.JSONDecodeError):
+            return None
+        if not translated.strip() or translated.strip()==piece.strip():return None
+        out.append(translated)
+    combined=''.join(out).strip()
+    return combined if len(combined)>len(original)*0.35 else None
+
+
 def verified_external_source_links(offline=False):
     """Short-lived original-source link supplements when an RSS publisher misses a story.
 
@@ -114,11 +157,9 @@ def localize_source_headlines(headlines, errors, offline):
             original=item.get('nws_official_bulletin_en') or ''
             body={'en':original} if original else {}
             for target in ('pt','es'):
-                if not original or not os.getenv('GOOGLE_TRANSLATE_API_KEY'):continue
-                try:
-                    translated=google_translate(original,target)
-                    if translated:body[target]=translated
-                except Exception:pass
+                if not original:continue
+                translated=translate_nws_bulletin(original,target)
+                if translated:body[target]=translated
             item['nws_bulletin_locales']=body
         # Curated external first-party link has independently checked human-readable
         # headline translations; don't overwrite them or fabricate a full article.
