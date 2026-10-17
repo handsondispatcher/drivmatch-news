@@ -1,0 +1,50 @@
+name: Facebook share card live proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/facebook-news-live-proof.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - name: Check actual production HTML and JPEG assets with Facebook crawler
+        shell: bash
+        run: |
+          python - <<'PY'
+          import time
+          import urllib.request
+          BASE='https://drivmatch.com/news/'
+          UAGENT='facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)'
+          def get(path):
+              req=urllib.request.Request(BASE+path,headers={'User-Agent':UAGENT,'Accept':'text/html,image/*;q=0.9,*/*;q=0.8','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=18) as response:
+                  return response.status,response.headers.get('Content-Type',''),response.read(2500000)
+          for n in range(55):
+              try:
+                  for lang in ('pt','en','es'):
+                      htmlpath=f'facebook-{lang}.html'
+                      imfile=f'assets/facebook-news-{lang}.jpg'
+                      status,ctype,html=get(htmlpath)
+                      assert status==200 and 'text/html' in ctype, (lang,status,ctype)
+                      text=html.decode('utf-8')
+                      assert 'og:image' in text and imfile in text, ('missing OG image',lang)
+                      assert f'utm_campaign=logistics_{lang}' in text, ('missing campaign attribution',lang)
+                      assert f'facebook-{lang}.html' in text, ('missing dedicated canonical',lang)
+                      status,mime,picture=get(imfile)
+                      assert status==200 and 'image/jpeg' in mime and picture[:3]==b'\xff\xd8\xff', ('invalid photo',lang,status,mime)
+                      assert len(picture)>20000, ('too small photo',lang,len(picture))
+                      print('LIVE_FACEBOOK_CARD_PASS',lang,len(picture),ctype,mime)
+                  print('LIVE_3_LANGUAGE_FACEBOOK_PREVIEW_PASS')
+                  break
+              except Exception as exc:
+                  print('Live preview not ready',n+1,str(exc)[:200],flush=True)
+                  if n==54:raise
+                  time.sleep(12)
+          PY
