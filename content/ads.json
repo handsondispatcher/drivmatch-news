@@ -345,7 +345,8 @@
     "slots": [
       "market-sidebar",
       "market-sidebar-driver",
-      "auto-m-usa"
+      "auto-m-usa",
+      "gracie-barra"
     ],
     "clickable_ads_preserved": true,
     "state_indicator": true,

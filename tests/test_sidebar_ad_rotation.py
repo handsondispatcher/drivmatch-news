@@ -11,7 +11,7 @@ class SidebarAdRotation(unittest.TestCase):
   self.assertTrue(cfg['infinite'])
   self.assertEqual(cfg['speed_css_pixels_per_second'],56)
   self.assertTrue(cfg['state_indicator'])
-  self.assertEqual(cfg['slots'],['market-sidebar','market-sidebar-driver','auto-m-usa'])
+  self.assertEqual(cfg['slots'],['market-sidebar','market-sidebar-driver','auto-m-usa','gracie-barra'])
   for key in ('hover_pause','focus_pause','touch_pause','reduced_motion_default_paused','clickable_ads_preserved'):
    self.assertTrue(cfg[key])
   self.assertTrue((P/cfg['governance_doc']).exists())
@@ -22,7 +22,7 @@ class SidebarAdRotation(unittest.TestCase):
    self.assertEqual(html.count('id="'+key+'"'),1)
   for key in ('dm-ad-rotation','dm-ad-rotation-viewport','dm-ad-rotation-track','dm-ad-rotation-toggle'):
    self.assertIn('id="'+key+'"',html)
-  self.assertIn('sidebar-ad-rotation.js?v=20261016-vertical-v1-1-visible',html)
+  self.assertIn('sidebar-ad-rotation.js?v=20261017-four-advertisers-v1',html)
   self.assertIn('id="dm-ad-rotation-status"',html)
   self.assertIn(' const speed=56;',js)
   self.assertIn("track.appendChild(first)",js)

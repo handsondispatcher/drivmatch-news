@@ -14,6 +14,6 @@ class MapsHorizontalAds(unittest.TestCase):
   j=(P/'site/assets/horizontal-ad-sequence.js').read_text(encoding='utf-8')
   for value in ('VER NO GOOGLE MAPS','VER EN GOOGLE MAPS','VIEW ON GOOGLE MAPS','dm-horizontal-auto-maps','dm-horizontal-auto-phone','dm-horizontal-auto-instagram'):
    self.assertIn(value,j)
-  self.assertIn('20261017-maps-button-v1',h)
+  self.assertIn('20261017-gracie-barra-v1',h)
   self.assertIn('width:42.25%',h)
 if __name__=='__main__':unittest.main()

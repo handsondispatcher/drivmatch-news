@@ -5,7 +5,7 @@ class AdvertisingCampaigns(unittest.TestCase):
  def test_slots_and_campaigns(self):
   ads=json.loads((P/'content/ads.json').read_text())
   self.assertTrue(ads['enabled'])
-  self.assertEqual({x['slot'] for x in ads['placements']},{'news-top','market-sidebar','article-inline','mobile-inline','news-carhauler','market-sidebar-driver','auto-m-usa'})
+  self.assertEqual({x['slot'] for x in ads['placements']},{'news-top','market-sidebar','article-inline','mobile-inline','news-carhauler','market-sidebar-driver','auto-m-usa','sidebar-rotation','paired-horizontal-rotation'})
   ucr=[p for p in ads['placements'] if p.get('creative_type')=='ucr-2027-official']
   self.assertEqual({p['slot'] for p in ucr},{'market-sidebar','mobile-inline','news-carhauler'})
   self.assertEqual({p['slot'] for p in ucr if p['enabled']},{'market-sidebar','news-carhauler'})

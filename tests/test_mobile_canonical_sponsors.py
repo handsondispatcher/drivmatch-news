@@ -14,7 +14,7 @@ class CanonicalMobileSponsors(unittest.TestCase):
                    '#market-driver-availability-banner:not([hidden])',
                    'max-width:680px!important','height:auto!important'):
    self.assertIn(fragment,html)
-  self.assertIn("const canonicalOrder=['ucr-2027','driver-available','auto-m-usa']",js)
+  self.assertIn("const canonicalOrder=['ucr-2027','driver-available','auto-m-usa','gracie-barra']",js)
   self.assertIn('track.appendChild(item); // Move, NEVER clone originals.',js)
   self.assertIn("canonical-full-mobile",js)
   self.assertIn('requestAnimationFrame(tick)',js)

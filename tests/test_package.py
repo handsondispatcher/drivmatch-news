@@ -201,7 +201,7 @@ class PublicationTests(unittest.TestCase):
   self.assertNotIn("document.querySelector('.newsroom-nav').addEventListener",app)
   ads=json.loads((BASE/'content/ads.json').read_text(encoding='utf-8'))
   self.assertTrue(ads['enabled'])
-  original_ads=[p for p in ads['placements'] if p['slot'] not in ('market-sidebar-driver','auto-m-usa')]
+  original_ads=[p for p in ads['placements'] if p['relationship']=='owner_promotion']
   self.assertEqual({p['slot'] for p in original_ads},{'news-top','market-sidebar','article-inline','mobile-inline','news-carhauler'})
   self.assertTrue(all(p['relationship']=='owner_promotion' for p in original_ads))
   self.assertEqual({p['slot'] for p in original_ads if p['enabled']},{'news-top','market-sidebar','article-inline','news-carhauler'})
