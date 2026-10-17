@@ -103,7 +103,7 @@ def _illustrative_photo(category):
         return None
 
 
-def create_card(title: str, category: str, target: Path, story=None):
+def create_card(title: str, category: str, target: Path, story=None, language="pt"):
     """1200x630 social preview: news photo on top, bold headline below.
 
     Reuse only licensed, attributed, first-party archive photographs. When no
@@ -125,10 +125,13 @@ def create_card(title: str, category: str, target: Path, story=None):
     draw=ImageDraw.Draw(image,"RGBA")
     draw.rectangle((0,0,w,88),fill=(0,16,32,190))
     draw.rounded_rectangle((39,224,300,277),radius=8,fill=(6,109,185,245))
-    draw.text((57,238),str(category or "TRANSPORTE").upper()[:22],
+    category_labels = {"en": {"Fretes": "Freight", "Caminhoneiros": "Truck Drivers", "Transporte": "Transport", "Caminhões": "Trucks", "Tecnologia": "Technology", "Rodovias": "Highways", "Combustíveis": "Fuel", "Segurança": "Safety"}, "es": {"Fretes": "Cargas", "Caminhoneiros": "Camioneros", "Transporte": "Transporte", "Caminhões": "Camiones", "Tecnologia": "Tecnología", "Rodovias": "Carreteras", "Combustíveis": "Combustible", "Segurança": "Seguridad"}}
+    category_text = category_labels.get(language, {}).get(str(category), str(category) if language == "pt" else ("Freight News" if language == "en" else "Noticias"))
+    draw.text((57,238),category_text.upper()[:22],
               font=_font(20,True),fill="white")
     draw.rounded_rectangle((840,269,1165,307),radius=6,fill=(0,17,34,200))
-    draw.text((854,279),"FOTO ILUSTRATIVA • ARQUIVO",
+    photo_label = {"pt": "FOTO ILUSTRATIVA • ARQUIVO", "en": "ILLUSTRATIVE • ARCHIVE PHOTO", "es": "FOTO ILUSTRATIVA • ARCHIVO"}.get(language, "ILLUSTRATIVE • ARCHIVE PHOTO")
+    draw.text((854,279),photo_label,
               font=_font(16,True),fill="white")
     draw.rectangle((0,325,w,h),fill=(6,26,49,255))
     # Preserve the official logo asset.
@@ -150,24 +153,36 @@ def create_card(title: str, category: str, target: Path, story=None):
     lines=_line_wrap(draw,title,font,1095,max_lines=4)
     for n,line in enumerate(lines):
         draw.text((48,387+n*(size+8)),line,font=font,fill="white")
-    draw.text((50,577),"NOTÍCIAS DE TRANSPORTE E LOGÍSTICA",
+    tagline = {"pt": "NOTÍCIAS DE TRANSPORTE E LOGÍSTICA", "en": "TRANSPORTATION AND LOGISTICS NEWS", "es": "NOTICIAS DE TRANSPORTE Y LOGÍSTICA"}.get(language, "TRANSPORTATION NEWS")
+    draw.text((50,577),tagline,
               font=_font(15,True),fill="#d3e4f4")
     target.parent.mkdir(parents=True,exist_ok=True)
     image.save(target,"JPEG",quality=89,optimize=True,progressive=False)
 
 
-def _write_page(directory, story, slug, title, description, locale="pt-BR"):
-    if not SAFE_ID.fullmatch(slug):return False
-    share_root=SHARE_BASE+"/share/"+slug+"/"
-    share_url=share_root+"?v="+SHARE_PREVIEW_VERSION
-    article_url=ARTICLE_BASE+"/?story="+slug
-    target=directory/slug
-    target.mkdir(parents=True,exist_ok=True)
-    create_card(title,str(story.get("category") or "Transporte"),target/"social.jpg",story)
-    image_url=share_root+"social.jpg?v="+SHARE_PREVIEW_VERSION
-    esc=lambda v:escape(str(v),quote=True)
-    og_locale={"pt-BR":"pt_BR","en-US":"en_US","es-419":"es_MX"}.get(locale,"pt_BR")
-    page=f"""<!doctype html>
+def _write_page(directory, story, slug, title, description, locale="pt-BR", language=None):
+    """Generate a crawlable share card. Keep the old PT/default route intact."""
+    if not SAFE_ID.fullmatch(slug):
+        return False
+    if language is not None and language not in ("pt", "en", "es"):
+        return False
+    share_root = SHARE_BASE + "/share/" + slug + "/" + ((language + "/") if language else "")
+    share_url = share_root + "?v=" + SHARE_PREVIEW_VERSION
+    article_url = ARTICLE_BASE + "/?story=" + slug
+    if language:
+        article_url += "&lang=" + language
+    target = directory / slug / language if language else directory / slug
+    target.mkdir(parents=True, exist_ok=True)
+    card_language = language or ("en" if locale == "en-US" else "es" if locale == "es-419" else "pt")
+    create_card(title, str(story.get("category") or "Transporte"),
+                target / "social.jpg", story, language=card_language)
+    image_url = share_root + "social.jpg?v=" + SHARE_PREVIEW_VERSION
+    esc = lambda value: escape(str(value), quote=True)
+    og_locale = {"pt-BR": "pt_BR", "en-US": "en_US", "es-419": "es_MX"}.get(locale, "pt_BR")
+    lead = {"pt": "Leia a notícia", "en": "Read this story", "es": "Lea la noticia"}.get(card_language, "Read this story")
+    image_alt = {"pt": "Imagem editorial ilustrativa", "en": "Illustrative editorial image",
+                 "es": "Imagen editorial ilustrativa"}.get(card_language, "Illustrative editorial image")
+    page = f"""<!doctype html>
 <html lang="{esc(locale)}"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(title)} | DrivMatch News</title>
@@ -183,7 +198,7 @@ def _write_page(directory, story, slug, title, description, locale="pt-BR"):
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Imagem editorial ilustrativa: {esc(title)} — DrivMatch News">
+<meta property="og:image:alt" content="{esc(image_alt)}: {esc(title)} — DrivMatch News">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{esc(title)}">
 <meta name="twitter:description" content="{esc(description[:230])}">
@@ -191,66 +206,94 @@ def _write_page(directory, story, slug, title, description, locale="pt-BR"):
 <link rel="canonical" href="{esc(share_url)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
 </head><body>
-<p>Leia a notícia <a href="{esc(article_url)}">no DrivMatch News</a>.</p>
+<p>{esc(lead)} <a href="{esc(article_url)}">DrivMatch News</a>.</p>
 <script>window.location.replace({json.dumps(article_url)});</script>
 </body></html>
 """
-    (target/"index.html").write_text(page,encoding="utf-8")
+    (target / "index.html").write_text(page, encoding="utf-8")
     return True
 
 
+def _valid_source(story):
+    original = str(story.get("source_url") or "")
+    parts = urlsplit(original)
+    return (parts.scheme == "https" and bool(parts.hostname) and
+            parts.hostname not in {"news.google.com", "www.google.com"})
+
+
 def build() -> int:
-    feed=json.loads((SITE/"data"/"content.json").read_text(encoding="utf-8"))
-    directory=SITE/"share"
-    directory.mkdir(parents=True,exist_ok=True)
-    count=0
-    created_ids=set()
+    """Use pre-existing verified news/translations; never synthesize new stories."""
+    feed = json.loads((SITE / "data" / "content.json").read_text(encoding="utf-8"))
+    directory = SITE / "share"
+    directory.mkdir(parents=True, exist_ok=True)
+    count = 0
+    created_ids = set()
     gallery_path = SITE / "data" / "news-images.json"
     images = json.loads(gallery_path.read_text(encoding="utf-8")).get("images", {}) if gallery_path.is_file() else {}
-    for story in feed.get("articles",[]):
-        if story.get("demo"):continue
-        slug=story.get("id","")
-        if not isinstance(slug,str) or not SAFE_ID.fullmatch(slug):continue
-        own=story.get("status")=="approved"
-        external=(story.get("kind")=="external_link" and story.get("status")=="external_source"
-                  and story.get("origin_type")!="aggregator-discovery")
-        if not own and not external:continue
-        if external:
-            original=str(story.get("source_url") or "")
-            parts=urlsplit(original)
-            if (parts.scheme!="https" or not parts.hostname or
-                parts.hostname in {"news.google.com","www.google.com"}):continue
-        locale=story.get("locales",{}).get("pt") or {}
-        title=str(locale.get("title","")).strip()
-        if not title:continue
-        description=(str(locale.get("summary","") or locale.get("body","")).strip() if own else
-          str(story.get("source") or "veículo de origem")+" · DrivMatch News")
-        combined={**story, **images.get(slug,{})}
-        if _write_page(directory,combined,slug,title,description):
-            count+=1
+    locales = {"pt": "pt-BR", "en": "en-US", "es": "es-419"}
+
+    for story in feed.get("articles", []):
+        if story.get("demo"):
+            continue
+        slug = story.get("id", "")
+        if not isinstance(slug, str) or not SAFE_ID.fullmatch(slug):
+            continue
+        own = story.get("status") == "approved"
+        external = (story.get("kind") == "external_link" and
+                    story.get("status") == "external_source" and
+                    story.get("origin_type") != "aggregator-discovery")
+        if not own and not external:
+            continue
+        if external and not _valid_source(story):
+            continue
+        localized = story.get("locales") or {}
+        combined = {**story, **images.get(slug, {})}
+        for language, locale_code in locales.items():
+            entry = localized.get(language) or {}
+            title = str(entry.get("title") or "").strip()
+            if not title:
+                continue  # Never invent or silently copy a translation.
+            summary = str(entry.get("summary") or entry.get("body") or "").strip()
+            description = (summary if own and summary else
+                           str(story.get("source") or "Original publisher") + " · DrivMatch News")
+            if language == "pt":
+                # Backwards compatibility for links already shared on Facebook.
+                count += int(_write_page(directory, combined, slug, title, description, locale_code))
+            count += int(_write_page(directory, combined, slug, title, description,
+                                     locale_code, language=language))
             created_ids.add(slug)
-    monitor=SITE/"data"/"source-headlines.json"
+
+    monitor = SITE / "data" / "source-headlines.json"
     if monitor.is_file():
-        rows=json.loads(monitor.read_text(encoding="utf-8")).get("headlines",[])
+        rows = json.loads(monitor.read_text(encoding="utf-8")).get("headlines", [])
         for story in rows:
-            if story.get("geo_scope_verified") is not True:continue
-            url=str(story.get("source_url") or "")
-            if not url.startswith("https://") or "news.google.com" in url:continue
-            slug=story.get("id") or ""
-            if not isinstance(slug,str) or not SAFE_ID.fullmatch(slug) or slug in created_ids:continue
-            translations=story.get("titles") or {}
-            title=str(translations.get("pt") or story.get("title") or "").strip()
-            if not title:continue
-            locale="pt-BR" if translations.get("pt") else "en-US"
-            publisher=str(story.get("source") or "veículo de origem")
-            description=publisher+" · DrivMatch News"
-            combined={**story, **images.get(slug,{})}
-            if _write_page(directory,combined,slug,title,description,locale):
-                count+=1
-                created_ids.add(slug)
-    print(f"SHARE PAGES WITH BRANDED 1200x630 CARDS: {count} articles and external headlines")
+            if story.get("geo_scope_verified") is not True or not _valid_source(story):
+                continue
+            slug = story.get("id") or ""
+            if not isinstance(slug, str) or not SAFE_ID.fullmatch(slug) or slug in created_ids:
+                continue
+            titles = story.get("titles") or {}
+            # Preserve the original title only for a confirmed original-language field.
+            original_lang = story.get("original_lang")
+            if original_lang in locales and not titles.get(original_lang):
+                titles = {**titles, original_lang: story.get("title") or ""}
+            combined = {**story, **images.get(slug, {})}
+            source_name = str(story.get("source") or "Original publisher")
+            description = source_name + " · DrivMatch News"
+            legacy_title = str(titles.get("pt") or story.get("title") or "").strip()
+            if legacy_title:
+                legacy_locale = "pt-BR" if titles.get("pt") else "en-US"
+                count += int(_write_page(directory, combined, slug, legacy_title,
+                                         description, legacy_locale))
+            for language, locale_code in locales.items():
+                title = str(titles.get(language) or "").strip()
+                if not title:
+                    continue
+                count += int(_write_page(directory, combined, slug, title,
+                                         description, locale_code, language=language))
+    print(f"SHARE PAGES WITH 1200x630 CARDS (legacy + localized): {count}")
     return count
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     build()
