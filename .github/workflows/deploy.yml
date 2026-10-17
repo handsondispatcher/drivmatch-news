@@ -307,6 +307,8 @@ jobs:
       - name: Browser regression (bounded)
         timeout-minutes: 11
         run: npm run test:browser
+      - name: Verificar botão ALERTA CLIMÁTICO e NWS PT EN ES
+        run: node tests/test_weather_alert_desk_browser.cjs
       - name: Verificar em navegador os 9 anúncios quadrados das cotações
         run: node tests/test_top_quote_ad_browser.cjs
       - name: Verificar rotacao horizontal sincronizada de 5 segundos

@@ -20,3 +20,6 @@ Estado: VIGENTE — 2026-10-13.
 - Mesma ordem por timestamp para PT, EN e ES.
 - Nenhum anúncio, imagem licenciada, preço, idioma ou posicionamento publicitário deve ser alterado por esta regra.
 - Proteger por teste automatizado e revisão de produção após deploy.
+
+## Emenda — ALERTA CLIMÁTICO (2026-10-17)
+Os boletins do NWS e as matérias classificadas editorialmente como Clima ficam exclusivamente na nova área pública ALERTA CLIMÁTICO, acessada pelo botão visível na capa. Sua lista é ordenada estritamente por `published_at`, mais recente primeiro, e inclui alertas distintos para localidades diferentes, sem colapsar avisos oficiais de municípios/condados distintos pelo simples tipo de fenômeno. A lista normal permanece cronológica após excluir os itens enviados à seção climática. Status, fonte e hora originais não são alterados; alerta publicado não é necessariamente ativo. Interdições rodoviárias exigem fonte DOT/511. O seletor PT/EN/ES e o filtro “Clima” devem acessar o mesmo conjunto, sem criar histórias nem descaracterizar outros conteúdos editoriais.

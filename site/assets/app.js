@@ -3,7 +3,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const source = window.DRIVMATCH_BOOTSTRAP || { articles: [], market: { indicators:{},stocks:{} }, ads:{ enabled:false }};
-  let externalHeadlines = [], photoByStory = {}, photoLibrary = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', page = 0, featurePage = 0, opened = null;
+  let externalHeadlines = [], photoByStory = {}, photoLibrary = [], data = source, lang = 'pt', articleLang = 'pt', selected = 'Todas', climateMode = false, page = 0, featurePage = 0, opened = null;
   let brentRealtime=null, topMarketVerified=null;
   let sourceCheckedAt=source.source_monitor?.checked_at||'', newestSourceAt=source.source_monitor?.latest_original_published_at||'', currentSourceCount=(source.articles||[]).filter(x=>x.kind==='external_link').length;
   const pageSize = 6, featureSize = 4;
@@ -165,10 +165,11 @@
       illustrative?(lang==='pt'?'Fotografia de arquivo ilustrativa; não retrata necessariamente o acontecimento':lang==='es'?'Fotografía de archivo ilustrativa; no representa necesariamente el acontecimiento':'Illustrative archive photograph; not necessarily the reported event'):(a.image_alt||localeOf(a)?.title||'Imagem');
     return '<img loading="lazy" decoding="async" src="'+escapeHTML(url)+'" data-fallback="'+escapeHTML(fallback)+'" alt="'+escapeHTML(alt)+'" title="'+(a.editorial_type==='operational_bulletin'?'Foto ilustrativa de rodovia, não imagem do evento meteorológico':illustrative?'Foto ilustrativa de arquivo':'Imagem licenciada')+'" '+(a.editorial_type==='operational_bulletin'?'data-bulletin="true" ':'')+'onerror="this.onerror=null;this.src=this.dataset.fallback" '+suffix+'>';
   }
-  function pageStories(){const pool=[...(data.articles||[]),...externalHeadlines].filter(s=>(s.kind!=='external_link'||s.original_lang===lang||(s.translated_langs?.includes(lang)&&eventFingerprint(s.locales?.[lang]?.title)!==eventFingerprint(s.locales?.[s.original_lang]?.title))) && (s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
+  function eligibleStories(){return [...(data.articles||[]),...externalHeadlines].filter(s=>(s.kind!=='external_link'||s.original_lang===lang||(s.translated_langs?.includes(lang)&&eventFingerprint(s.locales?.[lang]?.title)!==eventFingerprint(s.locales?.[s.original_lang]?.title))) && (s.status==='approved' || (s.kind==='external_link' && s.status==='external_source')) && !s.demo && !blockedPublisher(s.source_url) && (s.kind==='external_link' || ['pt','en','es'].every(l=>s.locales?.[l]?.title && s.locales?.[l]?.body))).sort((a,b)=>{
     const score=x=> x.demo?0:(x.kind==='opportunity' && x.consent_publication && (Date.now()-new Date(x.published_at).getTime())<86400000 ? 3 : 1);
     return score(b)-score(a) || (Date.parse(b.published_at||'2000-01-01')-Date.parse(a.published_at||'2000-01-01'));
-  }).filter(a=>a.origin_type!=='aggregator-discovery');
+  }).filter(a=>a.origin_type!=='aggregator-discovery');}
+  function pageStories(){const pool=eligibleStories();
     const unique=[];const seenUrls=new Set(),seenIds=new Set();
     for(const article of pool){
       const title=localeOf(article)?.title||article.locales?.en?.title||'';
@@ -179,7 +180,74 @@
     }
     return unique;
   }
+  // Official weather source is recognized by attributed metadata/URL, never
+  // by an unverified marketing claim. Other weather reporting uses editorial
+  // classification, not a generic keyword match on arbitrary articles.
+  function isWeatherAlertStory(a){
+    const sourceName=String(a.source||'');
+    const url=String(a.source_url||'');
+    const title=String(a.locales?.en?.title||a.locales?.pt?.title||'');
+    return a.category==='Clima' ||
+      /\b(?:National Weather Service|NWS)\b|\bNOAA\s*\/\s*NWS\b/i.test(sourceName) ||
+      /^https:\/\/(?:api\.|www\.)?weather\.gov(?:\/|$)/i.test(url) ||
+      (a.editorial_type==='operational_bulletin'&&/^NWS\s*:/i.test(title));
+  }
+  // Preserve all DISTINCT town/county bulletins in the weather desk. The
+  // homepage's same-hazard diversity suppression does not apply here.
+  function weatherStories(){
+    const unique=[],seen=new Set();
+    for(const article of eligibleStories().filter(isWeatherAlertStory)){
+      const key=article.id?'id:'+article.id:'url:'+String(article.source_url||'').toLowerCase();
+      if(seen.has(key))continue;
+      seen.add(key);unique.push(article);
+    }
+    return unique.sort((a,b)=>(Date.parse(b.published_at||'')||0)-(Date.parse(a.published_at||'')||0)||
+      String(a.id||a.source_url||'').localeCompare(String(b.id||b.source_url||'')));
+  }
+  function updateWeatherControls(){
+    const copy={pt:{alert:'ALERTA CLIMÁTICO',back:'← VOLTAR ÀS NOTÍCIAS',note:'Boletins e notícias meteorológicas publicados, com data e fonte de origem. Um aviso publicado não significa necessariamente que ainda está ativo. Para alertas atuais, consulte o NWS; para interdições de rodovias, confira o DOT/511.'},
+      en:{alert:'WEATHER ALERTS',back:'← BACK TO NEWS',note:'Published weather bulletins and reports, with original source and time. A published warning is not necessarily still active. Check NWS for current alerts and DOT/511 for road restrictions.'},
+      es:{alert:'ALERTA METEOROLÓGICA',back:'← VOLVER A NOTICIAS',note:'Boletines y noticias meteorológicas publicados, con fecha y fuente original. Un aviso publicado no necesariamente sigue vigente. Consulte NWS para alertas actuales y DOT/511 para cierres viales.'}}[lang];
+    const alertButton=$('weather-alerts-button');
+    if(!alertButton)return;
+    $('weather-alerts-label').textContent=copy.alert;
+    $('weather-alerts-count').textContent=String(weatherStories().length);
+    alertButton.setAttribute('aria-pressed',String(climateMode));
+    alertButton.classList.toggle('active',climateMode);
+    $('weather-alerts-home').hidden=!climateMode;
+    $('weather-alerts-home').textContent=copy.back;
+    $('weather-alerts-heading').textContent=copy.alert;
+    $('weather-alerts-heading').hidden=!climateMode;
+    $('weather-alerts-note').textContent=copy.note;
+    $('weather-alerts-note').hidden=!climateMode;
+    $('panorama').hidden=climateMode;
+    if(climateMode)$('highlights').hidden=true;
+  }
+  function climateCard(a,i){
+    const title=escapeHTML(cleanHeadline(localeOf(a)?.title||'')),source=escapeHTML(a.source||'');
+    const official=a.editorial_type==='operational_bulletin'||/\b(?:National Weather Service|NWS)\b/i.test(String(a.source||''));
+    const mark=official?(lang==='pt'?'BOLETIM NWS':lang==='es'?'BOLETÍN NWS':'NWS BULLETIN'):
+      (lang==='pt'?'NOTÍCIA METEOROLÓGICA':lang==='es'?'NOTICIA METEOROLÓGICA':'WEATHER REPORT');
+    return '<article class="item dm-climate-item" tabindex="0" role="button" data-story="'+i+'" data-external="'+(a.kind==='external_link')+'">'+
+      '<div><div class="kicker">'+mark+'</div><h3>'+title+'</h3><div class="byline">'+daysLabel(a)+' · '+source+'</div></div>'+
+      '<span class="dm-climate-symbol" aria-hidden="true">☁</span></article>';
+  }
+  function renderClimateStories(){
+    const all=weatherStories();
+    indexSet.clear();all.forEach((a,i)=>indexSet.set(a.id,i));
+    const feed=all.filter(a=>matches(a));
+    const pages=Math.max(1,Math.ceil(feed.length/pageSize));page=Math.min(page,pages-1);
+    $('list').innerHTML=feed.length?feed.slice(page*pageSize,(page+1)*pageSize).map(a=>climateCard(a,indexSet.get(a.id))).join(''):
+      '<div class="empty">'+labels[lang].noResults+'</div>';
+    $('pagecount').textContent=(page+1)+' / '+pages;
+    $('prev').disabled=page===0;$('next').disabled=page===pages-1;
+    $('count').textContent='';
+    $('highlights').hidden=true;
+    renderFreshness();
+  }
   function matches(a){
+    // The NWS/weather archive has an exclusive, explicit reader entry point.
+    if(climateMode?!isWeatherAlertStory(a):isWeatherAlertStory(a))return false;
     const q=$('search').value.toLocaleLowerCase(lang).trim(), age=$('age').value;
     if(selected!=='Todas' && a.category!==selected)return false;
     if(age!=='all' && !a.demo && a.published_at){const ms=Date.now()-Date.parse(a.published_at);if(ms>Number(age)*86400000)return false;}
@@ -311,7 +379,7 @@
       :lang==='en'?en+(story?`Newest identified story: ${story}.`:'No recent source headline identified.')
       :es+(story?`Noticia más reciente identificada: ${story}.`:'No se identificaron titulares recientes.');
   }
-  function renderStories(){const f=articlesFiltered();
+  function renderStories(){updateWeatherControls();if(climateMode){renderClimateStories();return;}const f=articlesFiltered();
     const all=pageStories(); indexSet.clear();all.forEach((a,i)=>indexSet.set(a.id,i));
     // The arrow/dot carousel changes the hero image/headline only.
     // The three "Leia Também" stories remain fixed across hero navigation.
@@ -795,6 +863,7 @@
     $('featurePrev').setAttribute('aria-label',trans.prev.replace(/[←→]/g,'').trim());
     $('featureNext').setAttribute('aria-label',trans.next.replace(/[←→]/g,'').trim());
     [...$('category').options].slice(1).forEach(o=>o.textContent=localizedCategory(o.value));
+    updateWeatherControls();
     if(rerender){renderStories();renderMarket();renderAds();if(opened)renderArticle();}
   }
   async function refreshNews(){
@@ -841,7 +910,21 @@
     $('language').addEventListener('change',e=>languageSet(e.target.value));
     document.querySelectorAll('.language-shortcuts').forEach(el=>el.addEventListener('click',e=>{const b=e.target.closest('[data-site-lang]');if(b)languageSet(b.dataset.siteLang);}));
     $('search').addEventListener('input',()=>{page=featurePage=0;renderStories();});
-    $('category').addEventListener('change',e=>{selected=e.target.value;page=featurePage=0;languageSet(lang);});
+    $('category').addEventListener('change',e=>{
+      selected=e.target.value;
+      climateMode=selected==='Clima';
+      page=featurePage=0;languageSet(lang);
+    });
+    $('weather-alerts-button').addEventListener('click',()=>{
+      climateMode=true;selected='Todas';$('category').value='Todas';
+      $('search').value='';$('age').value='all';page=featurePage=0;
+      renderStories();$('noticias').scrollIntoView({block:'start'});
+    });
+    $('weather-alerts-home').addEventListener('click',()=>{
+      climateMode=false;selected='Todas';$('category').value='Todas';
+      $('search').value='';$('age').value='all';page=featurePage=0;
+      renderStories();$('weather-alerts-button').focus();
+    });
     $('age').addEventListener('change',()=>{page=featurePage=0;renderStories();});
     $('prev').addEventListener('click',()=>{page--;renderStories();$('noticias').scrollIntoView({behavior:'smooth'});});
     $('next').addEventListener('click',()=>{page++;renderStories();$('noticias').scrollIntoView({behavior:'smooth'});});
@@ -866,7 +949,7 @@
     },{passive:true});
     const track=(name,fields)=>window.DrivMatchAnalytics?.track?.(name,fields);
     const storyInfo=story=>({article_id:story?.id,article_category:story?.category,article_source:story?.source});
-    const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=pageStories()[Number(item.dataset.story)];articleLang=lang;if(opened){track('news_article_open',storyInfo(opened));renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function'){track('news_source_click',storyInfo(opened));window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');}};
+    const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=(climateMode?weatherStories():pageStories())[Number(item.dataset.story)];articleLang=lang;if(opened){track('news_article_open',storyInfo(opened));renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function'){track('news_source_click',storyInfo(opened));window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');}};
     const shareText=()=>opened?cleanHeadline(localeOf(opened,lang)?.title||'DrivMatch News'):'DrivMatch News';
     // WhatsApp rich cards require a SINGLE, complete HTTPS URL in the message.
     // The crawler builds the photo/headline card from og:image and og:title.

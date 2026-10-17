@@ -1300,6 +1300,22 @@ body{background:#f7f9fc;color:#14283c}
 .dm-horizontal-auto-map-copy small{color:#eee;font:clamp(8px,.78vw,12px)/1.1 Arial,Helvetica,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:650px){.dm-horizontal-auto-map-copy small{display:none}.dm-horizontal-auto-map-pin{font-size:12px}}
 
+
+/* Weather alert desk: only verified and eligible weather/NWS publications.
+   No claim that an archived warning remains active, and no fake weather photo. */
+.dm-weather-alert-navigation{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 17px}
+.dm-weather-alert-button{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:10px 17px;border:1px solid #1570aa;border-radius:5px;background:#093453;color:#fff;font:700 14px/1.2 Arial,sans-serif;letter-spacing:.3px;cursor:pointer}
+.dm-weather-alert-button:hover,.dm-weather-alert-button.active{background:#005d98}
+.dm-weather-alert-button:focus-visible,.dm-weather-alert-back:focus-visible{outline:3px solid #e1ba2b;outline-offset:2px}
+.dm-weather-alert-count{background:#f4f8fa;color:#12314c;border-radius:50px;min-width:24px;padding:3px 7px;text-align:center;font:700 11px Arial,sans-serif}
+.dm-weather-alert-back{border:1px solid #bccbd9;border-radius:4px;padding:9px 12px;background:#fff;color:#16446d;font:700 12px Arial,sans-serif;min-height:42px}
+.dm-weather-alert-heading{margin:18px 0 6px;color:#153b58;font:bold 23px/1.3 Georgia,serif}
+.dm-weather-alert-note{border-left:3px solid #2289c3;background:#eaf5fd;color:#30516a;padding:10px 13px;margin:0 0 16px;font:12px/1.5 Arial,sans-serif}
+.dm-climate-item{grid-template-columns:minmax(0,1fr) 44px;min-height:112px;align-items:center}
+.dm-climate-item .byline{overflow-wrap:anywhere}
+.dm-climate-symbol{font-size:30px;color:#2689bb;text-align:center}
+@media(max-width:550px){.dm-weather-alert-button{font-size:12px}.dm-weather-alert-heading{font-size:20px}.dm-climate-item{grid-template-columns:minmax(0,1fr) 26px;gap:8px;padding:13px}.dm-climate-symbol{font-size:23px}}
+
 </style>
 
 
@@ -1456,6 +1472,10 @@ body{background:#f7f9fc;color:#14283c}
 
   <div class="roadtv-screen" aria-label="Transmissão em vídeo" aria-live="off"></div>
 </section><section class="mobile-market" id="mobile-market" aria-labelledby="market-title-mobile"><h2 id="market-title-mobile">Cotações e Mercado</h2><div id="market-mobile"></div><p class="micro" id="market-note-mobile"></p></section></div>
+<nav class="dm-weather-alert-navigation" aria-label="Navegação editorial">
+  <button type="button" id="weather-alerts-button" class="dm-weather-alert-button" aria-pressed="false" aria-controls="noticias"><span aria-hidden="true">☁</span><span id="weather-alerts-label">ALERTA CLIMÁTICO</span><span id="weather-alerts-count" class="dm-weather-alert-count" aria-label="Número de publicações"></span></button>
+  <button type="button" id="weather-alerts-home" class="dm-weather-alert-back" hidden>← VOLTAR ÀS NOTÍCIAS</button>
+</nav>
 <section id="panorama">
 
   <div class="topline"><h2 class="heading">Destaque</h2><div class="carousel-controls" role="group" aria-label="Navegação do panorama"><button class="btn secondary" id="featurePrev" type="button" aria-label="Página anterior" title="Anterior">←</button><div class="carousel-dots" id="featureDots" role="group" aria-label="Ir para página do panorama"></div><button class="btn" id="featureNext" type="button" aria-label="Próxima página" title="Próximas">→</button><span class="sub" id="featureCount" aria-live="polite"></span></div></div>
@@ -1467,6 +1487,8 @@ body{background:#f7f9fc;color:#14283c}
   <div class="topline" hidden aria-hidden="true"><h2 class="heading">Notícias</h2><span class="sub" id="count" hidden aria-hidden="true"></span></div>
   <p class="news-freshness" id="news-freshness" hidden aria-hidden="true"></p>
   <div id="mobile-commercial-banner" class="ad-placement ad-placement-mobile" aria-label="Publicidade" hidden></div><div id="news-commercial-banner" class="ad-placement ad-placement-news" aria-label="Publicidade"></div>
+  <h2 id="weather-alerts-heading" class="dm-weather-alert-heading" hidden>ALERTA CLIMÁTICO</h2>
+  <p id="weather-alerts-note" class="dm-weather-alert-note" hidden></p>
   <div id="list"></div>
   <div id="news-carhauler-banner" class="ad-placement ad-placement-carhauler-home" aria-label="Publicidade" hidden></div>
   <div class="pagination"><button class="btn secondary" id="prev">← Anterior</button><span class="sub" id="pagecount"></span><button class="btn" id="next">Próximas →</button></div>
@@ -1565,7 +1587,7 @@ body{background:#f7f9fc;color:#14283c}
 <script src="data/analytics-config.js" defer></script>
 <script src="assets/audience-analytics.js?v=analytics-v1-20261010" defer></script>
 <script src="data/bootstrap.js?v=b6a44c57a2d06319"></script>
-<script src="assets/app.js?v=carhauler-no-news-logo-v3-20261016" defer></script>
+<script src="assets/app.js?v=weather-alert-desk-20261017-v1" defer></script>
 <script src="assets/auto-m-usa.js?v=20261016-originals-sidebar-2" defer></script>
 <script src="assets/horizontal-ad-sequence.js?v=20261017-maps-button-v1" defer></script>
 <script src="assets/sidebar-ad-rotation.js?v=20261016-vertical-v1-1-visible" defer></script>
