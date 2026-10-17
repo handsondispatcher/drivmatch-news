@@ -1463,6 +1463,22 @@ body{background:linear-gradient(180deg,#e9f4ff 0,#f4f9ff 230px,#f8fbff 620px)!im
 .header .language-shortcuts{flex-wrap:nowrap!important}
 @media(max-width:600px){.header .language-shortcuts{flex-wrap:nowrap!important;gap:3px!important}.header .language-shortcuts button{padding:5px 6px!important;font-size:10px!important}}
 </style>
+
+<style id="dm-risk-position-and-full-wa-v1">
+/* Owner-approved: weather warning belongs directly beneath the weather tile, never under USD. */
+@media(min-width:1281px){
+ #dm-utility .dm-util-risk:not([hidden]){grid-column:4!important;grid-row:2!important;justify-self:center!important;align-self:start!important;margin:-7px 0 3px!important;max-width:100%!important;white-space:normal!important;text-align:center!important}
+}
+@media(min-width:851px) and (max-width:1280px){
+ #dm-utility .dm-util-risk:not([hidden]){grid-column:1!important;grid-row:3!important;justify-self:center!important;margin:0 0 2px!important}
+}
+@media(max-width:850px){
+ #dm-utility .dm-util-risk:not([hidden]){grid-column:1/-1!important;grid-row:auto!important;justify-self:center!important;margin:0!important}
+}
+/* Entire top advertisement opens WhatsApp. Keep rotating artwork untouched. */
+#dm-utility #top-quote-ad-slot .top-quote-ad-hit-sms{display:none!important;pointer-events:none!important}
+#dm-utility #top-quote-ad-slot .top-quote-ad-hit-whatsapp{position:absolute!important;inset:0!important;top:0!important;left:0!important;width:100%!important;height:100%!important;z-index:5!important;display:block!important;cursor:pointer!important}
+</style>
 </head>
 <body>
 <header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.11</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português (Brasil)</option><option value="en">English</option><option value="es">Español (Latinoamérica)</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true" title="Português brasileiro (pt-BR)"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false" title="English (US)"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false" title="Español latinoamericano (es-419)"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
