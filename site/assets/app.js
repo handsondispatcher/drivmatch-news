@@ -668,14 +668,29 @@
   }
   // This is the live GitHub Pages share host; custom-domain /news/share routing is not yet verified.
   // Social platforms require our own crawlable Open Graph page, never an RSS redirect.
-  const shareUrlOf = a => 'https://handsondispatcher.github.io/drivmatch-news/share/'+encodeURIComponent(a.id)+'/?v=og-photo-top-no-cta-20261013-r4';
+  // Share in the selected article language, only when the existing feed has that translation.
+  // Never direct users to a nonexistent localized card.
+  const shareUrlOf = (a, requested=articleLang) => {
+    const hasTranslation = language => Boolean(a.locales?.[language]?.title || a.titles?.[language]);
+    const available = langs.includes(requested) && hasTranslation(requested) ? requested
+      : hasTranslation('pt') ? 'pt' : null;
+    const suffix = available ? available+'/' : '';
+    return 'https://handsondispatcher.github.io/drivmatch-news/share/'+encodeURIComponent(a.id)+'/'+suffix+'?v=og-photo-top-no-cta-20261013-r4';
+  };
   let sharedStoryConsumed=false;
   function openSharedStory(){
     if(sharedStoryConsumed)return;
     try {
-      const id=new URLSearchParams(location.search).get('story');
+      const params=new URLSearchParams(location.search);
+      const id=params.get('story');
       const story=id&&pageStories().find(a=>a.id===id);
-      if(story){sharedStoryConsumed=true;opened=story;articleLang=lang;renderArticle();$('article-dialog').scrollTop=0;}
+      if(story){
+        const requested=params.get('lang');
+        if(langs.includes(requested) && story.locales?.[requested]?.title)languageSet(requested);
+        sharedStoryConsumed=true;opened=story;
+        articleLang=langs.includes(requested) && story.locales?.[requested]?.title ? requested : lang;
+        renderArticle();$('article-dialog').scrollTop=0;
+      }
     }catch(_){}
   }
   // Headline-based context is written by DrivMatch News, not a copy of a third-party article.
@@ -957,13 +972,13 @@
     const clickArticle=e=>{const item=e.target.closest('[data-story]');if(item){opened=(climateMode?weatherStories():pageStories())[Number(item.dataset.story)];articleLang=lang;if(opened){track('news_article_open',storyInfo(opened));renderArticle();$('article-dialog').scrollTop=0;}return;}const external=e.target.closest('[data-external-url]');if(external&&typeof window.open==='function'){track('news_source_click',storyInfo(opened));window.open(external.dataset.externalUrl,'_blank','noopener,noreferrer');}};
     // Delegated article listeners retained for hero, news cards and highlight rail.
     for(const id of ['features','list','highlights','highlightList'])$(id).addEventListener('click',clickArticle);
-    const shareText=()=>opened?cleanHeadline(localeOf(opened,lang)?.title||'DrivMatch News'):'DrivMatch News';
+    const shareText=()=>opened?cleanHeadline(localeOf(opened,articleLang)?.title||'DrivMatch News'):'DrivMatch News';
     // WhatsApp rich cards require a SINGLE, complete HTTPS URL in the message.
     // The crawler builds the photo/headline card from og:image and og:title.
     // Do not prepend a headline, copy a relative route or depend on an app
     // interpreting an extra text fragment before it recognizes the link.
     const whatsappMessage=(_title,url)=>{
-      const valid=/^https:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\/[a-zA-Z0-9-]+\/\?v=[a-zA-Z0-9-]+$/;
+      const valid=/^https:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\/[a-zA-Z0-9-]+\/(?:(?:pt|en|es)\/)?\?v=[a-zA-Z0-9-]+$/;
       if(!valid.test(url))throw new Error('Invalid absolute WhatsApp preview URL');
       return url;
     };
@@ -986,12 +1001,12 @@
       pickerFeedback.textContent='';
       $('share-native').setAttribute('aria-expanded',String(expanded));
       if(!expanded)return;
-      const urls=shareDestinations(shareText(),shareUrlOf(opened));
+      const urls=shareDestinations(shareText(),shareUrlOf(opened,articleLang));
       shareOptions.querySelectorAll('[data-share-platform]').forEach(a=>{a.href=urls[a.dataset.sharePlatform]||'#';});
     });
     $('share-options-close').addEventListener('click',()=>{shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');$('share-native').focus();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!shareOptions.hidden){shareOptions.hidden=true;$('share-native').setAttribute('aria-expanded','false');e.stopPropagation();}});
-    const shareMessage=()=>whatsappMessage(shareText(),shareUrlOf(opened));
+    const shareMessage=()=>whatsappMessage(shareText(),shareUrlOf(opened,articleLang));
     const pickerFeedback=$('share-picker-feedback');
     const shareSystem=$('share-system');
     shareSystem.hidden=typeof navigator.share!=='function';
@@ -1100,14 +1115,14 @@
     });
     $('share-system').addEventListener('click',async()=>{
       if(!opened)return;
-      const title=shareText(),url=shareUrlOf(opened);
+      const title=shareText(),url=shareUrlOf(opened,articleLang);
       if(typeof navigator.share==='function'){
         try{await navigator.share({url});}catch(e){if(e?.name!=='AbortError')$('share-feedback').textContent=lang==='pt'?'Use uma das opções acima ou copie o link.':'Choose a destination above or copy the link.';}
       }else $('share-feedback').textContent=lang==='pt'?'Escolha uma rede acima ou copie o link.':'Choose a network above or copy the link.';
     });
     $('share-copy').addEventListener('click',async()=>{
       if(!opened)return;
-      const url=shareUrlOf(opened);
+      const url=shareUrlOf(opened,articleLang);
       try{
         if(typeof navigator!=='undefined' && navigator.clipboard?.writeText){
           await navigator.clipboard.writeText(url);

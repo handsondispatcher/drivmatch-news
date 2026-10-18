@@ -507,7 +507,7 @@ class PublicationTests(unittest.TestCase):
       'origin_type':'aggregator-discovery','locales':{'pt':{'title':'Notícia não original'}}}
    ]}),encoding='utf-8')
    with patch.object(share,'SITE',site),patch.object(share,'create_card'):
-    self.assertEqual(share.build(),1)
+    self.assertEqual(share.build(),2)  # legacy URL plus the localized /pt/ URL
    html=(site/'share'/'source-4b971529a12a4211b8ac'/'index.html').read_text(encoding='utf-8')
    self.assertIn('property="og:title" content="Operadora Chameleon desativada"',html)
    self.assertIn('property="og:image" content="https://handsondispatcher.github.io/drivmatch-news/share/source-4b971529a12a4211b8ac/social.jpg?v=og-photo-top-no-cta-20261013-r4"',html)
@@ -654,7 +654,8 @@ class PublicationTests(unittest.TestCase):
   self.assertIn('role="button" data-external="false" data-story="${i}"',js)
   self.assertNotIn('role="link" data-external-url=',js)
   self.assertNotIn('${cat} · ${escapeHTML(a.region',js)
-  self.assertIn("const shareUrlOf = a => 'https://handsondispatcher.github.io/drivmatch-news/share/'",js)
+  self.assertIn("const shareUrlOf = (a, requested=articleLang)",js)
+  self.assertIn("shareUrlOf(opened,articleLang)",js)
   self.assertIn("opened.kind==='external_link'",js)
   self.assertIn("article-source",js)
   self.assertIn("share-native",js)

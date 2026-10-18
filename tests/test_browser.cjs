@@ -660,7 +660,7 @@ const {spawn}=require('node:child_process');
    assert.equal(await page.locator('#share-story').isVisible(),true);
    const shareLink=await page.locator('[data-share-platform="whatsapp"]').getAttribute('href');
    const waText=new URL(shareLink).searchParams.get('text');
-   assert.match(waText,/^https:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\/[a-zA-Z0-9-]+\/\?v=[a-zA-Z0-9-]+$/,
+   assert.match(waText,/^https:\/\/handsondispatcher\.github\.io\/drivmatch-news\/share\/[a-zA-Z0-9-]+\/(?:(?:pt|en|es)\/)?\?v=[a-zA-Z0-9-]+$/,
      'WhatsApp must receive ONLY the absolute HTTPS rich preview link, not text or /news/share');
    assert.ok(!waText.includes('Manchete e contexto no DrivMatch News'),'No placeholder message should displace the WhatsApp photo/title');
    assert.ok(!waText.startsWith('/news/share/'),'Relative share routes must never be sent');
