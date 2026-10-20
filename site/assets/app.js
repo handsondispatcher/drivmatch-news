@@ -446,7 +446,7 @@
     const historical=key==='brent'&&v.instrument==='brent_eia_reference'&&
       v.session_status==='historical_reference'&&v.quote_status==='historical_reference';
     const maxAge=(historical?21:{usdbrl:5,diesel:12,brent:5}[key])*86400000;
-    return age>=-5*60000 && age<=(v.session_status==='open'?(key==='usdbrl'?120:5)*60000:maxAge);
+    return age>=-5*60000 && age<=(v.session_status==='open'?5*60000:maxAge);
   }
 // MARKET_QUOTE_UI_RELEASE: compact-prices-only-20261013
   function marketValue(v,key){

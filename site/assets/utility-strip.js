@@ -23,8 +23,9 @@ function marketFresh(v,key){
  // That build can be delayed 30-60+ minutes by photos/browser tests, so do not
  // blank the LAST PUBLISHED VERIFIED observation after 25 minutes. It is never
  // described as streaming/live once older than 5 minutes (see provenance).
- // Cap visibility to 2 hours; other instruments keep the strict five-minute TTL.
- if(v.session_status==='open')return age<=(key==='usd'?120:5)*60000;
+ // Published spot observations expire after five minutes; the native
+ // TradingView widget is the separate current-price display.
+ if(v.session_status==='open')return age<=5*60000;
  if(key==='brent'&&v.instrument==='brent_eia_reference'&&
     v.quote_status==='historical_reference'&&v.session_status==='historical_reference')
    return age<=21*86400000;
@@ -46,7 +47,7 @@ function showMarket(){
  document.dispatchEvent(new CustomEvent('drivmatch:market-verified',{detail:{usdbrl:usd||null,diesel:market.diesel||null,brent:brent||null}}));
  // Never relabel an official PTAX reference as a traded commercial quote.
  el('top-usd-label').textContent=localized('Dólar','US Dollar','Dólar');
- el('top-diesel-label').textContent=localized('Diesel nos EUA','US Diesel','Diésel en EE. UU.');
+ el('top-diesel-label').textContent=localized('Diesel no varejo EUA','US Retail Diesel','Diésel minorista EE. UU.');
  el('top-brent-label').textContent=localized('Petróleo Bruto Brent','Brent Crude Oil','Petróleo crudo Brent');
  const values=[
   {id:'usd',data:usd,decimals:3,prefix:'R$ ',suffix:''},
@@ -55,6 +56,26 @@ function showMarket(){
  ];
  for(const item of values){
    const v=item.data;
+   // TradingView's own component renders the official USD/BRL figure. If the
+   // external widget cannot load, provide its direct source link, never a
+   // visually identical number from a different provider (AwesomeAPI).
+   if((item.id==='usd'&&document.querySelector('.dm-usd-provider tv-single-ticker'))||
+      (item.id==='diesel'&&document.querySelector('.dm-diesel-provider tv-single-ticker'))){
+     const value=el('top-usd-value'),chg=el('top-usd-change'),meta=el('top-usd-date');
+     value.textContent='';
+     const link=document.createElement('a');
+     link.href=item.id==='usd'?'https://br.tradingview.com/symbols/FX_IDC-USDBRL/':
+       'https://www.tradingview.com/symbols/FRED-GASDESW/';
+     link.target='_blank';link.rel='noopener noreferrer';
+     link.textContent=localized('Ver cotação ↗','View quote ↗','Ver cotización ↗');
+     value.appendChild(link);value.classList.add('dm-market-missing');
+     chg.hidden=true;chg.textContent='';
+     meta.textContent=item.id==='diesel'?
+       localized('EIA / FRED, cotação semanal exibida pela TradingView','EIA / FRED weekly retail diesel price displayed by TradingView','EIA / FRED, precio semanal de diésel mostrado por TradingView'):
+       localized('TradingView — cotação exibida por widget oficial','TradingView — rate displayed in official widget','TradingView — cotización en widget oficial');
+     value.title=meta.textContent;
+     continue;
+   }
    // An old EIA reference cannot be shown as today's Brent price.
    const historical=item.id==='brent'&&v?.instrument==='brent_eia_reference'&&
      v?.quote_status==='historical_reference'&&v?.session_status==='historical_reference';
