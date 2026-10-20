@@ -23,8 +23,9 @@ function marketFresh(v,key){
  // That build can be delayed 30-60+ minutes by photos/browser tests, so do not
  // blank the LAST PUBLISHED VERIFIED observation after 25 minutes. It is never
  // described as streaming/live once older than 5 minutes (see provenance).
- // Cap visibility to 2 hours; other instruments keep the strict five-minute TTL.
- if(v.session_status==='open')return age<=(key==='usd'?120:5)*60000;
+ // Published spot observations expire after five minutes; the native
+ // TradingView widget is the separate current-price display.
+ if(v.session_status==='open')return age<=5*60000;
  if(key==='brent'&&v.instrument==='brent_eia_reference'&&
     v.quote_status==='historical_reference'&&v.session_status==='historical_reference')
    return age<=21*86400000;
