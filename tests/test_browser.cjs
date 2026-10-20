@@ -287,10 +287,12 @@ const {spawn}=require('node:child_process');
        const noOverlap=(a,b)=>a.right<=b.left+2||b.right<=a.left+2||a.bottom<=b.top+2||b.bottom<=a.top+2;
        return {
          columns:css.gridTemplateColumns.trim().split(/\s+/).length,
-         sameRow:Math.abs(usd.top-diesel.top)<3,
+         usdFull:usd.left<=brent.left+2&&usd.right>=brent.right-2,
+         dieselFull:diesel.left<=brent.left+2&&diesel.right>=brent.right-2,
+         dieselAfter:diesel.top>=usd.bottom-2,
          separatedQuotes:noOverlap(usd,diesel),
          brentFull:brent.left<=usd.left+2&&brent.right>=diesel.right-2,
-         brentAfter:brent.top>=Math.max(usd.bottom,diesel.bottom)-2,
+         brentAfter:brent.top>=diesel.bottom-2,
          weatherAfter:weather.height===0||weather.top>=brent.bottom-2,
          searchFull:search.left<=brent.left+2&&search.right>=brent.right-2,
          searchAfter:search.top>=(weather.height?weather.bottom:brent.bottom)-2,
@@ -303,7 +305,8 @@ const {spawn}=require('node:child_process');
        };
      });
      assert.equal(topLayout.columns,2,'Mobile top area has exactly two pricing columns');
-     assert.ok(topLayout.sameRow&&topLayout.separatedQuotes,'USD and diesel belong in the first row without overlap');
+     assert.ok(topLayout.usdFull&&topLayout.dieselFull&&topLayout.dieselAfter&&topLayout.separatedQuotes,
+       'TradingView USD and diesel widgets must be full-width, stacked without overlap');
      assert.ok(topLayout.brentFull&&topLayout.brentAfter,'Brent stays full-width immediately below the quotes');
      assert.ok(topLayout.weatherAfter&&topLayout.searchFull&&topLayout.searchAfter,'Weather and city search have coherent vertical full-width flow');
      assert.ok(topLayout.riskAfter&&topLayout.adAfter&&topLayout.adCentered&&topLayout.adSquare,'Weather risk and square advertiser are centered below the search');
