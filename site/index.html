@@ -1531,16 +1531,51 @@ body{background:linear-gradient(180deg,#e9f4ff 0,#f4f9ff 230px,#f8fbff 620px)!im
 @media(max-width:420px){#mercados #dm-ad-rotation{max-width:100%!important;margin:17px auto 22px!important}#mercados #dm-ad-rotation-track{gap:14px!important}}
 </style>
 <link rel="stylesheet" href="assets/mobile-top-layout.css?v=20261017-1" media="(max-width:850px)">
+<style id="dm-usd-tradingview-native-v1">
+/* TradingView owns its price, percent and branding in an unmodified native widget.
+   Keep the Dólar label link; never scrape/overlay/mask third-party data. */
+#dm-utility .dm-util-quote.dm-usd-quote{
+  box-sizing:border-box!important;min-height:120px!important;
+  grid-template-columns:29px minmax(0,1fr)!important;
+  grid-template-rows:23px 89px!important;align-content:center!important;
+  row-gap:2px!important;
+}
+#dm-utility .dm-usd-quote .dm-usd-provider{
+  grid-column:1/-1!important;grid-row:2!important;display:block!important;
+  width:100%!important;min-width:0!important;height:89px!important;
+  min-height:89px!important;overflow:visible!important;
+}
+#dm-utility .dm-usd-provider tv-single-ticker{
+  display:block;width:100%;height:89px;min-height:89px;overflow:visible;
+}
+#dm-utility .dm-usd-quote .dm-usd-fallback{
+  grid-column:1/-1!important;grid-row:2!important;align-self:center!important;
+}
+#dm-utility .dm-usd-quote:has(tv-single-ticker:defined) .dm-usd-fallback{
+  display:none!important;
+}
+@media screen and (max-width:850px){
+  #dm-utility .dm-util-inner>.dm-util-quote.dm-usd-quote{
+    grid-column:1/-1!important;width:100%!important;max-width:100%!important;
+    min-height:120px!important;grid-template-rows:23px 89px!important;
+    overflow:visible!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <header class="header"><div class="header-inner"><a class="brand brand-link" href="https://drivmatch.com/" title="Visitar DrivMatch" aria-label="Visitar o site principal DrivMatch"><img alt="Logomarca oficial DrivMatch News" src="assets/logo-drivmatch-news.png"></a><div class="edition"><span id="site-version" hidden>v34.11</span><span id="edition-date" hidden></span><span class="language-picker"><img id="languageFlag" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2022%22%3E%3Crect%20width%3D%2232%22%20height%3D%2222%22%20fill%3D%22%23159447%22%2F%3E%3Cpath%20d%3D%22M16%202%2030%2011%2016%2020%202%2011Z%22%20fill%3D%22%23ffdd28%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2211%22%20r%3D%226%22%20fill%3D%22%23174a98%22%2F%3E%3Cpath%20d%3D%22M10.5%208.5c4-1.5%208.5-1%2011%201.5%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.1%22%2F%3E%3C%2Fsvg%3E" alt="Bandeira do Brasil"/><select id="language" aria-label="Idioma do jornal"><option value="pt">Português (Brasil)</option><option value="en">English</option><option value="es">Español (Latinoamérica)</option></select><span class="language-shortcuts" role="group" aria-label="Escolher idioma do jornal"><button type="button" data-site-lang="pt" class="selected" aria-pressed="true" title="Português brasileiro (pt-BR)"><img src="assets/flag-br.svg" alt="">Português</button><button type="button" data-site-lang="en" aria-pressed="false" title="English (US)"><img src="assets/flag-us.svg" alt="">English</button><button type="button" data-site-lang="es" aria-pressed="false" title="Español latinoamericano (es-419)"><img src="assets/flag-es.svg" alt="">Español</button></span></span></div></div></header>
 
 <section id="dm-utility" class="dm-utility" aria-label="Cotações e condições do tempo">
  <div class="dm-util-inner">
-  <div class="dm-util-quote">
+  <div class="dm-util-quote dm-usd-quote">
    <span class="dm-util-icon dm-market-line-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" focusable="false"><path d="M3 20V4M3 20h18" fill="none" stroke="#1b4d72" stroke-width="2" stroke-linecap="round"/><path d="m6 16 5-5 4 2 5-8" fill="none" stroke="#168d72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
    <a id="top-usd-label" class="dm-util-label dm-market-ref-link" href="https://br.tradingview.com/symbols/FX_IDC-USDBRL/" target="_blank" rel="noopener noreferrer" title="Abrir USD/BRL na TradingView">Dólar</a>
-   <div class="dm-util-money"><strong id="top-usd-value">—</strong><em id="top-usd-change" hidden></em></div>
+   <div class="dm-util-money dm-usd-fallback"><strong id="top-usd-value">—</strong><em id="top-usd-change" hidden></em></div>
+   <div class="dm-usd-provider" aria-label="Cotação USD/BRL da TradingView">
+    <tv-single-ticker symbol="FX_IDC:USDBRL" aria-label="USD/BRL na TradingView, cotação e variação"></tv-single-ticker>
+   </div>
    <small id="top-usd-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">Sem cotação</small>
   </div>
   <div class="dm-util-quote">
