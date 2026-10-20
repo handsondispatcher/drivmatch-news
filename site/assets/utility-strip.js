@@ -56,6 +56,22 @@ function showMarket(){
  ];
  for(const item of values){
    const v=item.data;
+   // TradingView's own component renders the official USD/BRL figure. If the
+   // external widget cannot load, provide its direct source link, never a
+   // visually identical number from a different provider (AwesomeAPI).
+   if(item.id==='usd'&&document.querySelector('.dm-usd-provider tv-single-ticker')){
+     const value=el('top-usd-value'),chg=el('top-usd-change'),meta=el('top-usd-date');
+     value.textContent='';
+     const link=document.createElement('a');
+     link.href='https://br.tradingview.com/symbols/FX_IDC-USDBRL/';
+     link.target='_blank';link.rel='noopener noreferrer';
+     link.textContent=localized('Ver cotação ↗','View quote ↗','Ver cotización ↗');
+     value.appendChild(link);value.classList.add('dm-market-missing');
+     chg.hidden=true;chg.textContent='';
+     meta.textContent=localized('TradingView — cotação exibida por widget oficial','TradingView — rate displayed in official widget','TradingView — cotización en widget oficial');
+     value.title=meta.textContent;
+     continue;
+   }
    // An old EIA reference cannot be shown as today's Brent price.
    const historical=item.id==='brent'&&v?.instrument==='brent_eia_reference'&&
      v?.quote_status==='historical_reference'&&v?.session_status==='historical_reference';
