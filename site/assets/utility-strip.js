@@ -47,7 +47,7 @@ function showMarket(){
  document.dispatchEvent(new CustomEvent('drivmatch:market-verified',{detail:{usdbrl:usd||null,diesel:market.diesel||null,brent:brent||null}}));
  // Never relabel an official PTAX reference as a traded commercial quote.
  el('top-usd-label').textContent=localized('Dólar','US Dollar','Dólar');
- el('top-diesel-label').textContent=localized('Diesel nos EUA','US Diesel','Diésel en EE. UU.');
+ el('top-diesel-label').textContent=localized('Diesel no varejo EUA','US Retail Diesel','Diésel minorista EE. UU.');
  el('top-brent-label').textContent=localized('Petróleo Bruto Brent','Brent Crude Oil','Petróleo crudo Brent');
  const values=[
   {id:'usd',data:usd,decimals:3,prefix:'R$ ',suffix:''},
@@ -59,16 +59,20 @@ function showMarket(){
    // TradingView's own component renders the official USD/BRL figure. If the
    // external widget cannot load, provide its direct source link, never a
    // visually identical number from a different provider (AwesomeAPI).
-   if(item.id==='usd'&&document.querySelector('.dm-usd-provider tv-single-ticker')){
+   if((item.id==='usd'&&document.querySelector('.dm-usd-provider tv-single-ticker'))||
+      (item.id==='diesel'&&document.querySelector('.dm-diesel-provider tv-single-ticker'))){
      const value=el('top-usd-value'),chg=el('top-usd-change'),meta=el('top-usd-date');
      value.textContent='';
      const link=document.createElement('a');
-     link.href='https://br.tradingview.com/symbols/FX_IDC-USDBRL/';
+     link.href=item.id==='usd'?'https://br.tradingview.com/symbols/FX_IDC-USDBRL/':
+       'https://www.tradingview.com/symbols/FRED-GASDESW/';
      link.target='_blank';link.rel='noopener noreferrer';
      link.textContent=localized('Ver cotação ↗','View quote ↗','Ver cotización ↗');
      value.appendChild(link);value.classList.add('dm-market-missing');
      chg.hidden=true;chg.textContent='';
-     meta.textContent=localized('TradingView — cotação exibida por widget oficial','TradingView — rate displayed in official widget','TradingView — cotización en widget oficial');
+     meta.textContent=item.id==='diesel'?
+       localized('EIA / FRED, cotação semanal exibida pela TradingView','EIA / FRED weekly retail diesel price displayed by TradingView','EIA / FRED, precio semanal de diésel mostrado por TradingView'):
+       localized('TradingView — cotação exibida por widget oficial','TradingView — rate displayed in official widget','TradingView — cotización en widget oficial');
      value.title=meta.textContent;
      continue;
    }
