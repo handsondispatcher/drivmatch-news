@@ -15,9 +15,16 @@ class TradingViewUsdCard(unittest.TestCase):
     def test_official_tradingview_widget_not_embedded_snapshot(self):
         self.assertIn('class="dm-util-quote dm-usd-quote"',HTML)
         self.assertIn('<tv-single-ticker symbol="FX_IDC:USDBRL"',HTML)
+        self.assertIn('<tv-single-ticker symbol="FRED:GASDESW"',HTML)
+        self.assertIn('class="dm-util-quote dm-diesel-quote"',HTML)
+        self.assertIn('class="dm-diesel-provider"',HTML)
+        self.assertIn('id="top-diesel-label" class="dm-util-label dm-market-ref-link"',HTML)
+        self.assertIn('Diesel no varejo EUA',HTML)
+        self.assertIn('EIA / FRED, cotação semanal',UTILITY)
         self.assertIn('https://widgets.tradingview-widget.com/w/en/tv-single-ticker.js',HTML)
         self.assertIn('class="dm-usd-provider"',HTML)
         self.assertIn(':has(tv-single-ticker:defined) .dm-usd-fallback',HTML)
+        self.assertIn(':has(tv-single-ticker:defined) .dm-diesel-fallback',HTML)
         self.assertIn('height:89px',HTML)
         self.assertNotIn('transform:scale(',HTML.split('<style id="dm-usd-tradingview-native-v1">')[1].split('</style>')[0])
 
