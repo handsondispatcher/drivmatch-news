@@ -1532,30 +1532,52 @@ body{background:linear-gradient(180deg,#e9f4ff 0,#f4f9ff 230px,#f8fbff 620px)!im
 </style>
 <link rel="stylesheet" href="assets/mobile-top-layout.css?v=20261017-1" media="(max-width:850px)">
 <style id="dm-usd-tradingview-native-v1">
-/* TradingView owns its price, percent and branding in an unmodified native widget.
-   Keep the Dólar label link; never scrape/overlay/mask third-party data. */
-#dm-utility .dm-util-quote.dm-usd-quote{
-  box-sizing:border-box!important;min-height:120px!important;
-  grid-template-columns:29px minmax(0,1fr)!important;
-  grid-template-rows:23px 89px!important;align-content:center!important;
-  row-gap:2px!important;
+/* Native, provider-owned TradingView presentation for USD/BRL and EIA US retail
+   diesel; full provider attribution remains visible. Never scrape or hide the
+   TV branding. Diesel FRED:GASDESW is WEEKLY and never a live traded spot. */
+#dm-utility .dm-util-quote.dm-usd-quote,
+#dm-utility .dm-util-quote.dm-diesel-quote{
+  box-sizing:border-box!important;min-width:0!important;
+  min-height:120px!important;grid-template-columns:29px minmax(0,1fr)!important;
+  grid-template-rows:23px 89px!important;align-content:center!important;row-gap:2px!important;
 }
-#dm-utility .dm-usd-quote .dm-usd-provider{
+#dm-utility .dm-usd-quote .dm-usd-provider,
+#dm-utility .dm-diesel-quote .dm-diesel-provider{
   grid-column:1/-1!important;grid-row:2!important;display:block!important;
-  width:100%!important;min-width:0!important;height:89px!important;
-  min-height:89px!important;overflow:visible!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  height:89px!important;min-height:89px!important;overflow:visible!important;
 }
-#dm-utility .dm-usd-provider tv-single-ticker{
-  display:block;width:100%;height:89px;min-height:89px;overflow:visible;
+#dm-utility .dm-usd-provider tv-single-ticker,
+#dm-utility .dm-diesel-provider tv-single-ticker{
+  display:block;width:100%;max-width:100%;height:89px;min-height:89px;
+  overflow:visible;
 }
-#dm-utility .dm-usd-quote .dm-usd-fallback{
+#dm-utility .dm-usd-quote .dm-usd-fallback,
+#dm-utility .dm-diesel-quote .dm-diesel-fallback{
   grid-column:1/-1!important;grid-row:2!important;align-self:center!important;
 }
-#dm-utility .dm-usd-quote:has(tv-single-ticker:defined) .dm-usd-fallback{
+#dm-utility .dm-usd-quote:has(tv-single-ticker:defined) .dm-usd-fallback,
+#dm-utility .dm-diesel-quote:has(tv-single-ticker:defined) .dm-diesel-fallback{
   display:none!important;
 }
+/* Room for native widget and its entire logo/attribution. */
+@media(min-width:1281px){
+  #dm-utility .dm-util-inner{
+    grid-template-columns:minmax(240px,1.25fr) minmax(240px,1.25fr)
+      minmax(330px,1.7fr) minmax(130px,.7fr)
+      minmax(135px,.75fr) minmax(100px,.6fr)!important;
+  }
+}
+@media(min-width:851px) and (max-width:1280px){
+  #dm-utility .dm-util-inner{
+    grid-template-columns:minmax(240px,1fr) minmax(240px,1fr)
+      minmax(320px,1.45fr)!important;
+  }
+}
 @media screen and (max-width:850px){
-  #dm-utility .dm-util-inner>.dm-util-quote.dm-usd-quote{
+  /* Source-owned tickers cannot be squeezed into half-width mobile cards. */
+  #dm-utility .dm-util-inner>.dm-util-quote.dm-usd-quote,
+  #dm-utility .dm-util-inner>.dm-util-quote.dm-diesel-quote{
     grid-column:1/-1!important;width:100%!important;max-width:100%!important;
     min-height:120px!important;grid-template-rows:23px 89px!important;
     overflow:visible!important;
@@ -1578,10 +1600,13 @@ body{background:linear-gradient(180deg,#e9f4ff 0,#f4f9ff 230px,#f8fbff 620px)!im
    </div>
    <small id="top-usd-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">Sem cotação</small>
   </div>
-  <div class="dm-util-quote">
+  <div class="dm-util-quote dm-diesel-quote">
    <span class="dm-util-icon dm-market-line-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" focusable="false"><path d="M5 21V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17H5ZM7 6h8v6H7ZM4 21h14" fill="none" stroke="#1b4d72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 8h2l2 3v7a2 2 0 0 1-4 0v-3" fill="none" stroke="#168d72" stroke-width="1.8" stroke-linejoin="round"/></svg></span>
-   <a id="top-diesel-label" class="dm-util-label dm-market-ref-link" href="https://www.tradingview.com/symbols/FRED-GASDESW/" target="_blank" rel="noopener noreferrer" title="Consultar série semanal oficial EIA / FRED GASDESW">Diesel nos EUA</a>
-   <div class="dm-util-money"><strong id="top-diesel-value">—</strong><em id="top-diesel-change" hidden></em></div>
+   <a id="top-diesel-label" class="dm-util-label dm-market-ref-link" href="https://www.tradingview.com/symbols/FRED-GASDESW/" target="_blank" rel="noopener noreferrer" title="Consultar o preço médio semanal de varejo do diesel nos EUA — EIA / FRED GASDESW">Diesel no varejo EUA</a>
+   <div class="dm-util-money dm-diesel-fallback"><strong id="top-diesel-value">—</strong><em id="top-diesel-change" hidden></em></div>
+   <div class="dm-diesel-provider" aria-label="Preço médio semanal do diesel no varejo nos EUA, via TradingView e EIA">
+    <tv-single-ticker symbol="FRED:GASDESW" aria-label="Diesel no varejo EUA, dólares por galão, série semanal da EIA"></tv-single-ticker>
+   </div>
    <small id="top-diesel-date" class="dm-util-provenance" hidden title="Fonte e data da cotação">EIA · semanal</small>
   </div>
   <div class="dm-util-quote dm-brent-quote">
