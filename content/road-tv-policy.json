@@ -24,5 +24,7 @@
   "display_title": false,
   "truck_lives_occupy_channels_first": true,
   "truck_live_channel_assignment": "Sequential verified cargo-cab live streams: first CH1, second CH2, then CH3+; never reserve a slot for an offline stream.",
-  "non_truck_sources_after_truck_lives": true
+  "non_truck_sources_after_truck_lives": true,
+  "live_manifest_refresh_stage": "immediately_before_pages_artifact",
+  "live_search_policy": "Official API: Ride Along Gang in two of three targeted searches per hour, other creators rotated in third; uploads checked every build; final live revalidation prior to Pages upload."
 }
