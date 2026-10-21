@@ -224,8 +224,9 @@
      creator.href='https://www.youtube.com/@Ridealonggang/live';
      creator.target='_blank';creator.rel='noopener noreferrer';
      creator.className='roadtv-creator-fallback';
-     creator.textContent=lang()==='en'?'Watch Ride Along Gang on YouTube ↗':lang()==='es'?'Ver Ride Along Gang en YouTube ↗':'Ver Ride Along Gang no YouTube ↗';
-     creator.style.cssText='display:block;margin:4px 0 1px;color:#9bd7ff;font:600 11px Arial,sans-serif;text-align:center;text-decoration:underline';
+     // Explicit source link, NOT an unverified live claim when Pages data is old.
+     creator.textContent=lang()==='en'?'Check Ride Along Gang broadcasts ↗':lang()==='es'?'Consultar transmisiones de Ride Along Gang ↗':'Ver transmissões do Ride Along Gang ↗';
+     creator.style.cssText='display:block;margin:8px 6px 4px;padding:11px 12px;color:#fff;background:#135b94;border:1px solid #6bb7ea;border-radius:9px;font:700 13px Arial,sans-serif;text-align:center;text-decoration:none';
      area.appendChild(creator);
    }
  }
