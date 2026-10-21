@@ -32,6 +32,9 @@ class RoadTvOwnerContract(unittest.TestCase):
         self.assertLess(player.index('let publisherIndex=0'),player.index('tvInstall();applyCameraOrder(fallbackCameraOrder);'))
     def test_verified_creator_refresh_rotates_both(self):
         engine=(ROOT/'scripts/road_tv.py').read_text(encoding='utf-8')
-        self.assertIn("targeted_hour=(now.hour*3 + now.minute//20) if now.minute % 20 < 10 else None",engine)
+        self.assertIn("targeted_hour=None if final_refresh else",engine)
+        self.assertIn("(now.hour*3 + now.minute//20) if now.minute % 20 < 10 else None",engine)
+        self.assertIn("priority_set.add(0)",engine)
+        self.assertIn("final_refresh=False",engine)
         self.assertIn("preferred_channels.get",engine)
         self.assertIn("Minden",engine)
