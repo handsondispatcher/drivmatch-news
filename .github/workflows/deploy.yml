@@ -359,6 +359,15 @@ jobs:
         with:
           name: browser-screenshots
           path: test-results/
+      # Refresh live status after long newsroom/photo/browser stages and
+      # immediately before the Pages payload is assembled.
+      - name: Road TV — revalidar transmissões antes do deploy
+        if: github.ref == 'refs/heads/main'
+        env:
+          YOUTUBE_DATA_API_KEY: ${{ secrets.YOUTUBE_DATA_API_KEY }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+        run: python scripts/refresh_roadtv_at_publish.py
       - uses: actions/configure-pages@v5
         if: github.ref == 'refs/heads/main'
       - uses: actions/upload-pages-artifact@v4

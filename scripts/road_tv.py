@@ -36,6 +36,8 @@ QUERIES = (
     'truck driver POV live USA',
     'trucking live driving USA',
     'truck dashcam live usa',
+    'trucker live ride along POV USA',
+    'semi truck driver livestream POV USA',
 )
 # City/state route evidence. There are 50 US state postal codes; require
 # actual title-like "City ST" syntax, not bare two-letter words ("in", "or").
@@ -243,7 +245,15 @@ def youtube_curated_channel_discover(key, channels, api, errors, *, targeted_hou
     # Rotate one priority channel search every 20 minutes, with no more
     # than three targeted searches/hour (plus one broad search/hour).
     # Other builds rely on uploads + previously discovered video IDs.
-    priority_set = {targeted_hour % min(2,len(channels))} if targeted_hour is not None and channels else set()
+    # One targeted search each 20-minute slot, never exceed the established
+    # three searches/hour. Check Ride Along Gang in 2/3 slots and rotate the
+    # other creators in the third; all uploads lists are still polled each run.
+    priority_set = set()
+    if targeted_hour is not None and channels:
+        if targeted_hour % 3 in (0,2) or len(channels)==1:
+            priority_set.add(0)
+        else:
+            priority_set.add(1 + (targeted_hour//3) % (len(channels)-1))
     if diagnostics is not None:
         diagnostics.setdefault('watchlist_channels_checked',0)
         diagnostics.setdefault('watchlist_channels_resolved',0)
@@ -359,7 +369,7 @@ def verify_youtube(ids, key, now, api, errors, diagnostics=None):
                     'channel_id_match':str(info.get('channelId') or '')==diagnostics.get('_targeted_channel_id'),
                     'cab_pov':bool(CAB.search(title+' '+desc)),
                     'cargo_vehicle':bool(CARGO.search(title+' '+desc)),
-                    'us_road_or_route':bool(US.search(title+' '+desc) or US_ROUTE.search(title+' '+desc)),
+                    'us_road_or_route':bool(usa_route_evidence(title,desc)),
                     'stopped_keyword':bool(STOP.search(title or '')),
                     'generic_description_mentions_stop':bool(STOP.search(desc)),
                     'snippet_live':info.get('liveBroadcastContent')=='live',
@@ -499,7 +509,7 @@ def twitch_verify(candidates, client_id, token, now, api, errors):
 
 
 def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
-                 twitch_id=None,twitch_secret=None,cache=None):
+                 twitch_id=None,twitch_secret=None,cache=None,final_refresh=False):
     now=now or dt.datetime.now(UTC)
     now=now.astimezone(UTC)
     cfg=json.loads((ROOT/'content/road-tv-curated.json').read_text(encoding='utf-8'))
@@ -542,8 +552,12 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
         diagnostics['targeted_channel_checked']=cached.get('targeted_channel_checked')
         diagnostics['_priority_source_by_video']=cached.get('priority_source_by_video') or {}
     if key:
-        if fresh_cache and isinstance(cached.get('youtube_ids'),list):
+        if (fresh_cache or final_refresh) and cached and isinstance(cached.get('youtube_ids'),list):
             search_ids=[i for i in cached['youtube_ids'] if VIDEO_ID.fullmatch(str(i))]
+        elif final_refresh:
+            # Revalidate previously discovered videos; preserve API quota by
+            # avoiding a second costly global search before deploy.
+            search_ids=[]
         else:
             found=youtube_discover(key,now,lambda u:api(u),result['warnings'])
             search_ids=list(found)[:MAX_CANDIDATES]
@@ -553,7 +567,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
             key,cfg['channel_sources'],lambda u:api(u),result['warnings'],
             # Search alternating priority channels every 20 minutes while staying
             # below the default YouTube Data API search quota budget.
-            targeted_hour=(now.hour*3 + now.minute//20) if now.minute % 20 < 10 else None,
+            targeted_hour=None if final_refresh else ((now.hour*3 + now.minute//20) if now.minute % 20 < 10 else None),
             diagnostics=diagnostics)
             if cache is None else [])  # Injected discovery fixtures remain deterministic.
         cached_creator_ids=[i for i in ((cached or {}).get('curated_ids') or [])
@@ -584,7 +598,7 @@ def make_road_tv(offline=False,api_key=None,now=None,get_json=None,
             approved+=twitch_verify(twitch_candidates,tid,token,now,api,result['warnings'])
         except (OSError,TimeoutError,ValueError,KeyError,TypeError):
             result['warnings'].append('twitch_authentication_failed')
-    if not fresh_cache and cache is None:
+    if not fresh_cache and cache is None and not final_refresh:
         store_cached_discovery(discovery)
     result['live_checked_at']=now.isoformat()
     result['discovery_diagnostics']={k:v for k,v in diagnostics.items()
