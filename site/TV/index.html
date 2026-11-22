@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#071327">
+  <title>Minha TV Internacional • DrivMatch</title>
+  <link rel="stylesheet" href="./tv.css">
+</head>
+<body>
+  <main id="app">
+    <section class="gate" id="gate" aria-live="polite">
+      <div class="gate-inner">
+        <span class="eyebrow">DRIVMATCH • ACESSO PESSOAL</span>
+        <h1>Minha TV Internacional</h1>
+        <p id="gate-message">Verificando acesso privado…</p>
+        <a href="/login" class="action-link" id="login-link" hidden>Entrar na conta DrivMatch</a>
+      </div>
+    </section>
+    <section id="tv" hidden>
+      <header class="topbar">
+        <div><div class="eyebrow">DRIVMATCH • TV PARTICULAR</div><h1>Minha TV <span>Internacional</span></h1><p>Selecione o canal e assista aqui mesmo.</p></div>
+        <div class="private-mark">Acesso pessoal</div>
+      </header>
+      <div class="layout">
+        <section class="viewer" aria-label="Tela de reprodução">
+          <div class="screen" id="screen">
+            <video id="video" playsinline controls preload="none" aria-label="Canal selecionado" hidden></video>
+            <div class="screen-message" id="screen-message"><div class="play-mark">▶</div><h2>Escolha um canal</h2><p>Selecione uma transmissão na lista ao lado.</p></div>
+          </div>
+          <div class="channel-info"><div><strong id="current-channel">Nenhum canal selecionado</strong><p id="current-country">Os sinais dependem de disponibilidade e direitos.</p></div><button id="full-screen" type="button" disabled>Tela cheia</button></div>
+          <p id="player-error" class="alert" role="alert" hidden></p>
+          <p class="disclaimer">Esta página não retransmite nem armazena vídeos. Algumas emissoras bloqueiam reprodução externa, CORS ou acesso fora da região. Links comunitários não são garantia de transmissão ou autorização de uso.</p>
+        </section>
+        <aside class="guide" aria-label="Guia de canais">
+          <h2>Canais</h2>
+          <label for="search" class="sr-only">Buscar canais</label><input id="search" type="search" placeholder="Buscar canal…" autocomplete="off">
+          <div class="filters" id="countries" role="group" aria-label="Filtrar por país"></div>
+          <div class="filters" id="categories" role="group" aria-label="Filtrar por categoria">
+            <button type="button" data-category="all" class="chosen">Todos</button>
+            <button type="button" data-category="news">Notícias</button>
+            <button type="button" data-category="sports">Esportes BR</button>
+            <button type="button" id="favorites-only">★ Favoritos</button>
+          </div>
+          <p id="catalog-status" role="status" class="status">Aguardando autorização…</p>
+          <div class="channels" id="channels"></div>
+        </aside>
+      </div>
+      <footer>Fontes: playlists públicas IPTV-org • Reprodução no navegador apenas de sinais que a origem permitir • Redes esportivas pagas exigem acesso oficial autorizado.</footer>
+    </section>
+  </main>
+  <script src="./config.js"></script>
+  <script defer src="./app.js"></script>
+</body>
+</html>
