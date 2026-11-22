@@ -101,6 +101,8 @@ jobs:
           node --check site/assets/gracie-barra-ads.js
           node --check site/assets/mobile-media-footer.js
           node --check site/assets/road-tv-live.js
+          node --check site/TV/app.js
+          python -m py_compile scripts/render_private_tv_config.py
           node tests/test_client.js
       # Road TV discovery queries are cached by UTC hour across 10-minute
       # publication runs (3 rotating YouTube searches/hour max).
@@ -368,6 +370,12 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
         run: python scripts/refresh_roadtv_at_publish.py
+      - name: Minha TV — render public config (owner access remains server-side)
+        if: github.ref == 'refs/heads/main'
+        env:
+          TV_SUPABASE_URL: ${{ secrets.TV_SUPABASE_URL }}
+          TV_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TV_SUPABASE_PUBLISHABLE_KEY }}
+        run: python scripts/render_private_tv_config.py
       - uses: actions/configure-pages@v5
         if: github.ref == 'refs/heads/main'
       - uses: actions/upload-pages-artifact@v4
