@@ -5,6 +5,7 @@ Only public Supabase URL and publishable/anon key may be embedded in a static
 GitHub Pages asset. The owner's UUID and service-role key remain server-side.
 Missing values leave an intentionally inaccessible TV instead of guessing.
 """
+import base64
 import json
 import os
 from pathlib import Path
@@ -20,6 +21,19 @@ if url or key:
         or not key or key.startswith("sb_secret_")
         or "service_role" in key.lower()):
         raise SystemExit("TV config ERROR: invalid public Supabase values (no secret printed)")
+    if key.startswith("sb_publishable_"):
+        pass
+    elif key.count(".") == 2:
+        try:
+            token_payload = key.split(".")[1]
+            token_payload += "=" * ((-len(token_payload)) % 4)
+            claims = json.loads(base64.urlsafe_b64decode(token_payload))
+            if claims.get("role") != "anon":
+                raise ValueError("Supabase browser key is not anon")
+        except (ValueError, TypeError, json.JSONDecodeError):
+            raise SystemExit("TV config ERROR: browser key is not confirmed anonymous")
+    else:
+        raise SystemExit("TV config ERROR: expected publishable or anon public key")
 else:
     print("TV config: public values absent; viewer remains closed to all accounts")
 
