@@ -33,6 +33,10 @@ async function main(){
     browser=await chromium.launch({headless:true});
     const setup=async(allowed,session)=>{
       const context=await browser.newContext();
+      await context.addInitScript(() => {
+        HTMLMediaElement.prototype.canPlayType = function(type){return type.includes('mpegurl') ? 'probably' : '';};
+        HTMLMediaElement.prototype.play = function(){return Promise.reject(new Error('Mock media playback disabled'));};
+      });
       if(session)await context.addInitScript(()=>{
         localStorage.setItem('sb-tenant-auth-token',JSON.stringify({access_token:'test-bearer-token-over-twenty-characters',expires_at:Math.floor(Date.now()/1000)+1800}));
       });
