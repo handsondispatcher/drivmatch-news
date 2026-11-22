@@ -1,0 +1,46 @@
+name: Private TV — isolated PR review
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'site/TV/**'
+      - 'scripts/render_private_tv_config.py'
+      - 'tests/private_tv_browser.cjs'
+      - 'integrations/private-tv-route-worker.js'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/private-tv-pr.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  private-tv:
+    name: owner gate + in-page playback + Pages package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Syntax and no-secret static audit
+        run: |
+          set -eu
+          node --check site/TV/app.js
+          node --check tests/private_tv_browser.cjs
+          node --input-type=module --check < integrations/private-tv-route-worker.js
+          python -m py_compile scripts/render_private_tv_config.py
+          test -s site/TV/index.html
+          grep -q 'id="video"' site/TV/index.html
+          grep -q 'private-tv-access' site/TV/app.js
+          ! grep -E 'target="_blank"|window.open\\(' site/TV/app.js
+          python scripts/render_private_tv_config.py
+          grep -q 'supabaseUrl": ""' site/TV/config.js
+      - name: Install Playwright
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Browser smoke — simulated authentication and playlist ONLY
+        run: node tests/private_tv_browser.cjs
